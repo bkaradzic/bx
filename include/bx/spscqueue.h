@@ -17,17 +17,17 @@ namespace bx
 {
 	// http://drdobbs.com/article/print?articleId=210604448&siteSectionName=
 	template <typename Ty>
-	class SpScUnboundedQueueOptimized
+	class SpScUnboundedQueueLf
 	{
 	public:
-		SpScUnboundedQueueOptimized()
+		SpScUnboundedQueueLf()
 			: m_first(new Node(NULL) )
 			, m_divider(m_first)
 			, m_last(m_first)
 		{
 		}
 
-		~SpScUnboundedQueueOptimized()
+		~SpScUnboundedQueueLf()
 		{
 			while (NULL != m_first)
 			{
@@ -73,8 +73,8 @@ namespace bx
 		}
 
 	private:
-		SpScUnboundedQueueOptimized(const SpScUnboundedQueueOptimized& _rhs); // no copy constructor
-		SpScUnboundedQueueOptimized& operator=(const SpScUnboundedQueueOptimized& _rhs); // no assignment operator
+		SpScUnboundedQueueLf(const SpScUnboundedQueueLf& _rhs); // no copy constructor
+		SpScUnboundedQueueLf& operator=(const SpScUnboundedQueueLf& _rhs); // no assignment operator
 
 		struct Node
 		{
@@ -94,14 +94,14 @@ namespace bx
 	};
 
 	template<typename Ty>
-	class SpScUnboundedQueueNaive
+	class SpScUnboundedQueueMutex
 	{
 	public:
-		SpScUnboundedQueueNaive()
+		SpScUnboundedQueueMutex()
 		{
 		}
 
-		~SpScUnboundedQueueNaive()
+		~SpScUnboundedQueueMutex()
 		{
 			BX_CHECK(m_queue.empty(), "Queue is not empty!");
 		}
@@ -141,11 +141,11 @@ namespace bx
 		std::list<Ty*> m_queue;
 	};
 
-#if BX_CONFIG_SPSCQUEUE_USE_NAIVE
-#	define SpScUnboundedQueue SpScUnboundedQueueNaive
+#if BX_CONFIG_SPSCQUEUE_USE_MUTEX
+#	define SpScUnboundedQueue SpScUnboundedQueueMutex
 #else
-#	define SpScUnboundedQueue SpScUnboundedQueueOptimized
-#endif // BX_CONFIG_NAIVE
+#	define SpScUnboundedQueue SpScUnboundedQueueLf
+#endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
 
 } // namespace bx
 
