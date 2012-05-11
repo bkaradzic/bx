@@ -37,6 +37,11 @@ namespace bx
 			return m_dense;
 		}
 
+		uint16_t getHandleAt(uint16_t _at) const
+		{
+			return m_dense[_at];
+		}
+
 		uint16_t getNumHandles() const
 		{
 			return m_numHandles;
