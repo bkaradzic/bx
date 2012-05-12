@@ -7,6 +7,7 @@
 #define __BX_COMMANDLINE_H__
 
 #include "bx.h"
+#include <string.h>
 
 namespace bx
 {
