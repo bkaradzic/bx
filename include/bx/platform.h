@@ -20,6 +20,9 @@
 #define BX_CPU_PPC 0
 #define BX_CPU_X86 0
 
+#define BX_ARCH_32BIT 0
+#define BX_ARCH_64BIT 0
+
 #define BX_CPU_ENDIAN_BIG 0
 #define BX_CPU_ENDIAN_LITTLE 0
 
@@ -74,6 +77,14 @@
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
 #endif // 
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
+#	undef BX_ARCH_64BIT
+#	define BX_ARCH_64BIT 1
+#else
+#	undef BX_ARCH_32BIT
+#	define BX_ARCH_32BIT 1
+#endif //
 
 #if BX_CPU_PPC
 #	undef BX_CPU_ENDIAN_BIG
