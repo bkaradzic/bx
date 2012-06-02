@@ -6,9 +6,11 @@ Base library.
 Contact
 -------
 
-Twitter @bkaradzic
+[@bkaradzic](https://twitter.com/bkaradzic)  
+http://www.stuckingeometry.com
 
-Web http://www.stuckingeometry.com
+Project page  
+https://github.com/bkaradzic/bx
 
 License
 -------
