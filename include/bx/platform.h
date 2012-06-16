@@ -11,8 +11,10 @@
 #define BX_COMPILER_MSVC 0
 
 #define BX_PLATFORM_ANDROID 0
+#define BX_PLATFORM_IOS 0
 #define BX_PLATFORM_LINUX 0
 #define BX_PLATFORM_NACL 0
+#define BX_PLATFORM_OSX 0
 #define BX_PLATFORM_WINDOWS 0
 #define BX_PLATFORM_XBOX360 0
 
@@ -59,6 +61,12 @@
 #elif defined(__linux__)
 #	undef BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
+#elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
+#	undef BX_PLATFORM_IOS
+#	define BX_PLATFORM_IOS 1
+#elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
+#	undef BX_PLATFORM_OSX
+#	define BX_PLATFORM_OSX 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
