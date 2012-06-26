@@ -12,6 +12,8 @@
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_NACL | BX_PLATFORM_LINUX
 #	include <sys/time.h> // gettimeofday
+#elif BX_PLATFORM_OSX
+#	include <mach/mach_time.h> // mach_absolute_time/mach_timebase_info
 #endif // BX_PLATFORM_
 
 namespace bx
@@ -26,6 +28,8 @@ namespace bx
 		int64_t i64 = li.QuadPart;
 #elif BX_PLATFORM_ANDROID
 		int64_t i64 = clock();
+#elif BX_PLATFORM_OSX
+		int64_t i64 = mach_absolute_time();
 #else
 		struct timeval now;
 		gettimeofday(&now, 0);
@@ -43,6 +47,10 @@ namespace bx
 		return li.QuadPart;
 #elif BX_PLATFORM_ANDROID
 		return CLOCKS_PER_SEC;
+#elif BX_PLATFORM_OSX
+		mach_timebase_info_data_t info;
+		mach_timebase_info(&info);
+		return (int64_t)(info.denom * 1000000) / info.numer;
 #else
 		return 1000000;
 #endif // BNET_PLATFORM_
