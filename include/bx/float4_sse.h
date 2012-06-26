@@ -395,6 +395,8 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #define float4_dot3 float4_dot3_ni
 #define float4_dot float4_dot_ni
 #endif // defined(__SSE4_1__)
+#define float4_ceil float4_ceil_ni
+#define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
 #endif // __FLOAT4_SSE_H__

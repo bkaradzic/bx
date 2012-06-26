@@ -11,7 +11,7 @@
 
 #define BX_FLOAT4_INLINE BX_FORCE_INLINE
 
-#if 0 // defined(__SSE2__)
+#if defined(__SSE2__)
 #	include "float4_sse.h"
 #elif 0 // __ARM_NEON__
 #	include "float4_neon.h"

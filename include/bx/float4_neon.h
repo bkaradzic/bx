@@ -222,6 +222,8 @@ namespace bx
 
 #define float4_div_nr float4_div_nr_ni
 #define float4_div float4_div_nr_ni
+#define float4_ceil float4_ceil_ni
+#define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
 #endif // __BX_FLOAT4_NEON_H__

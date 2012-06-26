@@ -402,6 +402,30 @@ namespace bx
 		return result;
 	}
 
+	BX_FLOAT4_INLINE float4_t float4_ceil_ni(float4_t _a)
+	{
+		const float4_t tmp0   = float4_ftoi(_a);
+		const float4_t tmp1   = float4_itof(tmp0);
+		const float4_t mask   = float4_cmplt(tmp1, _a);
+		const float4_t one    = float4_one();
+		const float4_t tmp2   = float4_and(one, mask);
+		const float4_t result = float4_add(tmp1, tmp2);
+
+		return result;
+	}
+
+	BX_FLOAT4_INLINE float4_t float4_floor_ni(float4_t _a)
+	{
+		const float4_t tmp0   = float4_ftoi(_a);
+		const float4_t tmp1   = float4_itof(tmp0);
+		const float4_t mask   = float4_cmpgt(tmp1, _a);
+		const float4_t one    = float4_one();
+		const float4_t tmp2   = float4_and(one, mask);
+		const float4_t result = float4_sub(tmp1, tmp2);
+
+		return result;
+	}
+
 } // namespace bx
 
 #endif // __BX_FLOAT4_NI_H__

@@ -517,6 +517,8 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #define float4_normalize3 float4_normalize3_ni
 #define float4_dot3 float4_dot3_ni
 #define float4_dot float4_dot_ni
+#define float4_ceil float4_ceil_ni
+#define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
 #endif // __BX_FLOAT4_REF_H__
