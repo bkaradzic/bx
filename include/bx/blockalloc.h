@@ -64,7 +64,7 @@ namespace bx
 		void free(void* _obj)
 		{
 			uint16_t index = getIndex(_obj);
-			BX_CHECK(index >= 0 && index < m_num, "index %d, m_num %d", index, m_num);
+			BX_CHECK(index < m_num, "index %d, m_num %d", index, m_num);
 
 			*( (uint16_t*)_obj) = m_freeIndex;
 			m_freeIndex = index;

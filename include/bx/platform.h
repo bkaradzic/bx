@@ -71,6 +71,8 @@
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
 
+#define BX_PLATFORM_POSIX (BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS)
+
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__)
 #	undef BX_CPU_ARM

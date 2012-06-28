@@ -8,9 +8,7 @@
 
 #include "bx.h"
 
-#define BX_SEM_CONFIG_POSIX (BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX)
-
-#if BX_SEM_CONFIG_POSIX
+#if BX_PLATFORM_POSIX
 #	include <semaphore.h>
 #	include <time.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
@@ -19,7 +17,7 @@
 
 namespace bx
 {
-#if BX_SEM_CONFIG_POSIX
+#if BX_PLATFORM_POSIX
 	class Semaphore
 	{
 	public:
