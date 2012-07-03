@@ -29,6 +29,7 @@
 #	define BX_FUNCTION __PRETTY_FUNCTION__
 #	define BX_NO_INLINE __attribute__( (noinline) )
 #	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
+#	define BX_ALLOW_UNUSED __attribute__( (unused) )
 #	if BX_COMPILER_CLANG
 #		define BX_THREAD /* not supported right now */
 #	else
@@ -40,12 +41,15 @@
 #	define BX_NO_INLINE __declspec(noinline)
 #	define BX_FORCE_INLINE __forceinline
 #	define BX_THREAD __declspec(thread)
+#	define BX_ALLOW_UNUSED
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
 
 #define BX_ALIGN_STRUCT_16(_struct) BX_ALIGN_STRUCT(16, _struct)
 #define BX_ALIGN_STRUCT_256(_struct) BX_ALIGN_STRUCT(256, _struct)
+
+#define BX_UNUSED(_unused) do { (void)sizeof(_unused); } while(0)
 
 #ifndef BX_CHECK
 #	define BX_CHECK(...) do {} while(0)
