@@ -26,6 +26,12 @@ namespace bx
 		{
 		}
 
+		const char* findOption(const char* _long, int _numParams = 1)
+		{
+			const char* result = _findOption('\0', _long, _numParams);
+			return result;
+		}
+
 		const char* findOption(const char _short, const char* _long = NULL, int _numParams = 1)
 		{
 			const char* result = _findOption(_short, _long, _numParams);
