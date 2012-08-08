@@ -14,12 +14,6 @@ namespace bx
 	class CommandLine
 	{
 	public:
-		CommandLine()
-			: m_argc(__argc)
-			, m_argv(__argv)
-		{
-		}
-
 		CommandLine(int _argc, char const* const* _argv)
 			: m_argc(_argc)
 			, m_argv(_argv)
