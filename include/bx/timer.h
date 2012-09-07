@@ -14,6 +14,8 @@
 #	include <sys/time.h> // gettimeofday
 #elif BX_PLATFORM_OSX
 #	include <mach/mach_time.h> // mach_absolute_time/mach_timebase_info
+#elif BX_PLATFORM_WINDOWS
+#	include <windows.h>
 #endif // BX_PLATFORM_
 
 namespace bx
