@@ -236,6 +236,7 @@ namespace bx
 			, m_buffer(_buffer)
 		{
 			uint32_t size = m_control.reserve(_size);
+			BX_UNUSED(size);
 			BX_CHECK(size == _size, "%d == %d", size, _size);
 			m_write = m_control.m_current;
 			m_end = m_write+_size;

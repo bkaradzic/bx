@@ -11,6 +11,7 @@
 #define BX_COMPILER_MSVC 0
 
 #define BX_PLATFORM_ANDROID 0
+#define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_IOS 0
 #define BX_PLATFORM_LINUX 0
 #define BX_PLATFORM_NACL 0
@@ -67,11 +68,19 @@
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX 1
+#elif defined(EMSCRIPTEN)
+#	undef BX_PLATFORM_EMSCRIPTEN
+#	define BX_PLATFORM_EMSCRIPTEN 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
 
-#define BX_PLATFORM_POSIX (BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS)
+#define BX_PLATFORM_POSIX (BX_PLATFORM_ANDROID \
+						|| BX_PLATFORM_EMSCRIPTEN \
+						|| BX_PLATFORM_IOS \
+						|| BX_PLATFORM_LINUX \
+						|| BX_PLATFORM_NACL \
+						|| BX_PLATFORM_OSX)
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__)

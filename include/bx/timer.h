@@ -28,7 +28,7 @@ namespace bx
 		// http://support.microsoft.com/kb/274323
 		QueryPerformanceCounter(&li);
 		int64_t i64 = li.QuadPart;
-#elif BX_PLATFORM_ANDROID
+#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
 		int64_t i64 = clock();
 #elif BX_PLATFORM_OSX
 		int64_t i64 = mach_absolute_time();
@@ -47,7 +47,7 @@ namespace bx
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
 		return li.QuadPart;
-#elif BX_PLATFORM_ANDROID
+#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
 		return CLOCKS_PER_SEC;
 #elif BX_PLATFORM_OSX
 		mach_timebase_info_data_t info;
