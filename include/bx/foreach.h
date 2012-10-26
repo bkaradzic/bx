@@ -60,11 +60,11 @@ namespace bx
 
 #define foreach(_variable, _container) \
 	for (const bx::foreach_ns::ContainerBase &__temp_container__ = bx::foreach_ns::containerNew(_container); \
-			bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container))->condition(); \
-			++bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container))->m_it) \
-	for (_variable = *container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container))->m_it; \
-			bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container))->m_break; \
-			--bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container))->m_break)
+			bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container) )->condition(); \
+			++bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container) )->m_it) \
+	for (_variable = *container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container) )->m_it; \
+			bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container) )->m_break; \
+			--bx::foreach_ns::container(&__temp_container__, true ? 0 : bx::foreach_ns::pointer(_container) )->m_break)
 
 } // namespace bx
 

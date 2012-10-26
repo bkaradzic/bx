@@ -49,6 +49,7 @@
 #define __in_nz
 #define __in_ecount_nz(size)
 #define __in_bcount_nz(size)
+#define __in_xcount_opt(size)
 #define __out
 #define __out_ecount(size)
 #define __out_bcount(size)
