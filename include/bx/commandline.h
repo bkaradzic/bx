@@ -9,6 +9,12 @@
 #include "bx.h"
 #include <string.h>
 
+#if BX_PLATFORM_POSIX
+#	include <stdarg.h>
+#	define _stricmp strcasecmp
+#	define _snprintf snprintf
+#endif // BX_PLATFORM_
+
 namespace bx
 {
 	class CommandLine
