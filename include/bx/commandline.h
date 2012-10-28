@@ -26,38 +26,50 @@ namespace bx
 		{
 		}
 
-		const char* findOption(const char* _long, int _numParams = 1)
+		const char* findOption(const char* _long, const char* _default) const
 		{
-			const char* result = _findOption('\0', _long, _numParams);
+			const char* result = find('\0', _long, 1);
+			return result == NULL ? _default : result;
+		}
+
+		const char* findOption(const char _short, const char* _long, const char* _default) const
+		{
+			const char* result = find(_short, _long, 1);
+			return result == NULL ? _default : result;
+		}
+
+		const char* findOption(const char* _long, int _numParams = 1) const
+		{
+			const char* result = find('\0', _long, _numParams);
 			return result;
 		}
 
-		const char* findOption(const char _short, const char* _long = NULL, int _numParams = 1)
+		const char* findOption(const char _short, const char* _long = NULL, int _numParams = 1) const
 		{
-			const char* result = _findOption(_short, _long, _numParams);
+			const char* result = find(_short, _long, _numParams);
 			return result;
 		}
 
-		bool hasArg(const char _short, const char* _long = NULL)
+		bool hasArg(const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 0);
 			return NULL != arg;
 		}
 
-		bool hasArg(const char* _long)
+		bool hasArg(const char* _long) const
 		{
 			const char* arg = findOption('\0', _long, 0);
 			return NULL != arg;
 		}
 
-		bool hasArg(const char*& _value, const char _short, const char* _long = NULL)
+		bool hasArg(const char*& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
 			_value = arg;
 			return NULL != arg;
 		}
 
-		bool hasArg(int& _value, const char _short, const char* _long = NULL)
+		bool hasArg(int& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
 			if (NULL != arg)
@@ -69,7 +81,7 @@ namespace bx
 			return false;
 		}
 
-		bool hasArg(unsigned int& _value, const char _short, const char* _long = NULL)
+		bool hasArg(unsigned int& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
 			if (NULL != arg)
@@ -81,7 +93,7 @@ namespace bx
 			return false;
 		}
 
-		bool hasArg(bool& _value, const char _short, const char* _long = NULL)
+		bool hasArg(bool& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
 			if (NULL != arg)
@@ -102,7 +114,7 @@ namespace bx
 		}
 
 	private:
-		const char* _findOption(const char _short, const char* _long, int _numParams)
+		const char* find(const char _short, const char* _long, int _numParams) const
 		{
 			for (int ii = 0; ii < m_argc; ++ii)
 			{
@@ -119,7 +131,7 @@ namespace bx
 								return "";
 							}
 							else if (ii+_numParams < m_argc
-									&& '-' != *m_argv[ii+1] )
+								 && '-' != *m_argv[ii+1] )
 							{
 								return m_argv[ii+1];
 							}
@@ -128,8 +140,8 @@ namespace bx
 						}
 					}
 					else if (NULL != _long
-							&&  '-' == *arg
-							&&  0 == _stricmp(arg+1, _long) )
+						 &&  '-' == *arg
+						 &&  0 == _stricmp(arg+1, _long) )
 					{
 						if (0 == _numParams)
 						{
