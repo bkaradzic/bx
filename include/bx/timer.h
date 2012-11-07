@@ -10,7 +10,7 @@
 
 #if BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
-#elif BX_PLATFORM_NACL | BX_PLATFORM_LINUX
+#elif BX_PLATFORM_NACL || BX_PLATFORM_LINUX
 #	include <sys/time.h> // gettimeofday
 #elif BX_PLATFORM_OSX
 #	include <mach/mach_time.h> // mach_absolute_time/mach_timebase_info
@@ -32,6 +32,10 @@ namespace bx
 		int64_t i64 = clock();
 #elif BX_PLATFORM_OSX
 		int64_t i64 = mach_absolute_time();
+#elif 0 // BX_PLATFORM_LINUX
+		struct timespec now;
+		clock_gettime(CLOCK_MONOTONIC_RAW, &now);
+		int64_t i64 = now.tv_sec*1000000 + now.tv_nsec/1000;
 #else
 		struct timeval now;
 		gettimeofday(&now, 0);
