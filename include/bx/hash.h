@@ -48,6 +48,12 @@ namespace bx
 			mixTail(data, _len);
 		}
 
+		template<typename Ty>
+		void add(Ty _value)
+		{
+			add(&_value, sizeof(Ty) );
+		}
+
 		uint32_t end()
 		{
 			mmix(m_hash, m_tail);
