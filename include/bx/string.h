@@ -9,6 +9,7 @@
 #include "bx.h"
 #include <alloca.h>
 #include <stdarg.h> // va_list
+#include <string.h>
 #include <string>
 
 namespace bx
@@ -115,7 +116,7 @@ namespace bx
 #endif // BX_COMPILER_MSVC
 	}
 
-	inline int32_t snprintf(char* _str, size_t _size, const char* _format, ...) BX_PRINTF_ARGS(3, 4)
+	inline int32_t snprintf(char* _str, size_t _size, const char* _format, ...) // BX_PRINTF_ARGS(3, 4)
 	{
 		va_list argList;
 		va_start(argList, _format);
