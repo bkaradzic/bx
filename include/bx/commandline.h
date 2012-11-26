@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2012 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -7,13 +7,7 @@
 #define __BX_COMMANDLINE_H__
 
 #include "bx.h"
-#include <string.h>
-
-#if BX_PLATFORM_POSIX
-#	include <stdarg.h>
-#	define _stricmp strcasecmp
-#	define _snprintf snprintf
-#endif // BX_PLATFORM_
+#include "string.h"
 
 namespace bx
 {
@@ -98,11 +92,11 @@ namespace bx
 			const char* arg = findOption(_short, _long, 1);
 			if (NULL != arg)
 			{
-				if ('0' == *arg || _stricmp(arg, "false") )
+				if ('0' == *arg || stricmp(arg, "false") )
 				{
 					_value = false;
 				}
-				else if ('0' != *arg || _stricmp(arg, "true") )
+				else if ('0' != *arg || stricmp(arg, "true") )
 				{
 					_value = true;
 				}
@@ -141,7 +135,7 @@ namespace bx
 					}
 					else if (NULL != _long
 						 &&  '-' == *arg
-						 &&  0 == _stricmp(arg+1, _long) )
+						 &&  0 == stricmp(arg+1, _long) )
 					{
 						if (0 == _numParams)
 						{

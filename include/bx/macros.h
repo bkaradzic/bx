@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2012 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -13,7 +13,9 @@
 
 #define BX_MACRO_DISPATCHER_DETAIL1(_func, _argCount) _func ## _argCount
 #define BX_MACRO_DISPATCHER_DETAIL2(_func, _argCount) BX_MACRO_DISPATCHER_DETAIL1(_func, _argCount)
-#define BX_MACRO_DISPATCHER(_func, ...) BX_MACRO_DISPATCHER_DETAIL2(_func, VA_ARGS_COUNT(__VA_ARGS__) )
+#define BX_MACRO_DISPATCHER(_func, ...) BX_MACRO_DISPATCHER_DETAIL2(_func, BX_VA_ARGS_COUNT(__VA_ARGS__) )
+
+#define BX_MAKEFOURCC(_a, _b, _c, _d) ( ( (uint32_t)(_a) | ( (uint32_t)(_b) << 8) | ( (uint32_t)(_c) << 16) | ( (uint32_t)(_d) << 24) ) )
 
 #define BX_STRINGIZE(_x) BX_STRINGIZE_(_x)
 #define BX_STRINGIZE_(_x) #_x
@@ -23,13 +25,18 @@
 #define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
 #define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
 #define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
+#define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
 
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 #	define BX_ALIGN_STRUCT(_align, _struct) _struct __attribute__( (aligned(_align) ) )
+#	define BX_ALLOW_UNUSED __attribute__( (unused) )
+#	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
 #	define BX_NO_INLINE __attribute__( (noinline) )
-#	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
-#	define BX_ALLOW_UNUSED __attribute__( (unused) )
+#	define BX_NO_RETURN __attribute__( (noreturn) )
+#	define BX_NO_VTABLE
+#	define BX_OVERRIDE
+#	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
 #	if BX_COMPILER_CLANG
 #		define BX_THREAD /* not supported right now */
 #	else
@@ -37,11 +44,15 @@
 #	endif // BX_COMPILER_CLANG
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_STRUCT(_align, _struct) __declspec(align(_align) ) _struct
+#	define BX_ALLOW_UNUSED
+#	define BX_FORCE_INLINE __forceinline
 #	define BX_FUNCTION __FUNCTION__
 #	define BX_NO_INLINE __declspec(noinline)
-#	define BX_FORCE_INLINE __forceinline
+#	define BX_NO_RETURN
+#	define BX_NO_VTABLE __declspec(novtable)
+#	define BX_OVERRIDE override
+#	define BX_PRINTF_ARGS(_format, _args)
 #	define BX_THREAD __declspec(thread)
-#	define BX_ALLOW_UNUSED
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
@@ -59,8 +70,16 @@
 #	define BX_TRACE(...) do {} while(0)
 #endif // BX_TRACE
 
+#ifndef BX_WARN
+#	define BX_WARN(...) do {} while(0)
+#endif // BX_CHECK
+
 #ifndef  BX_CONFIG_SPSCQUEUE_USE_MUTEX
 #	define BX_CONFIG_SPSCQUEUE_USE_MUTEX 0
 #endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
+
+#ifndef BX_CONFIG_CRT_FILE_READER_WRITER
+#	define BX_CONFIG_CRT_FILE_READER_WRITER BX_PLATFORM_WINDOWS|BX_PLATFORM_LINUX|BX_PLATFORM_OSX
+#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 #endif // __BX_MACROS_H__

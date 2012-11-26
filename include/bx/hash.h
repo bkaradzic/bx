@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2011 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2012 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -10,12 +10,12 @@
 
 namespace bx
 {
-	// MurmurHash2 was written by Austin Appleby, and is placed in the public
-	// domain. The author hereby disclaims copyright to this source code.
-	#define MURMUR_M 0x5bd1e995
-	#define MURMUR_R 24
+// MurmurHash2 was written by Austin Appleby, and is placed in the public
+// domain. The author hereby disclaims copyright to this source code.
 
-	#define mmix(_h, _k) { _k *= MURMUR_M; _k ^= _k >> MURMUR_R; _k *= MURMUR_M; _h *= MURMUR_M; _h ^= _k; }
+#define MURMUR_M 0x5bd1e995
+#define MURMUR_R 24
+#define mmix(_h, _k) { _k *= MURMUR_M; _k ^= _k >> MURMUR_R; _k *= MURMUR_M; _h *= MURMUR_M; _h ^= _k; }
 
 	class HashMurmur2A
 	{
@@ -90,6 +90,18 @@ namespace bx
 		uint32_t m_count;
 		uint32_t m_size;
 	};
+
+#undef MURMUR_M
+#undef MURMUR_R
+#undef mmix
+
+	inline uint32_t hashMurmur2A(const void* _data, uint32_t _size)
+	{
+		HashMurmur2A murmur;
+		murmur.begin();
+		murmur.add(_data, (int)_size);
+		return murmur.end();
+	}
 
 } // namespace bx
 
