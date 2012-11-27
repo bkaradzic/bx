@@ -57,6 +57,9 @@
 #	error "Unknown BX_COMPILER_?"
 #endif
 
+#define BX_CACHE_LINE_ALIGN_MARKER() BX_ALIGN_STRUCT(BX_CACHE_LINE_SIZE, struct) {}
+#define BX_CACHE_LINE_ALIGN(_def) BX_CACHE_LINE_ALIGN_MARKER(); _def; BX_CACHE_LINE_ALIGN_MARKER()
+
 #define BX_ALIGN_STRUCT_16(_struct) BX_ALIGN_STRUCT(16, _struct)
 #define BX_ALIGN_STRUCT_256(_struct) BX_ALIGN_STRUCT(256, _struct)
 

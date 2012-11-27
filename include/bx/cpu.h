@@ -31,14 +31,6 @@ extern "C" void _ReadWriteBarrier();
 
 namespace bx
 {
-#if BX_COMPILER_MSVC
-#	define BX_CACHE_LINE_ALIGN_MARKER() __declspec(align(BX_CACHE_LINE_SIZE) ) struct {}
-#else
-#	define BX_CACHE_LINE_ALIGN_MARKER() struct {} __attribute__( (__aligned__(BX_CACHE_LINE_SIZE) ) )
-#endif // BX_COMPILER_
-
-#define BX_CACHE_LINE_ALIGN(_def) BX_CACHE_LINE_ALIGN_MARKER(); _def; BX_CACHE_LINE_ALIGN_MARKER()
-
 	inline void readBarrier()
 	{
 #if BX_COMPILER_MSVC

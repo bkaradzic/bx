@@ -104,6 +104,21 @@ namespace bx
 		return _a.fxyzw[3];
 	}
 
+//	BX_FLOAT4_INLINE float4_t float4_ld(const void* _ptr)
+//	{
+//		return _mm_load_ps(reinterpret_cast<const float*>(_ptr) );
+//	}
+
+//	BX_FLOAT4_INLINE void float4_st(void* _ptr, float4_t _a)
+//	{
+//		_mm_store_ps(reinterpret_cast<float*>(_ptr), _a);
+//	}
+
+//	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
+//	{
+//		_mm_stream_ps(reinterpret_cast<float*>(_ptr), _a);
+//	}
+
 	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
 	{
 		const float32_t val[4] = {_x, _y, _z, _w};

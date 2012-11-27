@@ -6,10 +6,6 @@
 #ifndef __BX_FLOAT4_SSE_H__
 #define __BX_FLOAT4_SSE_H__
 
-#if !defined(__SSE2__)
-#	error "float4_t requires at least SSE2"
-#endif // !defined(__SSE2__)
-
 #include <stdint.h>
 
 #include <emmintrin.h> // __m128i
@@ -147,6 +143,11 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	BX_FLOAT4_INLINE void float4_st(void* _ptr, float4_t _a)
 	{
 		_mm_store_ps(reinterpret_cast<float*>(_ptr), _a);
+	}
+
+	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
+	{
+		_mm_stream_ps(reinterpret_cast<float*>(_ptr), _a);
 	}
 
 	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)

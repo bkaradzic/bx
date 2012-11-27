@@ -190,6 +190,11 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		*reinterpret_cast<float4_t*>(_ptr) = _a;
 	}
 
+	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
+	{
+		*reinterpret_cast<float4_t*>(_ptr) = _a;
+	}
+
 	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
 	{
 		float4_t result;

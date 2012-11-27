@@ -20,4 +20,3 @@ using namespace bx;
 #endif // BX_NAMESPACE
 
 #endif // __BX_H__ 
-
