@@ -125,7 +125,7 @@ namespace bx
 		return len;
 	}
 
-	inline std::string stringPrintfVargs(const char* _format, va_list _argList)
+	inline void stringPrintfVargs(std::string& _out, const char* _format, va_list _argList)
 	{
 		char temp[2048];
 
@@ -137,17 +137,15 @@ namespace bx
 			len = bx::vsnprintf(out, len, _format, _argList);
 		}
 		out[len] = '\0';
-
-		return out;
+		_out.append(out);
 	}
 
-	inline std::string stringPrintf(const char* _format, ...)
+	inline void stringPrintf(std::string& _out, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		std::string str = stringPrintfVargs(_format, argList);
+		stringPrintfVargs(_out, _format, argList);
 		va_end(argList);
-		return str;
 	}
 } // namespace bx
 
