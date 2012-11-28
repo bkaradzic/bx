@@ -11,11 +11,7 @@
 
 #define BX_FLOAT4_INLINE BX_FORCE_INLINE
 
-#if BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2)
-#	define __SSE2__
-#endif // BX_COMPILER_
-
-#if defined(__SSE2__)
+#if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include "float4_sse.h"
 #elif 0 // __ARM_NEON__
 #	include "float4_neon.h"

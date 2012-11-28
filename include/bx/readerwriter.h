@@ -6,9 +6,11 @@
 #ifndef __BX_READERWRITER_H__
 #define __BX_READERWRITER_H__
 
+#include <stdio.h>
 #include <string.h>
 
 #include "bx.h"
+#include "uint32_t.h"
 
 #if BX_COMPILER_MSVC
 #	define fseeko64 _fseeki64
