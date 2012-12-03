@@ -65,6 +65,10 @@
 
 #define BX_UNUSED(_unused) do { (void)sizeof(_unused); } while(0)
 
+#define BX_CLASS_NO_COPY_NO_ASSIGNMENT(_class) \
+			_class(const _class&); \
+			_class& operator=(const _class&)
+
 #ifndef BX_CHECK
 #	define BX_CHECK(...) do {} while(0)
 #endif // BX_CHECK
