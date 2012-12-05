@@ -13,10 +13,10 @@ namespace bx
 	// George Marsaglia's MWC
 	class RngMwc
 	{
-		public:
-			RngMwc(uint32_t _z = 12345, uint32_t _w = 65435)
+	public:
+		RngMwc(uint32_t _z = 12345, uint32_t _w = 65435)
 			: m_z(_z)
-			  , m_w(_w)
+			, m_w(_w)
 		{
 		}
 
@@ -44,7 +44,7 @@ namespace bx
 	public:
 		RngFib()
 			: m_a(9983651)
-			  , m_b(95746118)
+			, m_b(95746118)
 		{
 		}
 
