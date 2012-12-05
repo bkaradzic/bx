@@ -21,15 +21,15 @@ namespace bx
 		BX_CLASS_NO_COPY_NO_ASSIGNMENT(Thread);
 
 	public:
-		Thread(ThreadFn _fn, void* _userData, uint32_t _size = 16<<10)
+		Thread()
 #if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360
 			: m_handle(INVALID_HANDLE_VALUE)
 #elif BX_PLATFORM_POSIX
 			: m_handle(NULL)
 #endif // BX_PLATFORM_
-			, m_fn(_fn)
-			, m_userData(_userData)
-			, m_stackSize(_size)
+			, m_fn(NULL)
+			, m_userData(NULL)
+			, m_stackSize(16<<10)
 			, m_exitCode(EXIT_SUCCESS)
 			, m_running(false)
 		{
@@ -43,10 +43,13 @@ namespace bx
 			}
 		}
 
-		void init()
+		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 16<<10)
 		{
 			BX_CHECK(!m_running, "Already running!");
 
+			m_fn = _fn;
+			m_userData = _userData;
+			m_stackSize = _stackSize;
 			m_running = true;
 
 #if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360
