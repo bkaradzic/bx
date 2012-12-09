@@ -15,7 +15,10 @@
 #if BX_COMPILER_MSVC
 #	define fseeko64 _fseeki64
 #	define ftello64 _ftelli64
-#endif // BX_COMPILER_MSVC
+#elif BX_PLATFORM_OSX
+#	define fseeko64 fseeko
+#	define ftello64 ftello
+#endif // BX_
 
 namespace bx
 {

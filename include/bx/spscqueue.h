@@ -19,6 +19,8 @@ namespace bx
 	template <typename Ty>
 	class SpScUnboundedQueueLf
 	{
+		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScUnboundedQueueLf);
+
 	public:
 		SpScUnboundedQueueLf()
 			: m_first(new Node(NULL) )
@@ -39,8 +41,8 @@ namespace bx
 
 		void push(Ty* _ptr) // producer only
 		{
-			m_last->m_next = new Node(_ptr);
-			atomicExchangePtr((void**)&m_last, m_last->m_next);
+			m_last->m_next = new Node( (void*)_ptr);
+			atomicExchangePtr( (void**)&m_last, m_last->m_next);
 			while (m_first != m_divider)
 			{
 				Node* node = m_first;
@@ -53,7 +55,7 @@ namespace bx
 		{
 			if (m_divider != m_last)
 			{
-				Ty* ptr = m_divider->m_next->m_ptr;
+				Ty* ptr = (Ty*)m_divider->m_next->m_ptr;
 				return ptr;
 			}
 
@@ -64,8 +66,8 @@ namespace bx
 		{
 			if (m_divider != m_last)
 			{
-				Ty* ptr = m_divider->m_next->m_ptr;
-				atomicExchangePtr((void**)&m_divider, m_divider->m_next);
+				Ty* ptr = (Ty*)m_divider->m_next->m_ptr;
+				atomicExchangePtr( (void**)&m_divider, m_divider->m_next);
 				return ptr;
 			}
 
@@ -73,18 +75,15 @@ namespace bx
 		}
 
 	private:
-		SpScUnboundedQueueLf(const SpScUnboundedQueueLf& _rhs); // no copy constructor
-		SpScUnboundedQueueLf& operator=(const SpScUnboundedQueueLf& _rhs); // no assignment operator
-
 		struct Node
 		{
-			Node(Ty* _ptr)
+			Node(void* _ptr)
 				: m_ptr(_ptr)
 				, m_next(NULL)
 			{
 			}
 
-			Ty* m_ptr;
+			void* m_ptr;
 			Node* m_next;
 		};
 
@@ -96,6 +95,8 @@ namespace bx
 	template<typename Ty>
 	class SpScUnboundedQueueMutex
 	{
+		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScUnboundedQueueMutex);
+
 	public:
 		SpScUnboundedQueueMutex()
 		{
@@ -146,6 +147,46 @@ namespace bx
 #else
 #	define SpScUnboundedQueue SpScUnboundedQueueLf
 #endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
+
+	template <typename Ty>
+	class SpScBlockingUnboundedQueue
+	{
+		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScBlockingUnboundedQueue);
+
+	public:
+		SpScBlockingUnboundedQueue()
+		{
+		}
+
+		~SpScBlockingUnboundedQueue()
+		{
+		}
+
+		void push(Ty* _ptr) // producer only
+		{
+			m_queue.push( (void*)_ptr);
+			m_count.post();
+		}
+
+		Ty* peek() // consumer only
+		{
+			return (Ty*)m_queue.peek();
+		}
+
+		Ty* pop(int32_t _msecs = -1) // consumer only
+		{
+			if (m_count.wait(_msecs) )
+			{
+				return (Ty*)m_queue.pop();
+			}
+
+			return NULL;
+		}
+
+	private:
+		Semaphore m_count;
+		SpScUnboundedQueue<void> m_queue;
+	};
 
 } // namespace bx
 
