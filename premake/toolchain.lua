@@ -283,5 +283,21 @@ function toolchain(_buildDir, _libDir)
 			"_XBOX",
 		}
 
+	configuration { "macosx" }
+		buildoptions {
+			"-U__STRICT_ANSI__",
+			"-Wunused-value",
+			"-msse2",
+		}
+		defines {
+			"BGFX_CONFIG_RENDERER_NULL=1",
+		}
+		includedirs { bxDir .. "include/compat/macosx" }
+		targetdir (_buildDir .. "macosx" .. "/bin")
+		objdir (_buildDir .. "macosx" .. "/obj")
+		libdirs {
+			_buildDir .. "macosx" .. "/bin",
+		}
+
 	configuration {} -- reset configuration
 end
