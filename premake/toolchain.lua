@@ -283,5 +283,16 @@ function toolchain(_buildDir, _libDir)
 			"_XBOX",
 		}
 
+	configuration { "macosx" }
+		buildoptions {
+			"-U__STRICT_ANSI__",
+			"-Wunused-value",
+			"-msse2",
+		}
+		includedirs { bxDir .. "include/compat/osx" }
+		targetdir (_buildDir .. "osx" .. "/bin")
+		objdir (_buildDir .. "osx" .. "/obj")
+		libdirs { _libDir .. "lib/osx" }
+
 	configuration {} -- reset configuration
 end
