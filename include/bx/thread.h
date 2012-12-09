@@ -25,7 +25,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS|BX_PLATFORM_XBOX360
 			: m_handle(INVALID_HANDLE_VALUE)
 #elif BX_PLATFORM_POSIX
-			: m_handle(NULL)
+			: m_handle(0)
 #endif // BX_PLATFORM_
 			, m_fn(NULL)
 			, m_userData(NULL)
@@ -62,6 +62,7 @@ namespace bx
 				);
 #elif BX_PLATFORM_POSIX
 			int result;
+			BX_UNUSED(result);
 
 			pthread_attr_t attr;
 			result = pthread_attr_init(&attr);
@@ -91,10 +92,14 @@ namespace bx
 			CloseHandle(m_handle);
 			m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_POSIX
-			void* result;
-			pthread_join(m_handle, &result);
-			m_exitCode = reinterpret_cast<int32_t>(result);
-			m_handle = NULL;
+			union
+			{
+				void* ptr;
+				int32_t i;
+			} cast;
+			pthread_join(m_handle, &cast.ptr);
+			m_exitCode = cast.i;
+			m_handle = 0;
 #endif // BX_PLATFORM_
 			m_running = false;
 		}
@@ -122,8 +127,13 @@ namespace bx
 		static void* threadFunc(void* _arg)
 		{
 			Thread* thread = (Thread*)_arg;
-			int32_t result = thread->entry();
-			return reinterpret_cast<void*>(result);
+			union
+			{
+				void* ptr;
+				int32_t i;
+			} cast;
+			cast.i = thread->entry();
+			return cast.ptr;
 		}
 #endif // BX_PLATFORM_
 
