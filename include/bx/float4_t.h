@@ -6,7 +6,6 @@
 #ifndef __BX_FLOAT4_T_H__
 #define __BX_FLOAT4_T_H__
 
-#include <stdint.h>
 #include "bx.h"
 
 #define BX_FLOAT4_INLINE BX_FORCE_INLINE

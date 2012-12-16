@@ -6,6 +6,7 @@
 #ifndef __BX_H__
 #define __BX_H__
 
+#include <stdint.h>
 #include "platform.h"
 #include "macros.h"
 

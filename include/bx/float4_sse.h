@@ -6,8 +6,6 @@
 #ifndef __BX_FLOAT4_SSE_H__
 #define __BX_FLOAT4_SSE_H__
 
-#include <stdint.h>
-
 #include <emmintrin.h> // __m128i
 #if defined(__SSE4_1__)
 #	include <smmintrin.h>

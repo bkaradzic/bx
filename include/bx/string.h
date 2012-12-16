@@ -23,40 +23,77 @@ namespace bx
 #endif // BX_COMPILER_
 	}
 
+	/// Find substring in string. Limit search to _size.
+	inline const char* strnstr(const char* _str, const char* _find, size_t _size)
+	{
+		char first = *_find;
+		if ('\0' == first)
+		{
+			return _str;
+		}
+
+		const char* cmp = _find + 1;
+		size_t len = strlen(cmp);
+		do 
+		{
+			for (char match = *_str++; match != first && 0 < _size; match = *_str++, --_size)
+			{
+				if ('\0' == match)
+				{
+					return NULL;
+				}
+			}
+
+			if (0 == _size)
+			{
+				return NULL;
+			}
+			
+		} while (0 != strncmp(_str, cmp, len) );
+
+		return --_str;
+	}
+
 	/// Find new line. Returns pointer after new line terminator.
 	inline const char* strnl(const char* _str)
 	{
-		const char* eol = strstr(_str, "\n\r");
-		if (NULL != eol)
+		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			return eol + 2;
+			const char* eol = strnstr(_str, "\n\r", 1024);
+			if (NULL != eol)
+			{
+				return eol + 2;
+			}
+
+			eol = strnstr(_str, "\n", 1024);
+			if (NULL != eol)
+			{
+				return eol + 1;
+			}
 		}
 
-		eol = strstr(_str, "\n");
-		if (NULL != eol)
-		{
-			return eol + 1;
-		}
-
-		return eol + strlen(_str);
+		return _str;
 	}
 
 	/// Find end of line. Retuns pointer to new line terminator.
 	inline const char* streol(const char* _str)
 	{
-		const char* eol = strstr(_str, "\n\r");
-		if (NULL != eol)
+		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			return eol;
+			const char* eol = strnstr(_str, "\n\r", 1024);
+			if (NULL != eol)
+			{
+				return eol;
+			}
+
+			eol = strnstr(_str, "\n", 1024);
+			if (NULL != eol)
+			{
+				return eol;
+			}
 		}
 
-		eol = strstr(_str, "\n");
-		if (NULL != eol)
-		{
-			return eol;
-		}
-
-		return eol + strlen(_str);
+		return _str;
 	}
 
 	/// Skip whitespace.
