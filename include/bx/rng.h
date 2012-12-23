@@ -92,6 +92,21 @@ namespace bx
 		uint32_t m_jsr;
 	};
 
+	/// Returns random number between 0.0f and 1.0f.
+	template <typename Ty>
+	inline float frnd(Ty* _rng)
+	{
+		uint32_t rnd = _rng->gen() & UINT16_MAX;
+		return float(rnd) * 1.0f/float(UINT16_MAX);
+	}
+
+	/// Returns random number between -1.0f and 1.0f.
+	template <typename Ty>
+	inline float frndh(Ty* _rng)
+	{
+		return 2.0f * bx::frnd(_rng) - 1.0f;
+	}
+
 } // namespace bx
 
 #endif // __BX_RNG_H__
