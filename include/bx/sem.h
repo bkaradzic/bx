@@ -52,8 +52,9 @@ namespace bx
 			}
 
 			timespec ts;
-			ts.tv_sec = _msecs/1000;
-			ts.tv_nsec = (_msecs%1000)*1000;
+			clock_gettime(CLOCK_REALTIME, &ts);
+			ts.tv_sec += _msecs/1000;
+			ts.tv_nsec += (_msecs%1000)*1000;
 			return 0 == sem_timedwait(&m_handle, &ts);
 #endif // BX_PLATFORM_
 		}
