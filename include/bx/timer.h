@@ -40,7 +40,7 @@ namespace bx
 		struct timeval now;
 		gettimeofday(&now, 0);
 		int64_t i64 = now.tv_sec*1000000 + now.tv_usec;
-#endif // BNET_PLATFORM_
+#endif // BX_PLATFORM_
 		static int64_t offset = i64;
 		return i64 - offset;
 	}
@@ -59,7 +59,7 @@ namespace bx
 		return (int64_t)(info.denom * 1000000) / info.numer;
 #else
 		return 1000000;
-#endif // BNET_PLATFORM_
+#endif // BX_PLATFORM_
 	}
 
 } // namespace bx
