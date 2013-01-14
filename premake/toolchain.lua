@@ -141,6 +141,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			_libDir .. "lib/win32_" .. _ACTION,
 			"$(DXSDK_DIR)/lib/x86",
+			"$(GLES_X86_DIR)",
 		}
 
 	configuration { "x64", "vs*" }
@@ -150,6 +151,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			_libDir .. "lib/win64_" .. _ACTION,
 			"$(DXSDK_DIR)/lib/x64",
+			"$(GLES_X64_DIR)",
 		}
 
 	configuration { "mingw" }
@@ -172,6 +174,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			_libDir .. "lib/win32_mingw",
 			"$(DXSDK_DIR)/lib/x86",
+			"$(GLES_X86_DIR)",
 		}
 		buildoptions { "-m32" }
 
@@ -181,6 +184,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			_libDir .. "lib/win64_mingw",
 			"$(DXSDK_DIR)/lib/x64",
+			"$(GLES_X64_DIR)",
 		}
 		buildoptions { "-m64" }
 
