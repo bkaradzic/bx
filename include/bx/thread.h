@@ -29,7 +29,7 @@ namespace bx
 #endif // BX_PLATFORM_
 			, m_fn(NULL)
 			, m_userData(NULL)
-			, m_stackSize(16<<10)
+			, m_stackSize(0)
 			, m_exitCode(EXIT_SUCCESS)
 			, m_running(false)
 		{
@@ -43,7 +43,7 @@ namespace bx
 			}
 		}
 
-		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 16<<10)
+		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0)
 		{
 			BX_CHECK(!m_running, "Already running!");
 
@@ -68,8 +68,11 @@ namespace bx
 			result = pthread_attr_init(&attr);
 			BX_CHECK(0 == result, "pthread_attr_init failed! %d", result);
 
-			result = pthread_attr_setstacksize(&attr, m_stackSize);
-			BX_CHECK(0 == result, "pthread_attr_setstacksize failed! %d", result);
+			if (0 != m_stackSize)
+			{
+				result = pthread_attr_setstacksize(&attr, m_stackSize);
+				BX_CHECK(0 == result, "pthread_attr_setstacksize failed! %d", result);
+			}
 
 // 			sched_param sched;
 // 			sched.sched_priority = 0;
