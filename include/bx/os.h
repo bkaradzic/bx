@@ -24,7 +24,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 		Sleep(_ms);
 #else
-		timespec req = {_ms/1000, (_ms%1000)*1000000};
+		timespec req = {(time_t)_ms/1000, (long)((_ms%1000)*1000000)};
 		timespec rem = {0, 0};
 		nanosleep(&req, &rem);
 #endif // BX_PLATFORM_
