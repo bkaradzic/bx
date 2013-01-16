@@ -17,6 +17,7 @@ function toolchain(_buildDir, _libDir)
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
 			{ "pnacl", "Native Client - PNaCl" },
+			{ "osx", "OS X" },
 		}
 	}
 
@@ -45,7 +46,7 @@ function toolchain(_buildDir, _libDir)
 
 		if "emscripten" == _OPTIONS["gcc"] then
 
-			if not os.getenv("EMSCRIPTEN") then 
+			if not os.getenv("EMSCRIPTEN") then
 				print("Set EMSCRIPTEN enviroment variables.")
 			end
 
@@ -68,7 +69,7 @@ function toolchain(_buildDir, _libDir)
 
 		if "nacl" == _OPTIONS["gcc"] then
 
-			if not os.getenv("NACL") then 
+			if not os.getenv("NACL") then
 				print("Set NACL enviroment variables.")
 			end
 
@@ -80,7 +81,7 @@ function toolchain(_buildDir, _libDir)
 
 		if "pnacl" == _OPTIONS["gcc"] then
 
-			if not os.getenv("PNACL") then 
+			if not os.getenv("PNACL") then
 				print("Set PNACL enviroment variables.")
 			end
 
@@ -88,6 +89,10 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(PNACL)/bin/pnacl-clang++"
 			premake.gcc.ar = "$(PNACL)/bin/pnacl-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-pnacl")
+		end
+
+		if "osx" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
 		end
 	end
 
@@ -287,16 +292,30 @@ function toolchain(_buildDir, _libDir)
 			"_XBOX",
 		}
 
+	configuration { "macosx", "x32" }
+		targetdir (_buildDir .. "osx32_gcc" .. "/bin")
+		objdir (_buildDir .. "osx32_gcc" .. "/obj")
+		libdirs { _libDir .. "lib/osx32_gcc" }
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "macosx", "x64" }
+		targetdir (_buildDir .. "osx64_gcc" .. "/bin")
+		objdir (_buildDir .. "osx64_gcc" .. "/obj")
+		libdirs { _libDir .. "lib/osx64_gcc" }
+		buildoptions {
+			"-m64",
+		}
+
 	configuration { "macosx" }
 		buildoptions {
 			"-U__STRICT_ANSI__",
+			"-Wfatal-errors",
 			"-Wunused-value",
 			"-msse2",
 		}
 		includedirs { bxDir .. "include/compat/osx" }
-		targetdir (_buildDir .. "osx" .. "/bin")
-		objdir (_buildDir .. "osx" .. "/obj")
-		libdirs { _libDir .. "lib/osx" }
 
 	configuration {} -- reset configuration
 end
