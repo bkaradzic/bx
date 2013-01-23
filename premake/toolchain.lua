@@ -16,6 +16,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux", "Linux" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
+			{ "nacl-arm", "Native Client - ARM" },
 			{ "pnacl", "Native Client - PNaCl" },
 			{ "osx", "OS X" },
 		}
@@ -77,6 +78,18 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(NACL)/bin/x86_64-nacl-g++"
 			premake.gcc.ar = "$(NACL)/bin/x86_64-nacl-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl")
+		end
+
+		if "nacl-arm" == _OPTIONS["gcc"] then
+
+			if not os.getenv("NACL-ARM") then
+				print("Set NACL-ARM enviroment variables.")
+			end
+
+			premake.gcc.cc = "$(NACL-ARM)/bin/arm-nacl-gcc"
+			premake.gcc.cxx = "$(NACL-ARM)/bin/arm-nacl-g++"
+			premake.gcc.ar = "$(NACL-ARM)/bin/arm-nacl-ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-nacl-arm")
 		end
 
 		if "pnacl" == _OPTIONS["gcc"] then
@@ -264,6 +277,23 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "nacl-x64" .. "/obj")
 		libdirs { _libDir .. "lib/nacl-x64" }
 		linkoptions { "-melf64_nacl" }
+
+	configuration { "nacl-arm" }
+		defines { "_BSD_SOURCE=1", "_POSIX_C_SOURCE=199506", "_XOPEN_SOURCE=600", "__native_client__", "__LITTLE_ENDIAN__" }
+		includedirs { bxDir .. "include/compat/nacl" }
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-fno-stack-protector",
+			"-fdiagnostics-show-option",
+			"-Wunused-value",
+			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-fdata-sections",
+			"-ffunction-sections",
+		}
+		targetdir (_buildDir .. "nacl-arm" .. "/bin")
+		objdir (_buildDir .. "nacl-arm" .. "/obj")
+		libdirs { _libDir .. "lib/nacl-arm" }
 
 	configuration { "pnacl" }
 		defines { "_BSD_SOURCE=1", "_POSIX_C_SOURCE=199506", "_XOPEN_SOURCE=600", "__native_client__", "__LITTLE_ENDIAN__" }
