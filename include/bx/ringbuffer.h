@@ -82,6 +82,10 @@ namespace bx
 		uint32_t m_current;
 		uint32_t m_write;
 		uint32_t m_read;
+
+	private:
+		RingBufferControl(const RingBufferControl&);
+		void operator=(const RingBufferControl&);
 	};
 
 	class SpScRingBufferControl
@@ -158,6 +162,10 @@ namespace bx
 		uint32_t m_current;
 		uint32_t m_write;
 		uint32_t m_read;
+
+	private:
+		SpScRingBufferControl(const SpScRingBufferControl&);
+		void operator=(const SpScRingBufferControl&);
 	};
 
 	template <typename Control>
