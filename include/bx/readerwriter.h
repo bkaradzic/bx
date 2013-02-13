@@ -136,7 +136,7 @@ namespace bx
 		{
 		}
 
-		virtual void* more(uint32_t _size = 0) BX_OVERRIDE
+		virtual void* more(uint32_t /*_size*/ = 0) BX_OVERRIDE
 		{
 			return m_data;
 		}
@@ -202,7 +202,7 @@ namespace bx
 			return m_pos;
 		}
 
-		virtual int32_t write(const void* _data, int32_t _size) BX_OVERRIDE
+		virtual int32_t write(const void* /*_data*/, int32_t _size) BX_OVERRIDE
 		{
 			int32_t morecore = int32_t(m_pos - m_top) + _size;
 
