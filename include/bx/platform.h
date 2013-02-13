@@ -118,6 +118,9 @@
 #endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 
 #if BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
+#	pragma warning(error:4062) // ENABLE warning C4062: enumerator'...' in switch of enum '...' is not handled
+#	pragma warning(error:4121) // ENABLE warning C4121: 'symbol' : alignment of a member was sensitive to packing
+#	pragma warning(error:4130) // ENABLE warning C4130: 'operator' : logical operation on address of string constant
 #	pragma warning(error:4239) // ENABLE warning C4239: nonstandard extension used : 'argument' : conversion from '*' to '* &' A non-const reference may only be bound to an lvalue
 //#	pragma warning(error:4244) // ENABLE warning C4244: 'conversion' conversion from 'type1' to 'type2', possible loss of data
 #	pragma warning(error:4263) // ENABLE warning C4263: 'function' : member function does not override any base class virtual member function
