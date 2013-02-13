@@ -474,9 +474,9 @@ namespace bx
 		const uint32_t f_h_e_biased_flag          = uint32_li(0x0000008f);
 		const uint32_t f_s                        = uint32_and(ftou.ui, f_s_mask);
 		const uint32_t f_e                        = uint32_and(ftou.ui, f_e_mask);
-		const uint16_t h_s                        = uint32_srl(f_s, f_h_s_pos_offset);
+		const uint16_t h_s              = (uint16_t)uint32_srl(f_s, f_h_s_pos_offset);
 		const uint32_t f_m                        = uint32_and(ftou.ui, f_m_mask);
-		const uint16_t f_e_amount                 = uint32_srl(f_e, f_e_pos);
+		const uint16_t f_e_amount       = (uint16_t)uint32_srl(f_e, f_e_pos);
 		const uint32_t f_e_half_bias              = uint32_sub(f_e_amount, f_h_bias_offset);
 		const uint32_t f_snan                     = uint32_and(ftou.ui, f_snan_mask);
 		const uint32_t f_m_round_mask             = uint32_and(f_m, f_m_round_bit);
