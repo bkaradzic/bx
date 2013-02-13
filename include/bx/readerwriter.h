@@ -132,7 +132,7 @@ namespace bx
 		{
 		}
 
-		~StaticMemoryBlock()
+		virtual ~StaticMemoryBlock()
 		{
 		}
 

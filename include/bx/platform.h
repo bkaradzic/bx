@@ -113,4 +113,20 @@
 #	define BX_CPU_ENDIAN_LITTLE 1
 #endif // BX_PLATFORM_
 
+#ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
+#	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
+#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
+
+#if BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
+#	pragma warning(error:4239) // ENABLE warning C4239: nonstandard extension used : 'argument' : conversion from '*' to '* &' A non-const reference may only be bound to an lvalue
+//#	pragma warning(error:4244) // ENABLE warning C4244: 'conversion' conversion from 'type1' to 'type2', possible loss of data
+#	pragma warning(error:4263) // ENABLE warning C4263: 'function' : member function does not override any base class virtual member function
+#	pragma warning(error:4265) // ENABLE warning C4265: class has virtual functions, but destructor is not virtual
+#	pragma warning(error:4431) // ENABLE warning C4431: missing type specifier - int assumed. Note: C no longer supports default-int
+#	pragma warning(error:4545) // ENABLE warning C4545: expression before comma evaluates to a function which is missing an argument list
+#	pragma warning(error:4549) // ENABLE warning C4549: 'operator' : operator before comma has no effect; did you intend 'operator'?
+#	pragma warning(error:4701) // ENABLE warning C4701: potentially uninitialized local variable 'name' used
+#	pragma warning(error:4706) // ENABLE warning C4706: assignment within conditional expression
+#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
+
 #endif // __BX_PLATFORM_H__
