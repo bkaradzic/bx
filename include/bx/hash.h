@@ -103,6 +103,12 @@ namespace bx
 		return murmur.end();
 	}
 
+	template <typename Ty>
+	inline uint32_t hashMurmur2A(const Ty& _data)
+	{
+		return hashMurmur2A(&_data, sizeof(Ty) );
+	}
+
 } // namespace bx
 
 #endif // __BX_HASH_H__
