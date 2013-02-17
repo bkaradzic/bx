@@ -59,7 +59,7 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\n\r", 1024);
+			const char* eol = strnstr(_str, "\r\n", 1024);
 			if (NULL != eol)
 			{
 				return eol + 2;
@@ -80,7 +80,7 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\n\r", 1024);
+			const char* eol = strnstr(_str, "\r\n", 1024);
 			if (NULL != eol)
 			{
 				return eol;
@@ -138,6 +138,24 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	// Normalize string to sane line endings.
+	inline void eolLF(char* _out, size_t _size, const char* _str)
+	{
+		if (0 < _size)
+		{
+			char* end = _out + _size - 1;
+			for (char ch = *_str++; ch != '\0' && _out < end; ch = *_str++)
+			{
+				if ('\r' != ch)
+				{
+					*_out++ = ch;
+				}
+			}
+
+			*end = '\0';
+		}
 	}
 
 	/// Cross platform implementation of vsnprintf that returns number of
