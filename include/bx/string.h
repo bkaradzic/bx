@@ -154,7 +154,7 @@ namespace bx
 				}
 			}
 
-			*end = '\0';
+			*_out = '\0';
 		}
 	}
 
