@@ -35,9 +35,11 @@
 						 // must be included before intrin.h.
 #		include <intrin.h>
 #		pragma intrinsic(_BitScanForward)
-#		pragma intrinsic(_BitScanForward64)
 #		pragma intrinsic(_BitScanReverse)
-#		pragma intrinsic(_BitScanReverse64)
+#		if BX_ARCH_64BIT
+#			pragma intrinsic(_BitScanForward64)
+#			pragma intrinsic(_BitScanReverse64)
+#		endif // BX_ARCH_64BIT
 #	endif // BX_PLATFORM_WINDOWS
 #endif // BX_COMPILER_MSVC
 
@@ -580,30 +582,46 @@ namespace bx
 		return _a < _b ? _b : _a;
 	}
 
+	inline uint64_t uint64_cntlz_ref(uint64_t _val)
+	{
+		return _val & UINT64_C(0xffffffff00000000)
+			 ? uint32_cntlz(uint32_t(_val>>32) ) + 32
+			 : uint32_cntlz(uint32_t(_val) )
+			 ;
+	}
+
 	/// Count number of leading zeros.
 	inline uint64_t uint64_cntlz(uint64_t _val)
 	{
 #if BX_COMPILER_GCC
 		return __builtin_clz(_val);
-#elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS
+#elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
 		_BitScanReverse64(&index, _val);
 		return 63 - index;
 #else
-		return uint32_cntlz_ref(_val);
+		return uint64_cntlz_ref(_val);
 #endif // BX_COMPILER_
+	}
+
+	inline uint64_t uint64_cnttz_ref(uint64_t _val)
+	{
+		return _val & UINT64_C(0xffffffff)
+			? uint32_cnttz(uint32_t(_val) )
+			: uint32_cnttz(uint32_t(_val>>32) ) + 32
+			;
 	}
 
 	inline uint64_t uint64_cnttz(uint64_t _val)
 	{
 #if BX_COMPILER_GCC
 		return __builtin_ctz(_val);
-#elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS
+#elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
 		_BitScanForward64(&index, _val);
 		return index;
 #else
-#	error "not implemented" // return uint64_cnttz_ref(_val);
+		return uint64_cnttz_ref(_val);
 #endif // BX_COMPILER_
 	}
 
