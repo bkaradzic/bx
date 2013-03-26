@@ -130,6 +130,9 @@
 #	pragma warning(error:4549) // ENABLE warning C4549: 'operator' : operator before comma has no effect; did you intend 'operator'?
 #	pragma warning(error:4701) // ENABLE warning C4701: potentially uninitialized local variable 'name' used
 #	pragma warning(error:4706) // ENABLE warning C4706: assignment within conditional expression
+#	pragma warning(error:4100) // ENABLE warning C4100: '' : unreferenced formal parameter
+#	pragma warning(error:4189) // ENABLE warning C4189: '' : local variable is initialized but not referenced
+#	pragma warning(error:4505) // ENABLE warning C4505: '' : unreferenced local function has been removed
 #endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
 
 #endif // __BX_PLATFORM_H__
