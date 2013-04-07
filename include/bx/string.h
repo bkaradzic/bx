@@ -14,6 +14,7 @@
 
 namespace bx
 {
+	/// Case insensitive string compare.
 	inline int32_t stricmp(const char* _a, const char* _b)
 	{
 #if BX_COMPILER_MSVC
@@ -21,6 +22,15 @@ namespace bx
 #else
 		return strcasecmp(_a, _b);
 #endif // BX_COMPILER_
+	}
+
+	///
+	inline size_t strnlen(const char* _str, size_t _max)
+	{
+		const char* end = _str + _max;
+		const char* ptr;
+		for (ptr = _str; ptr < end && *ptr != '\0'; ++ptr);
+		return ptr - _str;
 	}
 
 	/// Find substring in string. Limit search to _size.

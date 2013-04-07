@@ -135,4 +135,13 @@
 #	pragma warning(error:4505) // ENABLE warning C4505: '' : unreferenced local function has been removed
 #endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
 
+#if BX_PLATFORM_WINDOWS
+// http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
+#	if !defined(WINVER) && !defined(_WIN32_WINNT)
+		// Windows 2000 and above
+#		define WINVER 0x0500
+#		define _WIN32_WINNT 0x0500
+#	endif // !defined(WINVER) && !defined(_WIN32_WINNT)
+#endif // BX_PLATFORM_WINDOWS
+
 #endif // __BX_PLATFORM_H__
