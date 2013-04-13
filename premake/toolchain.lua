@@ -19,6 +19,7 @@ function toolchain(_buildDir, _libDir)
 			{ "nacl-arm", "Native Client - ARM" },
 			{ "pnacl", "Native Client - PNaCl" },
 			{ "osx", "OS X" },
+			{ "qnx-arm", "QNX/Blackberry - ARM" },
 		}
 	}
 
@@ -106,6 +107,18 @@ function toolchain(_buildDir, _libDir)
 
 		if "osx" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+		end
+
+		if "qnx-arm" == _OPTIONS["gcc"] then
+
+			if not os.getenv("QNX_HOST") then
+				print("Set QNX_HOST enviroment variables.")
+			end
+
+			premake.gcc.cc = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
+			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
+			premake.gcc.ar = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-qnx-arm")
 		end
 	end
 
@@ -322,7 +335,7 @@ function toolchain(_buildDir, _libDir)
 			"_XBOX",
 		}
 
-	configuration { "macosx", "x32" }
+	configuration { "osx", "x32" }
 		targetdir (_buildDir .. "osx32_gcc" .. "/bin")
 		objdir (_buildDir .. "osx32_gcc" .. "/obj")
 		libdirs { _libDir .. "lib/osx32_gcc" }
@@ -330,7 +343,7 @@ function toolchain(_buildDir, _libDir)
 			"-m32",
 		}
 
-	configuration { "macosx", "x64" }
+	configuration { "osx", "x64" }
 		targetdir (_buildDir .. "osx64_gcc" .. "/bin")
 		objdir (_buildDir .. "osx64_gcc" .. "/obj")
 		libdirs { _libDir .. "lib/osx64_gcc" }
@@ -338,7 +351,7 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
-	configuration { "macosx" }
+	configuration { "osx" }
 		buildoptions {
 			"-U__STRICT_ANSI__",
 			"-Wfatal-errors",
@@ -346,6 +359,17 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 		}
 		includedirs { bxDir .. "include/compat/osx" }
+
+	configuration { "qnx-arm" }
+--		includedirs { bxDir .. "include/compat/qnx" }
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+		}
+		targetdir (_buildDir .. "qnx-arm" .. "/bin")
+		objdir (_buildDir .. "qnx-arm" .. "/obj")
+		libdirs { _libDir .. "lib/qnx-arm" }
 
 	configuration {} -- reset configuration
 end

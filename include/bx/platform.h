@@ -16,6 +16,7 @@
 #define BX_PLATFORM_LINUX 0
 #define BX_PLATFORM_NACL 0
 #define BX_PLATFORM_OSX 0
+#define BX_PLATFORM_QNX 0
 #define BX_PLATFORM_WINDOWS 0
 #define BX_PLATFORM_XBOX360 0
 
@@ -71,6 +72,9 @@
 #elif defined(EMSCRIPTEN)
 #	undef BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
+#elif defined(__QNX__)
+#	undef BX_PLATFORM_QNX
+#	define BX_PLATFORM_QNX 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
@@ -80,7 +84,8 @@
 						|| BX_PLATFORM_IOS \
 						|| BX_PLATFORM_LINUX \
 						|| BX_PLATFORM_NACL \
-						|| BX_PLATFORM_OSX)
+						|| BX_PLATFORM_OSX \
+						|| BX_PLATFORM_QNX)
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__)
