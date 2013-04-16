@@ -12,6 +12,7 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
+			{ "android-arm", "Android - ARM" },
 			{ "emscripten", "Emscripten" },
 			{ "linux", "Linux" },
 			{ "mingw", "MinGW" },
@@ -25,9 +26,6 @@ function toolchain(_buildDir, _libDir)
 
 	-- Avoid error when invoking premake4 --help.
 	if (_ACTION == nil) then return end
-
-	local XEDK = os.getenv("XEDK")
-	if not XEDK then XEDK = "<you must install XBOX SDK>" end
 
 	location (_buildDir .. "projects/" .. _ACTION)
 
@@ -45,6 +43,18 @@ function toolchain(_buildDir, _libDir)
 		flags {
 			"ExtraWarnings",
 		}
+
+		if "android-arm" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK") or not os.getenv("ANDROID_NDK_PLATFORM") then
+				print("Set ANDROID_NDK and ANDROID_NDK_PLATFORM envrionment variables.")
+			end
+
+			premake.gcc.cc = "$(ANDROID_NDK)/bin/arm-linux-androideabi-gcc"
+			premake.gcc.cxx = "$(ANDROID_NDK)/bin/arm-linux-androideabi-g++"
+			premake.gcc.ar = "$(ANDROID_NDK)/bin/arm-linux-androideabi-ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
+		end
 
 		if "emscripten" == _OPTIONS["gcc"] then
 
@@ -250,6 +260,21 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
+	configuration { "android-arm" }
+		targetdir (_buildDir .. "android-arm" .. "/bin")
+		objdir (_buildDir .. "android-arm" .. "/obj")
+		libdirs { _libDir .. "lib/android-arm" }
+		includedirs {
+			"$(ANDROID_NDK_PLATFORM)/platforms/android-14/arch-arm/usr/include",
+			"$(ANDROID_NDK_PLATFORM)/sources/cxx-stl/stlport/stlport",
+			"$(ANDROID_NDK_PLATFORM)/sources/cxx-stl/gabi++/include",
+		}
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+		}
+
 	configuration { "emscripten" }
 		targetdir (_buildDir .. "emscripten" .. "/bin")
 		objdir (_buildDir .. "emscripten" .. "/obj")
@@ -361,15 +386,15 @@ function toolchain(_buildDir, _libDir)
 		includedirs { bxDir .. "include/compat/osx" }
 
 	configuration { "qnx-arm" }
+		targetdir (_buildDir .. "qnx-arm" .. "/bin")
+		objdir (_buildDir .. "qnx-arm" .. "/obj")
+		libdirs { _libDir .. "lib/qnx-arm" }
 --		includedirs { bxDir .. "include/compat/qnx" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 		}
-		targetdir (_buildDir .. "qnx-arm" .. "/bin")
-		objdir (_buildDir .. "qnx-arm" .. "/obj")
-		libdirs { _libDir .. "lib/qnx-arm" }
 
 	configuration {} -- reset configuration
 end
