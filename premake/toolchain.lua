@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2012 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2013 Branimir Karadzic. All rights reserved.
 -- License: http://www.opensource.org/licenses/BSD-2-Clause
 --
 
@@ -46,13 +46,13 @@ function toolchain(_buildDir, _libDir)
 
 		if "android-arm" == _OPTIONS["gcc"] then
 
-			if not os.getenv("ANDROID_NDK") or not os.getenv("ANDROID_NDK_PLATFORM") then
-				print("Set ANDROID_NDK and ANDROID_NDK_PLATFORM envrionment variables.")
+			if not os.getenv("ANDROID_NDK_ARM") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc = "$(ANDROID_NDK)/bin/arm-linux-androideabi-gcc"
-			premake.gcc.cxx = "$(ANDROID_NDK)/bin/arm-linux-androideabi-g++"
-			premake.gcc.ar = "$(ANDROID_NDK)/bin/arm-linux-androideabi-ar"
+			premake.gcc.cc = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
+			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
+			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
 		end
 
@@ -263,16 +263,33 @@ function toolchain(_buildDir, _libDir)
 	configuration { "android-arm" }
 		targetdir (_buildDir .. "android-arm" .. "/bin")
 		objdir (_buildDir .. "android-arm" .. "/obj")
-		libdirs { _libDir .. "lib/android-arm" }
+		flags {
+			"NoImportLib",
+		}
+		libdirs {
+			_libDir .. "lib/android-arm",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a",
+		}
 		includedirs {
-			"$(ANDROID_NDK_PLATFORM)/platforms/android-14/arch-arm/usr/include",
-			"$(ANDROID_NDK_PLATFORM)/sources/cxx-stl/stlport/stlport",
-			"$(ANDROID_NDK_PLATFORM)/sources/cxx-stl/gabi++/include",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
+		}
+		linkoptions {
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
+			"-Wl,--gc-sections",
+		}
+		links {
+			"c",
+			"android",
+			"gnustl_static",
 		}
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-fPIC",
 		}
 
 	configuration { "emscripten" }
