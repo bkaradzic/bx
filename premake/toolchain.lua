@@ -268,20 +268,26 @@ function toolchain(_buildDir, _libDir)
 		}
 		libdirs {
 			_libDir .. "lib/android-arm",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
 		}
 		linkoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
+			"-nostdlib",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
+			"-march=armv7-a",
+			"-Wl,-shared,-Bsymbolic",
 			"-Wl,--gc-sections",
+			"-Wl,--fix-cortex-a8",
+			"-static-libgcc",
 		}
 		links {
 			"c",
+			"m",
 			"android",
 			"gnustl_static",
 		}
@@ -290,6 +296,11 @@ function toolchain(_buildDir, _libDir)
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-fPIC",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
+			"-mthumb",
+			"-march=armv7-a",
+			"-mfloat-abi=softfp",
+			"-mfpu=vfpv3-d16",
 		}
 
 	configuration { "emscripten" }
