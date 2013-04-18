@@ -273,6 +273,7 @@ function toolchain(_buildDir, _libDir)
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
