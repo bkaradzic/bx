@@ -30,7 +30,7 @@ namespace bx
 			, m_fn(NULL)
 			, m_userData(NULL)
 			, m_stackSize(0)
-			, m_exitCode(EXIT_SUCCESS)
+			, m_exitCode(0 /*EXIT_SUCCESS*/)
 			, m_running(false)
 		{
 		}
