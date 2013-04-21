@@ -281,22 +281,31 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
 			"-march=armv7-a",
-			"-Wl,-shared,-Bsymbolic",
-			"-Wl,--gc-sections",
+--			"-Wl,-shared,-Bsymbolic",
+--			"-Wl,--gc-sections",
 			"-Wl,--fix-cortex-a8",
+--			"-Wl,--no-undefined",
 			"-static-libgcc",
+
+			"-no-canonical-prefixes",
+			"-Wl,--no-undefined",
+			"-Wl,-z,noexecstack",
+			"-Wl,-z,relro",
+			"-Wl,-z,now",
 		}
 		links {
 			"c",
 			"m",
 			"android",
+			"log",
 			"gnustl_static",
+			"gcc",
 		}
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
-			"-fPIC",
+			"-fpic",
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
 			"-mthumb",
 			"-march=armv7-a",
@@ -424,6 +433,29 @@ function toolchain(_buildDir, _libDir)
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 		}
+
+	configuration {} -- reset configuration
+end
+
+function strip()
+
+	configuration { "android*", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
+		} 
+
+	configuration { "linux", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@strip -s \"$(TARGET)\""
+		} 
+
+	configuration { "nacl", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(NACL)/bin/x86_64-nacl-strip -s \"$(TARGET)\""
+		} 
 
 	configuration {} -- reset configuration
 end
