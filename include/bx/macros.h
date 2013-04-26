@@ -82,15 +82,15 @@
 			_class& operator=(const _class&)
 
 #ifndef BX_CHECK
-#	define BX_CHECK(_condition, ...)
+#	define BX_CHECK(_condition, ...) do {} while(0)
 #endif // BX_CHECK
 
 #ifndef BX_TRACE
-#	define BX_TRACE(...)
+#	define BX_TRACE(...) do {} while(0)
 #endif // BX_TRACE
 
 #ifndef BX_WARN
-#	define BX_WARN(_condition, ...)
+#	define BX_WARN(_condition, ...) do {} while(0)
 #endif // BX_CHECK
 
 #ifndef  BX_CONFIG_SPSCQUEUE_USE_MUTEX
