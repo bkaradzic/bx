@@ -37,8 +37,7 @@ namespace bx
 		gettimeofday(&now, 0);
 		int64_t i64 = now.tv_sec*1000000 + now.tv_usec;
 #endif // BX_PLATFORM_
-		static int64_t offset = i64;
-		return i64 - offset;
+		return i64;
 	}
 
 	inline int64_t getHPFrequency()
