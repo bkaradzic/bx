@@ -20,6 +20,9 @@
 #define BX_STRINGIZE(_x) BX_STRINGIZE_(_x)
 #define BX_STRINGIZE_(_x) #_x
 
+#define BX_CONCATENATE(_x, _y) BX_CONCATENATE_(_x, _y)
+#define BX_CONCATENATE_(_x, _y) _x ## _y
+
 #define BX_FILE_LINE_LITERAL "" __FILE__ "(" BX_STRINGIZE(__LINE__) "): "
 
 #define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
@@ -37,6 +40,7 @@
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
+#	define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, __VA_ARGS__)
 #	if BX_COMPILER_CLANG
 #		define BX_THREAD /* not supported right now */
 #	else
@@ -52,6 +56,7 @@
 #	define BX_NO_VTABLE __declspec(novtable)
 #	define BX_OVERRIDE override
 #	define BX_PRINTF_ARGS(_format, _args)
+#	define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)]
 #	define BX_THREAD __declspec(thread)
 #else
 #	error "Unknown BX_COMPILER_?"

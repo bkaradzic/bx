@@ -8,6 +8,14 @@
 
 #include "bx.h"
 
+#if BX_PLATFORM_ANDROID
+#	include <android/log.h>
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
+#else
+#	include <stdio.h>
+#endif // BX_PLATFORM_WINDOWS
+
 namespace bx
 {
 	inline void debugBreak()
@@ -24,6 +32,18 @@ namespace bx
 		int* int3 = (int*)3L;
 		*int3 = 3;
 #endif // BX
+	}
+
+	inline void debugOutput(const char* _out)
+	{
+#if BX_PLATFORM_ANDROID
+		__android_log_write(ANDROID_LOG_DEBUG, "", _out);
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+		OutputDebugStringA(_out);
+#else
+		fputs(_out, stderr);
+		fflush(stderr);
+#endif // BX_PLATFORM_
 	}
 
 } // namespace bx
