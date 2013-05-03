@@ -68,7 +68,7 @@
 #define BX_ALIGN_STRUCT_16(_struct) BX_ALIGN_STRUCT(16, _struct)
 #define BX_ALIGN_STRUCT_256(_struct) BX_ALIGN_STRUCT(256, _struct)
 
-#define BX_UNUSED_1(_a1) do { (void)sizeof(_a1); } while(0)
+#define BX_UNUSED_1(_a1) do { (void)(true ? (void)0 : ( (void)(_a1) ) ); } while(0)
 #define BX_UNUSED_2(_a1, _a2) BX_UNUSED_1(_a1); BX_UNUSED_1(_a2)
 #define BX_UNUSED_3(_a1, _a2, _a3) BX_UNUSED_2(_a1, _a2); BX_UNUSED_1(_a3)
 #define BX_UNUSED_4(_a1, _a2, _a3, _a4) BX_UNUSED_3(_a1, _a2, _a3); BX_UNUSED_1(_a4)

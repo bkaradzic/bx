@@ -9,6 +9,7 @@
 #include "bx.h"
 #include <alloca.h>
 #include <stdarg.h> // va_list
+#include <stdio.h>  // vsnprintf
 #include <string.h>
 #include <string>
 
