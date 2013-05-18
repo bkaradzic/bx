@@ -13,7 +13,7 @@ function toolchain(_buildDir, _libDir)
 		description = "Choose GCC flavor",
 		allowed = {
 			{ "android-arm", "Android - ARM" },
-			{ "emscripten", "Emscripten" },
+--			{ "emscripten-experimental", "Emscripten" },
 			{ "linux", "Linux" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
@@ -56,7 +56,7 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
 		end
 
-		if "emscripten" == _OPTIONS["gcc"] then
+		if "emscripten-experimental" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
 				print("Set EMSCRIPTEN enviroment variables.")
@@ -81,37 +81,37 @@ function toolchain(_buildDir, _libDir)
 
 		if "nacl" == _OPTIONS["gcc"] then
 
-			if not os.getenv("NACL") then
-				print("Set NACL enviroment variables.")
+			if not os.getenv("NACL_SDK_ROOT") then
+				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(NACL)/bin/x86_64-nacl-gcc"
-			premake.gcc.cxx = "$(NACL)/bin/x86_64-nacl-g++"
-			premake.gcc.ar = "$(NACL)/bin/x86_64-nacl-ar"
+			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-gcc"
+			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-g++"
+			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl")
 		end
 
 		if "nacl-arm" == _OPTIONS["gcc"] then
 
-			if not os.getenv("NACL-ARM") then
-				print("Set NACL-ARM enviroment variables.")
+			if not os.getenv("NACL_SDK_ROOT") then
+				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(NACL-ARM)/bin/arm-nacl-gcc"
-			premake.gcc.cxx = "$(NACL-ARM)/bin/arm-nacl-g++"
-			premake.gcc.ar = "$(NACL-ARM)/bin/arm-nacl-ar"
+			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-gcc"
+			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-g++"
+			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl-arm")
 		end
 
 		if "pnacl" == _OPTIONS["gcc"] then
 
-			if not os.getenv("PNACL") then
-				print("Set PNACL enviroment variables.")
+			if not os.getenv("NACL_SDK_ROOT") then
+				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(PNACL)/bin/pnacl-clang"
-			premake.gcc.cxx = "$(PNACL)/bin/pnacl-clang++"
-			premake.gcc.ar = "$(PNACL)/bin/pnacl-ar"
+			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-clang"
+			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-clang++"
+			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-pnacl")
 		end
 
@@ -310,7 +310,7 @@ function toolchain(_buildDir, _libDir)
 			"-mfpu=vfpv3-d16",
 		}
 
-	configuration { "emscripten" }
+	configuration { "emscripten-experimental" }
 		targetdir (_buildDir .. "emscripten" .. "/bin")
 		objdir (_buildDir .. "emscripten" .. "/obj")
 		libdirs { _libDir .. "lib/emscripten" }
@@ -319,9 +319,13 @@ function toolchain(_buildDir, _libDir)
 			"-pthread",
 		}
 
+	configuration { "nacl or nacl-arm or pnacl" }
+		includedirs { 
+			"$(NACL_SDK_ROOT)/include",
+			bxDir .. "include/compat/nacl",
+		}
+
 	configuration { "nacl" }
-		defines { "_BSD_SOURCE=1", "_POSIX_C_SOURCE=199506", "_XOPEN_SOURCE=600" }
-		includedirs { bxDir .. "include/compat/nacl" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
@@ -352,8 +356,6 @@ function toolchain(_buildDir, _libDir)
 		linkoptions { "-melf64_nacl" }
 
 	configuration { "nacl-arm" }
-		defines { "_BSD_SOURCE=1", "_POSIX_C_SOURCE=199506", "_XOPEN_SOURCE=600", "__native_client__", "__LITTLE_ENDIAN__" }
-		includedirs { bxDir .. "include/compat/nacl" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
@@ -369,8 +371,6 @@ function toolchain(_buildDir, _libDir)
 		libdirs { _libDir .. "lib/nacl-arm" }
 
 	configuration { "pnacl" }
-		defines { "_BSD_SOURCE=1", "_POSIX_C_SOURCE=199506", "_XOPEN_SOURCE=600", "__native_client__", "__LITTLE_ENDIAN__" }
-		includedirs { bxDir .. "include/compat/nacl" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
@@ -451,8 +451,20 @@ function strip()
 	configuration { "nacl", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
-			"@$(NACL)/bin/x86_64-nacl-strip -s \"$(TARGET)\""
-		} 
+			"@$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-strip -s \"$(TARGET)\""
+		}
+
+	configuration { "nacl-arm", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-strip -s \"$(TARGET)\""
+		}
+
+	configuration { "pnacl", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-strip -s \"$(TARGET)\""
+		}
 
 	configuration {} -- reset configuration
 end
