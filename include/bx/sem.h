@@ -9,6 +9,7 @@
 #include "bx.h"
 
 #if BX_PLATFORM_POSIX
+#	include <errno.h>
 #	include <semaphore.h>
 #	include <time.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
@@ -24,7 +25,9 @@ namespace bx
 	public:
 		Semaphore()
 		{
-			sem_init(&m_handle, 0, 0);
+			int32_t result = sem_init(&m_handle, 0, 0);
+			BX_CHECK(0 == result, "sem_init failed. errno %d", errno);
+			BX_UNUSED(result);
 		}
 
 		~Semaphore()

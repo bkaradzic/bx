@@ -440,13 +440,19 @@ function strip()
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
-		} 
+		}
 
 	configuration { "linux", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@strip -s \"$(TARGET)\""
-		} 
+		}
+
+	configuration { "mingw", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(MINGW)/bin/strip -s \"$(TARGET)\""
+		}
 
 	configuration { "nacl", "Release" }
 		postbuildcommands {
