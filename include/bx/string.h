@@ -192,7 +192,7 @@ namespace bx
 		int32_t len = ::_vsnwprintf_s(_str, _count*sizeof(wchar_t), _count, _format, _argList);
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #else
-		return ::vsnwprintf(_str, _count, _format, _argList);
+		return ::vswprintf(_str, _count, _format, _argList);
 #endif // BX_COMPILER_MSVC
 	}
 
