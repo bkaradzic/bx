@@ -191,6 +191,8 @@ namespace bx
 #if BX_COMPILER_MSVC
 		int32_t len = ::_vsnwprintf_s(_str, _count*sizeof(wchar_t), _count, _format, _argList);
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
+#elif defined(__MINGW32__)
+		return ::vsnwprintf(_str, _count, _format, _argList);
 #else
 		return ::vswprintf(_str, _count, _format, _argList);
 #endif // BX_COMPILER_MSVC
