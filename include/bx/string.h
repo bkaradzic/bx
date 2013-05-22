@@ -9,7 +9,7 @@
 #include "bx.h"
 #include <alloca.h>
 #include <stdarg.h> // va_list
-#include <stdio.h>  // vsnprintf
+#include <stdio.h>  // vsnprintf, vsnwprintf
 #include <string.h>
 #include <string>
 #include <wchar.h>  // wchar_t
@@ -183,6 +183,19 @@ namespace bx
 #endif // BX_COMPILER_MSVC
 	}
 
+	/// Cross platform implementation of vsnwprintf that returns number of
+	/// characters which would have been written to the final string if
+	/// enough space had been available.
+	inline int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList)
+	{
+#if BX_COMPILER_MSVC
+		int32_t len = ::_vsnwprintf_s(_str, _count*sizeof(wchar_t), _count, _format, _argList);
+		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
+#else
+		return ::vsnwprintf(_str, _count, _format, _argList);
+#endif // BX_COMPILER_MSVC
+	}
+
 	inline int32_t snprintf(char* _str, size_t _count, const char* _format, ...) // BX_PRINTF_ARGS(3, 4)
 	{
 		va_list argList;
@@ -196,11 +209,7 @@ namespace bx
 	{
 		va_list argList;
 		va_start(argList, _format);
-#if defined(__MINGW32__)
-		int32_t len = swprintf(_out, _format, argList);
-#else
-		int32_t len = swprintf(_out, _count, _format, argList);
-#endif // defined(__MINGW__)
+		int32_t len = vsnwprintf(_out, _count, _format, argList);
 		va_end(argList);
 		return len;
 	}
