@@ -297,10 +297,10 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	BX_FLOAT4_INLINE float4_t float4_div(float4_t _a, float4_t _b)
 	{
 		float4_t result;
-		result.fxyzw[0] = _a.fxyzw[0] * _b.fxyzw[0];
-		result.fxyzw[1] = _a.fxyzw[1] * _b.fxyzw[1];
-		result.fxyzw[2] = _a.fxyzw[2] * _b.fxyzw[2];
-		result.fxyzw[3] = _a.fxyzw[3] * _b.fxyzw[3];
+		result.fxyzw[0] = _a.fxyzw[0] / _b.fxyzw[0];
+		result.fxyzw[1] = _a.fxyzw[1] / _b.fxyzw[1];
+		result.fxyzw[2] = _a.fxyzw[2] / _b.fxyzw[2];
+		result.fxyzw[3] = _a.fxyzw[3] / _b.fxyzw[3];
 		return result;
 	}
 
