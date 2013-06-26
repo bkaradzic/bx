@@ -47,17 +47,17 @@ namespace bx
 	}
 
 	template <typename Ty>
-	inline Ty littleEndian(Ty& _in)
+	inline Ty littleEndian(const Ty _in)
 	{
 #if BX_CPU_ENDIAN_BIG
-		endianSwap(_in);
+		return endianSwap(_in);
 #else
 		return _in;
 #endif // BX_CPU_ENDIAN_BIG
 	}
 
 	template <typename Ty>
-	inline Ty bigEndian(Ty& _in)
+	inline Ty bigEndian(const Ty _in)
 	{
 #if BX_CPU_ENDIAN_LITTLE
 		return endianSwap(_in);
