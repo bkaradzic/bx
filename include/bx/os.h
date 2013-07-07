@@ -56,7 +56,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		FreeLibrary( (HMODULE)_handle);
 #else
-		::dlclose(_lib);
+		::dlclose(_handle);
 #endif // BX_PLATFORM_
 	}
 
@@ -74,7 +74,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		SetEnvironmentVariableA(_name, _value);
 #else
-		setenv(_name, _value, 1);
+		::setenv(_name, _value, 1);
 #endif // BX_PLATFORM_
 	}
 
