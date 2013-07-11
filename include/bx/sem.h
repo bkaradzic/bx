@@ -7,6 +7,7 @@
 #define __BX_SEM_H__
 
 #include "bx.h"
+#include "mutex.h"
 
 #if BX_PLATFORM_POSIX
 #	include <errno.h>
@@ -20,6 +21,97 @@
 namespace bx
 {
 #if BX_PLATFORM_POSIX
+
+#	if BX_CONFIG_SEMAPHORE_PTHREAD
+	class Semaphore
+	{
+	public:
+		Semaphore()
+			: m_count(0)
+		{
+			int result;
+			result = pthread_mutex_init(&m_mutex, NULL);
+			BX_CHECK(0 == result, "pthread_mutex_init %d", result);
+
+			result = pthread_cond_init(&m_cond, NULL);
+			BX_CHECK(0 == result, "pthread_cond_init %d", result);
+
+			BX_UNUSED(result);
+		}
+
+		~Semaphore()
+		{
+			int result;
+			result = pthread_cond_destroy(&m_cond);
+			BX_CHECK(0 == result, "pthread_cond_destroy %d", result);
+
+			result = pthread_mutex_destroy(&m_mutex);
+			BX_CHECK(0 == result, "pthread_mutex_destroy %d", result);
+
+			BX_UNUSED(result);
+		}
+
+		void post(uint32_t _count = 1)
+		{
+			int result = pthread_mutex_lock(&m_mutex);
+			BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
+
+			for (uint32_t ii = 0; ii < _count; ++ii)
+			{
+				result = pthread_cond_signal(&m_cond);
+				BX_CHECK(0 == result, "pthread_cond_signal %d", result);
+			}
+
+			m_count += _count;
+
+			result = pthread_mutex_unlock(&m_mutex);
+			BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
+
+			BX_UNUSED(result);
+		}
+
+		bool wait(int32_t _msecs = -1)
+		{
+			int result = pthread_mutex_lock(&m_mutex);
+			BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
+
+			timespec ts;
+			clock_gettime(CLOCK_REALTIME, &ts);
+			ts.tv_sec += _msecs/1000;
+			ts.tv_nsec += (_msecs%1000)*1000;
+
+			while (0 == result
+			&&     0 >= m_count)
+			{
+				result = pthread_cond_timedwait(&m_cond, &m_mutex, &ts);
+			}
+
+			bool ok = 0 == result;
+
+			if (ok)
+			{
+				--m_count;
+			}
+
+			result = pthread_mutex_unlock(&m_mutex);
+			BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
+
+			BX_UNUSED(result);
+
+			return ok;
+		}
+
+	private:
+		Semaphore(const Semaphore& _rhs); // no copy constructor
+		Semaphore& operator=(const Semaphore& _rhs); // no assignment operator
+
+		pthread_mutex_t m_mutex;
+		pthread_cond_t m_cond;
+		int32_t m_count;
+	};
+
+#	else
+
 	class Semaphore
 	{
 	public:
@@ -45,10 +137,10 @@ namespace bx
 
 		bool wait(int32_t _msecs = -1)
 		{
-#if BX_PLATFORM_NACL || BX_PLATFORM_OSX
+#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
 			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment.");
 			return 0 == sem_wait(&m_handle);
-#else
+#		else
 			if (0 > _msecs)
 			{
 				return 0 == sem_wait(&m_handle);
@@ -59,7 +151,7 @@ namespace bx
 			ts.tv_sec += _msecs/1000;
 			ts.tv_nsec += (_msecs%1000)*1000;
 			return 0 == sem_timedwait(&m_handle, &ts);
-#endif // BX_PLATFORM_
+#		endif // BX_PLATFORM_
 		}
 
 	private:
@@ -68,6 +160,7 @@ namespace bx
 
 		sem_t m_handle;
 	};
+#	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 
