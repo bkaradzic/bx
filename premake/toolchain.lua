@@ -429,6 +429,9 @@ function toolchain(_buildDir, _libDir)
 		includedirs { bxDir .. "include/compat/osx" }
 
 	configuration { "ios" }
+		targetdir (_buildDir .. "ios-arm" .. "/bin")
+		objdir (_buildDir .. "ios-arm" .. "/obj")
+		libdirs { _libDir .. "lib/ios-arm" }
 		linkoptions {
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk",
 			"-march=armv7-a",
