@@ -19,7 +19,8 @@ function toolchain(_buildDir, _libDir)
 			{ "nacl", "Native Client" },
 			{ "nacl-arm", "Native Client - ARM" },
 			{ "pnacl", "Native Client - PNaCl" },
-			{ "osx", "OS X" },
+			{ "osx", "OSX" },
+			{ "ios", "iOS" },
 			{ "qnx-arm", "QNX/Blackberry - ARM" },
 		}
 	}
@@ -117,6 +118,13 @@ function toolchain(_buildDir, _libDir)
 
 		if "osx" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+		end
+
+		if "ios" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-llvm-gcc-4.2"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-llvm-g++-4.2"
+			premake.gcc.ar = "ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-ios")
 		end
 
 		if "qnx-arm" == _OPTIONS["gcc"] then
@@ -417,6 +425,26 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-msse2",
+		}
+		includedirs { bxDir .. "include/compat/osx" }
+
+	configuration { "ios" }
+		linkoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk",
+			"-march=armv7-a",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk",
+			"-mthumb",
+			"-march=armv7-a",
+			"-mfloat-abi=softfp",
+			"-mfpu=neon",
+			"-U__STRICT_ANSI__",
+			"-Wfatal-errors",
+			"-Wunused-value",
 		}
 		includedirs { bxDir .. "include/compat/osx" }
 

@@ -75,8 +75,8 @@ namespace bx
 			int result = pthread_mutex_lock(&m_mutex);
 			BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
-#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
-			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
+#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX || BX_PLATFORM_IOS
+			BX_CHECK(-1 == _msecs, "NaCl, iOS and OSX don't support pthread_cond_timedwait at this moment.");
 			while (0 == result
 			&&     0 >= m_count)
 			{
