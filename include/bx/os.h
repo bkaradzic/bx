@@ -65,7 +65,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return (void*)GetProcAddress( (HMODULE)_handle, _symbol);
 #else
-		return dlsym(_handle, _symbol);
+		return ::dlsym(_handle, _symbol);
 #endif // BX_PLATFORM_
 	}
 
