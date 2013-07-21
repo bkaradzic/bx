@@ -12,6 +12,13 @@
 #	include <android/log.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
+#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+#	if defined(__OBJC__)
+#		import <Foundation/NSObjCRuntime.h>
+#	else
+#		include <CoreFoundation/CFString.h>
+extern "C" void NSLog(CFStringRef _format, ...);
+#	endif // defined(__OBJC__)
 #else
 #	include <stdio.h>
 #endif // BX_PLATFORM_WINDOWS
@@ -40,6 +47,12 @@ namespace bx
 		__android_log_write(ANDROID_LOG_DEBUG, "", _out);
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 		OutputDebugStringA(_out);
+#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+#	if defined(__OBJC__)
+		NSLog(@"%s", _out);
+#	else
+		NSLog(__CFStringMakeConstantString("%s"), _out);
+#	endif // defined(__OBJC__)
 #else
 		fputs(_out, stderr);
 		fflush(stderr);

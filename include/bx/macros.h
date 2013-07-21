@@ -41,7 +41,7 @@
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
 #	define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, __VA_ARGS__)
-#	if BX_COMPILER_CLANG
+#	if BX_COMPILER_CLANG || BX_PLATFORM_IOS
 #		define BX_THREAD /* not supported right now */
 #	else
 #		define BX_THREAD __thread
@@ -103,7 +103,14 @@
 #endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
-#	define BX_CONFIG_CRT_FILE_READER_WRITER (BX_PLATFORM_ANDROID|BX_PLATFORM_LINUX|BX_PLATFORM_OSX|BX_PLATFORM_QNX|BX_PLATFORM_WINDOWS)
+#	define BX_CONFIG_CRT_FILE_READER_WRITER (0 \
+				|BX_PLATFORM_ANDROID \
+				|BX_PLATFORM_IOS \
+				|BX_PLATFORM_LINUX \
+				|BX_PLATFORM_OSX \
+				|BX_PLATFORM_QNX \
+				|BX_PLATFORM_WINDOWS \
+				)
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 #ifndef BX_CONFIG_SEMAPHORE_PTHREAD
