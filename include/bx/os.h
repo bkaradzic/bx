@@ -14,8 +14,8 @@
 #		include <sys/nacl_syscalls.h> // nanosleep
 #	else
 #		include <time.h> // nanosleep
+#		include <dlfcn.h>
 #	endif // BX_PLATFORM_NACL
-#	include <dlfcn.h>
 #endif // BX_PLATFORM_
 
 namespace bx
@@ -23,29 +23,48 @@ namespace bx
 	inline void sleep(uint32_t _ms)
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
-		Sleep(_ms);
+		::Sleep(_ms);
 #else
 		timespec req = {(time_t)_ms/1000, (long)((_ms%1000)*1000000)};
 		timespec rem = {0, 0};
-		nanosleep(&req, &rem);
+		::nanosleep(&req, &rem);
 #endif // BX_PLATFORM_
 	}
 
 	inline void yield()
 	{
 #if BX_PLATFORM_WINDOWS
-		SwitchToThread();
+		::SwitchToThread();
 #elif BX_PLATFORM_XBOX360
-		Sleep(0);
+		::Sleep(0);
 #else
-		sched_yield();
+		::sched_yield();
 #endif // BX_PLATFORM_
+	}
+
+	inline uint32_t getTid()
+	{
+#if BX_PLATFORM_WINDOWS
+		return ::GetCurrentThreadId();
+#elif BX_PLATFORM_LINUX
+		return (pid_t)::syscall(SYS_gettid);
+#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
+#elif BX_PLATFORM_NACL
+		// Casting __nc_basic_thread_data*... need better way to do this.
+		return *(uint32_t*)::pthread_self();
+#else
+#	pragma message "not implemented."
+		return 0;
+#endif //
 	}
 
 	inline void* dlopen(const char* _filePath)
 	{
 #if BX_PLATFORM_WINDOWS
-		return (void*)LoadLibraryA(_filePath);
+		return (void*)::LoadLibraryA(_filePath);
+#elif BX_PLATFORM_NACL
+		return NULL;
 #else
 		return ::dlopen(_filePath, RTLD_LOCAL|RTLD_LAZY);
 #endif // BX_PLATFORM_
@@ -54,7 +73,8 @@ namespace bx
 	inline void dlclose(void* _handle)
 	{
 #if BX_PLATFORM_WINDOWS
-		FreeLibrary( (HMODULE)_handle);
+		::FreeLibrary( (HMODULE)_handle);
+#elif BX_PLATFORM_NACL
 #else
 		::dlclose(_handle);
 #endif // BX_PLATFORM_
@@ -63,7 +83,9 @@ namespace bx
 	inline void* dlsym(void* _handle, const char* _symbol)
 	{
 #if BX_PLATFORM_WINDOWS
-		return (void*)GetProcAddress( (HMODULE)_handle, _symbol);
+		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
+#elif BX_PLATFORM_NACL
+		return NULL;
 #else
 		return ::dlsym(_handle, _symbol);
 #endif // BX_PLATFORM_
@@ -72,7 +94,7 @@ namespace bx
 	inline void setenv(const char* _name, const char* _value)
 	{
 #if BX_PLATFORM_WINDOWS
-		SetEnvironmentVariableA(_name, _value);
+		::SetEnvironmentVariableA(_name, _value);
 #else
 		::setenv(_name, _value, 1);
 #endif // BX_PLATFORM_
@@ -81,9 +103,9 @@ namespace bx
 	inline void unsetenv(const char* _name)
 	{
 #if BX_PLATFORM_WINDOWS
-		SetEnvironmentVariableA(_name, NULL);
+		::SetEnvironmentVariableA(_name, NULL);
 #else
-		unsetenv(_name);
+		::unsetenv(_name);
 #endif // BX_PLATFORM_
 	}
 
