@@ -14,8 +14,12 @@
 #		include <sys/nacl_syscalls.h> // nanosleep
 #	else
 #		include <time.h> // nanosleep
-#		include <dlfcn.h>
+#		include <dlfcn.h> // dlopen, dlclose, dlsym
 #	endif // BX_PLATFORM_NACL
+#	if BX_PLATFORM_LINUX
+#		include <unistd.h> // syscall
+#		include <sys/syscall.h>
+#	endif // BX_PLATFORM_LINUX
 #endif // BX_PLATFORM_
 
 namespace bx
