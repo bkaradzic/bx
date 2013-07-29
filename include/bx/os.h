@@ -8,7 +8,7 @@
 
 #include "bx.h"
 
-#if BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+#if BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_NACL
 #		include <sys/nacl_syscalls.h> // nanosleep
