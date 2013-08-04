@@ -14,10 +14,4 @@ namespace bx
 {
 }// namespace bx
 
-#ifndef BX_NAMESPACE
-#	define BX_NAMESPACE 0
-#elif BX_NAMESPACE
-using namespace bx;
-#endif // BX_NAMESPACE
-
 #endif // __BX_H__ 
