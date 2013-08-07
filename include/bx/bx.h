@@ -12,6 +12,10 @@
 
 namespace bx
 {
-}// namespace bx
+	// http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
+	template<typename T, size_t N> char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]) )[N];
+#define BX_COUNTOF(x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(x) )
+
+} // namespace bx
 
 #endif // __BX_H__ 
