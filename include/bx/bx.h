@@ -6,7 +6,9 @@
 #ifndef __BX_H__
 #define __BX_H__
 
-#include <stdint.h>
+#include <stdint.h> // uint32_t
+#include <stdlib.h> // size_t
+
 #include "platform.h"
 #include "macros.h"
 
@@ -17,5 +19,8 @@ namespace bx
 #define BX_COUNTOF(x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(x) )
 
 } // namespace bx
+
+// Annoying C++0x stuff..
+namespace std { namespace tr1 {}; using namespace tr1; }
 
 #endif // __BX_H__ 

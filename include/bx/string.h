@@ -8,6 +8,7 @@
 
 #include "bx.h"
 #include <alloca.h>
+#include <ctype.h> // tolower
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf
 #include <string.h>
@@ -16,6 +17,12 @@
 
 namespace bx
 {
+	inline bool toBool(const char* _str)
+	{
+		char ch = tolower(_str[0]);
+		return ch == 't' ||  ch == '1';
+	}
+
 	/// Case insensitive string compare.
 	inline int32_t stricmp(const char* _a, const char* _b)
 	{

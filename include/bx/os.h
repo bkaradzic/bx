@@ -20,6 +20,9 @@
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
 #	endif // BX_PLATFORM_LINUX
+#	if BX_PLATFORM_ANDROID
+#		include "debug.h" // getTid is not implemented...
+#	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
 namespace bx
@@ -58,7 +61,8 @@ namespace bx
 		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
 #else
-#	pragma message "not implemented."
+//#	pragma message "not implemented."
+		debugOutput("getTid is not implemented"); debugBreak();
 		return 0;
 #endif //
 	}
