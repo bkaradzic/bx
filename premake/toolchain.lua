@@ -15,6 +15,7 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm", "Android - ARM" },
 --			{ "emscripten-experimental", "Emscripten" },
 			{ "linux", "Linux" },
+			{ "linux-clang", "Linux (Clang compiler)" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
 			{ "nacl-arm", "Native Client - ARM" },
@@ -72,6 +73,13 @@ function toolchain(_buildDir, _libDir)
 
 		if "linux" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux")
+		end
+
+		if "linux-clang" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "clang"
+			premake.gcc.cxx = "clang++"
+			premake.gcc.ar = "ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-linux-clang")
 		end
 
 		if "mingw" == _OPTIONS["gcc"] then
@@ -242,12 +250,21 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m64" }
 
-	configuration { "linux" }
+	configuration { "linux and not linux-clang" }
+		buildoptions {
+			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
+		}
+
+	configuration { "linux-clang" }
+		buildoptions {
+			"--analyze",
+		}
+
+	configuration { "linux or linux-clang" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wunused-value",
-			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 			"-msse2",
 		}
 		links {
@@ -269,6 +286,22 @@ function toolchain(_buildDir, _libDir)
 		targetdir (_buildDir .. "linux64_gcc" .. "/bin")
 		objdir (_buildDir .. "linux64_gcc" .. "/obj")
 		libdirs { _libDir .. "lib/linux64_gcc" }
+		buildoptions {
+			"-m64",
+		}
+
+	configuration { "linux-clang", "x32" }
+		targetdir (_buildDir .. "linux32_clang" .. "/bin")
+		objdir (_buildDir .. "linux32_clang" .. "/obj")
+		libdirs { _libDir .. "lib/linux32_clang" }
+		buildoptions {
+			"-m32",
+		}
+
+	configuration { "linux-clang", "x64" }
+		targetdir (_buildDir .. "linux64_clang" .. "/bin")
+		objdir (_buildDir .. "linux64_clang" .. "/obj")
+		libdirs { _libDir .. "lib/linux64_clang" }
 		buildoptions {
 			"-m64",
 		}

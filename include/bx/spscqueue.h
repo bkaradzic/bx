@@ -6,12 +6,12 @@
 #ifndef __BX_SPSCQUEUE_H__
 #define __BX_SPSCQUEUE_H__
 
-#include <list>
-
 #include "bx.h"
 #include "cpu.h"
 #include "mutex.h"
 #include "uint32_t.h"
+
+#include <list>
 
 namespace bx
 {
