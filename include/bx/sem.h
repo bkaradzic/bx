@@ -13,6 +13,7 @@
 #	include <errno.h>
 #	include <semaphore.h>
 #	include <time.h>
+#	include <pthread.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 #	include <windows.h>
 #	include <limits.h>
