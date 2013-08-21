@@ -190,6 +190,11 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		*reinterpret_cast<float4_t*>(_ptr) = _a;
 	}
 
+	BX_FLOAT4_INLINE void float4_stx(void* _ptr, float4_t _a)
+	{
+		*reinterpret_cast<uint32_t*>(_ptr) = _a.uxyzw[0];
+	}
+
 	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
 		*reinterpret_cast<float4_t*>(_ptr) = _a;
@@ -239,20 +244,20 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	BX_FLOAT4_INLINE float4_t float4_itof(float4_t _a)
 	{
 		float4_t result;
-		result.fxyzw[0] = (float)result.ixyzw[0];
-		result.fxyzw[1] = (float)result.ixyzw[1];
-		result.fxyzw[2] = (float)result.ixyzw[2];
-		result.fxyzw[3] = (float)result.ixyzw[3];
+		result.fxyzw[0] = (float)_a.ixyzw[0];
+		result.fxyzw[1] = (float)_a.ixyzw[1];
+		result.fxyzw[2] = (float)_a.ixyzw[2];
+		result.fxyzw[3] = (float)_a.ixyzw[3];
 		return result;
 	}
 
 	BX_FLOAT4_INLINE float4_t float4_ftoi(float4_t _a)
 	{
 		float4_t result;
-		result.ixyzw[0] = (int)result.fxyzw[0];
-		result.ixyzw[1] = (int)result.fxyzw[1];
-		result.ixyzw[2] = (int)result.fxyzw[2];
-		result.ixyzw[3] = (int)result.fxyzw[3];
+		result.ixyzw[0] = (int)_a.fxyzw[0];
+		result.ixyzw[1] = (int)_a.fxyzw[1];
+		result.ixyzw[2] = (int)_a.fxyzw[2];
+		result.ixyzw[3] = (int)_a.fxyzw[3];
 		return result;
 	}
 

@@ -143,6 +143,11 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		_mm_store_ps(reinterpret_cast<float*>(_ptr), _a);
 	}
 
+	BX_FLOAT4_INLINE void float4_stx(void* _ptr, float4_t _a)
+	{
+		_mm_store_ss(reinterpret_cast<float*>(_ptr), _a);
+	}
+
 	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
 		_mm_stream_ps(reinterpret_cast<float*>(_ptr), _a);

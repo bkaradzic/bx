@@ -28,6 +28,10 @@
 #	define BX_ALIGNED_FREE(_allocator, _ptr)           bx::alignedFree(_allocator, _ptr)
 #endif // BX_CONFIG_DEBUG_ALLOC
 
+#ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+#	define BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8
+#endif // BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+
 namespace bx
 {
 	struct BX_NO_VTABLE AllocatorI
@@ -87,11 +91,11 @@ namespace bx
 		return _allocator->alignedRealloc(_ptr, _size, _align, _file, _line);
 	}
 
-	inline void* alignPtr(void* _ptr, size_t _align)
+	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
 	{
 		union { void* ptr; size_t addr; } un;
 		un.ptr = _ptr;
-		size_t unaligned = un.addr + sizeof(uint32_t); // space for header
+		size_t unaligned = un.addr + _extra; // space for header
 		size_t mask = _align-1;
 		size_t aligned = BX_ALIGN_MASK(unaligned, mask);
 		un.addr = aligned;
@@ -102,7 +106,7 @@ namespace bx
 	{
 		size_t total = _size + _align;
 		uint8_t* ptr = (uint8_t*)alloc(_allocator, total, _file, _line);
-		uint8_t* aligned = (uint8_t*)alignPtr(ptr, _align);
+		uint8_t* aligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), _align);
 		uint32_t* header = (uint32_t*)aligned - 1;
 		*header = uint32_t(aligned - ptr);
 		return aligned;
@@ -128,7 +132,7 @@ namespace bx
 		uint8_t* ptr = aligned - offset;
 		size_t total = _size + _align;
 		ptr = (uint8_t*)realloc(_allocator, ptr, total, _file, _line);
-		uint8_t* newAligned = (uint8_t*)alignPtr(ptr, _align);
+		uint8_t* newAligned = (uint8_t*)alignPtr(ptr, sizeof(uint32_t), _align);
 
 		if (newAligned == aligned)
 		{

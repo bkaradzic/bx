@@ -8,7 +8,7 @@
 
 #include "bx.h"
 #include <alloca.h>
-#include <ctype.h> // tolower
+#include <ctype.h>  // tolower
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf
 #include <string.h>
@@ -19,7 +19,7 @@ namespace bx
 {
 	inline bool toBool(const char* _str)
 	{
-		char ch = tolower(_str[0]);
+		char ch = (char)tolower(_str[0]);
 		return ch == 't' ||  ch == '1';
 	}
 
