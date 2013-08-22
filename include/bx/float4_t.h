@@ -15,6 +15,7 @@
 #elif 0 // __ARM_NEON__
 #	include "float4_neon.h"
 #else
+#	pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
 #	include "float4_ref.h"
 #endif //
 

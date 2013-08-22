@@ -183,6 +183,9 @@ function toolchain(_buildDir, _libDir)
 		targetsuffix "Release"
 
 	configuration { "vs*" }
+		flags {
+			"EnableSSE2",
+		}
 		includedirs { bxDir .. "include/compat/msvc" }
 		defines {
 			"WIN32",

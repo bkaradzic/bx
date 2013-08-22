@@ -194,16 +194,11 @@ namespace bx
 
 	namespace float4_logexp_detail
 	{
-		BX_FLOAT4_INLINE float4_t float4_poly0(float4_t _a, float _b)
-		{
-			return float4_splat(_b);
-		}
-
 		BX_FLOAT4_INLINE float4_t float4_poly1(float4_t _a, float _b, float _c)
 		{
 			const float4_t bbbb   = float4_splat(_b);
-			const float4_t poly0  = float4_poly0(_a, _c);
-			const float4_t result = float4_madd(poly0, _a, bbbb);
+			const float4_t cccc   = float4_splat(_c);
+			const float4_t result = float4_madd(cccc, _a, bbbb);
 
 			return result;
 		}

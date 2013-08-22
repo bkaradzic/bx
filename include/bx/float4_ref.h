@@ -182,22 +182,37 @@ IMPLEMENT_TEST(xyzw , 0xf);
 
 	BX_FLOAT4_INLINE float4_t float4_ld(const void* _ptr)
 	{
-		return *reinterpret_cast<const float4_t*>(_ptr);
+		const uint32_t* input = reinterpret_cast<const uint32_t*>(_ptr);
+		float4_t result;
+		result.uxyzw[0] = input[0];
+		result.uxyzw[1] = input[1];
+		result.uxyzw[2] = input[2];
+		result.uxyzw[3] = input[3];
+		return result;
 	}
 
 	BX_FLOAT4_INLINE void float4_st(void* _ptr, float4_t _a)
 	{
-		*reinterpret_cast<float4_t*>(_ptr) = _a;
+		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
+		result[0] = _a.uxyzw[0];
+		result[1] = _a.uxyzw[1];
+		result[2] = _a.uxyzw[2];
+		result[3] = _a.uxyzw[3];
 	}
 
 	BX_FLOAT4_INLINE void float4_stx(void* _ptr, float4_t _a)
 	{
-		*reinterpret_cast<uint32_t*>(_ptr) = _a.uxyzw[0];
+		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
+		result[0] = _a.uxyzw[0];
 	}
 
 	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
-		*reinterpret_cast<float4_t*>(_ptr) = _a;
+		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
+		result[0] = _a.uxyzw[0];
+		result[1] = _a.uxyzw[1];
+		result[2] = _a.uxyzw[2];
+		result[3] = _a.uxyzw[3];
 	}
 
 	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
@@ -222,8 +237,13 @@ IMPLEMENT_TEST(xyzw , 0xf);
 
 	BX_FLOAT4_INLINE float4_t float4_splat(const void* _ptr)
 	{
-		float val = *reinterpret_cast<const float*>(_ptr);
-		return float4_ld(val, val, val, val);
+		const uint32_t val = *reinterpret_cast<const uint32_t*>(_ptr);
+		float4_t result;
+		result.uxyzw[0] = val;
+		result.uxyzw[1] = val;
+		result.uxyzw[2] = val;
+		result.uxyzw[3] = val;
+		return result;
 	}
 
 	BX_FLOAT4_INLINE float4_t float4_splat(float _a)
