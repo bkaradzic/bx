@@ -117,6 +117,26 @@ namespace bx
 		virtual int32_t close() = 0;
 	};
 
+	inline int32_t open(FileReaderI* _reader, const char* _filePath)
+	{
+		return _reader->open(_filePath);
+	}
+
+	inline int32_t close(FileReaderI* _reader)
+	{
+		return _reader->close();
+	}
+
+	inline int32_t open(FileWriterI* _writer, const char* _filePath, bool _append = false)
+	{
+		return _writer->open(_filePath, _append);
+	}
+
+	inline int32_t close(FileWriterI* _writer)
+	{
+		return _writer->close();
+	}
+
 	struct BX_NO_VTABLE MemoryBlockI
 	{
 		virtual void* more(uint32_t _size = 0) = 0;
