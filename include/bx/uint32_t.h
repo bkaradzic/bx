@@ -43,6 +43,11 @@
 #	endif // BX_PLATFORM_WINDOWS
 #endif // BX_COMPILER_MSVC
 
+#define BX_HALF_FLOAT_ZERO UINT16_C(0)
+#define BX_HALF_FLOAT_HALF UINT16_C(0x3800)
+#define BX_HALF_FLOAT_ONE  UINT16_C(0x3c00)
+#define BX_HALF_FLOAT_TWO  UINT16_C(0x4000)
+
 namespace bx
 {
 	inline uint32_t uint32_li(uint32_t _a)
