@@ -34,7 +34,7 @@
 
 namespace bx
 {
-	/// Aligns pointer to nearest next aligned address. _align
+	/// Aligns pointer to nearest next aligned address. _align must be power of two.
 	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
 	{
 		union { void* ptr; size_t addr; } un;
@@ -46,7 +46,7 @@ namespace bx
 		return un.ptr;
 	}
 
-	/// Check if pointer is aligned. _align must be power of two value.
+	/// Check if pointer is aligned. _align must be power of two.
 	inline bool isPtrAligned(const void* _ptr, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
 	{
 		union { const void* ptr; size_t addr; } un;
