@@ -34,6 +34,26 @@
 
 namespace bx
 {
+	/// Aligns pointer to nearest next aligned address. _align
+	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
+	{
+		union { void* ptr; size_t addr; } un;
+		un.ptr = _ptr;
+		size_t unaligned = un.addr + _extra; // space for header
+		size_t mask = _align-1;
+		size_t aligned = BX_ALIGN_MASK(unaligned, mask);
+		un.addr = aligned;
+		return un.ptr;
+	}
+
+	/// Check if pointer is aligned. _align must be power of two value.
+	inline bool isPtrAligned(const void* _ptr, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
+	{
+		union { const void* ptr; size_t addr; } un;
+		un.ptr = _ptr;
+		return 0 == (un.addr & (_align-1) );
+	}
+
 	struct BX_NO_VTABLE AllocatorI
 	{
 		virtual ~AllocatorI() = 0;
@@ -89,17 +109,6 @@ namespace bx
 	inline void* realloc(AlignedReallocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file = NULL, uint32_t _line = 0)
 	{
 		return _allocator->alignedRealloc(_ptr, _size, _align, _file, _line);
-	}
-
-	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT)
-	{
-		union { void* ptr; size_t addr; } un;
-		un.ptr = _ptr;
-		size_t unaligned = un.addr + _extra; // space for header
-		size_t mask = _align-1;
-		size_t aligned = BX_ALIGN_MASK(unaligned, mask);
-		un.addr = aligned;
-		return un.ptr;	
 	}
 
 	static inline void* alignedAlloc(AllocatorI* _allocator, size_t _size, size_t _align, const char* _file = NULL, uint32_t _line = 0)
