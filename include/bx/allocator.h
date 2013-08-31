@@ -70,7 +70,7 @@ namespace bx
 		virtual void* realloc(void* _ptr, size_t _size, const char* _file, uint32_t _line) = 0;
 	};
 
-	struct BX_NO_INLINE AlignedAllocatorI
+	struct BX_NO_VTABLE AlignedAllocatorI
 	{
 		virtual void* alignedAlloc(size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
 		virtual void alignedFree(void* _ptr, const char* _file, uint32_t _line) = 0;
