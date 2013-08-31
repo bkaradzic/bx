@@ -206,7 +206,7 @@ namespace bx
 			BX_UNUSED(_file, _line);
 			return _aligned_malloc(_size, _align);
 #	else
-			return alignedAlloc(static_cast<AlignedReallocatorI*>(this), _size, _align, _file, _line);
+			return bx::alignedAlloc(static_cast<AlignedReallocatorI*>(this), _size, _align, _file, _line);
 #	endif // BX_
 		}
 
@@ -216,7 +216,7 @@ namespace bx
 			BX_UNUSED(_file, _line);
 			return _aligned_free(_ptr);
 #	else
-			return alignedFree(static_cast<AlignedReallocatorI*>(this), _ptr, _align, _file, _line);
+			return bx::alignedFree(static_cast<AlignedReallocatorI*>(this), _ptr, _file, _line);
 #	endif // BX_
 		}
 
@@ -226,7 +226,7 @@ namespace bx
 			BX_UNUSED(_file, _line);
 			return _aligned_realloc(_ptr, _size, _align);
 #	else
-			return alignedRealloc(static_cast<AlignedReallocatorI*>(this), _ptr, _size, _align, _file, _line);
+			return bx::alignedRealloc(static_cast<AlignedReallocatorI*>(this), _ptr, _size, _align, _file, _line);
 #	endif // BX_
 		}
 	};
