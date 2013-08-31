@@ -229,6 +229,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
+			"-msse2",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
