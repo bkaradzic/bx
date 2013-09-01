@@ -203,6 +203,9 @@ function toolchain(_buildDir, _libDir)
 			"/Ob2", -- The Inline Function Expansion
 		}
 
+	configuration { "vs2008" }
+		includedirs { bxDir .. "include/compat/msvc/pre1600" }
+
 	configuration { "x32", "vs*" }
 		targetdir (_buildDir .. "win32_" .. _ACTION .. "/bin")
 		objdir (_buildDir .. "win32_" .. _ACTION .. "/obj")
