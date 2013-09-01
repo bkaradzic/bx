@@ -133,15 +133,20 @@ namespace bx
 
 		~Semaphore()
 		{
-			sem_destroy(&m_handle);
+			int32_t result = sem_destroy(&m_handle);
+			BX_CHECK(0 == result, "sem_destroy failed. errno %d", errno);
+			BX_UNUSED(result);
 		}
 
 		void post(uint32_t _count = 1)
 		{
+			int32_t result;
 			for (uint32_t ii = 0; ii < _count; ++ii)
 			{
-				sem_post(&m_handle);
+				result = sem_post(&m_handle);
+				BX_CHECK(0 == result, "sem_post failed. errno %d", errno);
 			}
+			BX_UNUSED(result);
 		}
 
 		bool wait(int32_t _msecs = -1)
@@ -152,7 +157,14 @@ namespace bx
 #		else
 			if (0 > _msecs)
 			{
-				return 0 == sem_wait(&m_handle);
+				int32_t result;
+				do
+				{
+					result = sem_wait(&m_handle);
+				} // keep waiting when interrupted by a signal handler...
+				while (-1 == result && EINTR == errno);
+				BX_CHECK(0 == result, "sem_wait failed. errno %d", errno);
+				return 0 == result;
 			}
 
 			timespec ts;
