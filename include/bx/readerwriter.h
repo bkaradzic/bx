@@ -62,26 +62,59 @@ namespace bx
 	{
 	}
 
+	/// Read data.
 	inline int32_t read(ReaderI* _reader, void* _data, int32_t _size)
 	{
 		return _reader->read(_data, _size);
 	}
 
+	/// Write value.
 	template<typename Ty>
 	inline int32_t read(ReaderI* _reader, Ty& _value)
 	{
 		return _reader->read(&_value, sizeof(Ty) );
 	}
 
+	/// Read value and converts it to host endianess. _fromLittleEndian specifies
+	/// underlying stream endianess.
+	template<typename Ty>
+	inline int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian)
+	{
+		Ty value;
+		int32_t result = _reader->read(&value, sizeof(Ty) );
+		_value = toHostEndian(value, _fromLittleEndian);
+		return result;
+	}
+
+	/// Write data.
 	inline int32_t write(WriterI* _writer, const void* _data, int32_t _size)
 	{
 		return _writer->write(_data, _size);
 	}
 
+	/// Write value.
 	template<typename Ty>
 	inline int32_t write(WriterI* _writer, const Ty& _value)
 	{
 		return _writer->write(&_value, sizeof(Ty) );
+	}
+
+	/// Write value as little endian.
+	template<typename Ty>
+	inline int32_t writeLE(WriterI* _writer, const Ty& _value)
+	{
+		Ty value = toLittleEndian(_value);
+		int32_t result = _writer->write(&value, sizeof(Ty) );
+		return result;
+	}
+
+	/// Write value as big endian.
+	template<typename Ty>
+	inline int32_t writeBE(WriterI* _writer, const Ty& _value)
+	{
+		Ty value = toBigEndian(_value);
+		int32_t result = _writer->write(&value, sizeof(Ty) );
+		return result;
 	}
 
 	inline int64_t skip(SeekerI* _seeker, int64_t _offset)
