@@ -8,24 +8,31 @@
 
 #include "bx.h"
 
+#include <memory.h>
+#include <new>
+
 #if BX_CONFIG_ALLOCATOR_CRT
 #	include <malloc.h>
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
-#	define BX_ALLOC(_allocator, _size)                 bx::alloc(_allocator, _size, __FILE__, __LINE__)
-#	define BX_REALLOC(_allocator, _ptr, _size)         bx::realloc(_allocator, _ptr, _size, __FILE__, __LINE__)
-#	define BX_FREE(_allocator, _ptr)                   bx::free(_allocator, _ptr, __FILE__, __LINE__)
-#	define BX_ALIGNED_ALLOC(_allocator, _size)         bx::alignedAlloc(_allocator, _size, __FILE__, __LINE__)
-#	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size) bx::alignedRealloc(_allocator, _ptr, _size, __FILE__, __LINE__)
-#	define BX_ALIGNED_FREE(_allocator, _ptr)           bx::alignedFree(_allocator, _ptr, __FILE__, __LINE__)
+#	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, __FILE__, __LINE__)
+#	define BX_REALLOC(_allocator, _ptr, _size)                 bx::realloc(_allocator, _ptr, _size, __FILE__, __LINE__)
+#	define BX_FREE(_allocator, _ptr)                           bx::free(_allocator, _ptr, __FILE__, __LINE__)
+#	define BX_ALIGNED_ALLOC(_allocator, _size, _align)         bx::alignedAlloc(_allocator, _size, _align, __FILE__, __LINE__)
+#	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size, _align) bx::alignedRealloc(_allocator, _ptr, _size, _align, __FILE__, __LINE__)
+#	define BX_ALIGNED_FREE(_allocator, _ptr)                   bx::alignedFree(_allocator, _ptr, __FILE__, __LINE__)
+#	define BX_NEW(_allocator, _type)                           new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
+#	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr, __FILE__, __LINE__)
 #else
-#	define BX_ALLOC(_allocator, _size)                 bx::alloc(_allocator, _size)
-#	define BX_REALLOC(_allocator, _ptr, _size)         bx::realloc(_allocator, _ptr, _size)
-#	define BX_FREE(_allocator, _ptr)                   bx::free(_allocator, _ptr)
-#	define BX_ALIGNED_ALLOC(_allocator, _size)         bx::alignedAlloc(_allocator, _size)
-#	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size) bx::alignedRealloc(_allocator, _ptr, _size)
-#	define BX_ALIGNED_FREE(_allocator, _ptr)           bx::alignedFree(_allocator, _ptr)
+#	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size)
+#	define BX_REALLOC(_allocator, _ptr, _size)                 bx::realloc(_allocator, _ptr, _size)
+#	define BX_FREE(_allocator, _ptr)                           bx::free(_allocator, _ptr)
+#	define BX_ALIGNED_ALLOC(_allocator, _size, _align)         bx::alignedAlloc(_allocator, _size, _align)
+#	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size, _align) bx::alignedRealloc(_allocator, _ptr, _size, _align)
+#	define BX_ALIGNED_FREE(_allocator, _ptr)                   bx::alignedFree(_allocator, _ptr)
+#	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
+#	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr)
 #endif // BX_CONFIG_DEBUG_ALLOC
 
 #ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
@@ -168,6 +175,16 @@ namespace bx
 	inline void* alignedRealloc(AlignedReallocatorI* _allocator, void* _ptr, size_t _size, size_t _align, const char* _file = NULL, uint32_t _line = 0)
 	{
 		return _allocator->alignedRealloc(_ptr, _size, _align, _file, _line);
+	}
+
+	template <typename ObjectT>
+	inline void deleteObject(AllocatorI* _allocator, ObjectT* _object, const char* _file = NULL, uint32_t _line = 0)
+	{
+		if (NULL != _object)
+		{
+			_object->~ObjectT();
+			free(_allocator, _object, _file, _line);
+		}
 	}
 
 #if BX_CONFIG_ALLOCATOR_CRT
