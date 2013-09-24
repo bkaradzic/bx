@@ -29,7 +29,7 @@
 
 #include "new.h"
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && defined(__is_pod)
 #	define TINYSTL_TRY_POD_OPTIMIZATION(t) __is_pod(t)
 #elif defined(_MSC_VER)
 #	define TINYSTL_TRY_POD_OPTIMIZATION(t) (!__is_class(t) || __is_pod(t))
