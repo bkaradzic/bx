@@ -13,7 +13,6 @@ function flagsremove(name)
 		for index, value in pairs(tbl) do
 			if value == name then
 				table.remove(tbl, index)
-				print(index, value, type(value))
 			end
 		end
 	end

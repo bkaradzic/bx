@@ -50,6 +50,7 @@ namespace tinystl {
 		void resize(size_t size);
 
 		void append(const char* first, const char* last);
+		void append(const char* str);
 
 		void swap(string& other);
 
@@ -154,6 +155,10 @@ namespace tinystl {
 		for (; first != last; ++m_last, ++first)
 			*m_last = *first;
 		*m_last = 0;
+	}
+
+	inline void string::append(const char* str) {
+		append(str, str + strlen(str) );
 	}
 
 	inline void string::swap(string& other) {
