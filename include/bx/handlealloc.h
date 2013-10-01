@@ -8,6 +8,7 @@
 
 #include "bx.h"
 #include "allocator.h"
+#include "debug.h"
 
 namespace bx
 {
@@ -17,7 +18,7 @@ namespace bx
 	public:
 		static const uint16_t invalid = 0xffff;
 
-		HandleAllocT()
+		BX_NO_INLINE HandleAllocT()
 			: m_numHandles(0)
 		{
 			for (uint16_t ii = 0; ii < MaxHandlesT; ++ii)

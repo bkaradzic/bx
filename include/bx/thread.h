@@ -154,6 +154,69 @@ namespace bx
 		bool m_running;
 	};
 
+#if BX_PLATFORM_WINDOWS
+	class TlsData
+	{
+	public:
+		TlsData()
+		{
+			m_id = TlsAlloc();
+			BX_CHECK(TLS_OUT_OF_INDEXES != m_id, "Failed to allocated TLS index (err: 0x%08x).", GetLastError() );
+		}
+
+		~TlsData()
+		{
+			BOOL result = TlsFree(m_id);
+			BX_CHECK(0 != result, "Failed to free TLS index (err: 0x%08x).", GetLastError() ); BX_UNUSED(result);
+		}
+
+		void* get() const
+		{
+			return TlsGetValue(m_id);
+		}
+
+		void set(void* _ptr)
+		{
+			TlsSetValue(m_id, _ptr);
+		}
+
+	private:
+		uint32_t m_id;
+	};
+
+#else
+
+	class TlsData
+	{
+	public:
+		TlsData()
+		{
+			int result = pthread_key_create(&m_id, NULL);
+			BX_CHECK(0 == result, "pthread_key_create failed %d.", result); BX_UNUSED(result);
+		}
+
+		~TlsData()
+		{
+			int result = pthread_key_delete(m_id);
+			BX_CHECK(0 == result, "pthread_key_delete failed %d.", result); BX_UNUSED(result);
+		}
+
+		void* get() const
+		{
+			return pthread_getspecific(m_id);
+		}
+
+		void set(void* _ptr)
+		{
+			int result = pthread_setspecific(m_id, _ptr);
+			BX_CHECK(0 == result, "pthread_setspecific failed %d.", result); BX_UNUSED(result);
+		}
+
+	private:
+		pthread_key_t m_id;
+	};
+#endif // BX_PLATFORM_WINDOWS
+
 } // namespace bx
 
 #endif // __BX_THREAD_H__
