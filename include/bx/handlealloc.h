@@ -8,7 +8,6 @@
 
 #include "bx.h"
 #include "allocator.h"
-#include "debug.h"
 
 namespace bx
 {
