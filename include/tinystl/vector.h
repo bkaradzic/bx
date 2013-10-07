@@ -27,7 +27,6 @@
 #ifndef TINYSTL_VECTOR_H
 #define TINYSTL_VECTOR_H
 
-#include "allocator.h"
 #include "buffer.h"
 #include "new.h"
 #include "stddef.h"

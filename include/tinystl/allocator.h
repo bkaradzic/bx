@@ -29,6 +29,8 @@
 
 #include "stddef.h"
 
+#ifndef TINYSTL_ALLOCATOR
+
 namespace tinystl {
 
 	struct allocator {
@@ -42,8 +44,7 @@ namespace tinystl {
 	};
 }
 
-#ifndef TINYSTL_ALLOCATOR
 #	define TINYSTL_ALLOCATOR ::tinystl::allocator
-#endif
+#endif // TINYSTL_ALLOCATOR
 
 #endif

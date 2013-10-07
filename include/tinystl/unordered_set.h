@@ -27,7 +27,6 @@
 #ifndef TINYSTL_UNORDERED_SET_H
 #define TINYSTL_UNORDERED_SET_H
 
-#include "allocator.h"
 #include "buffer.h"
 #include "hash.h"
 #include "hash_base.h"
@@ -65,7 +64,7 @@ namespace tinystl {
 		typedef unordered_hash_node<Key, void>* pointer;
 
 		size_t m_size;
-		tinystl::buffer<pointer, Alloc> m_buckets;
+		buffer<pointer, Alloc> m_buckets;
 	};
 
 	template<typename Key, typename Alloc>

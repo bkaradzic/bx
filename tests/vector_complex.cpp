@@ -25,7 +25,10 @@
  */
 
 #include "test.h"
+
+#include <tinystl/allocator.h>
 #include <tinystl/vector.h>
+
 #include <algorithm>
 #include <string.h>
 #include <stdlib.h>

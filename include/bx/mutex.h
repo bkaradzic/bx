@@ -104,45 +104,7 @@ namespace bx
 		Mutex& m_mutex;
 	};
 
-#if 1
 	typedef Mutex LwMutex;
-#else
-	class LwMutex
-	{
-	public:
-		LwMutex()
-			: m_count(0)
-		{
-		}
-
-		~LwMutex()
-		{
-		}
-
-		void lock()
-		{
-			if (atomicIncr(&m_count) > 1)
-			{
-				m_sem.wait();
-			}
-		}
-
-		void unlock()
-		{
-			if (atomicDecr(&m_count) > 0)
-			{
-				m_sem.post();
-			}
-		}
-
-	private:
-		LwMutex(const LwMutex& _rhs); // no copy constructor
-		LwMutex& operator=(const LwMutex& _rhs); // no assignment operator
-
-		Semaphore m_sem;
-		volatile int32_t m_count;
-	};
-#endif // 0
 
 	class LwMutexScope
 	{
