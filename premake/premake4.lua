@@ -37,7 +37,7 @@ project "bx.test"
 	uuid "8a653da8-23d6-11e3-acb4-887628d43830"
 	kind "ConsoleApp"
 
-	debugdir (BX_DIR .."tests")
+	debugdir (BX_DIR .. "tests")
 
 	includedirs {
 		BX_DIR .. "include",
@@ -49,6 +49,6 @@ project "bx.test"
 	}
 
 	files {
-		BX_DIR .. "test/**.cpp",
-		BX_DIR .. "test/**.H",
+		BX_DIR .. "tests/**.cpp",
+		BX_DIR .. "tests/**.H",
 	}

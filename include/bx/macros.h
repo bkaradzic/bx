@@ -8,12 +8,21 @@
 
 #include "bx.h"
 
-#define BX_VA_ARGS_COUNT_DETAIL(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12, _a13, _a14, _a15, _a16, _last, ...) _last
-#define BX_VA_ARGS_COUNT(...) BX_VA_ARGS_COUNT_DETAIL(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+#if BX_COMPILER_MSVC
+// Workaround MSVS bug...
+#	define BX_VA_ARGS_PASS(...) BX_VA_ARGS_PASS_1_ __VA_ARGS__ BX_VA_ARGS_PASS_2_
+#	define BX_VA_ARGS_PASS_1_ (
+#	define BX_VA_ARGS_PASS_2_ )
+#else
+#	define BX_VA_ARGS_PASS(...) (__VA_ARGS__)
+#endif // BX_COMPILER_MSVC
 
-#define BX_MACRO_DISPATCHER_DETAIL2(_func, _argCount) _func ## _argCount
-#define BX_MACRO_DISPATCHER_DETAIL1(_func, _argCount) BX_MACRO_DISPATCHER_DETAIL2(_func, _argCount)
-#define BX_MACRO_DISPATCHER(_func, ...) BX_MACRO_DISPATCHER_DETAIL1(_func, BX_VA_ARGS_COUNT(__VA_ARGS__) )
+#define BX_VA_ARGS_COUNT(...) BX_VA_ARGS_COUNT_ BX_VA_ARGS_PASS(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+#define BX_VA_ARGS_COUNT_(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12, _a13, _a14, _a15, _a16, _last, ...) _last
+
+#define BX_MACRO_DISPATCHER(_func, ...) BX_MACRO_DISPATCHER_1_(_func, BX_VA_ARGS_COUNT(__VA_ARGS__) )
+#define BX_MACRO_DISPATCHER_1_(_func, _argCount) BX_MACRO_DISPATCHER_2_(_func, _argCount)
+#define BX_MACRO_DISPATCHER_2_(_func, _argCount) BX_CONCATENATE(_func, _argCount)
 
 #define BX_MAKEFOURCC(_a, _b, _c, _d) ( ( (uint32_t)(_a) | ( (uint32_t)(_b) << 8) | ( (uint32_t)(_c) << 16) | ( (uint32_t)(_d) << 24) ) )
 
@@ -41,7 +50,7 @@
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
-#	define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, __VA_ARGS__)
+#	define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #	if BX_COMPILER_CLANG || BX_PLATFORM_IOS
 #		define BX_THREAD /* not supported right now */
 #	else
@@ -82,7 +91,13 @@
 #define BX_UNUSED_10(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10) BX_UNUSED_9(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9); BX_UNUSED_1(_a10)
 #define BX_UNUSED_11(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11) BX_UNUSED_10(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10); BX_UNUSED_1(_a11)
 #define BX_UNUSED_12(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12) BX_UNUSED_11(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11); BX_UNUSED_1(_a12)
-#define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__)(__VA_ARGS__)
+
+#if BX_COMPILER_MSVC
+// Workaround MSVS bug...
+#	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__) BX_VA_ARGS_PASS(__VA_ARGS__)
+#else
+#	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__)(__VA_ARGS__)
+#endif // BX_COMPILER_MSVC
 
 #define BX_CLASS_NO_COPY_NO_ASSIGNMENT(_class) \
 			_class(const _class&); \

@@ -12,7 +12,6 @@
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf
 #include <string.h>
-#include <string>
 #include <wchar.h>  // wchar_t
 
 namespace bx
@@ -223,7 +222,8 @@ namespace bx
 		return len;
 	}
 
-	inline void stringPrintfVargs(std::string& _out, const char* _format, va_list _argList)
+	template <typename Ty>
+	inline void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList)
 	{
 		char temp[2048];
 
@@ -238,7 +238,8 @@ namespace bx
 		_out.append(out);
 	}
 
-	inline void stringPrintf(std::string& _out, const char* _format, ...)
+	template <typename Ty>
+	inline void stringPrintf(Ty& _out, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);

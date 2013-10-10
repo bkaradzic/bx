@@ -25,4 +25,5 @@
  */
 
 // Test that header is standalone
+#include <tinystl/allocator.h>
 #include <tinystl/vector.h>
