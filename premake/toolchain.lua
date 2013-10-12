@@ -202,6 +202,9 @@ function toolchain(_buildDir, _libDir)
 			"/Oy-", -- Suppresses creation of frame pointers on the call stack.
 			"/Ob2", -- The Inline Function Expansion
 		}
+		linkoptions {
+			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
+		}
 
 	configuration { "vs2008" }
 		includedirs { bxDir .. "include/compat/msvc/pre1600" }
