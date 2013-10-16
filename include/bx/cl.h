@@ -906,6 +906,13 @@ namespace bx
 	}
 
 } // namespace bx
+
+#undef BX_CL_IMPORT_ALL
+#undef BX_CL_IMPORT_ALL_10
+#undef BX_CL_IMPORT_ALL_11
+#undef BX_CL_IMPORT_ALL_12
+#undef BX_CL_IMPORT_END
+
 #endif // defined(BX_CL_IMPLEMENTATION)
 
 #endif // __OPENCL_CL_H
