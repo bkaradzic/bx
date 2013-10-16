@@ -12,12 +12,6 @@
 /// To use it, just #include <bx/cl.h> without defining BX_CL_IMPLEMENTATION.
 /// To load dynamic library call bx::clLoad(), to unload it call bx::clUnload.
 
-#if defined(BX_CL_IMPLEMENTATION) && defined(__OPENCL_CL_H)
-#	error message("CL/cl.h is already included.")
-#endif // defined(BX_CL_IMPLEMENTATION) && defined(__OPENCL_CL_H)
-
-#include "os.h"
-
 namespace bx
 {
 	/// Load OpenCL dynamic library.
@@ -31,9 +25,14 @@ namespace bx
 	///
 	/// Returns internal reference count. When reference count reaches 0
 	/// library is fully unloaded.
+	///
 	int32_t clUnload();
 
 } // namespace bx
+
+#if defined(BX_CL_IMPLEMENTATION) && defined(__OPENCL_CL_H)
+#	error message("CL/cl.h is already included, it cannot be included before bx/cl.h header when BX_CL_IMPLEMENTATION is defined!")
+#endif // defined(BX_CL_IMPLEMENTATION) && defined(__OPENCL_CL_H)
 
 #ifndef __OPENCL_CL_H
 #define __OPENCL_CL_H
@@ -828,6 +827,8 @@ extern "C"
 BX_CL_IMPORT_ALL
 #undef BX_CL_IMPORT
 };
+
+#include "os.h"
 
 namespace bx
 {
