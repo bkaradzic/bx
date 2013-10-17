@@ -46,5 +46,5 @@ TEST(macros)
 	CHECK_EQUAL(5, BX_VA_ARGS_COUNT(1, 2, 3, 4, 5) );
 	CHECK_EQUAL(6, BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
 
-	CHECK(0 == strcmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
+	CHECK_EQUAL(0, strcmp(BX_STRINGIZE(TEST 1234 %^&*), "TEST 1234 %^&*") );
 }
