@@ -4,6 +4,7 @@
  */
 
 #include "test.h"
+#include <string.h>
 #include <bx/bx.h>
 
 BX_STATIC_ASSERT(1 == BX_VA_ARGS_COUNT(1) );
