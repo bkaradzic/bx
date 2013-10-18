@@ -28,6 +28,11 @@ BX_STATIC_ASSERT(256 == BX_ALIGN_256(256) );
 BX_STATIC_ASSERT(256 == BX_ALIGN_256(256) );
 BX_STATIC_ASSERT(512 == BX_ALIGN_256(511) );
 
+BX_NO_INLINE void unusedFunction()
+{
+	CHECK(false);
+}
+
 TEST(macros)
 {
 	uint32_t unused0;
@@ -37,7 +42,7 @@ TEST(macros)
 	BX_UNUSED(unused0, unused1);
 
 	uint32_t unused2;
-	BX_UNUSED(unused0, unused1, unused2);
+	BX_UNUSED(unused0, unused1, unused2, unusedFunction() );
 
 	CHECK_EQUAL(1, BX_VA_ARGS_COUNT(1) );
 	CHECK_EQUAL(2, BX_VA_ARGS_COUNT(1, 2) );
