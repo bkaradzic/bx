@@ -50,7 +50,6 @@
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
-#	define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #	if BX_COMPILER_CLANG || BX_PLATFORM_IOS
 #		define BX_THREAD /* not supported right now */
 #	else
@@ -67,11 +66,13 @@
 #	define BX_NO_VTABLE __declspec(novtable)
 #	define BX_OVERRIDE override
 #	define BX_PRINTF_ARGS(_format, _args)
-#	define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)]
 #	define BX_THREAD __declspec(thread)
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
+
+// #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
+#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)]
 
 #define BX_CACHE_LINE_ALIGN_MARKER() BX_ALIGN_STRUCT(BX_CACHE_LINE_SIZE, struct) {}
 #define BX_CACHE_LINE_ALIGN(_def) BX_CACHE_LINE_ALIGN_MARKER(); _def; BX_CACHE_LINE_ALIGN_MARKER()
