@@ -100,9 +100,31 @@
 #	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__)(__VA_ARGS__)
 #endif // BX_COMPILER_MSVC
 
-#define BX_CLASS_NO_COPY_NO_ASSIGNMENT(_class) \
-			_class(const _class&); \
-			_class& operator=(const _class&)
+#define BX_CLASS_NO_DEFAULT_CTOR(_class) \
+			private: _class()
+
+#define BX_CLASS_NO_COPY(_class) \
+			private: _class(const _class& _rhs)
+
+#define BX_CLASS_NO_ASSIGNMENT(_class) \
+			private: _class& operator=(const _class& _rhs)
+
+#define BX_CLASS_ALLOCATOR(_class) \
+			public: void* operator new(size_t _size); \
+			public: void  operator delete(void* _ptr); \
+			public: void* operator new[](size_t _size); \
+			public: void  operator delete[](void* _ptr)
+
+#define BX_CLASS_1(_class, _a1) BX_CONCATENATE(BX_CLASS_, _a1)(_class)
+#define BX_CLASS_2(_class, _a1, _a2) BX_CLASS_1(_class, _a1); BX_CLASS_1(_class, _a2)
+#define BX_CLASS_3(_class, _a1, _a2, _a3) BX_CLASS_2(_class, _a1, _a2); BX_CLASS_1(_class, _a3)
+#define BX_CLASS_4(_class, _a1, _a2, _a3, _a4) BX_CLASS_3(_class, _a1, _a2, _a3); BX_CLASS_1(_class, _a4)
+
+#if BX_COMPILER_MSVC
+#	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__) BX_VA_ARGS_PASS(_class, __VA_ARGS__)
+#else
+#	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__)(_class, __VA_ARGS__)
+#endif // BX_COMPILER_MSVC
 
 #ifndef BX_CHECK
 #	define BX_CHECK(_condition, ...) do {} while(0)

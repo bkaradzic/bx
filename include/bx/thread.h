@@ -18,7 +18,10 @@ namespace bx
 
 	class Thread
 	{
-		BX_CLASS_NO_COPY_NO_ASSIGNMENT(Thread);
+		BX_CLASS(Thread
+			, NO_COPY
+			, NO_ASSIGNMENT
+			);
 
 	public:
 		Thread()

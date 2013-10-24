@@ -19,7 +19,10 @@ namespace bx
 	template <typename Ty>
 	class SpScUnboundedQueueLf
 	{
-		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScUnboundedQueueLf);
+		BX_CLASS(SpScUnboundedQueueLf
+			, NO_COPY
+			, NO_ASSIGNMENT
+			);
 
 	public:
 		SpScUnboundedQueueLf()
@@ -95,7 +98,10 @@ namespace bx
 	template<typename Ty>
 	class SpScUnboundedQueueMutex
 	{
-		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScUnboundedQueueMutex);
+		BX_CLASS(SpScUnboundedQueueMutex
+			, NO_COPY
+			, NO_ASSIGNMENT
+			);
 
 	public:
 		SpScUnboundedQueueMutex()
@@ -151,7 +157,10 @@ namespace bx
 	template <typename Ty>
 	class SpScBlockingUnboundedQueue
 	{
-		BX_CLASS_NO_COPY_NO_ASSIGNMENT(SpScBlockingUnboundedQueue);
+		BX_CLASS(SpScBlockingUnboundedQueue
+			, NO_COPY
+			, NO_ASSIGNMENT
+			);
 
 	public:
 		SpScBlockingUnboundedQueue()
