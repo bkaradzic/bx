@@ -20,9 +20,10 @@
 #define BX_PLATFORM_WINDOWS 0
 #define BX_PLATFORM_XBOX360 0
 
-#define BX_CPU_ARM 0
-#define BX_CPU_PPC 0
-#define BX_CPU_X86 0
+#define BX_CPU_ARM  0
+#define BX_CPU_MIPS 0
+#define BX_CPU_PPC  0
+#define BX_CPU_X86  0
 
 #define BX_ARCH_32BIT 0
 #define BX_ARCH_64BIT 0
@@ -97,6 +98,10 @@
 #if defined(__arm__)
 #	undef BX_CPU_ARM
 #	define BX_CPU_ARM 1
+#	define BX_CACHE_LINE_SIZE 64
+#elif defined(__MIPSEL__) || defined(__mips_isa_rev) // defined(mips)
+#	undef BX_CPU_MIPS
+#	define BX_CPU_MIPS 1
 #	define BX_CACHE_LINE_SIZE 64
 #elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
 #	undef BX_CPU_PPC

@@ -13,6 +13,8 @@ function toolchain(_buildDir, _libDir)
 		description = "Choose GCC flavor",
 		allowed = {
 			{ "android-arm", "Android - ARM" },
+			{ "android-mips", "Android - MIPS" },
+			{ "android-x86", "Android - x86" },
 --			{ "emscripten-experimental", "Emscripten" },
 			{ "linux", "Linux" },
 			{ "linux-clang", "Linux (Clang compiler)" },
@@ -57,6 +59,30 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
 			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
+		end
+
+		if "android-mips" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK_MIPS") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
+			premake.gcc.cxx = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-g++"
+			premake.gcc.ar = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-android-mips")
+		end
+
+		if "android-x86" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK_X86") or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
+			end
+
+			premake.gcc.cc = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
+			premake.gcc.cxx = "$(ANDROID_NDK_X86)/bin/i686-linux-android-g++"
+			premake.gcc.ar = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-android-x86")
 		end
 
 		if "emscripten-experimental" == _OPTIONS["gcc"] then
@@ -316,38 +342,17 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
-	configuration { "android-arm" }
-		targetdir (_buildDir .. "android-arm" .. "/bin")
-		objdir (_buildDir .. "android-arm" .. "/obj")
+	configuration { "android-*" }
 		flags {
 			"NoImportLib",
 		}
-		libdirs {
-			_libDir .. "lib/android-arm",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a",
-		}
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/include",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
 			"-nostdlib",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
-			"-march=armv7-a",
---			"-Wl,-shared,-Bsymbolic",
---			"-Wl,--gc-sections",
-			"-Wl,--fix-cortex-a8",
---			"-Wl,--no-undefined",
 			"-static-libgcc",
-
-			"-no-canonical-prefixes",
-			"-Wl,--no-undefined",
-			"-Wl,-z,noexecstack",
-			"-Wl,-z,relro",
-			"-Wl,-z,now",
 		}
 		links {
 			"c",
@@ -361,12 +366,76 @@ function toolchain(_buildDir, _libDir)
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+		}
+
+	configuration { "android-arm" }
+		targetdir (_buildDir .. "android-arm" .. "/bin")
+		objdir (_buildDir .. "android-arm" .. "/obj")
+		libdirs {
+			_libDir .. "lib/android-arm",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
+		}
+		linkoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
+			"-march=armv7-a",
+			"-Wl,--fix-cortex-a8",
+
+			"-no-canonical-prefixes",
+			"-Wl,--no-undefined",
+			"-Wl,-z,noexecstack",
+			"-Wl,-z,relro",
+			"-Wl,-z,now",
+		}
+		buildoptions {
 			"-fpic",
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
 			"-mthumb",
 			"-march=armv7-a",
 			"-mfloat-abi=softfp",
 			"-mfpu=vfpv3-d16",
+		}
+
+	configuration { "android-mips" }
+		targetdir (_buildDir .. "android-mips" .. "/bin")
+		objdir (_buildDir .. "android-mips" .. "/obj")
+		libdirs {
+			_libDir .. "lib/android-mips",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/mips",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/mips/include",
+		}
+		linkoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtend_so.o",
+		}
+		buildoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
+		}
+
+	configuration { "android-x86" }
+		targetdir (_buildDir .. "android-x86" .. "/bin")
+		objdir (_buildDir .. "android-x86" .. "/obj")
+		libdirs {
+			_libDir .. "lib/android-x86",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/x86",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/x86/include",
+		}
+		linkoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtend_so.o",
+		}
+		buildoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
 		}
 
 	configuration { "emscripten-experimental" }
@@ -539,10 +608,22 @@ end
 
 function strip()
 
-	configuration { "android*", "Release" }
+	configuration { "android-arm", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
+		}
+
+	configuration { "android-mips", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-strip -s \"$(TARGET)\""
+		}
+
+	configuration { "android-x86", "Release" }
+		postbuildcommands {
+			"@echo Stripping symbols.",
+			"@$(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "linux", "Release" }
