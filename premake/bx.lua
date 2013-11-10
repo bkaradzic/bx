@@ -17,6 +17,8 @@ project "bx"
 			"/tmp/dummy.cpp",
 		}
 
+	configuration {}
+
 	files {
 		"../include/**.h",
 	}
