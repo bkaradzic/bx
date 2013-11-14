@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_CPU_H__
-#define __BX_CPU_H__
+#ifndef BX_CPU_H_HEADER_GUARD
+#define BX_CPU_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -99,4 +99,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_CPU_H__
+#endif // BX_CPU_H_HEADER_GUARD

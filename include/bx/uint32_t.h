@@ -23,8 +23,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE
 
-#ifndef __BX_UINT32_T_H__
-#define __BX_UINT32_T_H__
+#ifndef BX_UINT32_T_H_HEADER_GUARD
+#define BX_UINT32_T_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -632,4 +632,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_UINT32_T_H__
+#endif // BX_UINT32_T_H_HEADER_GUARD

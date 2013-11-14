@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4_NEON_H__
-#define __BX_FLOAT4_NEON_H__
+#ifndef BX_FLOAT4_NEON_H_HEADER_GUARD
+#define BX_FLOAT4_NEON_H_HEADER_GUARD
 
 #include <arm_neon.h>
 
@@ -241,4 +241,4 @@ namespace bx
 #define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
-#endif // __BX_FLOAT4_NEON_H__
+#endif // BX_FLOAT4_NEON_H_HEADER_GUARD

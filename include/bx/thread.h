@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_THREAD_H__
-#define __BX_THREAD_H__
+#ifndef BX_THREAD_H_HEADER_GUARD
+#define BX_THREAD_H_HEADER_GUARD
 
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
@@ -222,4 +222,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_THREAD_H__
+#endif // BX_THREAD_H_HEADER_GUARD

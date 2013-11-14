@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4_REF_H__
-#define __BX_FLOAT4_REF_H__
+#ifndef BX_FLOAT4_REF_H_HEADER_GUARD
+#define BX_FLOAT4_REF_H_HEADER_GUARD
 
 #include <math.h> // sqrtf
 
@@ -551,4 +551,4 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
-#endif // __BX_FLOAT4_REF_H__
+#endif // BX_FLOAT4_REF_H_HEADER_GUARD

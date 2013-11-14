@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_RNG_H__
-#define __BX_RNG_H__
+#ifndef BX_RNG_H_HEADER_GUARD
+#define BX_RNG_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -181,4 +181,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_RNG_H__
+#endif // BX_RNG_H_HEADER_GUARD

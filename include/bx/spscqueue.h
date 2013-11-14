@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_SPSCQUEUE_H__
-#define __BX_SPSCQUEUE_H__
+#ifndef BX_SPSCQUEUE_H_HEADER_GUARD
+#define BX_SPSCQUEUE_H_HEADER_GUARD
 
 #include "bx.h"
 #include "cpu.h"
@@ -199,4 +199,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_RINGBUFFER_H__
+#endif // BX_RINGBUFFER_H_HEADER_GUARD

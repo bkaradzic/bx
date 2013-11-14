@@ -3,9 +3,9 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4_T_H__
+#ifndef BX_FLOAT4_T_H_HEADER_GUARD
 #	error "xmacro file, must be included from float4_*.h"
-#endif // __BX_FLOAT4_T_H__
+#endif // BX_FLOAT4_T_H_HEADER_GUARD
 
 // included from float4_t.h
 IMPLEMENT_SWIZZLE(x, x, x, x)

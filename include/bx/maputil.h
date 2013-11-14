@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_MAPUTIL_H__
-#define __BX_MAPUTIL_H__
+#ifndef BX_MAPUTIL_H_HEADER_GUARD
+#define BX_MAPUTIL_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -26,4 +26,4 @@ namespace bx
 	}
 } // namespace bx
 
-#endif // __BX_MAPUTIL_H__
+#endif // BX_MAPUTIL_H_HEADER_GUARD

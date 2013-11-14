@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_PLATFORM_H__
-#define __BX_PLATFORM_H__
+#ifndef BX_PLATFORM_H_HEADER_GUARD
+#define BX_PLATFORM_H_HEADER_GUARD
 
 #define BX_COMPILER_CLANG 0
 #define BX_COMPILER_GCC 0
@@ -156,4 +156,4 @@
 typedef struct { long double x, y; } __float128;
 #endif // BX_COMPILER_CLANG && BX_PLATFORM_LINUX
 
-#endif // __BX_PLATFORM_H__
+#endif // BX_PLATFORM_H_HEADER_GUARD

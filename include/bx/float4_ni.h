@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4_NI_H__
-#define __BX_FLOAT4_NI_H__
+#ifndef BX_FLOAT4_NI_H_HEADER_GUARD
+#define BX_FLOAT4_NI_H_HEADER_GUARD
 
 namespace bx
 {
@@ -423,4 +423,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_FLOAT4_NI_H__
+#endif // BX_FLOAT4_NI_H_HEADER_GUARD

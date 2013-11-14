@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_RADIXSORT_H__
-#define __BX_RADIXSORT_H__
+#ifndef BX_RADIXSORT_H_HEADER_GUARD
+#define BX_RADIXSORT_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -162,4 +162,4 @@ done:
 
 } // namespace bx
 
-#endif // __BX_RADIXSORT_H__
+#endif // BX_RADIXSORT_H_HEADER_GUARD

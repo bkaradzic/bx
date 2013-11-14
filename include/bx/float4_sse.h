@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4_SSE_H__
-#define __BX_FLOAT4_SSE_H__
+#ifndef BX_FLOAT4_SSE_H_HEADER_GUARD
+#define BX_FLOAT4_SSE_H_HEADER_GUARD
 
 #include <emmintrin.h> // __m128i
 #if defined(__SSE4_1__)

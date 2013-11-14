@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_HANDLE_ALLOC_H__
-#define __BX_HANDLE_ALLOC_H__
+#ifndef BX_HANDLE_ALLOC_H_HEADER_GUARD
+#define BX_HANDLE_ALLOC_H_HEADER_GUARD
 
 #include "bx.h"
 #include "allocator.h"

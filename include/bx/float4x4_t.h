@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_FLOAT4X4_H__
-#define __BX_FLOAT4x4_H__
+#ifndef BX_FLOAT4X4_H_HEADER_GUARD
+#define BX_FLOAT4x4_H_HEADER_GUARD
 
 #include "float4_t.h"
 
@@ -165,4 +165,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_FLOAT4X4_H__
+#endif // BX_FLOAT4X4_H_HEADER_GUARD

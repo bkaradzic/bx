@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_ENDIAN_H__
-#define __BX_ENDIAN_H__
+#ifndef BX_ENDIAN_H_HEADER_GUARD
+#define BX_ENDIAN_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -84,4 +84,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __BX_ENDIAN_H__
+#endif // BX_ENDIAN_H_HEADER_GUARD

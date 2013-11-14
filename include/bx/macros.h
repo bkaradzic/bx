@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_MACROS_H__
-#define __BX_MACROS_H__
+#ifndef BX_MACROS_H_HEADER_GUARD
+#define BX_MACROS_H_HEADER_GUARD
 
 #include "bx.h"
 
@@ -165,4 +165,4 @@
 #	define BX_CONFIG_SEMAPHORE_PTHREAD (BX_PLATFORM_OSX|BX_PLATFORM_IOS)
 #endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
-#endif // __BX_MACROS_H__
+#endif // BX_MACROS_H_HEADER_GUARD

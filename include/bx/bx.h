@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_H__
-#define __BX_H__
+#ifndef BX_H_HEADER_GUARD
+#define BX_H_HEADER_GUARD
 
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
@@ -23,4 +23,4 @@ namespace bx
 // Annoying C++0x stuff..
 namespace std { namespace tr1 {}; using namespace tr1; }
 
-#endif // __BX_H__ 
+#endif // BX_H_HEADER_GUARD

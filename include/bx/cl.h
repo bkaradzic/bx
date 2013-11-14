@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef __BX_CL_H__
-#define __BX_CL_H__
+#ifndef BX_CL_H_HEADER_GUARD
+#define BX_CL_H_HEADER_GUARD
 
 /// To implement OpenCL dynamic loading, define BX_CL_IMPLEMENTATION and
 /// #include <bx/cl.h> into .cpp file.
@@ -917,4 +917,4 @@ namespace bx
 
 #endif // __OPENCL_CL_H
 
-#endif // __BX_CL_H__
+#endif // BX_CL_H_HEADER_GUARD
