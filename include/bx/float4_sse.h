@@ -403,4 +403,4 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #define float4_floor float4_floor_ni
 #include "float4_ni.h"
 
-#endif // __FLOAT4_SSE_H__
+#endif // BX_FLOAT4_SSE_H_HEADER_GUARD

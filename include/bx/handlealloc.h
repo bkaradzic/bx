@@ -169,4 +169,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // __HANDLE_ALLOC_H__
+#endif // BX_HANDLE_ALLOC_H_HEADER_GUARD
