@@ -4,6 +4,7 @@
 --
 
 local bxDir = (path.getabsolute("..") .. "/")
+local naclToolchain = ""
 
 function toolchain(_buildDir, _libDir)
 
@@ -121,9 +122,16 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-gcc"
-			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-g++"
-			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-ar"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
+			if os.is("macosx") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_newlib/bin/x86_64-nacl-"
+			elseif os.is("linux") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_newlib/bin/x86_64-nacl-"
+			end
+
+			premake.gcc.cc  = naclToolchain .. "gcc"
+			premake.gcc.cxx = naclToolchain .. "g++"
+			premake.gcc.ar  = naclToolchain .. "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl")
 		end
 
@@ -133,9 +141,16 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-gcc"
-			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-g++"
-			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-ar"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
+			if os.is("macosx") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_newlib/bin/arm-nacl-"
+			elseif os.is("linux") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_arm_newlib/bin/arm-nacl-"
+			end
+
+			premake.gcc.cc  = naclToolchain .. "gcc"
+			premake.gcc.cxx = naclToolchain .. "g++"
+			premake.gcc.ar  = naclToolchain .. "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl-arm")
 		end
 
@@ -145,9 +160,16 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-clang"
-			premake.gcc.cxx = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-clang++"
-			premake.gcc.ar = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-ar"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-"
+			if os.is("macosx") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_pnacl/newlib/bin/pnacl-"
+			elseif os.is("linux") then
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_pnacl/newlib/bin/pnacl-"
+			end
+
+			premake.gcc.cc  = naclToolchain .. "clang"
+			premake.gcc.cxx = naclToolchain .. "clang++"
+			premake.gcc.ar  = naclToolchain .. "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-pnacl")
 		end
 
@@ -638,22 +660,10 @@ function strip()
 			"@$(MINGW)/bin/strip -s \"$(TARGET)\""
 		}
 
-	configuration { "nacl", "Release" }
+	configuration { "*nacl*", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
-			"@$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "nacl-arm", "Release" }
-		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-strip -s \"$(TARGET)\""
-		}
-
-	configuration { "pnacl", "Release" }
-		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-strip -s \"$(TARGET)\""
+			"@" .. naclToolchain .. "strip -s \"$(TARGET)\""
 		}
 
 	configuration {} -- reset configuration

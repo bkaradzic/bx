@@ -111,6 +111,8 @@
 #	undef BX_CPU_X86
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
+#else // PNaCl doesn't have CPU defined.
+#	define BX_CACHE_LINE_SIZE 64
 #endif // 
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
