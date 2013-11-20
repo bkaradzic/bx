@@ -7,7 +7,7 @@ all:
 	premake4 --file=premake/premake4.lua vs2008
 	premake4 --file=premake/premake4.lua vs2010
 	premake4 --file=premake/premake4.lua --gcc=mingw gmake
-	premake4 --file=premake/premake4.lua --gcc=linux gmake
+	premake4 --file=premake/premake4.lua --gcc=linux-gcc gmake
 	premake4 --file=premake/premake4.lua --gcc=osx gmake
 	premake4 --file=premake/premake4.lua xcode4
 

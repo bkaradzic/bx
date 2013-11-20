@@ -17,7 +17,7 @@ function toolchain(_buildDir, _libDir)
 			{ "android-mips", "Android - MIPS" },
 			{ "android-x86", "Android - x86" },
 --			{ "emscripten-experimental", "Emscripten" },
-			{ "linux", "Linux" },
+			{ "linux-gcc", "Linux (GCC compiler)" },
 			{ "linux-clang", "Linux (Clang compiler)" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
@@ -98,7 +98,7 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-emscripten")
 		end
 
-		if "linux" == _OPTIONS["gcc"] then
+		if "linux-gcc" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux")
 		end
 
@@ -308,7 +308,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m64" }
 
-	configuration { "linux and not linux-clang" }
+	configuration { "linux-gcc and not linux-clang" }
 		buildoptions {
 			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 		}
@@ -318,7 +318,7 @@ function toolchain(_buildDir, _libDir)
 			"--analyze",
 		}
 
-	configuration { "linux or linux-clang" }
+	configuration { "linux-*" }
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
@@ -332,7 +332,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
-	configuration { "linux", "x32" }
+	configuration { "linux-gcc", "x32" }
 		targetdir (_buildDir .. "linux32_gcc" .. "/bin")
 		objdir (_buildDir .. "linux32_gcc" .. "/obj")
 		libdirs { _libDir .. "lib/linux32_gcc" }
@@ -340,7 +340,7 @@ function toolchain(_buildDir, _libDir)
 			"-m32",
 		}
 
-	configuration { "linux", "x64" }
+	configuration { "linux-gcc", "x64" }
 		targetdir (_buildDir .. "linux64_gcc" .. "/bin")
 		objdir (_buildDir .. "linux64_gcc" .. "/obj")
 		libdirs { _libDir .. "lib/linux64_gcc" }
@@ -648,7 +648,7 @@ function strip()
 			"@$(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux", "Release" }
+	configuration { "linux-*", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@strip -s \"$(TARGET)\""
