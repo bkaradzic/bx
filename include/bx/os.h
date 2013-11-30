@@ -80,6 +80,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return (void*)::LoadLibraryA(_filePath);
 #elif BX_PLATFORM_NACL
+		BX_UNUSED(_filePath);
 		return NULL;
 #else
 		return ::dlopen(_filePath, RTLD_LOCAL|RTLD_LAZY);
@@ -91,6 +92,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
 #elif BX_PLATFORM_NACL
+		BX_UNUSED(_handle);
 #else
 		::dlclose(_handle);
 #endif // BX_PLATFORM_
@@ -101,6 +103,7 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
 #elif BX_PLATFORM_NACL
+		BX_UNUSED(_handle, _symbol);
 		return NULL;
 #else
 		return ::dlsym(_handle, _symbol);

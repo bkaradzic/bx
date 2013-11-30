@@ -152,7 +152,7 @@ namespace bx
 		bool wait(int32_t _msecs = -1)
 		{
 #		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
-			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment.");
+			BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment."); BX_UNUSED(_msecs);
 			return 0 == sem_wait(&m_handle);
 #		else
 			if (0 > _msecs)
