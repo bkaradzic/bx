@@ -369,7 +369,7 @@ function toolchain(_buildDir, _libDir)
 			"NoImportLib",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
 		linkoptions {
@@ -395,10 +395,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "android-arm" .. "/obj")
 		libdirs {
 			_libDir .. "lib/android-arm",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/armeabi-v7a/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
@@ -427,10 +427,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "android-mips" .. "/obj")
 		libdirs {
 			_libDir .. "lib/android-mips",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/mips",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/mips/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
@@ -446,10 +446,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "android-x86" .. "/obj")
 		libdirs {
 			_libDir .. "lib/android-x86",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/x86",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.7/libs/x86/include",
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
