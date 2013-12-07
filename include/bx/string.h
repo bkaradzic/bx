@@ -37,7 +37,7 @@ namespace bx
 	{
 		const char* end = _str + _max;
 		const char* ptr;
-		for (ptr = _str; ptr < end && *ptr != '\0'; ++ptr);
+		for (ptr = _str; ptr < end && *ptr != '\0'; ++ptr) {};
 		return ptr - _str;
 	}
 
@@ -117,21 +117,21 @@ namespace bx
 	/// Skip whitespace.
 	inline const char* strws(const char* _str)
 	{
-		for (; isspace(*_str); ++_str);
+		for (; isspace(*_str); ++_str) {};
 		return _str;
 	}
 
 	/// Skip non-whitespace.
 	inline const char* strnws(const char* _str)
 	{
-		for (; !isspace(*_str); ++_str);
+		for (; !isspace(*_str); ++_str) {};
 		return _str;
 	}
 
 	/// Skip word.
 	inline const char* strword(const char* _str)
 	{
-		for (char ch = *_str++; isalnum(ch) || '_' == ch; ch = *_str++);
+		for (char ch = *_str++; isalnum(ch) || '_' == ch; ch = *_str++) {};
 		return _str-1;
 	}
 
