@@ -26,16 +26,16 @@ namespace bx
 		// http://support.microsoft.com/kb/274323
 		QueryPerformanceCounter(&li);
 		int64_t i64 = li.QuadPart;
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_EMSCRIPTEN
 		int64_t i64 = clock();
-#elif 0 // BX_PLATFORM_LINUX
+#elif BX_PLATFORM_ANDROID
 		struct timespec now;
-		clock_gettime(CLOCK_MONOTONIC_RAW, &now);
-		int64_t i64 = now.tv_sec*1000000 + now.tv_nsec/1000;
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		int64_t i64 = now.tv_sec*INT64_C(1000000000) + now.tv_nsec;
 #else
 		struct timeval now;
 		gettimeofday(&now, 0);
-		int64_t i64 = now.tv_sec*1000000 + now.tv_usec;
+		int64_t i64 = now.tv_sec*INT64_C(1000000) + now.tv_usec;
 #endif // BX_PLATFORM_
 		return i64;
 	}
@@ -46,10 +46,12 @@ namespace bx
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
 		return li.QuadPart;
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_EMSCRIPTEN
 		return CLOCKS_PER_SEC;
+#elif BX_PLATFORM_ANDROID
+		return INT64_C(1000000000);
 #else
-		return 1000000;
+		return INT64_C(1000000);
 #endif // BX_PLATFORM_
 	}
 
