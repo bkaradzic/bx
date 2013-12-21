@@ -178,15 +178,15 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-llvm-gcc-4.2"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/arm-apple-darwin10-llvm-g++-4.2"
+			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-ios-arm")
 		end
 
 		if "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/i686-apple-darwin11-llvm-gcc-4.2"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/i686-apple-darwin11-llvm-g++-4.2"
+			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-ios-simulator")
 		end
@@ -570,49 +570,49 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs { bxDir .. "include/compat/osx" }
 
+	configuration { "ios-*" }
+		linkoptions {
+			"-lc++",
+		}
+		buildoptions {
+			"-miphoneos-version-min=7.0",
+			"-U__STRICT_ANSI__",
+			"-Wfatal-errors",
+			"-Wunused-value",
+		}
+		includedirs { bxDir .. "include/compat/ios" }
+
 	configuration { "ios-arm" }
 		targetdir (_buildDir .. "ios-arm" .. "/bin")
 		objdir (_buildDir .. "ios-arm" .. "/obj")
 		libdirs { _libDir .. "lib/ios-arm" }
 		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk",
-			"-march=armv7-a",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk/System/Library/PrivateFrameworks",
+			"-arch armv7",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS6.1.sdk",
-			"-mthumb",
-			"-march=armv7-a",
-			"-mfloat-abi=softfp",
-			"-mfpu=neon",
-			"-U__STRICT_ANSI__",
-			"-Wfatal-errors",
-			"-Wunused-value",
+			"-arch armv7",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk",
 		}
-		includedirs { bxDir .. "include/compat/osx" }
 
 	configuration { "ios-simulator" }
 		targetdir (_buildDir .. "ios-simulator" .. "/bin")
 		objdir (_buildDir .. "ios-simulator" .. "/obj")
 		libdirs { _libDir .. "lib/ios-simulator" }
 		linkoptions {
+			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/System/Library/Frameworks",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
+			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator6.1.sdk",
-			"-miphoneos-version-min=3.0.0",
-			"-fobjc-abi-version=2",
-			"-fobjc-legacy-dispatch",
-			"-U__STRICT_ANSI__",
-			"-Wfatal-errors",
-			"-Wunused-value",
 		}
-		includedirs { bxDir .. "include/compat/osx" }
 
 	configuration { "qnx-arm" }
 		targetdir (_buildDir .. "qnx-arm" .. "/bin")
