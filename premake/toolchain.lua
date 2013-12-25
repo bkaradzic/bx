@@ -110,8 +110,8 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "mingw" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "$(MINGW)/bin/mingw32-gcc"
-			premake.gcc.cxx = "$(MINGW)/bin/mingw32-g++"
+			premake.gcc.cc = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
+			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar = "$(MINGW)/bin/ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw")
 		end
@@ -278,7 +278,7 @@ function toolchain(_buildDir, _libDir)
 		defines { "WIN32" }
 		includedirs { bxDir .. "include/compat/mingw" }
 		buildoptions {
-			"-std=c++0x",
+			"-std=c++11",
 			"-U__STRICT_ANSI__",
 			"-Wunused-value",
 			"-fdata-sections",
