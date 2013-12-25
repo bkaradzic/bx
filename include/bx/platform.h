@@ -117,10 +117,10 @@
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
 #	undef BX_ARCH_64BIT
-#	define BX_ARCH_64BIT 1
+#	define BX_ARCH_64BIT 64
 #else
 #	undef BX_ARCH_32BIT
-#	define BX_ARCH_32BIT 1
+#	define BX_ARCH_32BIT 32
 #endif //
 
 #if BX_CPU_PPC
@@ -157,5 +157,47 @@
 // Clang on Linux complains about missing __float128 type...
 typedef struct { long double x, y; } __float128;
 #endif // BX_COMPILER_CLANG && BX_PLATFORM_LINUX
+
+#if BX_COMPILER_GCC
+#	define BX_COMPILER_NAME "GCC"
+#elif BX_COMPILER_CLANG
+#	define BX_COMPILER_NAME "Clang"
+#elif BX_COMPILER_MSVC
+#	define BX_COMPILER_NAME "MSVC"
+#endif // BX_COMPILER_
+
+#if BX_PLATFORM_ANDROID
+#	define BX_PLATFORM_NAME "Android"
+#elif BX_PLATFORM_EMSCRIPTEN
+#	define BX_PLATFORM_NAME "asm.js"
+#elif BX_PLATFORM_IOS
+#	define BX_PLATFORM_NAME "iOS"
+#elif BX_PLATFORM_LINUX
+#	define BX_PLATFORM_NAME "Linux"
+#elif BX_PLATFORM_NACL
+#	define BX_PLATFORM_NAME "NaCl"
+#elif BX_PLATFORM_OSX
+#	define BX_PLATFORM_NAME "OSX"
+#elif BX_PLATFORM_QNX
+#	define BX_PLATFORM_NAME "QNX"
+#elif BX_PLATFORM_WINDOWS
+#	define BX_PLATFORM_NAME "Windows"
+#endif // BX_PLATFORM_
+
+#if BX_CPU_ARM
+#	define BX_CPU_NAME "ARM"
+#elif BX_CPU_MIPS
+#	define BX_CPU_NAME "MIPS"
+#elif BX_CPU_PPC
+#	define BX_CPU_NAME "PowerPC"
+#elif BX_CPU_X86
+#	define BX_CPU_NAME "x86"
+#endif // BX_CPU_
+
+#if BX_ARCH_32BIT
+#	define BX_ARCH_NAME "32-bit"
+#elif BX_ARCH_64BIT
+#	define BX_ARCH_NAME "64-bit"
+#endif // BX_ARCH_
 
 #endif // BX_PLATFORM_H_HEADER_GUARD
