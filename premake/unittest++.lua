@@ -29,13 +29,13 @@ project "UnitTest++"
 		"../3rdparty/UnitTest++/src/*.h",
 	}
 
-	configuration { "linux or osx" }
+	configuration { "linux or osx or android-*" }
 		files {
 			"../3rdparty/UnitTest++/src/Posix/**.cpp",
 			"../3rdparty/UnitTest++/src/Posix/**.h",
 		}
 
-	configuration { "windows" }
+	configuration { "mingw or vs*" }
 		files {
 			"../3rdparty/UnitTest++/src/Win32/**.cpp",
 			"../3rdparty/UnitTest++/src/Win32/**.h",

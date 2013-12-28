@@ -123,6 +123,22 @@ namespace bx
 		return result;
 	}
 
+	BX_FLOAT4_INLINE float4_t float4_imin_ni(float4_t _a, float4_t _b)
+	{
+		const float4_t mask   = float4_icmplt(_a, _b);
+		const float4_t result = float4_selb(mask, _a, _b);
+
+		return result;
+	}
+
+	BX_FLOAT4_INLINE float4_t float4_imax_ni(float4_t _a, float4_t _b)
+	{
+		const float4_t mask   = float4_icmpgt(_a, _b);
+		const float4_t result = float4_selb(mask, _a, _b);
+
+		return result;
+	}
+
 	BX_FLOAT4_INLINE float4_t float4_clamp_ni(float4_t _a, float4_t _min, float4_t _max)
 	{
 		const float4_t tmp    = float4_min(_a, _max);

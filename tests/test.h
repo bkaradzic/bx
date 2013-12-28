@@ -8,6 +8,7 @@
 
 #include <bx/bx.h>
 #include <UnitTest++.h>
+#include "dbg.h"
 
 #if !BX_COMPILER_MSVC
 #	define _strdup strdup

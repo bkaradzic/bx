@@ -1,4 +1,9 @@
-/*-
+/*
+ * Copyright 2010-2013 Branimir Karadzic. All rights reserved.
+ * License: http://www.opensource.org/licenses/BSD-2-Clause
+ */
+
+/*
  * Copyright 2012 Matthew Endsley
  * All rights reserved
  *
@@ -26,6 +31,16 @@
 
 #include "test.h"
 
-int main() {
+#if BX_PLATFORM_ANDROID
+#include <android/native_activity.h>
+
+void ANativeActivity_onCreate(ANativeActivity*, void*, size_t)
+{
+	exit(UnitTest::RunAllTests() );
+}
+#else
+int main()
+{
 	return UnitTest::RunAllTests();
 }
+#endif // BX_PLATFORM

@@ -14,7 +14,6 @@
 
 namespace bx
 {
-
 	typedef __m128 float4_t;
 
 #define ELEMx 0
@@ -349,6 +348,58 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
+	BX_FLOAT4_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
+	{
+		const __m128i tmp0    = _mm_castps_si128(_a);
+		const __m128i tmp1    = _mm_castps_si128(_b);
+		const __m128i tmp2    = _mm_cmpeq_epi32(tmp0, tmp1);
+		const float4_t result = _mm_castsi128_ps(tmp2);
+
+		return result;
+	}
+
+	BX_FLOAT4_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
+	{
+		const __m128i tmp0    = _mm_castps_si128(_a);
+		const __m128i tmp1    = _mm_castps_si128(_b);
+		const __m128i tmp2    = _mm_cmplt_epi32(tmp0, tmp1);
+		const float4_t result = _mm_castsi128_ps(tmp2);
+
+		return result;
+	}
+
+	BX_FLOAT4_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
+	{
+		const __m128i tmp0    = _mm_castps_si128(_a);
+		const __m128i tmp1    = _mm_castps_si128(_b);
+		const __m128i tmp2    = _mm_cmpgt_epi32(tmp0, tmp1);
+		const float4_t result = _mm_castsi128_ps(tmp2);
+
+		return result;
+	}
+
+#if defined(__SSE4_1__)
+	BX_FLOAT4_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
+	{
+		const __m128i tmp0    = _mm_castps_si128(_a);
+		const __m128i tmp1    = _mm_castps_si128(_b);
+		const __m128i tmp2    = _mm_min_epi32(tmp0, tmp1);
+		const float4_t result = _mm_castsi128_ps(tmp2);
+
+		return result;
+	}
+
+	BX_FLOAT4_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
+	{
+		const __m128i tmp0    = _mm_castps_si128(_a);
+		const __m128i tmp1    = _mm_castps_si128(_b);
+		const __m128i tmp2    = _mm_max_epi32(tmp0, tmp1);
+		const float4_t result = _mm_castsi128_ps(tmp2);
+
+		return result;
+	}
+#endif // defined(__SSE4_1__)
+
 	BX_FLOAT4_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
@@ -371,36 +422,40 @@ IMPLEMENT_TEST(xyzw , 0xf);
 
 } // namespace bx
 
-#define float4_shuf_xAzC float4_shuf_xAzC_ni
-#define float4_shuf_yBwD float4_shuf_yBwD_ni
-#define float4_rcp float4_rcp_ni
-#define float4_orx float4_orx_ni
-#define float4_orc float4_orc_ni
-#define float4_neg float4_neg_ni
-#define float4_madd float4_madd_ni
-#define float4_nmsub float4_nmsub_ni
-#define float4_div_nr float4_div_nr_ni
-#define float4_selb float4_selb_ni
-#define float4_sels float4_sels_ni
-#define float4_not float4_not_ni
-#define float4_abs float4_abs_ni
-#define float4_clamp float4_clamp_ni
-#define float4_lerp float4_lerp_ni
-#define float4_rsqrt float4_rsqrt_ni
-#define float4_rsqrt_nr float4_rsqrt_nr_ni
+#define float4_shuf_xAzC     float4_shuf_xAzC_ni
+#define float4_shuf_yBwD     float4_shuf_yBwD_ni
+#define float4_rcp           float4_rcp_ni
+#define float4_orx           float4_orx_ni
+#define float4_orc           float4_orc_ni
+#define float4_neg           float4_neg_ni
+#define float4_madd          float4_madd_ni
+#define float4_nmsub         float4_nmsub_ni
+#define float4_div_nr        float4_div_nr_ni
+#define float4_selb          float4_selb_ni
+#define float4_sels          float4_sels_ni
+#define float4_not           float4_not_ni
+#define float4_abs           float4_abs_ni
+#define float4_clamp         float4_clamp_ni
+#define float4_lerp          float4_lerp_ni
+#define float4_rsqrt         float4_rsqrt_ni
+#define float4_rsqrt_nr      float4_rsqrt_nr_ni
 #define float4_rsqrt_carmack float4_rsqrt_carmack_ni
-#define float4_sqrt_nr float4_sqrt_nr_ni
-#define float4_log2 float4_log2_ni
-#define float4_exp2 float4_exp2_ni
-#define float4_pow float4_pow_ni
-#define float4_cross3 float4_cross3_ni
-#define float4_normalize3 float4_normalize3_ni
+#define float4_sqrt_nr       float4_sqrt_nr_ni
+#define float4_log2          float4_log2_ni
+#define float4_exp2          float4_exp2_ni
+#define float4_pow           float4_pow_ni
+#define float4_cross3        float4_cross3_ni
+#define float4_normalize3    float4_normalize3_ni
+#define float4_ceil          float4_ceil_ni
+#define float4_floor         float4_floor_ni
+
 #if !defined(__SSE4_1__)
-#define float4_dot3 float4_dot3_ni
-#define float4_dot float4_dot_ni
+#	define float4_dot3       float4_dot3_ni
+#	define float4_dot        float4_dot_ni
+#	define float4_imin       float4_imin_ni
+#	define float4_imax       float4_imax_ni
 #endif // defined(__SSE4_1__)
-#define float4_ceil float4_ceil_ni
-#define float4_floor float4_floor_ni
+
 #include "float4_ni.h"
 
 #endif // BX_FLOAT4_SSE_H_HEADER_GUARD

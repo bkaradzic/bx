@@ -12,7 +12,7 @@
 
 #if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include "float4_sse.h"
-#elif 0 // __ARM_NEON__
+#elif __ARM_NEON__
 #	include "float4_neon.h"
 #else
 #	pragma message("************************************\nUsing SIMD reference implementation!\n************************************")

@@ -419,7 +419,7 @@ function toolchain(_buildDir, _libDir)
 			"-mthumb",
 			"-march=armv7-a",
 			"-mfloat-abi=softfp",
-			"-mfpu=vfpv3-d16",
+			"-mfpu=neon",
 		}
 
 	configuration { "android-mips" }

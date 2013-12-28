@@ -12,6 +12,7 @@ solution "bx"
 	platforms {
 		"x32",
 		"x64",
+		"Native", -- for targets where bitness is not specified
 	}
 
 	language "C++"
@@ -52,3 +53,35 @@ project "bx.test"
 		BX_DIR .. "tests/**.cpp",
 		BX_DIR .. "tests/**.H",
 	}
+
+	configuration { "vs*" }
+
+	configuration { "android*" }
+		kind "ConsoleApp"
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+		}
+
+	configuration { "nacl or nacl-arm" }
+		kind "ConsoleApp"
+		targetextension ".nexe"
+		links {
+			"ppapi",
+			"pthread",
+		}
+
+	configuration { "pnacl" }
+		kind "ConsoleApp"
+		targetextension ".pexe"
+		links {
+			"ppapi",
+			"pthread",
+		}
+
+	configuration { "linux-*" }
+		links {
+			"pthread",
+		}
+
+	configuration {}
