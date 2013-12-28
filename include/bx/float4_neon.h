@@ -10,7 +10,7 @@ namespace bx
 {
 	typedef __builtin_neon_sf  float4_t __attribute__( (__vector_size__(16) ) );
 
-	typedef __builtin_neon_sf  _f32x2_t	__attribute__( (__vector_size__( 8) ) );
+	typedef __builtin_neon_sf  _f32x2_t __attribute__( (__vector_size__( 8) ) );
 	typedef __builtin_neon_si  _i32x4_t __attribute__( (__vector_size__(16) ) );
 	typedef __builtin_neon_usi _u32x4_t __attribute__( (__vector_size__(16) ) );
 
