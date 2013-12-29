@@ -349,7 +349,7 @@ namespace bx
 
 	BX_FLOAT4_INLINE float4_t float4_nmsub(float4_t _a, float4_t _b, float4_t _c)
 	{
-		return __builtin_neon_vmlav4sf(_c, _a, _b, 3);
+		return __builtin_neon_vmlsv4sf(_c, _a, _b, 3);
 	}
 
 	BX_FLOAT4_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)

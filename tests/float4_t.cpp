@@ -183,6 +183,14 @@ TEST(float4_load)
 		);
 }
 
+TEST(float4_arithmetic)
+{
+	float4_check_float("madd"
+		, float4_madd(float4_ld(0.0f, 1.0f, 2.0f, 3.0f), float4_ld(4.0f, 5.0f, 6.0f, 7.0f), float4_ld(8.0f, 9.0f, 10.0f, 11.0f) )
+		, 8.0f, 14.0f, 22.0f, 32.0f
+		);
+}
+
 TEST(float4)
 {
 	const float4_t isplat = float4_isplat(0x80000001);
