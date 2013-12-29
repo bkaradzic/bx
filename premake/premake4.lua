@@ -84,4 +84,9 @@ project "bx.test"
 			"pthread",
 		}
 
+	configuration { "osx" }
+		links {
+			"Cocoa.framework",
+		}
+
 	configuration {}
