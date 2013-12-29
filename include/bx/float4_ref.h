@@ -419,7 +419,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_NO_INLINE float4_t float4_max(float4_t _a, float4_t _b)
+	BX_FLOAT4_INLINE float4_t float4_max(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] > _b.fxyzw[0] ? _a.fxyzw[0] : _b.fxyzw[0];
@@ -539,7 +539,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_NO_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
+	BX_FLOAT4_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] > _b.ixyzw[0] ? _a.ixyzw[0] : _b.ixyzw[0];
