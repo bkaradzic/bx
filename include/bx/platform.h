@@ -21,6 +21,7 @@
 #define BX_PLATFORM_XBOX360 0
 
 #define BX_CPU_ARM  0
+#define BX_CPU_JIT  0
 #define BX_CPU_MIPS 0
 #define BX_CPU_PPC  0
 #define BX_CPU_X86  0
@@ -112,6 +113,8 @@
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
 #else // PNaCl doesn't have CPU defined.
+#	undef BX_CPU_JIT
+#	define BX_CPU_JIT 1
 #	define BX_CACHE_LINE_SIZE 64
 #endif // 
 
@@ -190,6 +193,8 @@ typedef struct { long double x, y; } __float128;
 #	define BX_CPU_NAME "MIPS"
 #elif BX_CPU_PPC
 #	define BX_CPU_NAME "PowerPC"
+#elif BX_CPU_JIT
+#	define BX_CPU_NAME "JIT/VM"
 #elif BX_CPU_X86
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_
