@@ -534,7 +534,7 @@ function toolchain(_buildDir, _libDir)
 	configuration { "nacl-arm", "Debug" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Debug" }
 
-	configuration { "nacl", "Release" }
+	configuration { "nacl-arm", "Release" }
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
 
 	configuration { "pnacl" }
