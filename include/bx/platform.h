@@ -194,7 +194,7 @@ typedef struct { long double x, y; } __float128;
 #elif BX_CPU_PPC
 #	define BX_CPU_NAME "PowerPC"
 #elif BX_CPU_JIT
-#	define BX_CPU_NAME "JIT/VM"
+#	define BX_CPU_NAME "JIT-VM"
 #elif BX_CPU_X86
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_
