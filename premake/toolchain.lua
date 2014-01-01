@@ -160,11 +160,11 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_pnacl/newlib/bin/pnacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
 			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_pnacl/newlib/bin/pnacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_pnacl/bin/pnacl-"
 			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_pnacl/newlib/bin/pnacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_pnacl/bin/pnacl-"
 			end
 
 			premake.gcc.cc  = naclToolchain .. "clang"
@@ -221,10 +221,10 @@ function toolchain(_buildDir, _libDir)
 		"__STDC_CONSTANT_MACROS",
 	}
 
-	configuration "Debug"
+	configuration { "Debug" }
 		targetsuffix "Debug"
 
-	configuration "Release"
+	configuration { "Release" }
 		flags {
 			"OptimizeSpeed",
 		}
@@ -487,7 +487,6 @@ function toolchain(_buildDir, _libDir)
 			"-ffunction-sections",
 			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 			"-msse2",
-	--		"-fmerge-all-constants",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -499,11 +498,23 @@ function toolchain(_buildDir, _libDir)
 		libdirs { _libDir .. "lib/nacl-x86" }
 		linkoptions { "-melf32_nacl" }
 
+	configuration { "x32", "nacl", "Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Debug" }
+
+	configuration { "x32", "nacl", "Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
+
 	configuration { "x64", "nacl" }
 		targetdir (_buildDir .. "nacl-x64" .. "/bin")
 		objdir (_buildDir .. "nacl-x64" .. "/obj")
 		libdirs { _libDir .. "lib/nacl-x64" }
 		linkoptions { "-melf64_nacl" }
+
+	configuration { "x64", "nacl", "Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Debug" }
+
+	configuration { "x64", "nacl", "Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release" }
 
 	configuration { "nacl-arm" }
 		buildoptions {
@@ -520,6 +531,12 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "nacl-arm" .. "/obj")
 		libdirs { _libDir .. "lib/nacl-arm" }
 
+	configuration { "nacl-arm", "Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Debug" }
+
+	configuration { "nacl", "Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
+
 	configuration { "pnacl" }
 		buildoptions {
 			"-std=c++0x",
@@ -533,7 +550,12 @@ function toolchain(_buildDir, _libDir)
 		targetdir (_buildDir .. "pnacl" .. "/bin")
 		objdir (_buildDir .. "pnacl" .. "/obj")
 		libdirs { _libDir .. "lib/pnacl" }
-		includedirs { "$(PNACL)/sysroot/include" }
+
+	configuration { "pnacl", "Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Debug" }
+
+	configuration { "pnacl", "Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "Xbox360" }
 		targetdir (_buildDir .. "xbox360" .. "/bin")
@@ -658,6 +680,12 @@ function strip()
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@$(MINGW)/bin/strip -s \"$(TARGET)\""
+		}
+
+	configuration { "pnacl" }
+		postbuildcommands {
+			"@echo Running pnacl-finalize.",
+			"@" .. naclToolchain .. "finalize \"$(TARGET)\""
 		}
 
 	configuration { "*nacl*", "Release" }
