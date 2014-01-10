@@ -437,6 +437,32 @@ namespace bx
 		return result;
 	}
 
+	BX_FLOAT4_INLINE bool float4_test_any_ni(float4_t _a)
+	{
+		const float4_t mask   = float4_sra(_a, 31);
+		const float4_t zwxy   = float4_swiz_zwxy(mask);
+		const float4_t tmp0   = float4_or(mask, zwxy);
+		const float4_t tmp1   = float4_swiz_yyyy(tmp0);
+		const float4_t tmp2   = float4_or(tmp0, tmp1);
+		int res;
+		float4_stx(&res, tmp2);
+		return 0 != res;
+	}
+
+	BX_FLOAT4_INLINE bool float4_test_all_ni(float4_t _a)
+	{
+		const float4_t bits   = float4_sra(_a, 31);
+		const float4_t m1248  = float4_ild(1, 2, 4, 8);
+		const float4_t mask   = float4_and(bits, m1248);
+		const float4_t zwxy   = float4_swiz_zwxy(mask);
+		const float4_t tmp0   = float4_or(mask, zwxy);
+		const float4_t tmp1   = float4_swiz_yyyy(tmp0);
+		const float4_t tmp2   = float4_or(tmp0, tmp1);
+		int res;
+		float4_stx(&res, tmp2);
+		return 0xf == res;
+	}
+
 } // namespace bx
 
 #endif // BX_FLOAT4_NI_H_HEADER_GUARD

@@ -18,6 +18,17 @@ union float4_cast
 	char c[16];
 };
 
+void float4_check_bool(const char* _str, bool _a, bool _0)
+{
+	DBG("%s %d == %d"
+		, _str
+		, _a
+		, _0
+		);
+
+	CHECK_EQUAL(_a, _0);
+}
+
 void float4_check_int32(const char* _str, bx::float4_t _a, int32_t _0, int32_t _1, int32_t _2, int32_t _3)
 {
 	float4_cast c; c.f4 = _a;
@@ -150,6 +161,21 @@ TEST(float4_compare)
 	float4_check_uint32("icmpgt"
 		, float4_icmpgt(float4_ild(0, 1, 2, 3), float4_ild(0, -2, 1, 3) )
 		, 0, -1, -1, 0
+		);
+
+	float4_check_bool("test_any_xyzw"
+		, float4_test_any_xyzw(float4_ild(-1, 0, 0, 0) )
+		, true
+		);
+
+	float4_check_bool("test_all_xw"
+		, float4_test_all_xw(float4_ild(-1, 0, 0, -1) )
+		, true
+		);
+
+	float4_check_bool("test_all_xzw"
+		, float4_test_all_xzw(float4_ild(-1, 0, 0, -1) )
+		, false
 		);
 }
 

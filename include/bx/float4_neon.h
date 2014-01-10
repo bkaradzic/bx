@@ -32,6 +32,28 @@ namespace bx
 #undef ELEMy
 #undef ELEMx
 
+#define IMPLEMENT_TEST(_xyzw, _swizzle) \
+			BX_FLOAT4_INLINE bool float4_test_any_##_xyzw(float4_t _test); \
+			BX_FLOAT4_INLINE bool float4_test_all_##_xyzw(float4_t _test);
+
+IMPLEMENT_TEST(x    , xxxx);
+IMPLEMENT_TEST(y    , yyyy);
+IMPLEMENT_TEST(xy   , xyyy);
+IMPLEMENT_TEST(z    , zzzz);
+IMPLEMENT_TEST(xz   , xzzz);
+IMPLEMENT_TEST(yz   , yzzz);
+IMPLEMENT_TEST(xyz  , xyzz);
+IMPLEMENT_TEST(w    , wwww);
+IMPLEMENT_TEST(xw   , xwww);
+IMPLEMENT_TEST(yw   , ywww);
+IMPLEMENT_TEST(xyw  , xyww);
+IMPLEMENT_TEST(zw   , zwww);
+IMPLEMENT_TEST(xzw  , xzww);
+IMPLEMENT_TEST(yzw  , yzww);
+IMPLEMENT_TEST(xyzw , xyzw);
+
+#undef IMPLEMENT_TEST
+
 	BX_FLOAT4_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
 	{
 		return __builtin_shuffle(_a, _b, (_u32x4_t){ 0, 1, 4, 5 });
@@ -456,5 +478,48 @@ namespace bx
 #define float4_floor         float4_floor_ni
 
 #include "float4_ni.h"
+
+namespace bx
+{
+#define IMPLEMENT_TEST(_xyzw, _swizzle) \
+			BX_FLOAT4_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
+			{ \
+				const float4_t tmp0 = float4_swiz_##_swizzle(_test); \
+				return float4_test_any_ni(tmp0); \
+			} \
+			\
+			BX_FLOAT4_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
+			{ \
+				const float4_t tmp0 = float4_swiz_##_swizzle(_test); \
+				return float4_test_all_ni(tmp0); \
+			}
+
+IMPLEMENT_TEST(x    , xxxx);
+IMPLEMENT_TEST(y    , yyyy);
+IMPLEMENT_TEST(xy   , xyyy);
+IMPLEMENT_TEST(z    , zzzz);
+IMPLEMENT_TEST(xz   , xzzz);
+IMPLEMENT_TEST(yz   , yzzz);
+IMPLEMENT_TEST(xyz  , xyzz);
+IMPLEMENT_TEST(w    , wwww);
+IMPLEMENT_TEST(xw   , xwww);
+IMPLEMENT_TEST(yw   , ywww);
+IMPLEMENT_TEST(xyw  , xyww);
+IMPLEMENT_TEST(zw   , zwww);
+IMPLEMENT_TEST(xzw  , xzww);
+IMPLEMENT_TEST(yzw  , yzww);
+
+	BX_FLOAT4_INLINE bool float4_test_any_xyzw(float4_t _test)
+	{
+		return float4_test_any_ni(_test);
+	}
+
+	BX_FLOAT4_INLINE bool float4_test_all_xyzw(float4_t _test)
+	{
+		return float4_test_all_ni(_test);
+	}
+
+#undef IMPLEMENT_TEST
+} // namespace bx
 
 #endif // BX_FLOAT4_NEON_H_HEADER_GUARD
