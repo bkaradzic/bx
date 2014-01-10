@@ -162,9 +162,22 @@ TEST(float4_compare)
 		, float4_icmpgt(float4_ild(0, 1, 2, 3), float4_ild(0, -2, 1, 3) )
 		, 0, -1, -1, 0
 		);
+}
 
+TEST(float4_test)
+{
 	float4_check_bool("test_any_xyzw"
 		, float4_test_any_xyzw(float4_ild(-1, 0, 0, 0) )
+		, true
+		);
+
+	float4_check_bool("test_all_xyzw"
+		, float4_test_all_xyzw(float4_ild(-1, 0, -1, 0) )
+		, false
+		);
+
+	float4_check_bool("test_all_xyzw"
+		, float4_test_all_xyzw(float4_ild(-1, -1, -1, -1) )
 		, true
 		);
 
