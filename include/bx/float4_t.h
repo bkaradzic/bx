@@ -8,7 +8,8 @@
 
 #include "bx.h"
 
-#define BX_FLOAT4_INLINE BX_FORCE_INLINE
+#define BX_FLOAT4_FORCE_INLINE BX_FORCE_INLINE
+#define BX_FLOAT4_INLINE static inline
 
 #if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include "float4_sse.h"

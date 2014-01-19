@@ -12,9 +12,9 @@ namespace bx
 {
 	typedef union float4_t
 	{
+		float    fxyzw[4];
 		int32_t  ixyzw[4];
 		uint32_t uxyzw[4];
-		float    fxyzw[4];
 
 	} float4_t;
 
@@ -23,7 +23,7 @@ namespace bx
 #define ELEMz 2
 #define ELEMw 3
 #define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
-			BX_FLOAT4_INLINE float4_t float4_swiz_##_x##_y##_z##_w(float4_t _a) \
+			BX_FLOAT4_FORCE_INLINE float4_t float4_swiz_##_x##_y##_z##_w(float4_t _a) \
 			{ \
 				float4_t result; \
 				result.ixyzw[0] = _a.ixyzw[ELEM##_x]; \
@@ -42,7 +42,7 @@ namespace bx
 #undef ELEMx
 
 #define IMPLEMENT_TEST(_xyzw, _mask) \
-			BX_FLOAT4_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
 			{ \
 				uint32_t tmp = ( (_test.uxyzw[3]>>31)<<3) \
 				             | ( (_test.uxyzw[2]>>31)<<2) \
@@ -52,7 +52,7 @@ namespace bx
 				return 0 != (tmp&(_mask) ); \
 			} \
 			\
-			BX_FLOAT4_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
 			{ \
 				uint32_t tmp = ( (_test.uxyzw[3]>>31)<<3) \
 				             | ( (_test.uxyzw[2]>>31)<<2) \
@@ -80,7 +80,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 
 #undef IMPLEMENT_TEST
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0];
@@ -90,7 +90,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_ABxy(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_ABxy(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _b.uxyzw[0];
@@ -100,7 +100,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_CDzw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CDzw(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _b.uxyzw[2];
@@ -110,7 +110,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_zwCD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zwCD(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[2];
@@ -120,7 +120,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_xAyB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xAyB(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0];
@@ -130,7 +130,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_yBxA(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_yBxA(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[1];
@@ -140,7 +140,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_zCwD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zCwD(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[2];
@@ -150,7 +150,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_CzDw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CzDw(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _b.uxyzw[2];
@@ -160,27 +160,27 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float float4_x(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_x(float4_t _a)
 	{
 		return _a.fxyzw[0];
 	}
 
-	BX_FLOAT4_INLINE float float4_y(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_y(float4_t _a)
 	{
 		return _a.fxyzw[1];
 	}
 
-	BX_FLOAT4_INLINE float float4_z(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_z(float4_t _a)
 	{
 		return _a.fxyzw[2];
 	}
 
-	BX_FLOAT4_INLINE float float4_w(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_w(float4_t _a)
 	{
 		return _a.fxyzw[3];
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ld(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(const void* _ptr)
 	{
 		const uint32_t* input = reinterpret_cast<const uint32_t*>(_ptr);
 		float4_t result;
@@ -191,7 +191,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE void float4_st(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float4_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
@@ -200,13 +200,13 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		result[3] = _a.uxyzw[3];
 	}
 
-	BX_FLOAT4_INLINE void float4_stx(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float4_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
 	}
 
-	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
@@ -215,7 +215,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		result[3] = _a.uxyzw[3];
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
 	{
 		float4_t result;
 		result.fxyzw[0] = _x;
@@ -225,7 +225,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
 	{
 		float4_t result;
 		result.uxyzw[0] = _x;
@@ -235,7 +235,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_splat(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(const void* _ptr)
 	{
 		const uint32_t val = *reinterpret_cast<const uint32_t*>(_ptr);
 		float4_t result;
@@ -246,22 +246,22 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_splat(float _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(float _a)
 	{
 		return float4_ld(_a, _a, _a, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_isplat(uint32_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_isplat(uint32_t _a)
 	{
 		return float4_ild(_a, _a, _a, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_zero()
+	BX_FLOAT4_FORCE_INLINE float4_t float4_zero()
 	{
 		return float4_ild(0, 0, 0, 0);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_itof(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_itof(float4_t _a)
 	{
 		float4_t result;
 		result.fxyzw[0] = (float)_a.ixyzw[0];
@@ -271,7 +271,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ftoi(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ftoi(float4_t _a)
 	{
 		float4_t result;
 		result.ixyzw[0] = (int)_a.fxyzw[0];
@@ -281,7 +281,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_round(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_round(float4_t _a)
 	{
 		const float4_t tmp    = float4_ftoi(_a);
 		const float4_t result = float4_itof(tmp);
@@ -289,7 +289,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_add(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_add(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] + _b.fxyzw[0];
@@ -299,7 +299,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sub(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] - _b.fxyzw[0];
@@ -309,7 +309,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_mul(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_mul(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] * _b.fxyzw[0];
@@ -319,7 +319,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_div(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_div(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] / _b.fxyzw[0];
@@ -329,7 +329,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_rcp_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_rcp_est(float4_t _a)
 	{
 		float4_t result;
 		result.fxyzw[0] = 1.0f / _a.fxyzw[0];
@@ -339,7 +339,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sqrt(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sqrt(float4_t _a)
 	{
 		float4_t result;
 		result.fxyzw[0] = sqrtf(_a.fxyzw[0]);
@@ -349,7 +349,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_rsqrt_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_rsqrt_est(float4_t _a)
 	{
 		float4_t result;
 		result.fxyzw[0] = 1.0f / sqrtf(_a.fxyzw[0]);
@@ -359,7 +359,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.fxyzw[0] == _b.fxyzw[0] ? 0xffffffff : 0x0;
@@ -369,7 +369,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.fxyzw[0] < _b.fxyzw[0] ? 0xffffffff : 0x0;
@@ -379,7 +379,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.fxyzw[0] <= _b.fxyzw[0] ? 0xffffffff : 0x0;
@@ -389,7 +389,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.fxyzw[0] > _b.fxyzw[0] ? 0xffffffff : 0x0;
@@ -399,7 +399,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.fxyzw[0] >= _b.fxyzw[0] ? 0xffffffff : 0x0;
@@ -409,7 +409,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_min(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_min(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] < _b.fxyzw[0] ? _a.fxyzw[0] : _b.fxyzw[0];
@@ -419,7 +419,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_max(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_max(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.fxyzw[0] = _a.fxyzw[0] > _b.fxyzw[0] ? _a.fxyzw[0] : _b.fxyzw[0];
@@ -429,7 +429,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_and(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_and(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] & _b.uxyzw[0];
@@ -439,7 +439,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_andc(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_andc(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] & ~_b.uxyzw[0];
@@ -449,7 +449,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_or(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_or(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] | _b.uxyzw[0];
@@ -459,7 +459,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_xor(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_xor(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] ^ _b.uxyzw[0];
@@ -469,7 +469,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sll(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sll(float4_t _a, int _count)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] << _count;
@@ -479,7 +479,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_srl(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_srl(float4_t _a, int _count)
 	{
 		float4_t result;
 		result.uxyzw[0] = _a.uxyzw[0] >> _count;
@@ -489,7 +489,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sra(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sra(float4_t _a, int _count)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] >> _count;
@@ -499,7 +499,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] == _b.ixyzw[0] ? 0xffffffff : 0x0;
@@ -509,7 +509,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] < _b.ixyzw[0] ? 0xffffffff : 0x0;
@@ -519,7 +519,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] > _b.ixyzw[0] ? 0xffffffff : 0x0;
@@ -529,7 +529,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] < _b.ixyzw[0] ? _a.ixyzw[0] : _b.ixyzw[0];
@@ -539,7 +539,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] > _b.ixyzw[0] ? _a.ixyzw[0] : _b.ixyzw[0];
@@ -549,7 +549,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] + _b.ixyzw[0];
@@ -559,7 +559,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_isub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_isub(float4_t _a, float4_t _b)
 	{
 		float4_t result;
 		result.ixyzw[0] = _a.ixyzw[0] - _b.ixyzw[0];

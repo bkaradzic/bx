@@ -21,7 +21,7 @@ namespace bx
 #define ELEMz 2
 #define ELEMw 3
 #define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
-			BX_FLOAT4_INLINE float4_t float4_swiz_##_x##_y##_z##_w(float4_t _a) \
+			BX_FLOAT4_FORCE_INLINE float4_t float4_swiz_##_x##_y##_z##_w(float4_t _a) \
 			{ \
 				return _mm_shuffle_ps( _a, _a, _MM_SHUFFLE(ELEM##_w, ELEM##_z, ELEM##_y, ELEM##_x ) ); \
 			}
@@ -35,12 +35,12 @@ namespace bx
 #undef ELEMx
 
 #define IMPLEMENT_TEST(_xyzw, _mask) \
-			BX_FLOAT4_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
 			{ \
 				return 0x0 != (_mm_movemask_ps(_test)&(_mask) ); \
 			} \
 			\
-			BX_FLOAT4_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
 			{ \
 				return (_mask) == (_mm_movemask_ps(_test)&(_mask) ); \
 			}
@@ -63,52 +63,52 @@ IMPLEMENT_TEST(xyzw , 0xf);
 
 #undef IMPLEMENT_TEST
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
 	{
 		return _mm_movelh_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_ABxy(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_ABxy(float4_t _a, float4_t _b)
 	{
 		return _mm_movelh_ps(_b, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_CDzw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CDzw(float4_t _a, float4_t _b)
 	{
 		return _mm_movehl_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_zwCD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zwCD(float4_t _a, float4_t _b)
 	{
 		return _mm_movehl_ps(_b, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_xAyB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xAyB(float4_t _a, float4_t _b)
 	{
 		return _mm_unpacklo_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_yBxA(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_yBxA(float4_t _a, float4_t _b)
 	{
 		return _mm_unpacklo_ps(_b, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_zCwD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zCwD(float4_t _a, float4_t _b)
 	{
 		return _mm_unpackhi_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_shuf_CzDw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CzDw(float4_t _a, float4_t _b)
 	{
 		return _mm_unpackhi_ps(_b, _a);
 	}
 
-	BX_FLOAT4_INLINE float float4_x(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_x(float4_t _a)
 	{
 		return _mm_cvtss_f32(_a);
 	}
 
-	BX_FLOAT4_INLINE float float4_y(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_y(float4_t _a)
 	{
 		const float4_t yyyy = float4_swiz_yyyy(_a);
 		const float result  = _mm_cvtss_f32(yyyy);
@@ -116,7 +116,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float float4_z(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_z(float4_t _a)
 	{
 		const float4_t zzzz = float4_swiz_zzzz(_a);
 		const float result  = _mm_cvtss_f32(zzzz);
@@ -124,7 +124,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float float4_w(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_w(float4_t _a)
 	{
 		const float4_t wwww = float4_swiz_wwww(_a);
 		const float result  = _mm_cvtss_f32(wwww);
@@ -132,32 +132,32 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ld(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(const void* _ptr)
 	{
 		return _mm_load_ps(reinterpret_cast<const float*>(_ptr) );
 	}
 
-	BX_FLOAT4_INLINE void float4_st(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float4_t _a)
 	{
 		_mm_store_ps(reinterpret_cast<float*>(_ptr), _a);
 	}
 
-	BX_FLOAT4_INLINE void float4_stx(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float4_t _a)
 	{
 		_mm_store_ss(reinterpret_cast<float*>(_ptr), _a);
 	}
 
-	BX_FLOAT4_INLINE void float4_stream(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
 		_mm_stream_ps(reinterpret_cast<float*>(_ptr), _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
 	{
 		return _mm_set_ps(_w, _z, _y, _x);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
 	{
 		const __m128i set     = _mm_set_epi32(_w, _z, _y, _x);
 		const float4_t result = _mm_castsi128_ps(set);
@@ -165,7 +165,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_splat(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(const void* _ptr)
 	{
 		const float4_t x___   = _mm_load_ss(reinterpret_cast<const float*>(_ptr) );
 		const float4_t result = float4_swiz_xxxx(x___);
@@ -173,12 +173,12 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_splat(float _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(float _a)
 	{
 		return _mm_set1_ps(_a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_isplat(uint32_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_isplat(uint32_t _a)
 	{
 		const __m128i splat   = _mm_set1_epi32(_a);
 		const float4_t result = _mm_castsi128_ps(splat);
@@ -186,12 +186,12 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_zero()
+	BX_FLOAT4_FORCE_INLINE float4_t float4_zero()
 	{
 		return _mm_setzero_ps();
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_itof(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_itof(float4_t _a)
 	{
 		const __m128i  itof   = _mm_castps_si128(_a);
 		const float4_t result = _mm_cvtepi32_ps(itof);
@@ -199,7 +199,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_ftoi(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_ftoi(float4_t _a)
 	{
 		const __m128i ftoi    = _mm_cvtps_epi32(_a);
 		const float4_t result = _mm_castsi128_ps(ftoi);
@@ -207,7 +207,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_round(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_round(float4_t _a)
 	{
 #if defined(__SSE4_1__)
 		return _mm_round_ps(_a, _MM_FROUND_NINT);
@@ -219,109 +219,109 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #endif // defined(__SSE4_1__)
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_add(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_add(float4_t _a, float4_t _b)
 	{
 		return _mm_add_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sub(float4_t _a, float4_t _b)
 	{
 		return _mm_sub_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_mul(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_mul(float4_t _a, float4_t _b)
 	{
 		return _mm_mul_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_div(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_div(float4_t _a, float4_t _b)
 	{
 		return _mm_div_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_rcp_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_rcp_est(float4_t _a)
 	{
 		return _mm_rcp_ps(_a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sqrt(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sqrt(float4_t _a)
 	{
 		return _mm_sqrt_ps(_a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_rsqrt_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_rsqrt_est(float4_t _a)
 	{
 		return _mm_rsqrt_ps(_a);
 	}
 
 #if defined(__SSE4_1__)
-	BX_FLOAT4_INLINE float4_t float4_dot3(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_dot3(float4_t _a, float4_t _b)
 	{
 		return _mm_dp_ps(_a, _b, 0x77);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_dot(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_dot(float4_t _a, float4_t _b)
 	{
 		return _mm_dp_ps(_a, _b, 0xFF);
 	}
 #endif // defined(__SSE4__)
 
-	BX_FLOAT4_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
 	{
 		return _mm_cmpeq_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
 	{
 		return _mm_cmplt_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
 	{
 		return _mm_cmple_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
 	{
 		return _mm_cmpgt_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
 	{
 		return _mm_cmpge_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_min(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_min(float4_t _a, float4_t _b)
 	{
 		return _mm_min_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_max(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_max(float4_t _a, float4_t _b)
 	{
 		return _mm_max_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_and(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_and(float4_t _a, float4_t _b)
 	{
 		return _mm_and_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_andc(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_andc(float4_t _a, float4_t _b)
 	{
 		return _mm_andnot_ps(_b, _a);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_or(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_or(float4_t _a, float4_t _b)
 	{
 		return _mm_or_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_xor(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_xor(float4_t _a, float4_t _b)
 	{
 		return _mm_xor_ps(_a, _b);
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sll(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sll(float4_t _a, int _count)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
 		const __m128i shift   = _mm_slli_epi32(a, _count);
@@ -330,7 +330,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_srl(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_srl(float4_t _a, int _count)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
 		const __m128i shift   = _mm_srli_epi32(a, _count);
@@ -339,7 +339,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_sra(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_sra(float4_t _a, int _count)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
 		const __m128i shift   = _mm_srai_epi32(a, _count);
@@ -348,7 +348,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
 	{
 		const __m128i tmp0    = _mm_castps_si128(_a);
 		const __m128i tmp1    = _mm_castps_si128(_b);
@@ -358,7 +358,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
 	{
 		const __m128i tmp0    = _mm_castps_si128(_a);
 		const __m128i tmp1    = _mm_castps_si128(_b);
@@ -368,7 +368,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
 	{
 		const __m128i tmp0    = _mm_castps_si128(_a);
 		const __m128i tmp1    = _mm_castps_si128(_b);
@@ -379,7 +379,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 #if defined(__SSE4_1__)
-	BX_FLOAT4_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
 	{
 		const __m128i tmp0    = _mm_castps_si128(_a);
 		const __m128i tmp1    = _mm_castps_si128(_b);
@@ -389,7 +389,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
 	{
 		const __m128i tmp0    = _mm_castps_si128(_a);
 		const __m128i tmp1    = _mm_castps_si128(_b);
@@ -400,7 +400,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 #endif // defined(__SSE4_1__)
 
-	BX_FLOAT4_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
 		const __m128i b       = _mm_castps_si128(_b);
@@ -410,7 +410,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-	BX_FLOAT4_INLINE float4_t float4_isub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float4_t float4_isub(float4_t _a, float4_t _b)
 	{
 		const __m128i a       = _mm_castps_si128(_a);
 		const __m128i b       = _mm_castps_si128(_b);
