@@ -22,8 +22,10 @@
 #	define BX_ALIGNED_ALLOC(_allocator, _size, _align)         bx::alignedAlloc(_allocator, _size, _align, __FILE__, __LINE__)
 #	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size, _align) bx::alignedRealloc(_allocator, _ptr, _size, _align, __FILE__, __LINE__)
 #	define BX_ALIGNED_FREE(_allocator, _ptr)                   bx::alignedFree(_allocator, _ptr, __FILE__, __LINE__)
-#	define BX_NEW(_allocator, _type)                           new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
+#	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr, __FILE__, __LINE__)
+#	define BX_ALIGNED_NEW(_allocator, _align, _type)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
+#	define BX_ALIGNED_DELETE(_allocator, _align, _ptr)         bx::alignedDeleteObject(_allocator, _ptr)
 #else
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size)
 #	define BX_REALLOC(_allocator, _ptr, _size)                 bx::realloc(_allocator, _ptr, _size)
@@ -33,6 +35,8 @@
 #	define BX_ALIGNED_FREE(_allocator, _ptr)                   bx::alignedFree(_allocator, _ptr)
 #	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr)
+#	define BX_ALIGNED_NEW(_allocator, _align, _type)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
+#	define BX_ALIGNED_DELETE(_allocator, _align, _ptr)         bx::alignedDeleteObject(_allocator, _ptr)
 #endif // BX_CONFIG_DEBUG_ALLOC
 
 #ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
@@ -184,6 +188,16 @@ namespace bx
 		{
 			_object->~ObjectT();
 			free(_allocator, _object, _file, _line);
+		}
+	}
+
+	template <typename ObjectT>
+	inline void alignedDeleteObject(AllocatorI* _allocator, ObjectT* _object, const char* _file = NULL, uint32_t _line = 0)
+	{
+		if (NULL != _object)
+		{
+			_object->~ObjectT();
+			alignedFree(_allocator, _object, _file, _line);
 		}
 	}
 
