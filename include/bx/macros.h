@@ -39,9 +39,10 @@
 #define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
 #define BX_ALIGN_4096(_value) BX_ALIGN_MASK(_value, 0xfff)
 
+#define BX_ALIGNOF(_type) __alignof(_type)
+
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 #	define BX_ALIGN_STRUCT(_align, _struct) _struct __attribute__( (aligned(_align) ) )
-#	define BX_ALIGNOF(_type) alignof(_type)
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
 #	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
@@ -57,7 +58,6 @@
 #	endif // BX_COMPILER_CLANG
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_STRUCT(_align, _struct) __declspec(align(_align) ) _struct
-#	define BX_ALIGNOF(_type) __alignof(_type)
 #	define BX_ALLOW_UNUSED
 #	define BX_FORCE_INLINE __forceinline
 #	define BX_FUNCTION __FUNCTION__
