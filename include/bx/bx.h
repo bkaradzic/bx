@@ -16,7 +16,21 @@ namespace bx
 {
 	// http://cnicholson.net/2011/01/stupid-c-tricks-a-better-sizeof_array/
 	template<typename T, size_t N> char (&COUNTOF_REQUIRES_ARRAY_ARGUMENT(const T(&)[N]) )[N];
-#define BX_COUNTOF(x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(x) )
+#define BX_COUNTOF(_x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x) )
+
+	// Template for avoiding MSVC: C4127: conditional expression is constant
+	template<bool>
+	BX_FORCE_INLINE bool isEnabled()
+	{
+		return true;
+	}
+
+	template<>
+	BX_FORCE_INLINE bool isEnabled<false>()
+	{
+		return false;
+	}
+#define BX_ENABLED(_x) bx::isEnabled<!!(_x)>()
 
 } // namespace bx
 
