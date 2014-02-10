@@ -20,13 +20,13 @@ namespace bx
 
 	// Template for avoiding MSVC: C4127: conditional expression is constant
 	template<bool>
-	BX_FORCE_INLINE bool isEnabled()
+	inline bool isEnabled()
 	{
 		return true;
 	}
 
 	template<>
-	BX_FORCE_INLINE bool isEnabled<false>()
+	inline bool isEnabled<false>()
 	{
 		return false;
 	}

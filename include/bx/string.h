@@ -176,6 +176,49 @@ namespace bx
 		}
 	}
 
+	// Finds identifier.
+	inline const char* findIdentifierMatch(const char* _str, const char* _word)
+	{
+		size_t len = strlen(_word);
+		const char* ptr = strstr(_str, _word);
+		for (; NULL != ptr; ptr = strstr(ptr + len, _word) )
+		{
+			if (ptr != _str)
+			{
+				char ch = *(ptr - 1);
+				if (isalnum(ch) || '_' == ch)
+				{
+					continue;
+				}
+			}
+
+			char ch = ptr[len];
+			if (isalnum(ch) || '_' == ch)
+			{
+				continue;
+			}
+
+			return ptr;
+		}
+
+		return ptr;
+	}
+
+	// Finds any identifier from NULL terminated array of identifiers.
+	inline const char* findIdentifierMatch(const char* _str, const char* _words[])
+	{
+		for (const char* word = *_words; NULL != word; ++_words, word = *_words)
+		{
+			const char* match = findIdentifierMatch(_str, word);
+			if (NULL != match)
+			{
+				return match;
+			}
+		}
+
+		return NULL;
+	}
+
 	/// Cross platform implementation of vsnprintf that returns number of
 	/// characters which would have been written to the final string if
 	/// enough space had been available.
