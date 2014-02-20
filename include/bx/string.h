@@ -225,7 +225,7 @@ namespace bx
 	inline int32_t vsnprintf(char* _str, size_t _count, const char* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
-		int32_t len = ::vsnprintf(_str, _count, _format, _argList);
+		int32_t len = ::vsnprintf_s(_str, _count, _count, _format, _argList);
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
 #else
 		return ::vsnprintf(_str, _count, _format, _argList);
