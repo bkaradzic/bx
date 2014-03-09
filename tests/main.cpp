@@ -31,16 +31,22 @@
 
 #include "test.h"
 
+int runAllTests()
+{
+	DBG(BX_COMPILER_NAME " / " BX_CPU_NAME " / " BX_ARCH_NAME " / " BX_PLATFORM_NAME);
+	return UnitTest::RunAllTests();
+}
+
 #if BX_PLATFORM_ANDROID
 #include <android/native_activity.h>
 
 void ANativeActivity_onCreate(ANativeActivity*, void*, size_t)
 {
-	exit(UnitTest::RunAllTests() );
+	exit(runAllTests() );
 }
 #else
 int main()
 {
-	return UnitTest::RunAllTests();
+	return runAllTests();
 }
 #endif // BX_PLATFORM
