@@ -378,6 +378,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		links {
 			"c",
+			"dl",
 			"m",
 			"android",
 			"log",
@@ -385,9 +386,21 @@ function toolchain(_buildDir, _libDir)
 			"gcc",
 		}
 		buildoptions {
+			"-fPIC",
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-no-canonical-prefixes",
+			"-Wa,--noexecstack",
+			"-fstack-protector",
+			"-ffunction-sections",
+		}
+		linkoptions {
+			"-no-canonical-prefixes",
+			"-Wl,--no-undefined",
+			"-Wl,-z,noexecstack",
+			"-Wl,-z,relro",
+			"-Wl,-z,now",
 		}
 
 	configuration { "android-arm" }
@@ -400,26 +413,19 @@ function toolchain(_buildDir, _libDir)
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
 		}
+		buildoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
+			"-mthumb",
+			"-march=armv7-a",
+			"-mfloat-abi=softfp",
+			"-mfpu=neon",
+		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
 			"-march=armv7-a",
 			"-Wl,--fix-cortex-a8",
-
-			"-no-canonical-prefixes",
-			"-Wl,--no-undefined",
-			"-Wl,-z,noexecstack",
-			"-Wl,-z,relro",
-			"-Wl,-z,now",
-		}
-		buildoptions {
-			"-fpic",
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
-			"-mthumb",
-			"-march=armv7-a",
-			"-mfloat-abi=softfp",
-			"-mfpu=neon",
 		}
 
 	configuration { "android-mips" }
@@ -432,13 +438,13 @@ function toolchain(_buildDir, _libDir)
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
 		}
+		buildoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
+		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtend_so.o",
-		}
-		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
 		}
 
 	configuration { "android-x86" }
@@ -451,13 +457,18 @@ function toolchain(_buildDir, _libDir)
 		includedirs {
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
 		}
+		buildoptions {
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
+			"-march=i686",
+			"-mtune=atom",
+			"-mstackrealign",
+			"-msse3",
+			"-mfpmath=sse",
+		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtbegin_so.o",
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtend_so.o",
-		}
-		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
 		}
 
 	configuration { "emscripten-experimental" }
