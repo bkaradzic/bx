@@ -94,7 +94,7 @@ function toolchain(_buildDir, _libDir)
 
 			premake.gcc.cc = "$(EMSCRIPTEN)/emcc"
 			premake.gcc.cxx = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar = "$(EMSCRIPTEN)/emar"
+			premake.gcc.ar = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
 		end
 
