@@ -705,5 +705,11 @@ function strip()
 			"@" .. naclToolchain .. "strip -s \"$(TARGET)\""
 		}
 
+	configuration { "asmjs" }
+		postbuildcommands {
+			"@echo Running asmjs finalize.",
+			"@$(EMSCRIPTEN)/emcc -O2 \"$(TARGET)\" -o \"$(TARGET)\".html"
+		}
+
 	configuration {} -- reset configuration
 end
