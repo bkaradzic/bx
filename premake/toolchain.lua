@@ -480,6 +480,7 @@ function toolchain(_buildDir, _libDir)
 			"$(EMSCRIPTEN)/system/include/libc",
 		}
 		buildoptions {
+			"-Wno-unknown-warning-option", -- Linux Emscripten doesn't know about no-warn-absolute-paths...
 			"-Wno-warn-absolute-paths",
 		}
 

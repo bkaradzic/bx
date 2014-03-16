@@ -10,6 +10,8 @@
 #include "cpu.h"
 #include "sem.h"
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 #if BX_PLATFORM_NACL || BX_PLATFORM_LINUX || BX_PLATFORM_ANDROID || BX_PLATFORM_OSX
 #	include <pthread.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
@@ -129,5 +131,7 @@ namespace bx
 	};
 
 } // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_MUTEX_H_HEADER_GUARD

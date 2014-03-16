@@ -95,6 +95,7 @@ namespace bx
 		Node* m_last;
 	};
 
+#if BX_CONFIG_SUPPORTS_THREADING
 	template<typename Ty>
 	class SpScUnboundedQueueMutex
 	{
@@ -147,13 +148,15 @@ namespace bx
 		bx::LwMutex m_mutex;
 		std::list<Ty*> m_queue;
 	};
+#endif // BX_CONFIG_SUPPORTS_THREADING
 
-#if BX_CONFIG_SPSCQUEUE_USE_MUTEX
+#if BX_CONFIG_SPSCQUEUE_USE_MUTEX && BX_CONFIG_SUPPORTS_THREADING
 #	define SpScUnboundedQueue SpScUnboundedQueueMutex
 #else
 #	define SpScUnboundedQueue SpScUnboundedQueueLf
 #endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
 
+#if BX_CONFIG_SUPPORTS_THREADING
 	template <typename Ty>
 	class SpScBlockingUnboundedQueue
 	{
@@ -196,6 +199,7 @@ namespace bx
 		Semaphore m_count;
 		SpScUnboundedQueue<void> m_queue;
 	};
+#endif // BX_CONFIG_SUPPORTS_THREADING
 
 } // namespace bx
 

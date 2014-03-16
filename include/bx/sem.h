@@ -9,6 +9,8 @@
 #include "bx.h"
 #include "mutex.h"
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 #if BX_PLATFORM_POSIX
 #	include <errno.h>
 #	include <semaphore.h>
@@ -221,5 +223,7 @@ namespace bx
 #endif // BX_PLATFORM_
 
 } // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_SEM_H_HEADER_GUARD

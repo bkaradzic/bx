@@ -12,6 +12,8 @@
 
 #include "sem.h"
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 namespace bx
 {
 	typedef int32_t (*ThreadFn)(void* _userData);
@@ -221,5 +223,7 @@ namespace bx
 #endif // BX_PLATFORM_WINDOWS
 
 } // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_THREAD_H_HEADER_GUARD
