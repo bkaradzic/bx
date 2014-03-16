@@ -479,6 +479,9 @@ function toolchain(_buildDir, _libDir)
 			"$(EMSCRIPTEN)/system/include",
 			"$(EMSCRIPTEN)/system/include/libc",
 		}
+		buildoptions {
+			"-Wno-warn-absolute-paths",
+		}
 
 	configuration { "nacl or nacl-arm or pnacl" }
 		includedirs { 
