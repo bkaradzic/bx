@@ -16,7 +16,7 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm", "Android - ARM" },
 			{ "android-mips", "Android - MIPS" },
 			{ "android-x86", "Android - x86" },
---			{ "emscripten-experimental", "Emscripten" },
+			{ "asmjs", "Emscripten/asm.js" },
 			{ "linux-gcc", "Linux (GCC compiler)" },
 			{ "linux-clang", "Linux (Clang compiler)" },
 			{ "mingw", "MinGW" },
@@ -86,7 +86,7 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-x86")
 		end
 
-		if "emscripten-experimental" == _OPTIONS["gcc"] then
+		if "asmjs" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
 				print("Set EMSCRIPTEN enviroment variables.")
@@ -95,7 +95,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cc = "$(EMSCRIPTEN)/emcc"
 			premake.gcc.cxx = "$(EMSCRIPTEN)/em++"
 			premake.gcc.ar = "$(EMSCRIPTEN)/emar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-emscripten")
+			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
@@ -471,13 +471,13 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtend_so.o",
 		}
 
-	configuration { "emscripten-experimental" }
-		targetdir (_buildDir .. "emscripten" .. "/bin")
-		objdir (_buildDir .. "emscripten" .. "/obj")
-		libdirs { _libDir .. "lib/emscripten" }
-		includedirs { "$(EMSCRIPTEN)/system/include" }
-		buildoptions {
-			"-pthread",
+	configuration { "asmjs" }
+		targetdir (_buildDir .. "asmjs" .. "/bin")
+		objdir (_buildDir .. "asmjs" .. "/obj")
+		libdirs { _libDir .. "lib/asmjs" }
+		includedirs {
+			"$(EMSCRIPTEN)/system/include",
+			"$(EMSCRIPTEN)/system/include/libc",
 		}
 
 	configuration { "nacl or nacl-arm or pnacl" }

@@ -10,7 +10,13 @@
 
 #if BX_PLATFORM_WINDOWS
 #	include <windows.h>
-#elif BX_PLATFORM_NACL || BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS
+#elif BX_PLATFORM_NACL \
+	|| BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX \
+	|| BX_PLATFORM_OSX \
+	|| BX_PLATFORM_IOS \
+	|| BX_PLATFORM_EMSCRIPTEN
+
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_NACL
 #		include <pthread.h> // mach_port_t
@@ -79,7 +85,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::LoadLibraryA(_filePath);
-#elif BX_PLATFORM_NACL
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
@@ -91,7 +97,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
-#elif BX_PLATFORM_NACL
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
 		BX_UNUSED(_handle);
 #else
 		::dlclose(_handle);
@@ -102,7 +108,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
-#elif BX_PLATFORM_NACL
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
 		BX_UNUSED(_handle, _symbol);
 		return NULL;
 #else
