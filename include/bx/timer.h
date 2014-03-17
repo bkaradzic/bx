@@ -8,8 +8,10 @@
 
 #include "bx.h"
 
-#if BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
+#if BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
+#elif BX_PLATFORM_EMSCRIPTEN
+#	include <emscripten.h>
 #elif BX_PLATFORM_NACL || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_QNX
 #	include <sys/time.h> // gettimeofday
 #elif BX_PLATFORM_WINDOWS
@@ -26,10 +28,12 @@ namespace bx
 		// http://support.microsoft.com/kb/274323
 		QueryPerformanceCounter(&li);
 		int64_t i64 = li.QuadPart;
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_ANDROID
 		struct timespec now;
 		clock_gettime(CLOCK_MONOTONIC, &now);
 		int64_t i64 = now.tv_sec*INT64_C(1000000000) + now.tv_nsec;
+#elif BX_PLATFORM_EMSCRIPTEN
+		int64_t i64 = int64_t(1000.0f * emscripten_get_now() );
 #else
 		struct timeval now;
 		gettimeofday(&now, 0);
@@ -44,8 +48,10 @@ namespace bx
 		LARGE_INTEGER li;
 		QueryPerformanceFrequency(&li);
 		return li.QuadPart;
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_ANDROID
 		return INT64_C(1000000000);
+#elif BX_PLATFORM_EMSCRIPTEN
+		return INT64_C(1000000);
 #else
 		return INT64_C(1000000);
 #endif // BX_PLATFORM_
