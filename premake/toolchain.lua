@@ -712,7 +712,8 @@ function strip()
 	configuration { "asmjs" }
 		postbuildcommands {
 			"@echo Running asmjs finalize.",
-			"@$(EMSCRIPTEN)/emcc -O2 \"$(TARGET)\" -o \"$(TARGET)\".html"
+			"@$(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
+			-- ALLOW_MEMORY_GROWTH
 		}
 
 	configuration {} -- reset configuration
