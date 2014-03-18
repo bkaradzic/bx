@@ -4,7 +4,7 @@
  */
 
 #ifndef BX_FLOAT4X4_H_HEADER_GUARD
-#define BX_FLOAT4x4_H_HEADER_GUARD
+#define BX_FLOAT4X4_H_HEADER_GUARD
 
 #include "float4_t.h"
 
