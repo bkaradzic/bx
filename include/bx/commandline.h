@@ -111,7 +111,6 @@ namespace bx
 			return false;
 		}
 
-
 		bool hasArg(bool& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
