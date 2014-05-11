@@ -52,7 +52,7 @@ namespace bx
 
 		const char* cmp = _find + 1;
 		size_t len = strlen(cmp);
-		do 
+		do
 		{
 			for (char match = *_str++; match != first && 0 < _size; match = *_str++, --_size)
 			{
@@ -66,7 +66,7 @@ namespace bx
 			{
 				return NULL;
 			}
-			
+
 		} while (0 != strncmp(_str, cmp, len) );
 
 		return --_str;

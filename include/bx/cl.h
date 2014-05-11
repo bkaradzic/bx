@@ -669,6 +669,8 @@ typedef cl_int           (CL_API_CALL* PFNCLENQUEUETASKPROC)(cl_command_queue, c
 typedef cl_int           (CL_API_CALL* PFNCLENQUEUENATIVEKERNELPROC)(cl_command_queue, void (CL_CALLBACK*)(void*), void*, size_t, cl_uint, const cl_mem*, const void**, cl_uint, const cl_event*, cl_event*);
 
 // 1.1
+typedef cl_mem           (CL_API_CALL* PFNCLCREATEIMAGE2DPROC)(cl_context, cl_mem_flags, const cl_image_format*, size_t, size_t, size_t, void*, cl_int*);
+typedef cl_mem           (CL_API_CALL* PFNCLCREATEIMAGE3DPROC)(cl_context, cl_mem_flags, const cl_image_format*, size_t, size_t, size_t, size_t, size_t, void*, cl_int*);
 typedef cl_mem           (CL_API_CALL* PFNCLCREATESUBBUFFERPROC)(cl_mem, cl_mem_flags, cl_buffer_create_type, const void*, cl_int*);
 typedef cl_int           (CL_API_CALL* PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC)(cl_mem, void (CL_CALLBACK*)(cl_mem, void*), void*);
 typedef cl_event         (CL_API_CALL* PFNCLCREATEUSEREVENTPROC)(cl_context, cl_int*);
@@ -769,6 +771,8 @@ typedef cl_int           (CL_API_CALL* PFNCLENQUEUEBARRIERWITHWAITLISTPROC)(cl_c
 
 #define BX_CL_IMPORT_ALL_11 \
 			/* Memory Object APIs */ \
+			BX_CL_IMPORT_11(false, PFNCLCREATEIMAGE2DPROC,                   clCreateImage2D); \
+			BX_CL_IMPORT_11(false, PFNCLCREATEIMAGE3DPROC,                   clCreateImage3D); \
 			BX_CL_IMPORT_11(false, PFNCLCREATESUBBUFFERPROC,                 clCreateSubBuffer); \
 			BX_CL_IMPORT_11(false, PFNCLSETMEMOBJECTDESTRUCTORCALLBACKPROC,  clSetMemObjectDestructorCallback); \
 			/* Event Object APIs */  \
