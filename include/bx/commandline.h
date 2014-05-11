@@ -87,6 +87,31 @@ namespace bx
 			return false;
 		}
 
+		bool hasArg(float& _value, const char _short, const char* _long = NULL) const
+		{
+			const char* arg = findOption(_short, _long, 1);
+			if (NULL != arg)
+			{
+				_value = float(atof(arg));
+				return true;
+			}
+
+			return false;
+		}
+
+		bool hasArg(double& _value, const char _short, const char* _long = NULL) const
+		{
+			const char* arg = findOption(_short, _long, 1);
+			if (NULL != arg)
+			{
+				_value = atof(arg);
+				return true;
+			}
+
+			return false;
+		}
+
+
 		bool hasArg(bool& _value, const char _short, const char* _long = NULL) const
 		{
 			const char* arg = findOption(_short, _long, 1);
