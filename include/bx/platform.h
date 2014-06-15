@@ -188,7 +188,8 @@
 //#	pragma warning(error:4127) // ENABLE warning C4127: conditional expression is constant
 #	pragma warning(error:4130) // ENABLE warning C4130: 'operator' : logical operation on address of string constant
 #	pragma warning(error:4239) // ENABLE warning C4239: nonstandard extension used : 'argument' : conversion from '*' to '* &' A non-const reference may only be bound to an lvalue
-//#	pragma warning(error:4244) // ENABLE warning C4244: 'conversion' conversion from 'type1' to 'type2', possible loss of data
+//#	pragma warning(error:4244) // ENABLE warning C4244: 'argument' : conversion from 'type1' to 'type2', possible loss of data
+#	pragma warning(error:4245) // ENABLE warning C4245: 'conversion' : conversion from 'type1' to 'type2', signed/unsigned mismatch
 #	pragma warning(error:4263) // ENABLE warning C4263: 'function' : member function does not override any base class virtual member function
 #	pragma warning(error:4265) // ENABLE warning C4265: class has virtual functions, but destructor is not virtual
 #	pragma warning(error:4431) // ENABLE warning C4431: missing type specifier - int assumed. Note: C no longer supports default-int
