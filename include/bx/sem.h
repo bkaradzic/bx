@@ -16,7 +16,7 @@
 #	include <semaphore.h>
 #	include <time.h>
 #	include <pthread.h>
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <limits.h>
 #endif // BX_PLATFORM_
@@ -190,7 +190,7 @@ namespace bx
 	};
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 
 	class Semaphore
 	{

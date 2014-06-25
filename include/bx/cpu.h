@@ -62,6 +62,8 @@ namespace bx
 	{
 #if BX_PLATFORM_XBOX360
 		__lwsync();
+#elif BX_PLATFORM_WINRT
+        MemoryBarrier();
 #elif BX_COMPILER_MSVC
 		_mm_mfence();
 #else

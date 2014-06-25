@@ -8,7 +8,7 @@
 
 #include "bx.h"
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #elif BX_PLATFORM_NACL \
 	|| BX_PLATFORM_ANDROID \
@@ -45,6 +45,9 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 		::Sleep(_ms);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_ms);
+        debugOutput("sleep is not implemented"); debugBreak();
 #else
 		timespec req = {(time_t)_ms/1000, (long)((_ms%1000)*1000000)};
 		timespec rem = {0, 0};
@@ -58,6 +61,8 @@ namespace bx
 		::SwitchToThread();
 #elif BX_PLATFORM_XBOX360
 		::Sleep(0);
+#elif BX_PLATFORM_WINRT
+        debugOutput("yield is not implemented"); debugBreak();
 #else
 		::sched_yield();
 #endif // BX_PLATFORM_
@@ -85,7 +90,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::LoadLibraryA(_filePath);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
@@ -97,7 +102,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_handle);
 #else
 		::dlclose(_handle);
@@ -108,7 +113,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_handle, _symbol);
 		return NULL;
 #else
@@ -120,6 +125,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, _value);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_name, _value);
 #else
 		::setenv(_name, _value, 1);
 #endif // BX_PLATFORM_
@@ -129,6 +136,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, NULL);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_name);
 #else
 		::unsetenv(_name);
 #endif // BX_PLATFORM_
