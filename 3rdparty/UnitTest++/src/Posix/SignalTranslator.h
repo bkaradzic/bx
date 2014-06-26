@@ -26,7 +26,7 @@ private:
 //    struct sigaction m_old_SIGALRM_action;
 };
 
-#if !defined (__GNUC__)
+#if !defined(__GNUC__) && !defined(__clang__)
     #define UNITTEST_EXTENSION
 #else
     #define UNITTEST_EXTENSION __extension__
