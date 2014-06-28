@@ -34,6 +34,16 @@ namespace bx
 		return _a > _b ? _a : _b;
 	}
 
+	inline float fmin3(float _a, float _b, float _c)
+	{
+		return fmin(_a, fmin(_b, _c) );
+	}
+
+	inline float fmax3(float _a, float _b, float _c)
+	{
+		return fmax(_a, fmax(_b, _c) );
+	}
+
 	inline float fclamp(float _a, float _min, float _max)
 	{
 		return fmin(fmax(_a, _min), _max);
