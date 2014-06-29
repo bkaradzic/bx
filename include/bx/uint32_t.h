@@ -263,6 +263,14 @@ namespace bx
 		return _a > _b ? _a : _b;
 	}
 
+	inline uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max)
+	{
+		const uint32_t tmp    = uint32_max(_a, _min);
+		const uint32_t result = uint32_min(tmp, _max);
+
+		return result;
+	}
+
 	inline uint32_t uint32_incwrap(uint32_t _val, uint32_t _min, uint32_t _max)
 	{
 		const uint32_t inc          = uint32_inc(_val);
