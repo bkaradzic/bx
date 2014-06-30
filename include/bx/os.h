@@ -39,6 +39,12 @@
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
+#if BX_COMPILER_MSVC
+#	include <direct.h> // _getcwd
+#else
+#	include <unistd.h> // getcwd
+#endif // BX_COMPILER_MSVC
+
 namespace bx
 {
 	inline void sleep(uint32_t _ms)
@@ -132,6 +138,24 @@ namespace bx
 #else
 		::unsetenv(_name);
 #endif // BX_PLATFORM_
+	}
+
+	inline int chdir(const char* _path)
+	{
+#if BX_COMPILER_MSVC
+		return ::_chdir(_path);
+#else
+		return ::chdir(_path);
+#endif // BX_COMPILER_
+	}
+
+	inline char* pwd(char* _buffer, uint32_t _size)
+	{
+#if BX_COMPILER_MSVC
+		return ::_getcwd(_buffer, (int)_size);
+#else
+		return ::getcwd(_buffer, _size);
+#endif // BX_COMPILER_
 	}
 
 } // namespace bx
