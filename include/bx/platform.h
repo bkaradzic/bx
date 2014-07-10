@@ -19,6 +19,7 @@
 #define BX_PLATFORM_QNX 0
 #define BX_PLATFORM_WINDOWS 0
 #define BX_PLATFORM_XBOX360 0
+#define BX_PLATFORM_FREEBSD 0
 
 #define BX_CPU_ARM  0
 #define BX_CPU_JIT  0
@@ -83,6 +84,9 @@
 #elif defined(__QNX__)
 #	undef BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
+#elif defined(__FreeBSD__)
+#	undef BX_PLATFORM_FREEBSD
+#	define BX_PLATFORM_FREEBSD 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
@@ -93,7 +97,8 @@
 						|| BX_PLATFORM_LINUX \
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
-						|| BX_PLATFORM_QNX)
+						|| BX_PLATFORM_QNX \
+						|| BX_PLATFORM_FREEBSD )
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__)
@@ -160,6 +165,8 @@
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_QNX
 #	define BX_PLATFORM_NAME "QNX"
+#elif BX_PLATFORM_FREEBSD
+#	define BX_PLATFORM_NAME "FreeBSD"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #endif // BX_PLATFORM_
