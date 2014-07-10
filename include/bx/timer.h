@@ -12,7 +12,7 @@
 #	include <time.h> // clock, clock_gettime
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
-#elif BX_PLATFORM_NACL || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_QNX
+#elif BX_PLATFORM_NACL || BX_PLATFORM_LINUX || BX_PLATFORM_OSX || BX_PLATFORM_IOS || BX_PLATFORM_QNX || BX_PLATFORM_FREEBSD
 #	include <sys/time.h> // gettimeofday
 #elif BX_PLATFORM_WINDOWS
 #	include <windows.h>
