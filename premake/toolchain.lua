@@ -17,6 +17,7 @@ function toolchain(_buildDir, _libDir)
 			{ "android-mips", "Android - MIPS" },
 			{ "android-x86", "Android - x86" },
 			{ "asmjs", "Emscripten/asm.js" },
+			{ "freebsd", "FreeBSD" },
 			{ "linux-gcc", "Linux (GCC compiler)" },
 			{ "linux-clang", "Linux (Clang compiler)" },
 			{ "mingw", "MinGW" },
@@ -96,6 +97,10 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(EMSCRIPTEN)/em++"
 			premake.gcc.ar = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
+		end
+
+		if "freebsd" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd")
 		end
 
 		if "linux-gcc" == _OPTIONS["gcc"] then
@@ -482,6 +487,14 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wno-unknown-warning-option", -- Linux Emscripten doesn't know about no-warn-absolute-paths...
 			"-Wno-warn-absolute-paths",
+		}
+
+	configuration { "freebsd" }
+		targetdir (_buildDir .. "freebsd" .. "/bin")
+		objdir (_buildDir .. "freebsd" .. "/obj")
+		libdirs { _libDir .. "lib/freebsd" }
+		includedirs { 
+			bxDir .. "include/compat/freebsd",
 		}
 
 	configuration { "nacl or nacl-arm or pnacl" }
