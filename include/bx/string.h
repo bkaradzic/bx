@@ -7,9 +7,7 @@
 #define BX_PRINTF_H_HEADER_GUARD
 
 #include "bx.h"
-#if !BX_PLATFORM_FREEBSD
-#	include <alloca.h>
-#endif
+#include <alloca.h>
 #include <ctype.h>  // tolower
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf

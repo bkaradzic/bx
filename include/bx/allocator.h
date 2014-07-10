@@ -12,11 +12,7 @@
 #include <new>
 
 #if BX_CONFIG_ALLOCATOR_CRT
-#	if BX_PLATFORM_FREEBSD
-#		include <stdlib.h>
-#	else
-#		include <malloc.h>
-#	endif
+#	include <malloc.h>
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_ALLOCATOR_DEBUG
