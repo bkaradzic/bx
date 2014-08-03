@@ -117,6 +117,11 @@ namespace bx
 			return m_running;
 		}
 
+		int32_t getExitCode() const
+		{
+			return m_exitCode;
+		}
+
 	private:
 		int32_t entry()
 		{

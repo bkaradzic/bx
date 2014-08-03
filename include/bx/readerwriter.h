@@ -117,11 +117,19 @@ namespace bx
 		return result;
 	}
 
+	/// Skip _offset bytes forward.
 	inline int64_t skip(SeekerI* _seeker, int64_t _offset)
 	{
 		return _seeker->seek(_offset, Whence::Current);
 	}
 
+	/// Seek to any position in file.
+	inline int64_t seek(SeekerI* _seeker, int64_t _offset = 0, Whence::Enum _whence = Whence::Current)
+	{
+		return _seeker->seek(_offset, _whence);
+	}
+
+	/// Returns size of file.
 	inline int64_t getSize(SeekerI* _seeker)
 	{
 		int64_t offset = _seeker->seek();
