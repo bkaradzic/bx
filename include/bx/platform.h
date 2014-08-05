@@ -19,6 +19,7 @@
 #define BX_PLATFORM_OSX 0
 #define BX_PLATFORM_QNX 0
 #define BX_PLATFORM_WINDOWS 0
+#define BX_PLATFORM_WINRT 0
 #define BX_PLATFORM_XBOX360 0
 
 #define BX_CPU_ARM  0
@@ -53,14 +54,19 @@
 #	undef BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
 #elif defined(_WIN32) || defined(_WIN64)
-#	undef BX_PLATFORM_WINDOWS
 // http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
-#	if !defined(WINVER) && !defined(_WIN32_WINNT)
-// Windows Server 2003 with SP1, Windows XP with SP2 and above
-#		define WINVER 0x0502
-#		define _WIN32_WINNT 0x0502
-#	endif // !defined(WINVER) && !defined(_WIN32_WINNT)
-#	define BX_PLATFORM_WINDOWS _WIN32_WINNT
+#   if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
+#	    undef BX_PLATFORM_WINDOWS
+#	    if !defined(WINVER) && !defined(_WIN32_WINNT)
+        // Windows Server 2003 with SP1, Windows XP with SP2 and above
+#		    define WINVER 0x0502
+#		    define _WIN32_WINNT 0x0502
+#	    endif // !defined(WINVER) && !defined(_WIN32_WINNT)
+#	    define BX_PLATFORM_WINDOWS _WIN32_WINNT
+#   else
+#       undef BX_PLATFORM_WINRT
+#       define BX_PLATFORM_WINRT 1
+#   endif
 #elif defined(__native_client__)
 // NaCl compiler defines __linux__
 #	undef BX_PLATFORM_NACL
@@ -103,7 +109,7 @@
 						)
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
-#if defined(__arm__)
+#if defined(__arm__) || (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP))
 #	undef BX_CPU_ARM
 #	define BX_CPU_ARM 1
 #	define BX_CACHE_LINE_SIZE 64
@@ -171,6 +177,8 @@
 #	define BX_PLATFORM_NAME "QNX"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
+#elif BX_PLATFORM_WINRT
+#   define BX_PLATFORM_NAME "WinRT"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM

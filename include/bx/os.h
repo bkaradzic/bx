@@ -8,7 +8,7 @@
 
 #include "bx.h"
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #elif BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_EMSCRIPTEN \
@@ -52,6 +52,9 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
 		::Sleep(_ms);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_ms);
+        debugOutput("sleep is not implemented"); debugBreak();
 #else
 		timespec req = {(time_t)_ms/1000, (long)((_ms%1000)*1000000)};
 		timespec rem = {0, 0};
@@ -65,6 +68,8 @@ namespace bx
 		::SwitchToThread();
 #elif BX_PLATFORM_XBOX360
 		::Sleep(0);
+#elif BX_PLATFORM_WINRT
+        debugOutput("yield is not implemented"); debugBreak();
 #else
 		::sched_yield();
 #endif // BX_PLATFORM_
@@ -92,7 +97,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::LoadLibraryA(_filePath);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
@@ -104,7 +109,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_handle);
 #else
 		::dlclose(_handle);
@@ -115,7 +120,7 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
-#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_NACL || BX_PLATFORM_EMSCRIPTEN || BX_PLATFORM_WINRT
 		BX_UNUSED(_handle, _symbol);
 		return NULL;
 #else
@@ -127,6 +132,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, _value);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_name, _value);
 #else
 		::setenv(_name, _value, 1);
 #endif // BX_PLATFORM_
@@ -136,6 +143,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(_name, NULL);
+#elif BX_PLATFORM_WINRT
+        BX_UNUSED(_name);
 #else
 		::unsetenv(_name);
 #endif // BX_PLATFORM_
@@ -143,7 +152,9 @@ namespace bx
 
 	inline int chdir(const char* _path)
 	{
-#if BX_COMPILER_MSVC
+#if BX_PLATFORM_WINRT
+        BX_UNUSED(_path);
+#elif BX_COMPILER_MSVC
 		return ::_chdir(_path);
 #else
 		return ::chdir(_path);
@@ -152,7 +163,9 @@ namespace bx
 
 	inline char* pwd(char* _buffer, uint32_t _size)
 	{
-#if BX_COMPILER_MSVC
+#if BX_PLATFORM_WINRT
+        BX_UNUSED(_buffer, _size);
+#elif BX_COMPILER_MSVC
 		return ::_getcwd(_buffer, (int)_size);
 #else
 		return ::getcwd(_buffer, _size);
