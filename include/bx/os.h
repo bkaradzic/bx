@@ -152,7 +152,9 @@ namespace bx
 
 	inline int chdir(const char* _path)
 	{
-#if BX_COMPILER_MSVC
+#if BX_PLATFORM_WINRT
+        BX_UNUSED(_path);
+#elif BX_COMPILER_MSVC
 		return ::_chdir(_path);
 #else
 		return ::chdir(_path);
@@ -161,7 +163,9 @@ namespace bx
 
 	inline char* pwd(char* _buffer, uint32_t _size)
 	{
-#if BX_COMPILER_MSVC
+#if BX_PLATFORM_WINRT
+        BX_UNUSED(_buffer, _size);
+#elif BX_COMPILER_MSVC
 		return ::_getcwd(_buffer, (int)_size);
 #else
 		return ::getcwd(_buffer, _size);
