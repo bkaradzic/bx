@@ -7,20 +7,20 @@
 #define BX_PLATFORM_H_HEADER_GUARD
 
 #define BX_COMPILER_CLANG 0
-#define BX_COMPILER_GCC 0
-#define BX_COMPILER_MSVC 0
+#define BX_COMPILER_GCC   0
+#define BX_COMPILER_MSVC  0
 
-#define BX_PLATFORM_ANDROID 0
+#define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
-#define BX_PLATFORM_FREEBSD 0
-#define BX_PLATFORM_IOS 0
-#define BX_PLATFORM_LINUX 0
-#define BX_PLATFORM_NACL 0
-#define BX_PLATFORM_OSX 0
-#define BX_PLATFORM_QNX 0
-#define BX_PLATFORM_WINDOWS 0
-#define BX_PLATFORM_WINRT 0
-#define BX_PLATFORM_XBOX360 0
+#define BX_PLATFORM_FREEBSD    0
+#define BX_PLATFORM_IOS        0
+#define BX_PLATFORM_LINUX      0
+#define BX_PLATFORM_NACL       0
+#define BX_PLATFORM_OSX        0
+#define BX_PLATFORM_QNX        0
+#define BX_PLATFORM_WINDOWS    0
+#define BX_PLATFORM_WINRT      0
+#define BX_PLATFORM_XBOX360    0
 
 #define BX_CPU_ARM  0
 #define BX_CPU_JIT  0
@@ -31,7 +31,7 @@
 #define BX_ARCH_32BIT 0
 #define BX_ARCH_64BIT 0
 
-#define BX_CPU_ENDIAN_BIG 0
+#define BX_CPU_ENDIAN_BIG    0
 #define BX_CPU_ENDIAN_LITTLE 0
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
