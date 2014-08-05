@@ -10,15 +10,16 @@
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
-#elif BX_PLATFORM_NACL \
-	|| BX_PLATFORM_ANDROID \
-	|| BX_PLATFORM_LINUX \
-	|| BX_PLATFORM_OSX \
+#elif BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_EMSCRIPTEN \
+	|| BX_PLATFORM_FREEBSD \
 	|| BX_PLATFORM_IOS \
-	|| BX_PLATFORM_EMSCRIPTEN
+	|| BX_PLATFORM_LINUX \
+	|| BX_PLATFORM_NACL \
+	|| BX_PLATFORM_OSX
 
 #	include <sched.h> // sched_yield
-#	if BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_NACL
+#	if BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_NACL || BX_PLATFORM_OSX
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_NACL
 
@@ -38,6 +39,12 @@
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
+
+#if BX_COMPILER_MSVC
+#	include <direct.h> // _getcwd
+#else
+#	include <unistd.h> // getcwd
+#endif // BX_COMPILER_MSVC
 
 namespace bx
 {
@@ -76,7 +83,7 @@ namespace bx
 		return (pid_t)::syscall(SYS_gettid);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
-#elif BX_PLATFORM_NACL
+#elif BX_PLATFORM_FREEBSD || BX_PLATFORM_NACL
 		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
 #else
@@ -141,6 +148,24 @@ namespace bx
 #else
 		::unsetenv(_name);
 #endif // BX_PLATFORM_
+	}
+
+	inline int chdir(const char* _path)
+	{
+#if BX_COMPILER_MSVC
+		return ::_chdir(_path);
+#else
+		return ::chdir(_path);
+#endif // BX_COMPILER_
+	}
+
+	inline char* pwd(char* _buffer, uint32_t _size)
+	{
+#if BX_COMPILER_MSVC
+		return ::_getcwd(_buffer, (int)_size);
+#else
+		return ::getcwd(_buffer, _size);
+#endif // BX_COMPILER_
 	}
 
 } // namespace bx

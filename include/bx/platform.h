@@ -12,6 +12,7 @@
 
 #define BX_PLATFORM_ANDROID 0
 #define BX_PLATFORM_EMSCRIPTEN 0
+#define BX_PLATFORM_FREEBSD 0
 #define BX_PLATFORM_IOS 0
 #define BX_PLATFORM_LINUX 0
 #define BX_PLATFORM_NACL 0
@@ -89,17 +90,23 @@
 #elif defined(__QNX__)
 #	undef BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
+#elif defined(__FreeBSD__)
+#	undef BX_PLATFORM_FREEBSD
+#	define BX_PLATFORM_FREEBSD 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
 
-#define BX_PLATFORM_POSIX (BX_PLATFORM_ANDROID \
+#define BX_PLATFORM_POSIX (0 \
+						|| BX_PLATFORM_ANDROID \
 						|| BX_PLATFORM_EMSCRIPTEN \
+						|| BX_PLATFORM_FREEBSD \
 						|| BX_PLATFORM_IOS \
 						|| BX_PLATFORM_LINUX \
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
-						|| BX_PLATFORM_QNX)
+						|| BX_PLATFORM_QNX \
+						)
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__) || (defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_PHONE_APP))
@@ -156,6 +163,8 @@
 #	define BX_PLATFORM_NAME "Android"
 #elif BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_NAME "asm.js"
+#elif BX_PLATFORM_FREEBSD
+#	define BX_PLATFORM_NAME "FreeBSD"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
 #elif BX_PLATFORM_LINUX

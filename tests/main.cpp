@@ -38,11 +38,30 @@ int runAllTests()
 }
 
 #if BX_PLATFORM_ANDROID
-#include <android/native_activity.h>
+#	include <android/native_activity.h>
 
 void ANativeActivity_onCreate(ANativeActivity*, void*, size_t)
 {
 	exit(runAllTests() );
+}
+#elif BX_PLATFORM_NACL
+#	include <ppapi/c/pp_errors.h>
+#	include <ppapi/c/ppp.h>
+
+PP_EXPORT const void* PPP_GetInterface(const char* /*_name*/)
+{
+	return NULL;
+}
+
+PP_EXPORT int32_t PPP_InitializeModule(PP_Module /*_module*/, PPB_GetInterface /*_interface*/)
+{
+	DBG("PPAPI version: %d", PPAPI_RELEASE);
+	runAllTests();
+	return PP_ERROR_NOINTERFACE;
+}
+
+PP_EXPORT void PPP_ShutdownModule()
+{
 }
 #else
 int main()

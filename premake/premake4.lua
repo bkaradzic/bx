@@ -90,3 +90,5 @@ project "bx.test"
 		}
 
 	configuration {}
+
+	strip()

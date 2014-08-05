@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2014 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
@@ -15,6 +15,8 @@
 #	include "float4_sse.h"
 #elif __ARM_NEON__ && !BX_COMPILER_CLANG
 #	include "float4_neon.h"
+#elif 0 // BX_COMPILER_CLANG
+#	include "float4_langext.h"
 #else
 #	pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
 #	include "float4_ref.h"

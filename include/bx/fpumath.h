@@ -34,6 +34,16 @@ namespace bx
 		return _a > _b ? _a : _b;
 	}
 
+	inline float fmin3(float _a, float _b, float _c)
+	{
+		return fmin(_a, fmin(_b, _c) );
+	}
+
+	inline float fmax3(float _a, float _b, float _c)
+	{
+		return fmax(_a, fmax(_b, _c) );
+	}
+
 	inline float fclamp(float _a, float _min, float _max)
 	{
 		return fmin(fmax(_a, _min), _max);
@@ -54,6 +64,26 @@ namespace bx
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
+	inline float fstep(float _edge, float _a)
+	{
+		return _a < _edge ? 0.0f : 1.0f;
+	}
+
+	inline float fabsolute(float _a)
+	{
+		return fabsf(_a);
+	}
+
+	inline float fsqrt(float _a)
+	{
+		return sqrtf(_a);
+	}
+
+	inline float ffract(float _a)
+	{
+		return _a - floorf(_a);
+	}
+
 	inline void vec3Move(float* __restrict _result, const float* __restrict _a)
 	{
 		_result[0] = _a[0];
@@ -63,9 +93,9 @@ namespace bx
 
 	inline void vec3Abs(float* __restrict _result, const float* __restrict _a)
 	{
-		_result[0] = fabsf(_a[0]);
-		_result[1] = fabsf(_a[1]);
-		_result[2] = fabsf(_a[2]);
+		_result[0] = fabsolute(_a[0]);
+		_result[1] = fabsolute(_a[1]);
+		_result[2] = fabsolute(_a[2]);
 	}
 
 	inline void vec3Neg(float* __restrict _result, const float* __restrict _a)
@@ -117,7 +147,7 @@ namespace bx
 
 	inline float vec3Length(const float* _a)
 	{
-		return sqrtf(vec3Dot(_a, _a) );
+		return fsqrt(vec3Dot(_a, _a) );
 	}
 
 	inline float vec3Norm(float* __restrict _result, const float* __restrict _a)
@@ -567,6 +597,50 @@ namespace bx
 		_result[2] = normal[2];
 		_result[3] = -vec3Dot(normal, _va);
 	}
+
+	inline void rgbToHsv(float _hsv[3], const float _rgb[3])
+	{
+		const float rr = _rgb[0];
+		const float gg = _rgb[1];
+		const float bb = _rgb[2];
+
+		const float s0 = fstep(bb, gg);
+
+		const float px = flerp(bb,        gg,         s0);
+		const float py = flerp(gg,        bb,         s0);
+		const float pz = flerp(-1.0f,     0.0f,       s0);
+		const float pw = flerp(2.0f/3.0f, -1.0f/3.0f, s0);
+
+		const float s1 = fstep(px, rr);
+
+		const float qx = flerp(px, rr, s1);
+		const float qy = py;
+		const float qz = flerp(pw, pz, s1);
+		const float qw = flerp(rr, px, s1);
+
+		const float dd = qx - fmin(qw, qy);
+		const float ee = 1.0e-10f;
+
+		_hsv[0] = fabsolute(qz + (qw - qy) / (6.0f * dd + ee) );
+		_hsv[1] = dd / (qx + ee);
+		_hsv[2] = qx;
+	}
+
+	inline void hsvToRgb(float _rgb[3], const float _hsv[3])
+	{
+		const float hh = _hsv[0];
+		const float ss = _hsv[1];
+		const float vv = _hsv[2];
+
+		const float px = fabsolute(ffract(hh + 1.0f     ) * 6.0f - 3.0f);
+		const float py = fabsolute(ffract(hh + 2.0f/3.0f) * 6.0f - 3.0f);
+		const float pz = fabsolute(ffract(hh + 1.0f/3.0f) * 6.0f - 3.0f);
+
+		_rgb[0] = vv * flerp(1.0f, fsaturate(px - 1.0f), ss);
+		_rgb[1] = vv * flerp(1.0f, fsaturate(py - 1.0f), ss);
+		_rgb[2] = vv * flerp(1.0f, fsaturate(pz - 1.0f), ss);
+	}
+
 } // namespace bx
 
 #endif // BX_FPU_MATH_H_HEADER_GUARD
