@@ -55,18 +55,18 @@
 #	define BX_PLATFORM_XBOX360 1
 #elif defined(_WIN32) || defined(_WIN64)
 // http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
-#   if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-#	    undef BX_PLATFORM_WINDOWS
-#	    if !defined(WINVER) && !defined(_WIN32_WINNT)
-        // Windows Server 2003 with SP1, Windows XP with SP2 and above
-#		    define WINVER 0x0502
-#		    define _WIN32_WINNT 0x0502
-#	    endif // !defined(WINVER) && !defined(_WIN32_WINNT)
-#	    define BX_PLATFORM_WINDOWS _WIN32_WINNT
-#   else
-#       undef BX_PLATFORM_WINRT
-#       define BX_PLATFORM_WINRT 1
-#   endif
+#	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
+#		undef BX_PLATFORM_WINDOWS
+#		if !defined(WINVER) && !defined(_WIN32_WINNT)
+		// Windows Server 2003 with SP1, Windows XP with SP2 and above
+#			define WINVER 0x0502
+#			define _WIN32_WINNT 0x0502
+#		endif // !defined(WINVER) && !defined(_WIN32_WINNT)
+#		define BX_PLATFORM_WINDOWS _WIN32_WINNT
+#	else
+#		undef BX_PLATFORM_WINRT
+#		define BX_PLATFORM_WINRT 1
+#	endif
 #elif defined(__native_client__)
 // NaCl compiler defines __linux__
 #	undef BX_PLATFORM_NACL
@@ -178,7 +178,7 @@
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
-#   define BX_PLATFORM_NAME "WinRT"
+#	define BX_PLATFORM_NAME "WinRT"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
