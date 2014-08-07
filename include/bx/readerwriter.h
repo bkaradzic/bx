@@ -212,24 +212,6 @@ namespace bx
 		uint32_t m_size;
 	};
 
-	inline int64_t int64_min(int64_t _a, int64_t _b)
-	{
-		return _a < _b ? _a : _b;
-	}
-
-	inline int64_t int64_max(int64_t _a, int64_t _b)
-	{
-		return _a > _b ? _a : _b;
-	}
-
-	inline int64_t int64_clamp(int64_t _a, int64_t _min, int64_t _max)
-	{
-		const int64_t min    = int64_min(_a, _max);
-		const int64_t result = int64_max(_min, min);
-
-		return result;
-	}
-
 	class SizerWriter : public WriterSeekerI
 	{
 	public:
