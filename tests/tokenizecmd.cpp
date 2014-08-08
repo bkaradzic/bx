@@ -5,7 +5,25 @@
 
 #include "test.h"
 #include <bx/tokenizecmd.h>
+#include <bx/commandline.h>
 #include <string.h>
+
+TEST(commandLine)
+{
+	const char* args[] =
+	{
+		"-s"
+		"--long",
+	};
+
+	bx::CommandLine cmdLine(BX_COUNTOF(args), args);
+
+	CHECK(NULL != cmdLine.findOption("long") );
+	CHECK(NULL != cmdLine.findOption('s') );
+
+	// non-existing argument
+	CHECK(NULL == cmdLine.findOption('x') );
+}
 
 TEST(tokenizeCommandLine)
 {
