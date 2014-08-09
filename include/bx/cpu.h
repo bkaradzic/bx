@@ -141,7 +141,7 @@ namespace bx
 		do
 		{
 			oldVal = newVal;
-			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal <= _test ? _test : newVal+1);
+			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal <= _test ? _test : newVal-1);
 
 		} while (oldVal != newVal);
 
