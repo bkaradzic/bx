@@ -28,7 +28,6 @@ extern "C" void _ReadWriteBarrier();
 #	pragma intrinsic(_InterlockedIncrement)
 #	pragma intrinsic(_InterlockedDecrement)
 #	pragma intrinsic(_InterlockedCompareExchange)
-#	pragma intrinsic(_InterlockedExchangePointer)
 #endif // BX_COMPILER_MSVC
 
 namespace bx
@@ -112,7 +111,7 @@ namespace bx
 	inline void* atomicExchangePtr(void** _ptr, void* _new)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedExchangePointer(_ptr, _new);
+		return InterlockedExchangePointer(_ptr, _new); /* VS2012 no intrinsics */
 #else
 		return __sync_lock_test_and_set(_ptr, _new);
 #endif // BX_COMPILER
