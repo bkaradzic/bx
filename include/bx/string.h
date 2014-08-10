@@ -16,6 +16,7 @@
 
 namespace bx
 {
+	///
 	inline bool toBool(const char* _str)
 	{
 		char ch = (char)tolower(_str[0]);
@@ -247,6 +248,7 @@ namespace bx
 #endif // BX_COMPILER_MSVC
 	}
 
+	///
 	inline int32_t snprintf(char* _str, size_t _count, const char* _format, ...) // BX_PRINTF_ARGS(3, 4)
 	{
 		va_list argList;
@@ -256,6 +258,7 @@ namespace bx
 		return len;
 	}
 
+	///
 	inline int32_t swnprintf(wchar_t* _out, size_t _count, const wchar_t* _format, ...)
 	{
 		va_list argList;
@@ -265,6 +268,7 @@ namespace bx
 		return len;
 	}
 
+	///
 	template <typename Ty>
 	inline void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList)
 	{
@@ -281,6 +285,7 @@ namespace bx
 		_out.append(out);
 	}
 
+	///
 	template <typename Ty>
 	inline void stringPrintf(Ty& _out, const char* _format, ...)
 	{
@@ -288,6 +293,22 @@ namespace bx
 		va_start(argList, _format);
 		stringPrintfVargs(_out, _format, argList);
 		va_end(argList);
+	}
+
+	/// Extract base file name from file path.
+	inline const char* baseName(const char* _filePath)
+	{
+		const char* bs       = strrchr(_filePath, '\\');
+		const char* fs       = strrchr(_filePath, '/');
+		const char* slash    = (bs > fs ? bs : fs);
+		const char* colon    = strrchr(_filePath, ':');
+		const char* basename = slash > colon ? slash : colon;
+		if (NULL != basename)
+		{
+			return basename+1;
+		}
+
+		return _filePath;
 	}
 
 	/*
