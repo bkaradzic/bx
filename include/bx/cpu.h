@@ -103,7 +103,7 @@ namespace bx
 #if BX_COMPILER_MSVC
 		return _InterlockedCompareExchange( (volatile LONG*)(_ptr), _new, _old);
 #else
-		return __sync_val_compare_and_swap(_ptr, _old, _new);
+		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
 	}
 
