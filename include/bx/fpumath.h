@@ -69,6 +69,11 @@ namespace bx
 		return _a < _edge ? 0.0f : 1.0f;
 	}
 
+	inline float fpulse(float _a, float _start, float _end)
+	{
+		return fstep(_a, _start) - fstep(_a, _end);
+	}
+
 	inline float fabsolute(float _a)
 	{
 		return fabsf(_a);
