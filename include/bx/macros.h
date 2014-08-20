@@ -56,6 +56,7 @@
 #	else
 #		define BX_THREAD __thread
 #	endif // BX_COMPILER_CLANG
+#	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_STRUCT(_align, _struct) __declspec(align(_align) ) _struct
 #	define BX_ALLOW_UNUSED
@@ -67,12 +68,13 @@
 #	define BX_OVERRIDE override
 #	define BX_PRINTF_ARGS(_format, _args)
 #	define BX_THREAD __declspec(thread)
+#	define BX_ATTRIBUTE(_x)
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
 
 // #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
-#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)]
+#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
 
 #define BX_CACHE_LINE_ALIGN_MARKER() BX_ALIGN_STRUCT(BX_CACHE_LINE_SIZE, struct) BX_CONCATENATE(bx_cache_line_marker_compiler_stfu, __COUNTER__) {}
 #define BX_CACHE_LINE_ALIGN(_def) BX_CACHE_LINE_ALIGN_MARKER(); _def; BX_CACHE_LINE_ALIGN_MARKER()
@@ -103,6 +105,8 @@
 #else
 #	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__)(__VA_ARGS__)
 #endif // BX_COMPILER_MSVC
+
+#define BX_TYPE_IS_POD(_type) (!__is_class(_type) || __is_pod(_type) )
 
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
 			private: _class()

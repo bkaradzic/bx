@@ -72,6 +72,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t read(ReaderI* _reader, Ty& _value)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		return _reader->read(&_value, sizeof(Ty) );
 	}
 
@@ -80,6 +81,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		Ty value;
 		int32_t result = _reader->read(&value, sizeof(Ty) );
 		_value = toHostEndian(value, _fromLittleEndian);
@@ -96,6 +98,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t write(WriterI* _writer, const Ty& _value)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		return _writer->write(&_value, sizeof(Ty) );
 	}
 
@@ -103,6 +106,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t writeLE(WriterI* _writer, const Ty& _value)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		Ty value = toLittleEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty) );
 		return result;
@@ -112,6 +116,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t writeBE(WriterI* _writer, const Ty& _value)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		Ty value = toBigEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty) );
 		return result;
