@@ -13,7 +13,7 @@
 
 #if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include "float4_sse.h"
-#elif __ARM_NEON__ && !BX_COMPILER_CLANG
+#elif defined(__ARM_NEON__) && !BX_COMPILER_CLANG
 #	include "float4_neon.h"
 #elif 0 // BX_COMPILER_CLANG
 #	include "float4_langext.h"
