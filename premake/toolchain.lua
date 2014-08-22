@@ -289,6 +289,7 @@ function toolchain(_buildDir, _libDir)
 			"-fdata-sections",
 			"-ffunction-sections",
 			"-msse2",
+			"-Wunused-value",
 			"-Wundef",
 		}
 		linkoptions {
@@ -328,8 +329,9 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
-			"-Wunused-value",
 			"-msse2",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		links {
 			"rt",
@@ -395,11 +397,13 @@ function toolchain(_buildDir, _libDir)
 			"-fPIC",
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-no-canonical-prefixes",
 			"-Wa,--noexecstack",
 			"-fstack-protector",
 			"-ffunction-sections",
+			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-Wunused-value",
+			"-Wundef",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -425,6 +429,8 @@ function toolchain(_buildDir, _libDir)
 			"-march=armv7-a",
 			"-mfloat-abi=softfp",
 			"-mfpu=neon",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
@@ -446,6 +452,8 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
@@ -470,6 +478,8 @@ function toolchain(_buildDir, _libDir)
 			"-mstackrealign",
 			"-msse3",
 			"-mfpmath=sse",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		linkoptions {
 			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
@@ -488,18 +498,20 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wno-unknown-warning-option", -- Linux Emscripten doesn't know about no-warn-absolute-paths...
 			"-Wno-warn-absolute-paths",
+			"-Wunused-value",
+			"-Wundef",
 		}
 
 	configuration { "freebsd" }
 		targetdir (_buildDir .. "freebsd" .. "/bin")
 		objdir (_buildDir .. "freebsd" .. "/obj")
 		libdirs { _libDir .. "lib/freebsd" }
-		includedirs { 
+		includedirs {
 			bxDir .. "include/compat/freebsd",
 		}
 
 	configuration { "nacl or nacl-arm or pnacl" }
-		includedirs { 
+		includedirs {
 			"$(NACL_SDK_ROOT)/include",
 			bxDir .. "include/compat/nacl",
 		}
@@ -511,11 +523,12 @@ function toolchain(_buildDir, _libDir)
 			"-pthread",
 			"-fno-stack-protector",
 			"-fdiagnostics-show-option",
-			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
 			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 			"-msse2",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -551,10 +564,11 @@ function toolchain(_buildDir, _libDir)
 			"-U__STRICT_ANSI__",
 			"-fno-stack-protector",
 			"-fdiagnostics-show-option",
-			"-Wunused-value",
-			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-fdata-sections",
 			"-ffunction-sections",
+			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-Wunused-value",
+			"-Wundef",
 		}
 		targetdir (_buildDir .. "nacl-arm" .. "/bin")
 		objdir (_buildDir .. "nacl-arm" .. "/obj")
@@ -572,9 +586,10 @@ function toolchain(_buildDir, _libDir)
 			"-U__STRICT_ANSI__",
 			"-fno-stack-protector",
 			"-fdiagnostics-show-option",
-			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		targetdir (_buildDir .. "pnacl" .. "/bin")
 		objdir (_buildDir .. "pnacl" .. "/obj")
@@ -616,8 +631,9 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-U__STRICT_ANSI__",
 			"-Wfatal-errors",
-			"-Wunused-value",
 			"-msse2",
+			"-Wunused-value",
+			"-Wundef",
 		}
 		includedirs { bxDir .. "include/compat/osx" }
 
@@ -630,6 +646,7 @@ function toolchain(_buildDir, _libDir)
 			"-U__STRICT_ANSI__",
 			"-Wfatal-errors",
 			"-Wunused-value",
+			"-Wundef",
 		}
 		includedirs { bxDir .. "include/compat/ios" }
 
@@ -674,6 +691,8 @@ function toolchain(_buildDir, _libDir)
 			"-std=c++0x",
 			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
+			"-Wunused-value",
+			"-Wundef",
 		}
 
 	configuration {} -- reset configuration
