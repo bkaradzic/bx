@@ -289,6 +289,7 @@ function toolchain(_buildDir, _libDir)
 			"-fdata-sections",
 			"-ffunction-sections",
 			"-msse2",
+			"-Wundef",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
