@@ -708,7 +708,8 @@ function toolchain(_buildDir, _libDir)
 			"/opt/vc/lib",
 		}
 		defines {
-			"BCM2708", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
+			"__VCCOREVER__=0x04000000", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
+			"__STDC_VERSION__=199901L",
 		}
 		buildoptions {
 			"-std=c++0x",

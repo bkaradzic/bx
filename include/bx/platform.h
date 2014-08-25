@@ -68,7 +68,7 @@
 #		undef BX_PLATFORM_WINRT
 #		define BX_PLATFORM_WINRT 1
 #	endif
-#elif defined(BCM2708)
+#elif defined(__VCCOREVER__)
 // RaspberryPi compiler defines __linux__
 #	undef BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
