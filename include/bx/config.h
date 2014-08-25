@@ -28,6 +28,7 @@
 				|| BX_PLATFORM_LINUX \
 				|| BX_PLATFORM_OSX \
 				|| BX_PLATFORM_QNX \
+				|| BX_PLATFORM_RPI \
 				|| BX_PLATFORM_WINDOWS \
 				? 1 : 0)
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
