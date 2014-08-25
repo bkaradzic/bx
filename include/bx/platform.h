@@ -18,6 +18,7 @@
 #define BX_PLATFORM_NACL       0
 #define BX_PLATFORM_OSX        0
 #define BX_PLATFORM_QNX        0
+#define BX_PLATFORM_RPI        0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOX360    0
@@ -67,6 +68,10 @@
 #		undef BX_PLATFORM_WINRT
 #		define BX_PLATFORM_WINRT 1
 #	endif
+#elif defined(BCM2708)
+// RaspberryPi compiler defines __linux__
+#	undef BX_PLATFORM_RPI
+#	define BX_PLATFORM_RPI 1
 #elif defined(__native_client__)
 // NaCl compiler defines __linux__
 #	undef BX_PLATFORM_NACL
@@ -106,6 +111,7 @@
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
 						|| BX_PLATFORM_QNX \
+						|| BX_PLATFORM_RPI \
 						)
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
@@ -175,6 +181,8 @@
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_QNX
 #	define BX_PLATFORM_NAME "QNX"
+#elif BX_PLATFORM_RPI
+#	define BX_PLATFORM_NAME "RaspberryPi"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT

@@ -20,14 +20,15 @@ function toolchain(_buildDir, _libDir)
 			{ "freebsd", "FreeBSD" },
 			{ "linux-gcc", "Linux (GCC compiler)" },
 			{ "linux-clang", "Linux (Clang compiler)" },
+			{ "ios-arm", "iOS - ARM" },
+			{ "ios-simulator", "iOS - Simulator" },
 			{ "mingw", "MinGW" },
 			{ "nacl", "Native Client" },
 			{ "nacl-arm", "Native Client - ARM" },
-			{ "pnacl", "Native Client - PNaCl" },
 			{ "osx", "OSX" },
-			{ "ios-arm", "iOS - ARM" },
-			{ "ios-simulator", "iOS - Simulator" },
+			{ "pnacl", "Native Client - PNaCl" },
 			{ "qnx-arm", "QNX/Blackberry - ARM" },
+			{ "rpi", "RaspberryPi" },
 		}
 	}
 
@@ -103,6 +104,20 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-freebsd")
 		end
 
+		if "ios-arm" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar = "ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-ios-arm")
+		end
+
+		if "ios-simulator" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar = "ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-ios-simulator")
+		end
+
 		if "linux-gcc" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux")
 		end
@@ -159,6 +174,10 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-nacl-arm")
 		end
 
+		if "osx" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+		end
+
 		if "pnacl" == _OPTIONS["gcc"] then
 
 			if not os.getenv("NACL_SDK_ROOT") then
@@ -178,24 +197,6 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-pnacl")
 		end
 
-		if "osx" == _OPTIONS["gcc"] then
-			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
-		end
-
-		if "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-ios-arm")
-		end
-
-		if "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar = "ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-ios-simulator")
-		end
-
 		if "qnx-arm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("QNX_HOST") then
@@ -206,6 +207,10 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
 			premake.gcc.ar = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-qnx-arm")
+		end
+
+		if "rpi" == _OPTIONS["gcc"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-rpi")
 		end
 	end
 
@@ -695,6 +700,31 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 
+	configuration { "rpi" }
+		defines {
+			"BCM2708", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
+		}
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		includedirs {
+			"/opt/vc/include",
+			"/opt/vc/include/interface/vcos/pthreads",
+			"/opt/vc/include/interface/vmcs_host/linux",
+		}
+		libdirs {
+			"/opt/vc/lib",
+		}
+		links {
+			"rt",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
 	configuration {} -- reset configuration
 end
 
@@ -718,7 +748,7 @@ function strip()
 			"@$(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
-	configuration { "linux-*", "Release" }
+	configuration { "linux-* or rpi", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@strip -s \"$(TARGET)\""
