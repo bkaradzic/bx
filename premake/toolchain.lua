@@ -701,6 +701,12 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "rpi" }
+		targetdir (_buildDir .. "rpi" .. "/bin")
+		objdir (_buildDir .. "rpi" .. "/obj")
+		libdirs {
+			_libDir .. "lib/rpi",
+			"/opt/vc/lib",
+		}
 		defines {
 			"BCM2708", -- There is no special prefedined compiler symbol to detect RaspberryPi, faking it.
 		}
@@ -714,9 +720,6 @@ function toolchain(_buildDir, _libDir)
 			"/opt/vc/include",
 			"/opt/vc/include/interface/vcos/pthreads",
 			"/opt/vc/include/interface/vmcs_host/linux",
-		}
-		libdirs {
-			"/opt/vc/lib",
 		}
 		links {
 			"rt",
