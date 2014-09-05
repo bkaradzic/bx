@@ -29,7 +29,13 @@ function toolchain(_buildDir, _libDir)
 			{ "pnacl", "Native Client - PNaCl" },
 			{ "qnx-arm", "QNX/Blackberry - ARM" },
 			{ "rpi", "RaspberryPi" },
-		}
+		},
+	}
+
+	newoption {
+		trigger = "with-android",
+		value   = "#",
+		description = "Set Android platform version.",
 	}
 
 	-- Avoid error when invoking premake4 --help.
@@ -39,6 +45,11 @@ function toolchain(_buildDir, _libDir)
 
 	if _ACTION == "clean" then
 		os.rmdir(BUILD_DIR)
+	end
+
+	local androidPlatform = "android-14"
+	if _OPTIONS["with-android"] then
+		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	end
 
 	if _ACTION == "gmake" then
@@ -429,7 +440,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a/include",
 		}
 		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
 			"-mthumb",
 			"-march=armv7-a",
 			"-mfloat-abi=softfp",
@@ -438,9 +449,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-arm/usr/lib/crtend_so.o",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-arm/usr/lib/crtend_so.o",
 			"-march=armv7-a",
 			"-Wl,--fix-cortex-a8",
 		}
@@ -456,14 +467,14 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips/include",
 		}
 		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
 			"-Wunused-value",
 			"-Wundef",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-mips/usr/lib/crtend_so.o",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-mips/usr/lib/crtend_so.o",
 		}
 
 	configuration { "android-x86" }
@@ -477,7 +488,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86/include",
 		}
 		buildoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
 			"-march=i686",
 			"-mtune=atom",
 			"-mstackrealign",
@@ -487,9 +498,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		linkoptions {
-			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtbegin_so.o",
-			"$(ANDROID_NDK_ROOT)/platforms/android-14/arch-x86/usr/lib/crtend_so.o",
+			"--sysroot=$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtbegin_so.o",
+			"$(ANDROID_NDK_ROOT)/platforms/" .. androidPlatform .. "/arch-x86/usr/lib/crtend_so.o",
 		}
 
 	configuration { "asmjs" }
