@@ -1,6 +1,6 @@
 --
--- Copyright 2010-2013 Branimir Karadzic. All rights reserved.
--- License: http://www.opensource.org/licenses/BSD-2-Clause
+-- Copyright 2010-2014 Branimir Karadzic. All rights reserved.
+-- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
 local bxDir = (path.getabsolute("..") .. "/")
@@ -13,22 +13,22 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
-			{ "android-arm", "Android - ARM" },
-			{ "android-mips", "Android - MIPS" },
-			{ "android-x86", "Android - x86" },
-			{ "asmjs", "Emscripten/asm.js" },
-			{ "freebsd", "FreeBSD" },
-			{ "linux-gcc", "Linux (GCC compiler)" },
-			{ "linux-clang", "Linux (Clang compiler)" },
-			{ "ios-arm", "iOS - ARM" },
-			{ "ios-simulator", "iOS - Simulator" },
-			{ "mingw", "MinGW" },
-			{ "nacl", "Native Client" },
-			{ "nacl-arm", "Native Client - ARM" },
-			{ "osx", "OSX" },
-			{ "pnacl", "Native Client - PNaCl" },
-			{ "qnx-arm", "QNX/Blackberry - ARM" },
-			{ "rpi", "RaspberryPi" },
+			{ "android-arm",   "Android - ARM"          },
+			{ "android-mips",  "Android - MIPS"         },
+			{ "android-x86",   "Android - x86"          },
+			{ "asmjs",         "Emscripten/asm.js"      },
+			{ "freebsd",       "FreeBSD"                },
+			{ "linux-gcc",     "Linux (GCC compiler)"   },
+			{ "linux-clang",   "Linux (Clang compiler)" },
+			{ "ios-arm",       "iOS - ARM"              },
+			{ "ios-simulator", "iOS - Simulator"        },
+			{ "mingw",         "MinGW"                  },
+			{ "nacl",          "Native Client"          },
+			{ "nacl-arm",      "Native Client - ARM"    },
+			{ "osx",           "OSX"                    },
+			{ "pnacl",         "Native Client - PNaCl"  },
+			{ "qnx-arm",       "QNX/Blackberry - ARM"   },
+			{ "rpi",           "RaspberryPi"            },
 		},
 	}
 
