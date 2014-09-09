@@ -28,9 +28,6 @@ defines {
 dofile (BX_DIR .. "premake/toolchain.lua")
 toolchain(BX_BUILD_DIR, BX_THIRD_PARTY_DIR)
 
-function copyLib()
-end
-
 dofile "bx.lua"
 dofile "unittest++.lua"
 
