@@ -38,7 +38,7 @@ function toolchain(_buildDir, _libDir)
 		description = "Set Android platform version.",
 	}
 
-	-- Avoid error when invoking premake4 --help.
+	-- Avoid error when invoking genie --help.
 	if (_ACTION == nil) then return end
 
 	location (_buildDir .. "projects/" .. _ACTION)

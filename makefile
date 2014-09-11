@@ -14,7 +14,7 @@ else
 OS=windows
 endif
 
-GENIE=../bx/tools/bin/$(OS)/premake4
+GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
 	$(GENIE) vs2008
@@ -167,7 +167,7 @@ analyze:
 	cppcheck examples/
 
 docs:
-	doxygen premake/bgfx.doxygen
+	doxygen scripts/bgfx.doxygen
 	markdown README.md > .build/docs/readme.html
 
 clean:
