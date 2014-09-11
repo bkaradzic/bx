@@ -14,28 +14,28 @@ else
 OS=windows
 endif
 
-PREMAKE4=../bx/tools/bin/$(OS)/premake4
+GENIE=../bx/tools/bin/$(OS)/premake4
 
 all:
-	$(PREMAKE4) --file=premake/premake4.lua vs2008
-	$(PREMAKE4) --file=premake/premake4.lua vs2010
-	$(PREMAKE4) --file=premake/premake4.lua vs2012
-	$(PREMAKE4) --file=premake/premake4.lua vs2013
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-arm gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-mips gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-x86 gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=nacl gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=nacl-arm gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=pnacl gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=mingw gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=linux-gcc gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=osx gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-arm gmake
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-simulator gmake
-	$(PREMAKE4) --file=premake/premake4.lua xcode4
+	$(GENIE) vs2008
+	$(GENIE) vs2010
+	$(GENIE) vs2012
+	$(GENIE) vs2013
+	$(GENIE) --gcc=android-arm gmake
+	$(GENIE) --gcc=android-mips gmake
+	$(GENIE) --gcc=android-x86 gmake
+	$(GENIE) --gcc=nacl gmake
+	$(GENIE) --gcc=nacl-arm gmake
+	$(GENIE) --gcc=pnacl gmake
+	$(GENIE) --gcc=mingw gmake
+	$(GENIE) --gcc=linux-gcc gmake
+	$(GENIE) --gcc=osx gmake
+	$(GENIE) --gcc=ios-arm gmake
+	$(GENIE) --gcc=ios-simulator gmake
+	$(GENIE) xcode4
 
 .build/projects/gmake-android-arm:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-arm gmake
+	$(GENIE) --gcc=android-arm gmake
 android-arm-debug: .build/projects/gmake-android-arm
 	make -R -C .build/projects/gmake-android-arm config=debug
 android-arm-release: .build/projects/gmake-android-arm
@@ -43,7 +43,7 @@ android-arm-release: .build/projects/gmake-android-arm
 android-arm: android-arm-debug android-arm-release
 
 .build/projects/gmake-android-mips:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-mips gmake
+	$(GENIE) --gcc=android-mips gmake
 android-mips-debug: .build/projects/gmake-android-mips
 	make -R -C .build/projects/gmake-android-mips config=debug
 android-mips-release: .build/projects/gmake-android-mips
@@ -51,7 +51,7 @@ android-mips-release: .build/projects/gmake-android-mips
 android-mips: android-mips-debug android-mips-release
 
 .build/projects/gmake-android-x86:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=android-x86 gmake
+	$(GENIE) --gcc=android-x86 gmake
 android-x86-debug: .build/projects/gmake-android-x86
 	make -R -C .build/projects/gmake-android-x86 config=debug
 android-x86-release: .build/projects/gmake-android-x86
@@ -59,7 +59,7 @@ android-x86-release: .build/projects/gmake-android-x86
 android-x86: android-x86-debug android-x86-release
 
 .build/projects/gmake-linux:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=linux-gcc gmake
+	$(GENIE) --gcc=linux-gcc gmake
 linux-debug32: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=debug32
 linux-release32: .build/projects/gmake-linux
@@ -71,7 +71,7 @@ linux-release64: .build/projects/gmake-linux
 linux: linux-debug32 linux-release32 linux-debug64 linux-release64
 
 .build/projects/gmake-mingw:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=mingw gmake
+	$(GENIE) --gcc=mingw gmake
 mingw-debug32: .build/projects/gmake-mingw
 	make -R -C .build/projects/gmake-mingw config=debug32
 mingw-release32: .build/projects/gmake-mingw
@@ -83,7 +83,7 @@ mingw-release64: .build/projects/gmake-mingw
 mingw: mingw-debug32 mingw-release32 mingw-debug64 mingw-release64
 
 .build/projects/vs2008:
-	$(PREMAKE4) --file=premake/premake4.lua vs2008
+	$(GENIE) vs2008
 vs2008-debug32:
 	devenv .build/projects/vs2008/bgfx.sln /Build "Debug|Win32"
 vs2008-release32:
@@ -95,16 +95,16 @@ vs2008-release64:
 vs2008: vs2008-debug32 vs2008-release32 vs2008-debug64 vs2008-release64
 
 .build/projects/vs2010:
-	$(PREMAKE4) --file=premake/premake4.lua vs2010
+	$(GENIE) vs2010
 
 .build/projects/vs2012:
-	$(PREMAKE4) --file=premake/premake4.lua vs2012
+	$(GENIE) vs2012
 
 .build/projects/vs2013:
-	$(PREMAKE4) --file=premake/premake4.lua vs2013
+	$(GENIE) vs2013
 
 .build/projects/gmake-nacl:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=nacl gmake
+	$(GENIE) --gcc=nacl gmake
 nacl-debug32: .build/projects/gmake-nacl
 	make -R -C .build/projects/gmake-nacl config=debug32
 nacl-release32: .build/projects/gmake-nacl
@@ -116,7 +116,7 @@ nacl-release64: .build/projects/gmake-nacl
 nacl: nacl-debug32 nacl-release32 nacl-debug64 nacl-release64
 
 .build/projects/gmake-nacl-arm:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=nacl-arm gmake
+	$(GENIE) --gcc=nacl-arm gmake
 nacl-arm-debug: .build/projects/gmake-nacl-arm
 	make -R -C .build/projects/gmake-nacl-arm config=debug
 nacl-arm-release: .build/projects/gmake-nacl-arm
@@ -124,7 +124,7 @@ nacl-arm-release: .build/projects/gmake-nacl-arm
 nacl-arm: nacl-arm-debug32 nacl-arm-release32
 
 .build/projects/gmake-pnacl:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=pnacl gmake
+	$(GENIE) --gcc=pnacl gmake
 pnacl-debug: .build/projects/gmake-pnacl
 	make -R -C .build/projects/gmake-pnacl config=debug
 pnacl-release: .build/projects/gmake-pnacl
@@ -132,7 +132,7 @@ pnacl-release: .build/projects/gmake-pnacl
 pnacl: pnacl-debug pnacl-release
 
 .build/projects/gmake-osx:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=osx gmake
+	$(GENIE) --gcc=osx gmake
 osx-debug32: .build/projects/gmake-osx
 	make -C .build/projects/gmake-osx config=debug32
 osx-release32: .build/projects/gmake-osx
@@ -144,7 +144,7 @@ osx-release64: .build/projects/gmake-osx
 osx: osx-debug32 osx-release32 osx-debug64 osx-release64
 
 .build/projects/gmake-ios-arm:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-arm gmake
+	$(GENIE) --gcc=ios-arm gmake
 ios-arm-debug: .build/projects/gmake-ios-arm
 	make -R -C .build/projects/gmake-ios-arm config=debug
 ios-arm-release: .build/projects/gmake-ios-arm
@@ -152,7 +152,7 @@ ios-arm-release: .build/projects/gmake-ios-arm
 ios-arm: ios-arm-debug ios-arm-release
 
 .build/projects/gmake-ios-simulator:
-	$(PREMAKE4) --file=premake/premake4.lua --gcc=ios-simulator gmake
+	$(GENIE) --gcc=ios-simulator gmake
 ios-simulator-debug: .build/projects/gmake-ios-simulator
 	make -R -C .build/projects/gmake-ios-simulator config=debug
 ios-simulator-release: .build/projects/gmake-ios-simulator
