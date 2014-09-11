@@ -25,7 +25,7 @@ defines {
 	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
 }
 
-dofile (BX_DIR .. "premake/toolchain.lua")
+dofile "toolchain.lua"
 toolchain(BX_BUILD_DIR, BX_THIRD_PARTY_DIR)
 
 function copyLib()
