@@ -35,7 +35,13 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger = "with-android",
 		value   = "#",
-		description = "Set Android platform version.",
+		description = "Set Android platform version (default: android-14).",
+	}
+
+	newoption {
+		trigger = "with-ios",
+		value   = "#",
+		description = "Set iOS target version (default: 8.0).",
 	}
 
 	-- Avoid error when invoking genie --help.
