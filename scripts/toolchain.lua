@@ -238,7 +238,6 @@ function toolchain(_buildDir, _libDir)
 
 	flags {
 		"StaticRuntime",
-		"NoMinimalRebuild",
 		"NoPCH",
 		"NativeWChar",
 		"NoRTTI",
