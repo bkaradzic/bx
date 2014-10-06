@@ -229,12 +229,13 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far)
+	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
 		const float height = 1.0f/tanf(_fovy*( (float)M_PI/180.0f)*0.5f);
 		const float width = height * 1.0f/_aspect;
-		const float aa = _far/(_far-_near);
-		const float bb = -_near * aa;
+		const float diff = _far-_near;
+		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
+		const float bb = _oglNdc ? -(2.0f*_far*_near)/diff : -_near*aa;
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[0] = width;
