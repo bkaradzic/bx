@@ -8,6 +8,8 @@
 
 namespace bx
 {
+	BX_FLOAT4_INLINE float4_t float4_rcp_ni(float4_t _a);
+
 	BX_FLOAT4_INLINE float4_t float4_shuf_xAzC_ni(float4_t _a, float4_t _b)
 	{
 		const float4_t xAyB   = float4_shuf_xAyB(_a, _b);

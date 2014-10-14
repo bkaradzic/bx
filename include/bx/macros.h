@@ -42,7 +42,7 @@
 #define BX_ALIGNOF(_type) __alignof(_type)
 
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
-#	define BX_ALIGN_STRUCT(_align, _struct) _struct __attribute__( (aligned(_align) ) )
+#	define BX_ALIGN_DECL(_align, _decl) _decl __attribute__( (aligned(_align) ) )
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
 #	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
@@ -58,7 +58,7 @@
 #	endif // BX_COMPILER_CLANG
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
 #elif BX_COMPILER_MSVC
-#	define BX_ALIGN_STRUCT(_align, _struct) __declspec(align(_align) ) _struct
+#	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
 #	define BX_FORCE_INLINE __forceinline
 #	define BX_FUNCTION __FUNCTION__
@@ -76,11 +76,9 @@
 // #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
 
-#define BX_CACHE_LINE_ALIGN_MARKER() BX_ALIGN_STRUCT(BX_CACHE_LINE_SIZE, struct) BX_CONCATENATE(bx_cache_line_marker_compiler_stfu, __COUNTER__) {}
-#define BX_CACHE_LINE_ALIGN(_def) BX_CACHE_LINE_ALIGN_MARKER(); _def; BX_CACHE_LINE_ALIGN_MARKER()
-
-#define BX_ALIGN_STRUCT_16(_struct) BX_ALIGN_STRUCT(16, _struct)
-#define BX_ALIGN_STRUCT_256(_struct) BX_ALIGN_STRUCT(256, _struct)
+#define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
+#define BX_ALIGN_DECL_256(_decl) BX_ALIGN_DECL(256, _decl)
+#define BX_ALIGN_DECL_CACHE_LINE(_decl) BX_ALIGN_DECL(BX_CACHE_LINE_SIZE, _decl)
 
 #define BX_MACRO_BLOCK_BEGIN for(;;) {
 #define BX_MACRO_BLOCK_END break; }

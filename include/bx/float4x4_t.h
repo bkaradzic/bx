@@ -10,7 +10,7 @@
 
 namespace bx
 {
-	BX_ALIGN_STRUCT_16(struct) float4x4_t
+	BX_ALIGN_DECL_16(struct) float4x4_t
 	{
 		float4_t col[4];
 	};

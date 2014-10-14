@@ -50,6 +50,45 @@
 #	error "BX_COMPILER_* is not defined!"
 #endif //
 
+// http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
+#if defined(__arm__) || defined(_M_ARM)
+#	undef BX_CPU_ARM
+#	define BX_CPU_ARM 1
+#	define BX_CACHE_LINE_SIZE 64
+#elif defined(__MIPSEL__) || defined(__mips_isa_rev) // defined(mips)
+#	undef BX_CPU_MIPS
+#	define BX_CPU_MIPS 1
+#	define BX_CACHE_LINE_SIZE 64
+#elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
+#	undef BX_CPU_PPC
+#	define BX_CPU_PPC 1
+#	define BX_CACHE_LINE_SIZE 128
+#elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
+#	undef BX_CPU_X86
+#	define BX_CPU_X86 1
+#	define BX_CACHE_LINE_SIZE 64
+#else // PNaCl doesn't have CPU defined.
+#	undef BX_CPU_JIT
+#	define BX_CPU_JIT 1
+#	define BX_CACHE_LINE_SIZE 64
+#endif //
+
+#if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
+#	undef BX_ARCH_64BIT
+#	define BX_ARCH_64BIT 64
+#else
+#	undef BX_ARCH_32BIT
+#	define BX_ARCH_32BIT 32
+#endif //
+
+#if BX_CPU_PPC
+#	undef BX_CPU_ENDIAN_BIG
+#	define BX_CPU_ENDIAN_BIG 1
+#else
+#	undef BX_CPU_ENDIAN_LITTLE
+#	define BX_CPU_ENDIAN_LITTLE 1
+#endif // BX_PLATFORM_
+
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Operating_Systems
 #if defined(_XBOX_VER)
 #	undef BX_PLATFORM_XBOX360
@@ -59,9 +98,15 @@
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
-		// Windows Server 2003 with SP1, Windows XP with SP2 and above
-#			define WINVER 0x0502
-#			define _WIN32_WINNT 0x0502
+#			if BX_ARCH_64BIT
+//				When building 64-bit target Win7 and above.
+#				define WINVER 0x0601
+#				define _WIN32_WINNT 0x0601
+#			else
+//				Windows Server 2003 with SP1, Windows XP with SP2 and above
+#				define WINVER 0x0502
+#				define _WIN32_WINNT 0x0502
+#			endif // BX_ARCH_64BIT
 #		endif // !defined(WINVER) && !defined(_WIN32_WINNT)
 #		define BX_PLATFORM_WINDOWS _WIN32_WINNT
 #	else
@@ -113,45 +158,6 @@
 						|| BX_PLATFORM_QNX \
 						|| BX_PLATFORM_RPI \
 						)
-
-// http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
-#if defined(__arm__) || defined(_M_ARM)
-#	undef BX_CPU_ARM
-#	define BX_CPU_ARM 1
-#	define BX_CACHE_LINE_SIZE 64
-#elif defined(__MIPSEL__) || defined(__mips_isa_rev) // defined(mips)
-#	undef BX_CPU_MIPS
-#	define BX_CPU_MIPS 1
-#	define BX_CACHE_LINE_SIZE 64
-#elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
-#	undef BX_CPU_PPC
-#	define BX_CPU_PPC 1
-#	define BX_CACHE_LINE_SIZE 128
-#elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
-#	undef BX_CPU_X86
-#	define BX_CPU_X86 1
-#	define BX_CACHE_LINE_SIZE 64
-#else // PNaCl doesn't have CPU defined.
-#	undef BX_CPU_JIT
-#	define BX_CPU_JIT 1
-#	define BX_CACHE_LINE_SIZE 64
-#endif // 
-
-#if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
-#	undef BX_ARCH_64BIT
-#	define BX_ARCH_64BIT 64
-#else
-#	undef BX_ARCH_32BIT
-#	define BX_ARCH_32BIT 32
-#endif //
-
-#if BX_CPU_PPC
-#	undef BX_CPU_ENDIAN_BIG
-#	define BX_CPU_ENDIAN_BIG 1
-#else
-#	undef BX_CPU_ENDIAN_LITTLE
-#	define BX_CPU_ENDIAN_LITTLE 1
-#endif // BX_PLATFORM_
 
 #ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 #	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
