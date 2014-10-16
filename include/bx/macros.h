@@ -57,6 +57,9 @@
 #		define BX_THREAD __thread
 #	endif // BX_COMPILER_CLANG
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
+#	if BX_COMPILER_GCC
+#		define __has_extension(x) false
+#	endif // BX_COMPILER_GCC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
