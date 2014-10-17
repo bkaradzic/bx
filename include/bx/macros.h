@@ -51,12 +51,15 @@
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
-#	if BX_COMPILER_CLANG || BX_PLATFORM_OSX || BX_PLATFORM_IOS
+#	if BX_COMPILER_CLANG && (BX_PLATFORM_OSX || BX_PLATFORM_IOS)
 #		define BX_THREAD /* not supported right now */
 #	else
 #		define BX_THREAD __thread
 #	endif // BX_COMPILER_CLANG
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
+#	if BX_COMPILER_MSVC_COMPATIBLE
+#		define __stdcall
+#	endif // BX_COMPILER_MSVC_COMPATIBLE
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED

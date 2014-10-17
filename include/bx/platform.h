@@ -6,9 +6,10 @@
 #ifndef BX_PLATFORM_H_HEADER_GUARD
 #define BX_PLATFORM_H_HEADER_GUARD
 
-#define BX_COMPILER_CLANG 0
-#define BX_COMPILER_GCC   0
-#define BX_COMPILER_MSVC  0
+#define BX_COMPILER_CLANG           0
+#define BX_COMPILER_GCC             0
+#define BX_COMPILER_MSVC            0
+#define BX_COMPILER_MSVC_COMPATIBLE 0
 
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
@@ -36,15 +37,19 @@
 #define BX_CPU_ENDIAN_LITTLE 0
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
-#if defined(_MSC_VER)
-#	undef BX_COMPILER_MSVC
-#	define BX_COMPILER_MSVC _MSC_VER
-#elif defined(__clang__)
-// clang defines __GNUC__
-#	undef BX_COMPILER_CLANG
+#if defined(__clang__)
+// clang defines __GNUC__ or _MSC_VER
+#	undef  BX_COMPILER_CLANG
 #	define BX_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#	if defined(_MSC_VER)
+#		undef  BX_COMPILER_MSVC_COMPATIBLE
+#		define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
+#	endif // defined(_MSC_VER)
+#elif defined(_MSC_VER)
+#	undef  BX_COMPILER_MSVC
+#	define BX_COMPILER_MSVC _MSC_VER
 #elif defined(__GNUC__)
-#	undef BX_COMPILER_GCC
+#	undef  BX_COMPILER_GCC
 #	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 #else
 #	error "BX_COMPILER_* is not defined!"
@@ -52,51 +57,51 @@
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__) || defined(_M_ARM)
-#	undef BX_CPU_ARM
+#	undef  BX_CPU_ARM
 #	define BX_CPU_ARM 1
 #	define BX_CACHE_LINE_SIZE 64
 #elif defined(__MIPSEL__) || defined(__mips_isa_rev) // defined(mips)
-#	undef BX_CPU_MIPS
+#	undef  BX_CPU_MIPS
 #	define BX_CPU_MIPS 1
 #	define BX_CACHE_LINE_SIZE 64
 #elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
-#	undef BX_CPU_PPC
+#	undef  BX_CPU_PPC
 #	define BX_CPU_PPC 1
 #	define BX_CACHE_LINE_SIZE 128
 #elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
-#	undef BX_CPU_X86
+#	undef  BX_CPU_X86
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
 #else // PNaCl doesn't have CPU defined.
-#	undef BX_CPU_JIT
+#	undef  BX_CPU_JIT
 #	define BX_CPU_JIT 1
 #	define BX_CACHE_LINE_SIZE 64
 #endif //
 
 #if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
-#	undef BX_ARCH_64BIT
+#	undef  BX_ARCH_64BIT
 #	define BX_ARCH_64BIT 64
 #else
-#	undef BX_ARCH_32BIT
+#	undef  BX_ARCH_32BIT
 #	define BX_ARCH_32BIT 32
 #endif //
 
 #if BX_CPU_PPC
-#	undef BX_CPU_ENDIAN_BIG
+#	undef  BX_CPU_ENDIAN_BIG
 #	define BX_CPU_ENDIAN_BIG 1
 #else
-#	undef BX_CPU_ENDIAN_LITTLE
+#	undef  BX_CPU_ENDIAN_LITTLE
 #	define BX_CPU_ENDIAN_LITTLE 1
 #endif // BX_PLATFORM_
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Operating_Systems
 #if defined(_XBOX_VER)
-#	undef BX_PLATFORM_XBOX360
+#	undef  BX_PLATFORM_XBOX360
 #	define BX_PLATFORM_XBOX360 1
 #elif defined(_WIN32) || defined(_WIN64)
 // http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
-#		undef BX_PLATFORM_WINDOWS
+#		undef  BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
 #			if BX_ARCH_64BIT
 //				When building 64-bit target Win7 and above.
@@ -110,38 +115,38 @@
 #		endif // !defined(WINVER) && !defined(_WIN32_WINNT)
 #		define BX_PLATFORM_WINDOWS _WIN32_WINNT
 #	else
-#		undef BX_PLATFORM_WINRT
+#		undef  BX_PLATFORM_WINRT
 #		define BX_PLATFORM_WINRT 1
 #	endif
 #elif defined(__VCCOREVER__)
 // RaspberryPi compiler defines __linux__
-#	undef BX_PLATFORM_RPI
+#	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
 #elif defined(__native_client__)
 // NaCl compiler defines __linux__
-#	undef BX_PLATFORM_NACL
+#	undef  BX_PLATFORM_NACL
 #	define BX_PLATFORM_NACL 1
 #elif defined(__ANDROID__)
 // Android compiler defines __linux__
-#	undef BX_PLATFORM_ANDROID
+#	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID 1
 #elif defined(__linux__)
-#	undef BX_PLATFORM_LINUX
+#	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
 #elif defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__)
-#	undef BX_PLATFORM_IOS
+#	undef  BX_PLATFORM_IOS
 #	define BX_PLATFORM_IOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
-#	undef BX_PLATFORM_OSX
+#	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX 1
 #elif defined(EMSCRIPTEN)
-#	undef BX_PLATFORM_EMSCRIPTEN
+#	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN 1
 #elif defined(__QNX__)
-#	undef BX_PLATFORM_QNX
+#	undef  BX_PLATFORM_QNX
 #	define BX_PLATFORM_QNX 1
 #elif defined(__FreeBSD__)
-#	undef BX_PLATFORM_FREEBSD
+#	undef  BX_PLATFORM_FREEBSD
 #	define BX_PLATFORM_FREEBSD 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
