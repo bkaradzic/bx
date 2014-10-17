@@ -60,6 +60,9 @@
 #	if BX_COMPILER_MSVC_COMPATIBLE
 #		define __stdcall
 #	endif // BX_COMPILER_MSVC_COMPATIBLE
+#	if BX_COMPILER_GCC
+#		define __has_extension(x) false
+#	endif // BX_COMPILER_GCC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
