@@ -23,6 +23,7 @@ function toolchain(_buildDir, _libDir)
 			{ "ios-arm",       "iOS - ARM"              },
 			{ "ios-simulator", "iOS - Simulator"        },
 			{ "mingw",         "MinGW"                  },
+			{ "mingw-clang",   "MinGW (clang compiler)" },
 			{ "nacl",          "Native Client"          },
 			{ "nacl-arm",      "Native Client - ARM"    },
 			{ "osx",           "OSX"                    },
@@ -156,6 +157,13 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar = "$(MINGW)/bin/ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw")
+		end
+
+		if "mingw-clang" == _OPTIONS["gcc"] then
+			premake.gcc.cc = "$(CLANG)/bin/clang"
+			premake.gcc.cxx = "$(CLANG)/bin/clang++"
+			premake.gcc.ar = "$(MINGW)/bin/ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-clang")
 		end
 
 		if "nacl" == _OPTIONS["gcc"] then
@@ -305,7 +313,7 @@ function toolchain(_buildDir, _libDir)
 			"$(DXSDK_DIR)/lib/x64",
 		}
 
-	configuration { "mingw" }
+	configuration { "mingw or mingw-clang" }
 		defines { "WIN32" }
 		includedirs { bxDir .. "include/compat/mingw" }
 		buildoptions {
@@ -336,6 +344,36 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "win64_mingw" .. "/obj")
 		libdirs {
 			_libDir .. "lib/win64_mingw",
+			"$(DXSDK_DIR)/lib/x64",
+			"$(GLES_X64_DIR)",
+		}
+		buildoptions { "-m64" }
+
+	configuration { "mingw-clang" }
+		buildoptions {
+			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
+			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
+			"-isystem$(MINGW)/x86_64-w64-mingw32/include",
+		}
+		linkoptions {
+			"-Qunused-arguments",
+			"-Wno-error=unused-command-line-argument-hard-error-in-future",
+		}
+
+	configuration { "x32", "mingw-clang" }
+		targetdir (_buildDir .. "win32_mingw-clang" .. "/bin")
+		objdir (_buildDir .. "win32_mingw-clang" .. "/obj")
+		libdirs {
+			_libDir .. "lib/win32_mingw-clang",
+			"$(DXSDK_DIR)/lib/x86",
+		}
+		buildoptions { "-m32" }
+
+	configuration { "x64", "mingw-clang" }
+		targetdir (_buildDir .. "win64_mingw-clang" .. "/bin")
+		objdir (_buildDir .. "win64_mingw-clang" .. "/obj")
+		libdirs {
+			_libDir .. "lib/win64_mingw-clang",
 			"$(DXSDK_DIR)/lib/x64",
 			"$(GLES_X64_DIR)",
 		}
