@@ -48,6 +48,8 @@
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
+#	undef  BX_COMPILER_MSVC_COMPATIBLE
+#	define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
 #elif defined(__GNUC__)
 #	undef  BX_COMPILER_GCC
 #	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
