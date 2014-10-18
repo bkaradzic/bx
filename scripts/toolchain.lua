@@ -389,7 +389,6 @@ function toolchain(_buildDir, _libDir)
 	configuration { "linux-*" }
 		buildoptions {
 			"-std=c++0x",
-			"-U__STRICT_ANSI__",
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
@@ -457,7 +456,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-fPIC",
 			"-std=c++0x",
-			"-U__STRICT_ANSI__",
 			"-no-canonical-prefixes",
 			"-Wa,--noexecstack",
 			"-fstack-protector",
@@ -572,6 +570,16 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "nacl or nacl-arm or pnacl" }
+		buildoptions {
+			"-std=c++0x",
+			"-U__STRICT_ANSI__", -- strcasecmp, setenv, unsetenv,...
+			"-fno-stack-protector",
+			"-fdiagnostics-show-option",
+			"-fdata-sections",
+			"-ffunction-sections",
+			"-Wunused-value",
+			"-Wundef",
+		}
 		includedirs {
 			"$(NACL_SDK_ROOT)/include",
 			bxDir .. "include/compat/nacl",
@@ -579,17 +587,9 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "nacl" }
 		buildoptions {
-			"-std=c++0x",
-			"-U__STRICT_ANSI__",
 			"-pthread",
-			"-fno-stack-protector",
-			"-fdiagnostics-show-option",
-			"-fdata-sections",
-			"-ffunction-sections",
 			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
 			"-msse2",
-			"-Wunused-value",
-			"-Wundef",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -621,15 +621,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "nacl-arm" }
 		buildoptions {
-			"-std=c++0x",
-			"-U__STRICT_ANSI__",
-			"-fno-stack-protector",
-			"-fdiagnostics-show-option",
-			"-fdata-sections",
-			"-ffunction-sections",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
-			"-Wunused-value",
-			"-Wundef",
 		}
 		targetdir (_buildDir .. "nacl-arm" .. "/bin")
 		objdir (_buildDir .. "nacl-arm" .. "/obj")
@@ -642,16 +634,6 @@ function toolchain(_buildDir, _libDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
 
 	configuration { "pnacl" }
-		buildoptions {
-			"-std=c++0x",
-			"-U__STRICT_ANSI__",
-			"-fno-stack-protector",
-			"-fdiagnostics-show-option",
-			"-fdata-sections",
-			"-ffunction-sections",
-			"-Wunused-value",
-			"-Wundef",
-		}
 		targetdir (_buildDir .. "pnacl" .. "/bin")
 		objdir (_buildDir .. "pnacl" .. "/obj")
 		libdirs { _libDir .. "lib/pnacl" }
@@ -690,7 +672,6 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "osx" }
 		buildoptions {
-			"-U__STRICT_ANSI__",
 			"-Wfatal-errors",
 			"-msse2",
 			"-Wunused-value",
@@ -704,7 +685,6 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-miphoneos-version-min=7.0",
-			"-U__STRICT_ANSI__",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -750,7 +730,6 @@ function toolchain(_buildDir, _libDir)
 --		includedirs { bxDir .. "include/compat/qnx" }
 		buildoptions {
 			"-std=c++0x",
-			"-U__STRICT_ANSI__",
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 			"-Wunused-value",
 			"-Wundef",
@@ -769,7 +748,6 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-std=c++0x",
-			"-U__STRICT_ANSI__",
 			"-Wunused-value",
 			"-Wundef",
 		}

@@ -256,9 +256,4 @@
 #	pragma warning(error:4505) // ENABLE warning C4505: '' : unreferenced local function has been removed
 #endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
 
-#if BX_COMPILER_CLANG && BX_PLATFORM_LINUX
-// Clang on Linux complains about missing __float128 type...
-typedef struct { long double x, y; } __float128;
-#endif // BX_COMPILER_CLANG && BX_PLATFORM_LINUX
-
 #endif // BX_PLATFORM_H_HEADER_GUARD
