@@ -385,9 +385,6 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "linux-clang" }
-		buildoptions {
-			"--analyze",
-		}
 
 	configuration { "linux-*" }
 		buildoptions {
