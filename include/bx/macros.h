@@ -8,6 +8,7 @@
 
 #include "bx.h"
 
+///
 #if BX_COMPILER_MSVC
 // Workaround MSVS bug...
 #	define BX_VA_ARGS_PASS(...) BX_VA_ARGS_PASS_1_ __VA_ARGS__ BX_VA_ARGS_PASS_2_
@@ -20,20 +21,26 @@
 #define BX_VA_ARGS_COUNT(...) BX_VA_ARGS_COUNT_ BX_VA_ARGS_PASS(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
 #define BX_VA_ARGS_COUNT_(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12, _a13, _a14, _a15, _a16, _last, ...) _last
 
+///
 #define BX_MACRO_DISPATCHER(_func, ...) BX_MACRO_DISPATCHER_1_(_func, BX_VA_ARGS_COUNT(__VA_ARGS__) )
 #define BX_MACRO_DISPATCHER_1_(_func, _argCount) BX_MACRO_DISPATCHER_2_(_func, _argCount)
 #define BX_MACRO_DISPATCHER_2_(_func, _argCount) BX_CONCATENATE(_func, _argCount)
 
+///
 #define BX_MAKEFOURCC(_a, _b, _c, _d) ( ( (uint32_t)(_a) | ( (uint32_t)(_b) << 8) | ( (uint32_t)(_c) << 16) | ( (uint32_t)(_d) << 24) ) )
 
+///
 #define BX_STRINGIZE(_x) BX_STRINGIZE_(_x)
 #define BX_STRINGIZE_(_x) #_x
 
+///
 #define BX_CONCATENATE(_x, _y) BX_CONCATENATE_(_x, _y)
 #define BX_CONCATENATE_(_x, _y) _x ## _y
 
+///
 #define BX_FILE_LINE_LITERAL "" __FILE__ "(" BX_STRINGIZE(__LINE__) "): "
 
+///
 #define BX_ALIGN_MASK(_value, _mask) ( ( (_value)+(_mask) ) & ( (~0)&(~(_mask) ) ) )
 #define BX_ALIGN_16(_value) BX_ALIGN_MASK(_value, 0xf)
 #define BX_ALIGN_256(_value) BX_ALIGN_MASK(_value, 0xff)
@@ -60,9 +67,9 @@
 #	if BX_COMPILER_MSVC_COMPATIBLE
 #		define __stdcall
 #	endif // BX_COMPILER_MSVC_COMPATIBLE
-#	if BX_COMPILER_GCC
+#	if BX_COMPILER_GCC && !defined(__has_extension)
 #		define __has_extension(x) false
-#	endif // BX_COMPILER_GCC
+#	endif // BX_COMPILER_GCC && !defined(__has_extension)
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
@@ -82,14 +89,17 @@
 // #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
 
+///
 #define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
 #define BX_ALIGN_DECL_256(_decl) BX_ALIGN_DECL(256, _decl)
 #define BX_ALIGN_DECL_CACHE_LINE(_decl) BX_ALIGN_DECL(BX_CACHE_LINE_SIZE, _decl)
 
+///
 #define BX_MACRO_BLOCK_BEGIN for(;;) {
 #define BX_MACRO_BLOCK_END break; }
 #define BX_NOOP(...) BX_MACRO_BLOCK_BEGIN BX_MACRO_BLOCK_END
 
+///
 #define BX_UNUSED_1(_a1) BX_MACRO_BLOCK_BEGIN (void)(true ? (void)0 : ( (void)(_a1) ) ); BX_MACRO_BLOCK_END
 #define BX_UNUSED_2(_a1, _a2) BX_UNUSED_1(_a1); BX_UNUSED_1(_a2)
 #define BX_UNUSED_3(_a1, _a2, _a3) BX_UNUSED_2(_a1, _a2); BX_UNUSED_1(_a3)
@@ -110,8 +120,55 @@
 #	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__)(__VA_ARGS__)
 #endif // BX_COMPILER_MSVC
 
+///
+#if BX_COMPILER_CLANG
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG()      _Pragma("clang diagnostic push")
+#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG()       _Pragma("clang diagnostic pop")
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x) _Pragma(BX_STRINGIZE(clang diagnostic ignored _x) )
+#else
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_CLANG()
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
+#endif // BX_COMPILER_CLANG
+
+#if BX_COMPILER_GCC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()        _Pragma("GCC diagnostic push")
+#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()         _Pragma("GCC diagnostic pop")
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )
+#else
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)
+#endif // BX_COMPILER_GCC
+
+#if BX_COMPILER_MSVC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC()      __pragma(warning(push) )
+#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC()       __pragma(warning(pop) )
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(_x) __pragma(warning(disable:_x) )
+#else
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC()
+#	define BX_PRAGMA_DIAGNOSTIC_POP_MSVC()
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(_x)
+#endif // BX_COMPILER_CLANG
+
+#if BX_COMPILER_CLANG
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_CLANG
+#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_CLANG
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG
+#elif BX_COMPILER_GCC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_GCC
+#	define BX_PRAGMA_DIAGNOSTIC_POP               BX_PRAGMA_DIAGNOSTIC_POP_GCC
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC
+#elif BX_COMPILER_MSVC
+#	define BX_PRAGMA_DIAGNOSTIC_PUSH              BX_PRAGMA_DIAGNOSTIC_PUSH_MSVC
+#	define BX_PRAGMA_DIAGNOSTIC_POP	              BX_PRAGMA_DIAGNOSTIC_POP_MSVC
+#	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(_x)
+#endif // BX_COMPILER_
+
+///
 #define BX_TYPE_IS_POD(_type) (!__is_class(_type) || __is_pod(_type) )
 
+///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
 			private: _class()
 

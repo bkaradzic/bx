@@ -22,7 +22,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang",   "Linux (Clang compiler)" },
 			{ "ios-arm",       "iOS - ARM"              },
 			{ "ios-simulator", "iOS - Simulator"        },
-			{ "mingw",         "MinGW"                  },
+			{ "mingw-gcc",     "MinGW"                  },
 			{ "mingw-clang",   "MinGW (clang compiler)" },
 			{ "nacl",          "Native Client"          },
 			{ "nacl-arm",      "Native Client - ARM"    },
@@ -152,17 +152,18 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux-clang")
 		end
 
-		if "mingw" == _OPTIONS["gcc"] then
+		if "mingw-gcc" == _OPTIONS["gcc"] then
 			premake.gcc.cc = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
 			premake.gcc.ar = "$(MINGW)/bin/ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-mingw")
+			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-gcc")
 		end
 
 		if "mingw-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc = "$(CLANG)/bin/clang"
 			premake.gcc.cxx = "$(CLANG)/bin/clang++"
 			premake.gcc.ar = "$(MINGW)/bin/ar"
+--			premake.gcc.ar = "$(CLANG)/bin/llvm-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-clang")
 		end
 
@@ -269,10 +270,12 @@ function toolchain(_buildDir, _libDir)
 		}
 		targetsuffix "Release"
 
-	configuration { "vs*" }
+	configuration { "vs*", "x86" }
 		flags {
 			"EnableSSE2",
 		}
+
+	configuration { "vs*" }
 		includedirs { bxDir .. "include/compat/msvc" }
 		defines {
 			"WIN32",
@@ -313,7 +316,7 @@ function toolchain(_buildDir, _libDir)
 			"$(DXSDK_DIR)/lib/x64",
 		}
 
-	configuration { "mingw or mingw-clang" }
+	configuration { "mingw-*" }
 		defines { "WIN32" }
 		includedirs { bxDir .. "include/compat/mingw" }
 		buildoptions {
@@ -330,20 +333,20 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
-	configuration { "x32", "mingw" }
-		targetdir (_buildDir .. "win32_mingw" .. "/bin")
-		objdir (_buildDir .. "win32_mingw" .. "/obj")
+	configuration { "x32", "mingw-gcc" }
+		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin")
+		objdir (_buildDir .. "win32_mingw-gcc" .. "/obj")
 		libdirs {
-			_libDir .. "lib/win32_mingw",
+			_libDir .. "lib/win32_mingw-gcc",
 			"$(DXSDK_DIR)/lib/x86",
 		}
 		buildoptions { "-m32" }
 
-	configuration { "x64", "mingw" }
-		targetdir (_buildDir .. "win64_mingw" .. "/bin")
-		objdir (_buildDir .. "win64_mingw" .. "/obj")
+	configuration { "x64", "mingw-gcc" }
+		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin")
+		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
 		libdirs {
-			_libDir .. "lib/win64_mingw",
+			_libDir .. "lib/win64_mingw-gcc",
 			"$(DXSDK_DIR)/lib/x64",
 			"$(GLES_X64_DIR)",
 		}
@@ -792,7 +795,7 @@ function strip()
 			"@strip -s \"$(TARGET)\""
 		}
 
-	configuration { "mingw", "Release" }
+	configuration { "mingw*", "Release" }
 		postbuildcommands {
 			"@echo Stripping symbols.",
 			"@$(MINGW)/bin/strip -s \"$(TARGET)\""
