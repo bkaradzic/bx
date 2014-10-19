@@ -120,6 +120,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cc = "$(EMSCRIPTEN)/emcc"
 			premake.gcc.cxx = "$(EMSCRIPTEN)/em++"
 			premake.gcc.ar = "ar"
+--			premake.gcc.ar = "$(EMSCRIPTEN)/emar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
 		end
 
@@ -553,13 +554,9 @@ function toolchain(_buildDir, _libDir)
 		targetdir (_buildDir .. "asmjs" .. "/bin")
 		objdir (_buildDir .. "asmjs" .. "/obj")
 		libdirs { _libDir .. "lib/asmjs" }
-		includedirs {
-			"$(EMSCRIPTEN)/system/include",
-			"$(EMSCRIPTEN)/system/include/libc",
-		}
 		buildoptions {
-			"-Wno-unknown-warning-option", -- Linux Emscripten doesn't know about no-warn-absolute-paths...
-			"-Wno-warn-absolute-paths",
+			"-isystem$(EMSCRIPTEN)/system/include",
+			"-isystem$(EMSCRIPTEN)/system/include/libc",
 			"-Wunused-value",
 			"-Wundef",
 		}
@@ -773,50 +770,50 @@ function strip()
 
 	configuration { "android-arm", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "android-mips", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "android-x86", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "linux-* or rpi", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) strip -s \"$(TARGET)\""
 		}
 
 	configuration { "mingw*", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@$(MINGW)/bin/strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(MINGW)/bin/strip -s \"$(TARGET)\""
 		}
 
 	configuration { "pnacl" }
 		postbuildcommands {
-			"@echo Running pnacl-finalize.",
-			"@" .. naclToolchain .. "finalize \"$(TARGET)\""
+			"$(SILENT) echo Running pnacl-finalize.",
+			"$(SILENT) " .. naclToolchain .. "finalize \"$(TARGET)\""
 		}
 
 	configuration { "*nacl*", "Release" }
 		postbuildcommands {
-			"@echo Stripping symbols.",
-			"@" .. naclToolchain .. "strip -s \"$(TARGET)\""
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) " .. naclToolchain .. "strip -s \"$(TARGET)\""
 		}
 
 	configuration { "asmjs" }
 		postbuildcommands {
-			"@echo Running asmjs finalize.",
-			"@$(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
+			"$(SILENT) echo Running asmjs finalize.",
+			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 -s TOTAL_MEMORY=268435456 \"$(TARGET)\" -o \"$(TARGET)\".html"
 			-- ALLOW_MEMORY_GROWTH
 		}
 

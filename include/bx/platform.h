@@ -126,12 +126,14 @@
 #	define BX_PLATFORM_RPI 1
 #elif defined(__native_client__)
 // NaCl compiler defines __linux__
+#	include <ppapi/c/pp_macros.h>
 #	undef  BX_PLATFORM_NACL
-#	define BX_PLATFORM_NACL 1
+#	define BX_PLATFORM_NACL PPAPI_RELEASE
 #elif defined(__ANDROID__)
 // Android compiler defines __linux__
+#	include <android/api-level.h>
 #	undef  BX_PLATFORM_ANDROID
-#	define BX_PLATFORM_ANDROID 1
+#	define BX_PLATFORM_ANDROID __ANDROID_API__
 #elif defined(__linux__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
@@ -195,9 +197,13 @@
 #endif // BX_COMPILER_
 
 #if BX_PLATFORM_ANDROID
-#	define BX_PLATFORM_NAME "Android"
+#	define BX_PLATFORM_NAME "Android " \
+				BX_STRINGIZE(BX_PLATFORM_ANDROID)
 #elif BX_PLATFORM_EMSCRIPTEN
-#	define BX_PLATFORM_NAME "asm.js"
+#	define BX_PLATFORM_NAME "asm.js " \
+				BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
+				BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
+				BX_STRINGIZE(__EMSCRIPTEN_tiny__)
 #elif BX_PLATFORM_FREEBSD
 #	define BX_PLATFORM_NAME "FreeBSD"
 #elif BX_PLATFORM_IOS
@@ -205,7 +211,8 @@
 #elif BX_PLATFORM_LINUX
 #	define BX_PLATFORM_NAME "Linux"
 #elif BX_PLATFORM_NACL
-#	define BX_PLATFORM_NAME "NaCl"
+#	define BX_PLATFORM_NAME "NaCl " \
+				BX_STRINGIZE(BX_PLATFORM_NACL)
 #elif BX_PLATFORM_OSX
 #	define BX_PLATFORM_NAME "OSX"
 #elif BX_PLATFORM_QNX
