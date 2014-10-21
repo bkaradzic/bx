@@ -263,7 +263,7 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "winphone8" == _OPTIONS["vs"] then
-			premake.vstudio.toolset = "v120_wp81"
+			premake.vstudio.toolset = "v110_wp80"
 			location (_buildDir .. "projects/" .. _ACTION .. "-winphone8")
 		end
 	end
