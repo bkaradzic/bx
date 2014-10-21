@@ -34,6 +34,17 @@ function toolchain(_buildDir, _libDir)
 	}
 
 	newoption {
+		trigger = "vs",
+		value = "toolset",
+		description = "Choose VS toolset",
+		allowed = {
+			{ "vs2012-clang",  "Clang 3.6"         },
+			{ "vs2013-clang",  "Clang 3.6"         },
+			{ "winphone8",     "Windows Phone 8.0" },
+		},
+	}
+
+	newoption {
 		trigger = "with-android",
 		value   = "#",
 		description = "Set Android platform version (default: android-14).",
@@ -244,6 +255,17 @@ function toolchain(_buildDir, _libDir)
 		if "rpi" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-rpi")
 		end
+	elseif _ACTION == "vs2012" or _ACTION == "vs2013" then
+
+		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			location (_buildDir .. "projects/" .. _ACTION .. "-clang")
+		end
+
+		if "winphone8" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v120_wp81"
+			location (_buildDir .. "projects/" .. _ACTION .. "-winphone8")
+		end
 	end
 
 	flags {
@@ -316,6 +338,19 @@ function toolchain(_buildDir, _libDir)
 			_libDir .. "lib/win64_" .. _ACTION,
 			"$(DXSDK_DIR)/lib/x64",
 		}
+
+	configuration { "vs*-clang" }
+		buildoptions {
+			"-Qunused-arguments",
+		}
+
+	configuration { "x32", "vs*-clang" }
+		targetdir (_buildDir .. "win32_" .. _ACTION .. "-clang/bin")
+		objdir (_buildDir .. "win32_" .. _ACTION .. "-clang/obj")
+
+	configuration { "x64", "vs*-clang" }
+		targetdir (_buildDir .. "win64_" .. _ACTION .. "-clang/bin")
+		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
 
 	configuration { "mingw-*" }
 		defines { "WIN32" }
