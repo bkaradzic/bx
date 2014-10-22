@@ -27,6 +27,11 @@ extern "C" void NSLog(CFStringRef _format, ...);
 
 namespace bx
 {
+	BX_PRAGMA_DIAGNOSTIC_PUSH();
+	BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Winvalid-noreturn");
+
+	inline void debugBreak() BX_NO_RETURN;
+
 	inline void debugBreak()
 	{
 #if BX_COMPILER_MSVC
@@ -42,6 +47,8 @@ namespace bx
 		*int3 = 3;
 #endif // BX
 	}
+
+	BX_PRAGMA_DIAGNOSTIC_POP();
 
 	inline void debugOutput(const char* _out)
 	{
