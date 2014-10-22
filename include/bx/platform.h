@@ -7,6 +7,7 @@
 #define BX_PLATFORM_H_HEADER_GUARD
 
 #define BX_COMPILER_CLANG           0
+#define BX_COMPILER_CLANG_ANALYZER  0
 #define BX_COMPILER_GCC             0
 #define BX_COMPILER_MSVC            0
 #define BX_COMPILER_MSVC_COMPATIBLE 0
@@ -41,6 +42,10 @@
 // clang defines __GNUC__ or _MSC_VER
 #	undef  BX_COMPILER_CLANG
 #	define BX_COMPILER_CLANG (__clang_major__ * 10000 + __clang_minor__ * 100 + __clang_patchlevel__)
+#	if defined(__clang_analyzer__)
+#		undef  BX_COMPILER_CLANG_ANALYZER
+#		define BX_COMPILER_CLANG_ANALYZER 1
+#	endif // defined(__clang_analyzer__)
 #	if defined(_MSC_VER)
 #		undef  BX_COMPILER_MSVC_COMPATIBLE
 #		define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
