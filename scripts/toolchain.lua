@@ -357,7 +357,6 @@ function toolchain(_buildDir, _libDir)
 		includedirs { bxDir .. "include/compat/mingw" }
 		buildoptions {
 			"-std=c++11",
-			"-U__STRICT_ANSI__",
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",

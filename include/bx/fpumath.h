@@ -8,20 +8,22 @@
 #ifndef BX_FPU_MATH_H_HEADER_GUARD
 #define BX_FPU_MATH_H_HEADER_GUARD
 
-#define _USE_MATH_DEFINES
 #include <math.h>
 #include <string.h>
 
 namespace bx
 {
+	const float pi     = 3.14159265358979323846f;
+	const float piHalf = 1.57079632679489661923f;
+
 	inline float toRad(float _deg)
 	{
-		return _deg * float(M_PI / 180.0);
+		return _deg * pi / 180.0f;;
 	}
 
 	inline float toDeg(float _rad)
 	{
-		return _rad * float(180.0 / M_PI);
+		return _rad * 180.0f / pi;
 	}
 
 	inline float fmin(float _a, float _b)
@@ -231,7 +233,7 @@ namespace bx
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		const float height = 1.0f/tanf(_fovy*( (float)M_PI/180.0f)*0.5f);
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
 		const float width = height * 1.0f/_aspect;
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
