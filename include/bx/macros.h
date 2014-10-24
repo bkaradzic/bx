@@ -67,9 +67,6 @@
 #	if BX_COMPILER_MSVC_COMPATIBLE
 #		define __stdcall
 #	endif // BX_COMPILER_MSVC_COMPATIBLE
-#	if BX_COMPILER_GCC && !defined(__has_extension)
-#		define __has_extension(x) false
-#	endif // BX_COMPILER_GCC && !defined(__has_extension)
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED
@@ -85,6 +82,12 @@
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
+
+#if defined(__has_extension)
+#	define BX_CLANG_HAS_EXTENSION(_x) __has_extension(_x)
+#else
+#	define BX_CLANG_HAS_EXTENSION(_x) 0
+#endif // defined(__has_extension)
 
 // #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 #define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
