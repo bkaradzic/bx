@@ -231,20 +231,41 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width = height * 1.0f/_aspect;
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
 		const float bb = _oglNdc ? -(2.0f*_far*_near)/diff : -_near*aa;
 
 		memset(_result, 0, sizeof(float)*16);
-		_result[0] = width;
-		_result[5] = height;
+		_result[ 0] = _width;
+		_result[ 5] = _height;
+		_result[ 8] =  _x;
+		_result[ 9] = -_y;
 		_result[10] = aa;
 		_result[11] = 1.0f;
 		_result[14] = bb;
+	}
+
+	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	{
+		const float width  = 2.0f / (_lt + _rt);
+		const float height = 2.0f / (_ut + _dt);
+		const float xx     = (_lt - _rt) * width  * 0.5f;
+		const float yy     = (_ut - _dt) * height * 0.5f;
+		mtxProjXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+	}
+
+	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far)
