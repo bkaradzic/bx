@@ -185,7 +185,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
+			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_newlib/bin/x86_64-nacl-"
 			elseif os.is("linux") then
@@ -204,7 +204,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
+			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_newlib/bin/arm-nacl-"
 			elseif os.is("linux") then
@@ -218,6 +218,12 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "osx" == _OPTIONS["gcc"] then
+			if os.is("linux") then
+				local osxToolchain = "x86_64-apple-darwin13-"
+				premake.gcc.cc  = osxToolchain .. "clang"
+				premake.gcc.cxx = osxToolchain .. "clang++"
+				premake.gcc.ar  = osxToolchain .. "ar"
+			end
 			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
 		end
 
@@ -227,7 +233,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
+			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_pnacl/bin/pnacl-"
 			elseif os.is("linux") then
@@ -689,17 +695,17 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "osx", "x32" }
-		targetdir (_buildDir .. "osx32_gcc" .. "/bin")
-		objdir (_buildDir .. "osx32_gcc" .. "/obj")
-		libdirs { _libDir .. "lib/osx32_gcc" }
+		targetdir (_buildDir .. "osx32_clang" .. "/bin")
+		objdir (_buildDir .. "osx32_clang" .. "/obj")
+		libdirs { _libDir .. "lib/osx32_clang" }
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "osx", "x64" }
-		targetdir (_buildDir .. "osx64_gcc" .. "/bin")
-		objdir (_buildDir .. "osx64_gcc" .. "/obj")
-		libdirs { _libDir .. "lib/osx64_gcc" }
+		targetdir (_buildDir .. "osx64_clang" .. "/bin")
+		objdir (_buildDir .. "osx64_clang" .. "/obj")
+		libdirs { _libDir .. "lib/osx64_clang" }
 		buildoptions {
 			"-m64",
 		}
