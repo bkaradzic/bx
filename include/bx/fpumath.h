@@ -268,7 +268,7 @@ namespace bx
 		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
 
-	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far)
+	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f)
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
@@ -281,7 +281,7 @@ namespace bx
 		_result[0] = aa;
 		_result[5] = bb;
 		_result[10] = cc;
-		_result[12] = dd;
+		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
 		_result[15] = 1.0f;
