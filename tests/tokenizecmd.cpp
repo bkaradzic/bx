@@ -12,17 +12,17 @@ TEST(commandLine)
 {
 	const char* args[] =
 	{
-		"-s"
+		"-s",
 		"--long",
 	};
 
 	bx::CommandLine cmdLine(BX_COUNTOF(args), args);
 
-	CHECK(NULL != cmdLine.findOption("long") );
-	CHECK(NULL != cmdLine.findOption('s') );
+	CHECK(cmdLine.hasArg("long") );
+	CHECK(cmdLine.hasArg('s') );
 
 	// non-existing argument
-	CHECK(NULL == cmdLine.findOption('x') );
+	CHECK(!cmdLine.hasArg('x') );
 }
 
 TEST(tokenizeCommandLine)
