@@ -8,6 +8,7 @@
 
 #include "bx.h"
 #include "cpu.h"
+#include "os.h"
 #include "sem.h"
 
 #if BX_CONFIG_SUPPORTS_THREADING
