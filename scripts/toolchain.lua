@@ -352,6 +352,10 @@ function toolchain(_buildDir, _libDir)
 			"$(DXSDK_DIR)/lib/x64",
 		}
 
+	configuration { "ARM", "vs*" }
+		targetdir (_buildDir .. "arm_" .. _ACTION .. "/bin")
+		objdir (_buildDir .. "arm_" .. _ACTION .. "/obj")
+
 	configuration { "vs*-clang" }
 		buildoptions {
 			"-Qunused-arguments",
