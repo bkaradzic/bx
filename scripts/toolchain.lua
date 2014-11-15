@@ -41,7 +41,7 @@ function toolchain(_buildDir, _libDir)
 			{ "vs2012-clang",  "Clang 3.6"         },
 			{ "vs2013-clang",  "Clang 3.6"         },
 			{ "winphone8",     "Windows Phone 8.0" },
-			{ "winphone8-1",   "Windows Phone 8.1" }
+			{ "winphone81",   "Windows Phone 8.1" }
 		},
 	}
 
@@ -274,10 +274,10 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-winphone8")
 		end
 
-		if "winphone8-1" == _OPTIONS["vs"] then
+		if "winphone81" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v120_wp81"
 			platforms { "ARM" }
-			location (_buildDir .. "projects/" .. _ACTION .. "-winphone8-1")
+			location (_buildDir .. "projects/" .. _ACTION .. "-winphone81")
 		end
 	end
 
