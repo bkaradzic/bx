@@ -202,7 +202,11 @@ namespace bx
 	public:
 		Semaphore()
 		{
+#if BX_PLATFORM_WINRT
+            m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+#else
 			m_handle = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
+#endif
 			BX_CHECK(NULL != m_handle, "Failed to create Semaphore!");
 		}
 
@@ -219,7 +223,11 @@ namespace bx
 		bool wait(int32_t _msecs = -1) const
 		{
 			DWORD milliseconds = (0 > _msecs) ? INFINITE : _msecs;
-			return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);
+#if BX_PLATFORM_WINRT
+			return WAIT_OBJECT_0 == WaitForSingleObjectEx(m_handle, milliseconds, FALSE);
+#else
+            return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);
+#endif
 		}
 
 	private:
