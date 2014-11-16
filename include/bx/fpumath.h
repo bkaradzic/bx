@@ -26,6 +26,11 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
+	inline float fround(float _f)
+	{
+		return float(int(_f) );
+	}
+
 	inline float fmin(float _a, float _b)
 	{
 		return _a < _b ? _a : _b;
