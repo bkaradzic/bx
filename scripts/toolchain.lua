@@ -186,7 +186,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_newlib/bin/x86_64-nacl-"
 			elseif os.is("linux") then
@@ -205,7 +205,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_newlib/bin/arm-nacl-"
 			elseif os.is("linux") then
@@ -234,7 +234,7 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variables.")
 			end
 
-			local naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_pnacl/bin/pnacl-"
 			if os.is("macosx") then
 				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_pnacl/bin/pnacl-"
 			elseif os.is("linux") then
