@@ -41,7 +41,7 @@ function toolchain(_buildDir, _libDir)
 			{ "vs2012-clang",  "Clang 3.6"         },
 			{ "vs2013-clang",  "Clang 3.6"         },
 			{ "winphone8",     "Windows Phone 8.0" },
-			{ "winphone81",   "Windows Phone 8.1" }
+			{ "winphone81",    "Windows Phone 8.1" },
 		},
 	}
 
@@ -58,7 +58,7 @@ function toolchain(_buildDir, _libDir)
 	}
 
 	-- Avoid error when invoking genie --help.
-	if (_ACTION == nil) then return end
+	if (_ACTION == nil) then return false end
 
 	location (_buildDir .. "projects/" .. _ACTION)
 
@@ -818,6 +818,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration {} -- reset configuration
+
+	return true
 end
 
 function strip()
