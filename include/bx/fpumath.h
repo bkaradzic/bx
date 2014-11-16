@@ -8,6 +8,7 @@
 #ifndef BX_FPU_MATH_H_HEADER_GUARD
 #define BX_FPU_MATH_H_HEADER_GUARD
 
+#include "bx.h"
 #include <math.h>
 #include <string.h>
 
