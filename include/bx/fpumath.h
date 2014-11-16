@@ -112,6 +112,13 @@ namespace bx
 		return equal;
 	}
 
+	inline float fwrap(float _a, float _wrap)
+	{
+		const float mod    = fmodf(_a, _wrap);
+		const float result = mod < 0.0f ? _wrap + mod : mod;
+		return result;
+	}
+
 	inline void vec3Move(float* __restrict _result, const float* __restrict _a)
 	{
 		_result[0] = _a[0];
