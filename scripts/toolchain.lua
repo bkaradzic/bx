@@ -370,7 +370,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "win64_" .. _ACTION .. "-clang/obj")
 
 	configuration { "winphone8*" }
-		removeflags { "StaticRuntime", "NoExceptions" }
+		removeflags {
+			"StaticRuntime",
+			"NoExceptions",
+		}
 
 	configuration { "mingw-*" }
 		defines { "WIN32" }

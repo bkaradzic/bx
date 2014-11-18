@@ -40,6 +40,10 @@ project "bx.test"
 
 	debugdir (BX_DIR .. "tests")
 
+	removeflags {
+		"NoExceptions",
+	}
+
 	includedirs {
 		BX_DIR .. "include",
 		BX_THIRD_PARTY_DIR .. "UnitTest++/src/",
