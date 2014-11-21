@@ -7,7 +7,6 @@ Contact
 -------
 
 [@bkaradzic](https://twitter.com/bkaradzic)  
-http://www.stuckingeometry.com
 
 Project page  
 https://github.com/bkaradzic/bx
