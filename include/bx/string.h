@@ -3,8 +3,8 @@
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#ifndef BX_PRINTF_H_HEADER_GUARD
-#define BX_PRINTF_H_HEADER_GUARD
+#ifndef BX_STRING_H_HEADER_GUARD
+#define BX_STRING_H_HEADER_GUARD
 
 #include "bx.h"
 #include <alloca.h>
@@ -422,4 +422,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_PRINTF_H_HEADER_GUARD
+#endif // BX_STRING_H_HEADER_GUARD
