@@ -262,7 +262,7 @@ function toolchain(_buildDir, _libDir)
 		if "rpi" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _ACTION .. "-rpi")
 		end
-	elseif _ACTION == "vs2012" or _ACTION == "vs2013" then
+	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
