@@ -63,19 +63,28 @@
 #endif //
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
-#if defined(__arm__) || defined(_M_ARM)
+#if defined(__arm__)     || \
+	defined(__aarch64__) || \
+	defined(_M_ARM)
 #	undef  BX_CPU_ARM
 #	define BX_CPU_ARM 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(__MIPSEL__) || defined(__mips_isa_rev) // defined(mips)
+#elif defined(__MIPSEL__)     || \
+	  defined(__mips_isa_rev) || \
+	  defined(__mips64)
 #	undef  BX_CPU_MIPS
 #	define BX_CPU_MIPS 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(_M_PPC) || defined(__powerpc__) || defined(__powerpc64__)
+#elif defined(_M_PPC)        || \
+	  defined(__powerpc__)   || \
+	  defined(__powerpc64__)
 #	undef  BX_CPU_PPC
 #	define BX_CPU_PPC 1
 #	define BX_CACHE_LINE_SIZE 128
-#elif defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || defined(__x86_64__)
+#elif defined(_M_IX86)    || \
+	  defined(_M_X64)     || \
+	  defined(__i386__)   || \
+	  defined(__x86_64__)
 #	undef  BX_CPU_X86
 #	define BX_CPU_X86 1
 #	define BX_CACHE_LINE_SIZE 64
@@ -85,7 +94,13 @@
 #	define BX_CACHE_LINE_SIZE 64
 #endif //
 
-#if defined(__x86_64__) || defined(_M_X64) || defined(__64BIT__) || defined(__powerpc64__) || defined(__ppc64__)
+#if defined(__x86_64__)    || \
+	defined(_M_X64)        || \
+	defined(__aarch64__)   || \
+	defined(__64BIT__)     || \
+	defined(__mips64)      || \
+	defined(__powerpc64__) || \
+	defined(__ppc64__)
 #	undef  BX_ARCH_64BIT
 #	define BX_ARCH_64BIT 64
 #else
