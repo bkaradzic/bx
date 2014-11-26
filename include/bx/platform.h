@@ -122,7 +122,8 @@
 #	define BX_PLATFORM_XBOX360 1
 #elif defined(_WIN32) || defined(_WIN64)
 // http://msdn.microsoft.com/en-us/library/6sehtctf.aspx
-#   include <windows.h>
+#	define NOMINMAX
+#	include <windows.h>
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef  BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
