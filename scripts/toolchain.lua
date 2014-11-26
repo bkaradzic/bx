@@ -93,9 +93,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set ANDROID_NDK_ARM and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
+			premake.gcc.cc  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-g++"
-			premake.gcc.ar = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
+			premake.gcc.ar  = "$(ANDROID_NDK_ARM)/bin/arm-linux-androideabi-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-arm")
 		end
 
@@ -105,9 +105,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set ANDROID_NDK_MIPS and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
+			premake.gcc.cc  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-g++"
-			premake.gcc.ar = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
+			premake.gcc.ar  = "$(ANDROID_NDK_MIPS)/bin/mipsel-linux-android-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-mips")
 		end
 
@@ -117,9 +117,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set ANDROID_NDK_X86 and ANDROID_NDK_ROOT envrionment variables.")
 			end
 
-			premake.gcc.cc = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
+			premake.gcc.cc  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-gcc"
 			premake.gcc.cxx = "$(ANDROID_NDK_X86)/bin/i686-linux-android-g++"
-			premake.gcc.ar = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
+			premake.gcc.ar  = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-android-x86")
 		end
 
@@ -129,10 +129,10 @@ function toolchain(_buildDir, _libDir)
 				print("Set EMSCRIPTEN enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(EMSCRIPTEN)/emcc"
-			premake.gcc.cxx = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar = "ar"
---			premake.gcc.ar = "$(EMSCRIPTEN)/emar"
+			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
+			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
+			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
+			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _ACTION .. "-asmjs")
 		end
 
@@ -141,16 +141,16 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar = "ar"
+			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-ios-arm")
 		end
 
 		if "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar = "ar"
+			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-ios-simulator")
 		end
 
@@ -159,24 +159,25 @@ function toolchain(_buildDir, _libDir)
 		end
 
 		if "linux-clang" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "clang"
+			premake.gcc.cc  = "clang"
 			premake.gcc.cxx = "clang++"
-			premake.gcc.ar = "ar"
+			premake.gcc.ar  = "ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux-clang")
 		end
 
 		if "mingw-gcc" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
+			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
 			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
-			premake.gcc.ar = "$(MINGW)/bin/ar"
+			premake.gcc.ar  = "$(MINGW)/bin/ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-gcc")
 		end
 
 		if "mingw-clang" == _OPTIONS["gcc"] then
-			premake.gcc.cc = "$(CLANG)/bin/clang"
-			premake.gcc.cxx = "$(CLANG)/bin/clang++"
-			premake.gcc.ar = "$(MINGW)/bin/ar"
---			premake.gcc.ar = "$(CLANG)/bin/llvm-ar"
+			premake.gcc.cc   = "$(CLANG)/bin/clang"
+			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
+			premake.gcc.ar   = "$(MINGW)/bin/ar"
+--			premake.gcc.ar   = "$(CLANG)/bin/llvm-ar"
+--			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-clang")
 		end
 
@@ -253,9 +254,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set QNX_HOST enviroment variables.")
 			end
 
-			premake.gcc.cc = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
+			premake.gcc.cc  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-gcc"
 			premake.gcc.cxx = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-g++"
-			premake.gcc.ar = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
+			premake.gcc.ar  = "$(QNX_HOST)/usr/bin/arm-unknown-nto-qnx8.0.0eabi-ar"
 			location (_buildDir .. "projects/" .. _ACTION .. "-qnx-arm")
 		end
 
