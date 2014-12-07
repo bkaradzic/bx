@@ -71,7 +71,7 @@ function toolchain(_buildDir, _libDir)
 		androidPlatform = "android-" .. _OPTIONS["with-android"]
 	end
 
-	local iosPlatform = "8.0"
+	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
 	end
