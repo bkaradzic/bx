@@ -742,7 +742,6 @@ function toolchain(_buildDir, _libDir)
 			"-lc++",
 		}
 		buildoptions {
-			"-miphoneos-version-min=7.0",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -754,6 +753,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "ios-arm" .. "/obj")
 		libdirs { _libDir .. "lib/ios-arm" }
 		linkoptions {
+			"-miphoneos-version-min=7.0",
 			"-arch armv7",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -761,6 +761,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
+			"-miphoneos-version-min=7.0",
 			"-arch armv7",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 		}
@@ -770,6 +771,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (_buildDir .. "ios-simulator" .. "/obj")
 		libdirs { _libDir .. "lib/ios-simulator" }
 		linkoptions {
+			"-mios-simulator-version-min=7.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
@@ -777,6 +779,7 @@ function toolchain(_buildDir, _libDir)
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
+			"-mios-simulator-version-min=7.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
