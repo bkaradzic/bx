@@ -6,6 +6,7 @@
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
+#include <stdarg.h> // va_list
 #include <stdio.h>
 #include <string.h>
 
@@ -120,6 +121,29 @@ namespace bx
 		Ty value = toBigEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty) );
 		return result;
+	}
+
+	/// Write formated string.
+	inline int32_t writePrintf(WriterI* _writer, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+
+		char temp[2048];
+		char* out = temp;
+		int32_t max = sizeof(temp);
+		int32_t len = vsnprintf(out, max, _format, argList);
+		if (len > max)
+		{
+			out = (char*)alloca(len);
+			len = vsnprintf(out, len, _format, argList);
+		}
+
+		int32_t size = write(_writer, out, len);
+
+		va_end(argList);
+
+		return size;
 	}
 
 	/// Skip _offset bytes forward.

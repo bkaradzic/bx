@@ -27,7 +27,7 @@ all:
 	$(GENIE) --gcc=nacl gmake
 	$(GENIE) --gcc=nacl-arm gmake
 	$(GENIE) --gcc=pnacl gmake
-	$(GENIE) --gcc=mingw gmake
+	$(GENIE) --gcc=mingw-gcc gmake
 	$(GENIE) --gcc=linux-gcc gmake
 	$(GENIE) --gcc=osx gmake
 	$(GENIE) --gcc=ios-arm gmake
