@@ -70,17 +70,29 @@ linux-release64: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=release64
 linux: linux-debug32 linux-release32 linux-debug64 linux-release64
 
-.build/projects/gmake-mingw:
-	$(GENIE) --gcc=mingw gmake
-mingw-debug32: .build/projects/gmake-mingw
-	make -R -C .build/projects/gmake-mingw config=debug32
-mingw-release32: .build/projects/gmake-mingw
-	make -R -C .build/projects/gmake-mingw config=release32
-mingw-debug64: .build/projects/gmake-mingw
-	make -R -C .build/projects/gmake-mingw config=debug64
-mingw-release64: .build/projects/gmake-mingw
-	make -R -C .build/projects/gmake-mingw config=release64
-mingw: mingw-debug32 mingw-release32 mingw-debug64 mingw-release64
+.build/projects/gmake-mingw-gcc:
+	$(GENIE) --gcc=mingw-gcc gmake
+mingw-gcc-debug32: .build/projects/gmake-mingw-gcc
+	make -R -C .build/projects/gmake-mingw-gcc config=debug32
+mingw-gcc-release32: .build/projects/gmake-mingw-gcc
+	make -R -C .build/projects/gmake-mingw-gcc config=release32
+mingw-gcc-debug64: .build/projects/gmake-mingw-gcc
+	make -R -C .build/projects/gmake-mingw-gcc config=debug64
+mingw-gcc-release64: .build/projects/gmake-mingw-gcc
+	make -R -C .build/projects/gmake-mingw-gcc config=release64
+mingw-gcc: mingw-gcc-debug32 mingw-gcc-release32 mingw-gcc-debug64 mingw-gcc-release64
+
+.build/projects/gmake-mingw-clang:
+	$(GENIE) --clang=mingw-clang gmake
+mingw-clang-debug32: .build/projects/gmake-mingw-clang
+	make -R -C .build/projects/gmake-mingw-clang config=debug32
+mingw-clang-release32: .build/projects/gmake-mingw-clang
+	make -R -C .build/projects/gmake-mingw-clang config=release32
+mingw-clang-debug64: .build/projects/gmake-mingw-clang
+	make -R -C .build/projects/gmake-mingw-clang config=debug64
+mingw-clang-release64: .build/projects/gmake-mingw-clang
+	make -R -C .build/projects/gmake-mingw-clang config=release64
+mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw-clang-release64
 
 .build/projects/vs2008:
 	$(GENIE) vs2008
@@ -173,3 +185,38 @@ docs:
 clean:
 	@echo Cleaning...
 	-@rm -rf .build
+
+###
+
+SILENT ?= @
+
+UNAME := $(shell uname)
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
+ifeq ($(UNAME),$(filter $(UNAME),Darwin))
+OS=darwin
+BUILD_PROJECT_DIR=gmake-osx
+BUILD_OUTPUT_DIR=osx64_clang
+BUILD_TOOLS_CONFIG=release64
+EXE=
+else
+OS=linux
+BUILD_PROJECT_DIR=gmake-linux
+BUILD_OUTPUT_DIR=linux64_gcc
+BUILD_TOOLS_CONFIG=release64
+EXE=
+endif
+else
+OS=windows
+BUILD_PROJECT_DIR=gmake-mingw-gcc
+BUILD_OUTPUT_DIR=win32_mingw-gcc
+BUILD_TOOLS_CONFIG=release32
+EXE=.exe
+endif
+
+.build/$(BUILD_OUTPUT_DIR)/bin/bin2cRelease$(EXE): .build/projects/$(BUILD_PROJECT_DIR)
+	$(SILENT) make -C .build/projects/$(BUILD_PROJECT_DIR) -f bin2c.make config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/$(OS)/bin2c$(EXE): .build/$(BUILD_OUTPUT_DIR)/bin/bin2cRelease$(EXE)
+	$(SILENT) cp $(<) $(@)
+
+tools: tools/bin/$(OS)/bin2c$(EXE)
