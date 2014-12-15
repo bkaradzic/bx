@@ -100,7 +100,7 @@ namespace bx
 			const char* search = _find;
 
 			// Start comparing.
-			while (tolower(*string++) == tolower(*search++))
+			while (tolower(*string++) == tolower(*search++) )
 			{
 				// If end of the 'search' string is reached, all characters match.
 				if ('\0' == *search)
@@ -141,7 +141,7 @@ namespace bx
 			const char* search = _find;
 
 			// Start comparing.
-			while (tolower(*string++) == tolower(*search++))
+			while (tolower(*string++) == tolower(*search++) )
 			{
 				// If end of the 'search' string is reached, all characters match.
 				if ('\0' == *search)
