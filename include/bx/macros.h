@@ -79,6 +79,29 @@
 #	define BX_PRINTF_ARGS(_format, _args)
 #	define BX_THREAD __declspec(thread)
 #	define BX_ATTRIBUTE(_x)
+#elif BX_COMPILER_MARMALADE
+#	define BX_ALIGN_DECL(_align, _decl) _decl
+//_decl __attribute__( (aligned(_align) ) )
+#	define BX_ALLOW_UNUSED __attribute__( (unused) )
+#	define BX_FORCE_INLINE static inline
+//__extension__ static __inline __attribute__( (__always_inline__) )
+#	define BX_FUNCTION __PRETTY_FUNCTION__
+#	define BX_NO_INLINE
+#	define BX_NO_RETURN __attribute__( (noreturn) )
+#	define BX_NO_VTABLE
+#	define BX_OVERRIDE
+#	define BX_PRINTF_ARGS(_format, _args) __attribute__ ( (format(__printf__, _format, _args) ) )
+#	if BX_COMPILER_CLANG && (BX_PLATFORM_OSX || BX_PLATFORM_IOS)
+#		define BX_THREAD /* not supported right now */
+#	else
+#		define BX_THREAD
+//__thread
+#	endif // BX_COMPILER_CLANG
+#	define BX_ATTRIBUTE(_x)
+//__attribute__( (_x) )
+#	if BX_COMPILER_MSVC_COMPATIBLE
+#		define __stdcall
+#	endif // BX_COMPILER_MSVC_COMPATIBLE
 #else
 #	error "Unknown BX_COMPILER_?"
 #endif
@@ -116,7 +139,7 @@
 #define BX_UNUSED_11(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11) BX_UNUSED_10(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10); BX_UNUSED_1(_a11)
 #define BX_UNUSED_12(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11, _a12) BX_UNUSED_11(_a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9, _a10, _a11); BX_UNUSED_1(_a12)
 
-#if BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC || BX_COMPILER_MARMALADE
 // Workaround MSVS bug...
 #	define BX_UNUSED(...) BX_MACRO_DISPATCHER(BX_UNUSED_, __VA_ARGS__) BX_VA_ARGS_PASS(__VA_ARGS__)
 #else
@@ -192,7 +215,7 @@
 #define BX_CLASS_3(_class, _a1, _a2, _a3) BX_CLASS_2(_class, _a1, _a2); BX_CLASS_1(_class, _a3)
 #define BX_CLASS_4(_class, _a1, _a2, _a3, _a4) BX_CLASS_3(_class, _a1, _a2, _a3); BX_CLASS_1(_class, _a4)
 
-#if BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC || BX_COMPILER_MARMALADE
 #	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__) BX_VA_ARGS_PASS(_class, __VA_ARGS__)
 #else
 #	define BX_CLASS(_class, ...) BX_MACRO_DISPATCHER(BX_CLASS_, __VA_ARGS__)(_class, __VA_ARGS__)

@@ -11,7 +11,9 @@
 #define BX_COMPILER_GCC             0
 #define BX_COMPILER_MSVC            0
 #define BX_COMPILER_MSVC_COMPATIBLE 0
+#define BX_COMPILER_MARMALADE       0
 
+#define BX_PLATFORM_MARMALADE  0
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_EMSCRIPTEN 0
 #define BX_PLATFORM_FREEBSD    0
@@ -50,7 +52,7 @@
 #		undef  BX_COMPILER_MSVC_COMPATIBLE
 #		define BX_COMPILER_MSVC_COMPATIBLE _MSC_VER
 #	endif // defined(_MSC_VER)
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !defined(__S3E__)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
 #	undef  BX_COMPILER_MSVC_COMPATIBLE
@@ -58,6 +60,9 @@
 #elif defined(__GNUC__)
 #	undef  BX_COMPILER_GCC
 #	define BX_COMPILER_GCC (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+#elif defined(__S3E__)
+#	undef  BX_COMPILER_MARMALADE
+#   define BX_COMPILER_MARMALADE 1
 #else
 #	error "BX_COMPILER_* is not defined!"
 #endif //
@@ -176,11 +181,15 @@
 #elif defined(__FreeBSD__)
 #	undef  BX_PLATFORM_FREEBSD
 #	define BX_PLATFORM_FREEBSD 1
+#elif defined(__S3E__)
+#   undef  BX_PLATFORM_MARMALADE
+#   define BX_PLATFORM_MARMALADE 1
 #else
 #	error "BX_PLATFORM_* is not defined!"
 #endif //
 
 #define BX_PLATFORM_POSIX (0 \
+						|| BX_PLATFORM_MARMALADE \
 						|| BX_PLATFORM_ANDROID \
 						|| BX_PLATFORM_EMSCRIPTEN \
 						|| BX_PLATFORM_FREEBSD \
@@ -218,6 +227,8 @@
 #	else
 #		define BX_COMPILER_NAME "MSVC"
 #	endif //
+#elif BX_COMPILER_MARMALADE
+#   define BX_COMPILER_NAME "Marmalade"
 #endif // BX_COMPILER_
 
 #if BX_PLATFORM_ANDROID
@@ -247,6 +258,8 @@
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT
 #	define BX_PLATFORM_NAME "WinRT"
+#elif BX_PLATFORM_MARMALADE
+#	define BX_PLATFORM_NAME "Marmalade"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
