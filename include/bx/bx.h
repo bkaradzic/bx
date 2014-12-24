@@ -38,6 +38,12 @@ namespace bx
 	}
 #define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
 
+	template<typename Ty>
+	inline void swap(Ty& _a, Ty& _b)
+	{
+		Ty tmp = _a; _a = _b; _b = tmp;
+	}
+
 } // namespace bx
 
 // Annoying C++0x stuff..

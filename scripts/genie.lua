@@ -33,6 +33,7 @@ end
 
 dofile "bx.lua"
 dofile "unittest++.lua"
+dofile "bin2c.lua"
 
 project "bx.test"
 	uuid "8a653da8-23d6-11e3-acb4-887628d43830"
