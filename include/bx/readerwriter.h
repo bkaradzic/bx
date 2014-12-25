@@ -16,7 +16,7 @@
 #if BX_COMPILER_MSVC_COMPATIBLE
 #	define fseeko64 _fseeki64
 #	define ftello64 _ftelli64
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX
+#elif BX_PLATFORM_ANDROID || BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX || BX_PLATFORM_MARMALADE
 #	define fseeko64 fseeko
 #	define ftello64 ftello
 #endif // BX_
@@ -465,8 +465,13 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
 		{
+#if BX_PLATFORM_MARMALADE
+			fseek(m_file, (long)_offset, _whence);
+			return (int64_t)ftell(m_file);
+#else
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
+#endif
 		}
 
 		virtual int32_t read(void* _data, int32_t _size) BX_OVERRIDE
@@ -512,8 +517,13 @@ namespace bx
 
 		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
 		{
+#if BX_PLATFORM_MARMALADE
+			fseek(m_file, (long)_offset, _whence);
+			return (int64_t)ftell(m_file);
+#else
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
+#endif
 		}
 
 		virtual int32_t write(const void* _data, int32_t _size) BX_OVERRIDE

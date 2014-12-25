@@ -18,7 +18,8 @@
 	|| BX_PLATFORM_LINUX \
 	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_OSX \
-	|| BX_PLATFORM_RPI
+	|| BX_PLATFORM_RPI \
+	|| BX_PLATFORM_MARMALADE
 
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_FREEBSD || BX_PLATFORM_IOS || BX_PLATFORM_NACL || BX_PLATFORM_OSX
@@ -40,6 +41,10 @@
 #	if BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
+
+#	if BX_PLATFORM_MARMALADE
+#		define RTLD_LOCAL 0
+#	endif // BX_PLATFORM_MARMALADE
 #endif // BX_PLATFORM_
 
 #if BX_COMPILER_MSVC_COMPATIBLE

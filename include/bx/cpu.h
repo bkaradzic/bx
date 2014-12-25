@@ -37,6 +37,7 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_ReadBarrier();
+#elif BX_COMPILER_MARMALADE
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER
@@ -47,6 +48,7 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_WriteBarrier();
+#elif BX_COMPILER_MARMALADE
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER
@@ -57,6 +59,7 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_ReadWriteBarrier();
+#elif BX_COMPILER_MARMALADE
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER
@@ -71,12 +74,14 @@ namespace bx
         MemoryBarrier();
 #elif BX_COMPILER_MSVC
 		_mm_mfence();
+#elif BX_COMPILER_MARMALADE
 #else
 		__sync_synchronize();
-//		asm volatile("mfence":::"memory");
+		asm volatile("mfence":::"memory");
 #endif // BX_COMPILER
 	}
 
+#ifndef BX_COMPILER_MARMALADE
 	///
 	inline int32_t atomicInc(volatile void* _ptr)
 	{
@@ -146,7 +151,7 @@ namespace bx
 
 		return oldVal;
 	}
-
+#endif
 } // namespace bx
 
 #endif // BX_CPU_H_HEADER_GUARD

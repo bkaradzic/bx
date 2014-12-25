@@ -1,0 +1,14 @@
+files
+{
+	(include/bx)
+	"*.h"
+
+	[tinystl]
+	(include/tinystl)
+	"*.h"
+}
+
+includepaths
+{
+	include
+}
