@@ -390,6 +390,8 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+			"-static-libgcc",
+			"-static-libstdc++",
 		}
 
 	configuration { "x32", "mingw-gcc" }
