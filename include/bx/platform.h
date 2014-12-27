@@ -125,7 +125,9 @@
 #	ifndef NOMINMAX
 #		define NOMINMAX
 #	endif // NOMINMAX
-#	include <windows.h>
+#	if defined(_MSC_VER) && (_MSC_VER >= 1700)
+#		include <winapifamily.h>
+#	endif // defined(_MSC_VER) && (_MSC_VER >= 1700)
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef  BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
