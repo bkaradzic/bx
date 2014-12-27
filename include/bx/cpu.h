@@ -77,23 +77,25 @@ namespace bx
 #endif // BX_COMPILER
 	}
 
-	///
+	/// Atomically increment the int32_t value at _ptr
+	/// and return the new value
 	inline int32_t atomicInc(volatile void* _ptr)
 	{
 #if BX_COMPILER_MSVC
 		return _InterlockedIncrement( (volatile LONG*)(_ptr) );
 #else
-		return __sync_fetch_and_add( (volatile int32_t*)_ptr, 1);
+		return __sync_fetch_and_add( (volatile int32_t*)_ptr, 1) + 1;
 #endif // BX_COMPILER
 	}
 
-	///
+	/// Atomically decrement the int32_t value at _ptr
+	// and return the new value
 	inline int32_t atomicDec(volatile void* _ptr)
 	{
 #if BX_COMPILER_MSVC
 		return _InterlockedDecrement( (volatile LONG*)(_ptr) );
 #else
-		return __sync_fetch_and_sub( (volatile int32_t*)_ptr, 1);
+		return __sync_fetch_and_sub( (volatile int32_t*)_ptr, 1) - 1;
 #endif // BX_COMPILER
 	}
 
