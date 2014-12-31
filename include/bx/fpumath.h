@@ -15,7 +15,9 @@
 namespace bx
 {
 	const float pi     = 3.14159265358979323846f;
+	const float invPi  = 1.0f/3.14159265358979323846f;
 	const float piHalf = 1.57079632679489661923f;
+	const float sqrt2  = 1.41421356237309504880f;
 
 	inline float toRad(float _deg)
 	{
