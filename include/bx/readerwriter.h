@@ -11,6 +11,7 @@
 #include <string.h>
 
 #include "bx.h"
+#include "allocator.h"
 #include "uint32_t.h"
 
 #if BX_COMPILER_MSVC_COMPATIBLE
@@ -237,6 +238,43 @@ namespace bx
 		}
 
 	private:
+		void* m_data;
+		uint32_t m_size;
+	};
+
+	class MemoryBlock : public MemoryBlockI
+	{
+	public:
+		MemoryBlock(ReallocatorI* _allocator)
+			: m_allocator(_allocator)
+			, m_data(NULL)
+			, m_size(0)
+		{
+		}
+
+		virtual ~MemoryBlock()
+		{
+			BX_FREE(m_allocator, m_data);
+		}
+
+		virtual void* more(uint32_t _size = 0) BX_OVERRIDE
+		{
+			if (0 < _size)
+			{
+				m_size += _size;
+				m_data = BX_REALLOC(m_allocator, m_data, m_size);
+			}
+
+			return m_data;
+		}
+
+		virtual uint32_t getSize() BX_OVERRIDE
+		{
+			return m_size;
+		}
+
+	private:
+		ReallocatorI* m_allocator;
 		void* m_data;
 		uint32_t m_size;
 	};
