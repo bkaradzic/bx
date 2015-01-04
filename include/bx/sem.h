@@ -203,7 +203,7 @@ namespace bx
 		Semaphore()
 		{
 #if BX_PLATFORM_WINRT
-            m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+			m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
 #else
 			m_handle = CreateSemaphore(NULL, 0, LONG_MAX, NULL);
 #endif
@@ -226,7 +226,7 @@ namespace bx
 #if BX_PLATFORM_WINRT
 			return WAIT_OBJECT_0 == WaitForSingleObjectEx(m_handle, milliseconds, FALSE);
 #else
-            return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);
+			return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);
 #endif
 		}
 

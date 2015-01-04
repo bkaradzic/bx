@@ -70,14 +70,14 @@ namespace bx
 				, NULL
 				);
 #elif BX_PLATFORM_WINRT
-            m_handle = CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
-            auto workItemHandler = ref new WorkItemHandler([=](IAsyncAction^)
-            {
-                m_exitCode = threadFunc(this);
-                SetEvent(m_handle);
-            }, CallbackContext::Any);
+			m_handle = CreateEventEx(nullptr, nullptr, CREATE_EVENT_MANUAL_RESET, EVENT_ALL_ACCESS);
+			auto workItemHandler = ref new WorkItemHandler([=](IAsyncAction^)
+			{
+				m_exitCode = threadFunc(this);
+				SetEvent(m_handle);
+			}, CallbackContext::Any);
 
-            ThreadPool::RunAsync(workItemHandler, WorkItemPriority::Normal, WorkItemOptions::TimeSliced);
+			ThreadPool::RunAsync(workItemHandler, WorkItemPriority::Normal, WorkItemOptions::TimeSliced);
 #elif BX_PLATFORM_POSIX
 			int result;
 			BX_UNUSED(result);
@@ -113,9 +113,9 @@ namespace bx
 			CloseHandle(m_handle);
 			m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_WINRT
-            WaitForSingleObjectEx(m_handle, INFINITE, FALSE);
-            CloseHandle(m_handle);
-            m_handle = INVALID_HANDLE_VALUE;
+			WaitForSingleObjectEx(m_handle, INFINITE, FALSE);
+			CloseHandle(m_handle);
+			m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_POSIX
 			union
 			{

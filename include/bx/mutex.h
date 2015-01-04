@@ -45,7 +45,7 @@ namespace bx
 	inline int pthread_mutex_init(pthread_mutex_t* _mutex, pthread_mutexattr_t* /*_attr*/)
 	{
 #if BX_PLATFORM_WINRT
-        InitializeCriticalSectionEx(_mutex, 4000, 0);   // docs recommend 4000 spincount as sane default
+		InitializeCriticalSectionEx(_mutex, 4000, 0);   // docs recommend 4000 spincount as sane default
 #else
 		InitializeCriticalSection(_mutex);
 #endif
