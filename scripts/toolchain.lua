@@ -22,7 +22,8 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang",   "Linux (Clang compiler)" },
 			{ "ios-arm",       "iOS - ARM"              },
 			{ "ios-simulator", "iOS - Simulator"        },
-			{ "mingw-gcc",     "MinGW"                  },
+			{ "mingw32-gcc",   "MinGW32"                },
+			{ "mingw64-gcc",   "MinGW64"                },
 			{ "mingw-clang",   "MinGW (clang compiler)" },
 			{ "nacl",          "Native Client"          },
 			{ "nacl-arm",      "Native Client - ARM"    },
@@ -165,17 +166,24 @@ function toolchain(_buildDir, _libDir)
 			location (_buildDir .. "projects/" .. _ACTION .. "-linux-clang")
 		end
 
-		if "mingw-gcc" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
-			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
-			premake.gcc.ar  = "$(MINGW)/bin/ar"
-			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-gcc")
+		if "mingw32-gcc" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "$(MINGW32)/bin/i686-w64-mingw32-gcc"
+			premake.gcc.cxx = "$(MINGW32)/bin/i686-w64-mingw32-g++"
+			premake.gcc.ar  = "$(MINGW32)/bin/ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-mingw32-gcc")
+		end
+
+		if "mingw64-gcc" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "$(MINGW64)/bin/x86_64-w64-mingw32-gcc"
+			premake.gcc.cxx = "$(MINGW64)/bin/x86_64-w64-mingw32-g++"
+			premake.gcc.ar  = "$(MINGW64)/bin/ar"
+			location (_buildDir .. "projects/" .. _ACTION .. "-mingw64-gcc")
 		end
 
 		if "mingw-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc   = "$(CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(CLANG)/bin/clang++"
-			premake.gcc.ar   = "$(MINGW)/bin/ar"
+			premake.gcc.ar   = "$(MINGW32)/bin/ar"
 --			premake.gcc.ar   = "$(CLANG)/bin/llvm-ar"
 --			premake.gcc.llvm = true
 			location (_buildDir .. "projects/" .. _ACTION .. "-mingw-clang")
@@ -376,7 +384,7 @@ function toolchain(_buildDir, _libDir)
 			"NoExceptions",
 		}
 
-	configuration { "mingw-*" }
+	configuration { "mingw*" }
 		defines { "WIN32" }
 		includedirs { bxDir .. "include/compat/mingw" }
 		buildoptions {
@@ -394,7 +402,7 @@ function toolchain(_buildDir, _libDir)
 			"-static-libstdc++",
 		}
 
-	configuration { "x32", "mingw-gcc" }
+	configuration { "x32", "mingw32-gcc" }
 		targetdir (_buildDir .. "win32_mingw-gcc" .. "/bin")
 		objdir (_buildDir .. "win32_mingw-gcc" .. "/obj")
 		libdirs {
@@ -403,7 +411,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m32" }
 
-	configuration { "x64", "mingw-gcc" }
+	configuration { "x64", "mingw64-gcc" }
 		targetdir (_buildDir .. "win64_mingw-gcc" .. "/bin")
 		objdir (_buildDir .. "win64_mingw-gcc" .. "/obj")
 		libdirs {
@@ -415,9 +423,9 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "mingw-clang" }
 		buildoptions {
-			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
-			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
-			"-isystem$(MINGW)/x86_64-w64-mingw32/include",
+			"-isystem$(MINGW32)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
+			"-isystem$(MINGW32)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
+			"-isystem$(MINGW32)/x86_64-w64-mingw32/include",
 		}
 		linkoptions {
 			"-Qunused-arguments",
@@ -861,7 +869,7 @@ function strip()
 	configuration { "mingw*", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(MINGW)/bin/strip -s \"$(TARGET)\""
+			"$(SILENT) $(MINGW32)/bin/strip -s \"$(TARGET)\""
 		}
 
 	configuration { "pnacl" }
