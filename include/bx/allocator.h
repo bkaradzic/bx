@@ -2,13 +2,14 @@
  * Copyright 2010-2015 Branimir Karadzic. All rights reserved.
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
- 
+
 #ifndef BX_ALLOCATOR_H_HEADER_GUARD
 #define BX_ALLOCATOR_H_HEADER_GUARD
 
 #include "bx.h"
 
 #include <memory.h>
+#include <string.h> //::memmove
 #include <new>
 
 #if BX_CONFIG_ALLOCATOR_CRT
