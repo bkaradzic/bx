@@ -45,6 +45,17 @@ function toolchain(_buildDir, _libDir)
 		},
 	}
 
+
+	newoption {
+		trigger = "xcode",
+		value = "xcode_target",
+		description = "Choose XCode target",
+		allowed = {
+			{ "osx", "OSX" },
+			{ "ios", "iOS" },
+		}
+	}
+
 	newoption {
 		trigger = "with-android",
 		value   = "#",
@@ -280,6 +291,17 @@ function toolchain(_buildDir, _libDir)
 			platforms { "ARM" }
 			location (_buildDir .. "projects/" .. _ACTION .. "-winphone81")
 		end
+	elseif _ACTION == "xcode4" then
+
+		if "osx" == _OPTIONS["xcode"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
+		end
+
+		if "ios" == _OPTIONS["xcode"] then
+			location (_buildDir .. "projects/" .. _ACTION .. "-ios")
+		end
+
+
 	end
 
 	flags {
@@ -740,7 +762,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs { bxDir .. "include/compat/osx" }
 
-	configuration { "ios-*" }
+	configuration { "ios*" }
 		linkoptions {
 			"-lc++",
 		}
