@@ -25,7 +25,7 @@
 #	define BX_ALIGNED_FREE(_allocator, _ptr, _align)           bx::free(_allocator, _ptr, _align, __FILE__, __LINE__)
 #	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr, __FILE__, __LINE__)
-#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(bx::alignedAlloc(_allocator, sizeof(_type), _align) ) _type
+#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
 #	define BX_ALIGNED_DELETE(_allocator, _ptr, _align)         bx::alignedDeleteObject(_allocator, _ptr, _align, __FILE__, __LINE__)
 #else
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0)
@@ -36,7 +36,7 @@
 #	define BX_ALIGNED_FREE(_allocator, _ptr, _align)           bx::free(_allocator, _ptr, _align)
 #	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr)
-#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(bx::alignedAlloc(_allocator, sizeof(_type), _align) ) _type
+#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
 #	define BX_ALIGNED_DELETE(_allocator, _ptr, _align)         bx::alignedDeleteObject(_allocator, _ptr, _align)
 #endif // BX_CONFIG_DEBUG_ALLOC
 
@@ -157,7 +157,7 @@ namespace bx
 		if (NULL != _object)
 		{
 			_object->~ObjectT();
-			alignedFree(_allocator, _object, _align, _file, _line);
+			free(_allocator, _object, _align, _file, _line);
 		}
 	}
 
