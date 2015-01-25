@@ -583,7 +583,7 @@ namespace bx
 		union { uint32_t ui; float flt;	} utof;
 		utof.ui = f_result;
 		return utof.flt;
-	} 
+	}
 
 	inline uint16_t uint16_min(uint16_t _a, uint16_t _b)
 	{
@@ -611,6 +611,29 @@ namespace bx
 		const int64_t result = int64_max(_min, min);
 
 		return result;
+	}
+
+	inline uint64_t uint64_cntbits_ref(uint64_t _val)
+	{
+		const uint32_t lo = uint32_t(_val&UINT32_MAX);
+		const uint32_t hi = uint32_t(_val>>32);
+
+		const uint32_t total = bx::uint32_cntbits(lo)
+							 + bx::uint32_cntbits(hi);
+
+		return total;
+	}
+
+	/// Count number of bits set.
+	inline uint64_t uint64_cntbits(uint64_t _val)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		return __builtin_popcountll(_val);
+#elif BX_COMPILER_MSVC && BX_ARCH_64BIT
+		return __popcnt64(_val);
+#else
+		return uint64_cntbits_ref(_val);
+#endif // BX_COMPILER_
 	}
 
 	inline uint64_t uint64_cntlz_ref(uint64_t _val)
