@@ -294,14 +294,13 @@ function toolchain(_buildDir, _libDir)
 	elseif _ACTION == "xcode4" then
 
 		if "osx" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "macosx"
 			location (_buildDir .. "projects/" .. _ACTION .. "-osx")
 		end
-
 		if "ios" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "iphoneos"
 			location (_buildDir .. "projects/" .. _ACTION .. "-ios")
 		end
-
-
 	end
 
 	flags {
