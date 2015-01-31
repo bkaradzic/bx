@@ -48,6 +48,14 @@
 #	include <unistd.h> // getcwd
 #endif // BX_COMPILER_MSVC
 
+#if BX_PLATFORM_OSX
+#	define BX_DL_EXT "dylib"
+#elif BX_PLATFORM_WINDOWS
+#	define BX_DL_EXT "dll"
+#else
+#	define BX_DL_EXT "so"
+#endif //
+
 namespace bx
 {
 	inline void sleep(uint32_t _ms)
