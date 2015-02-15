@@ -138,7 +138,7 @@
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG(_x)
 #endif // BX_COMPILER_CLANG
 
-#if BX_COMPILER_GCC && (__GNUC__ == 4) && (__GNUC_MINOR__ >= 6)
+#if BX_COMPILER_GCC && BX_COMPILER_GCC >= 40600
 #	define BX_PRAGMA_DIAGNOSTIC_PUSH_GCC()        _Pragma("GCC diagnostic push")
 #	define BX_PRAGMA_DIAGNOSTIC_POP_GCC()         _Pragma("GCC diagnostic pop")
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC(_x)   _Pragma(BX_STRINGIZE(GCC diagnostic ignored _x) )
