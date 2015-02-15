@@ -173,9 +173,9 @@
 #endif // BX_COMPILER_
 
 ///
-#if defined(__GNUC__) && defined(__is_pod)
+#if BX_COMPILER_GCC && defined(__is_pod)
 #	define BX_TYPE_IS_POD(t) __is_pod(t)
-#elif defined(_MSC_VER)
+#elif BX_COMPILER_MSVC
 #	define BX_TYPE_IS_POD(t) (!__is_class(t) || __is_pod(t))
 #else
 #	define BX_TYPE_IS_POD(t) false
