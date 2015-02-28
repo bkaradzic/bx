@@ -384,8 +384,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "x32", "vs*-clang" }
-		targetdir (path.join(_buildDir, "win32_" .. _ACTION, "-clang/bin"))
-		objdir (path.join(_buildDir, "win32_" .. _ACTION, "-clang/obj"))
+		targetdir (path.join(_buildDir, "win32_" .. _ACTION .. "-clang/bin"))
+		objdir (path.join(_buildDir, "win32_" .. _ACTION .. "-clang/obj"))
 
 	configuration { "x64", "vs*-clang" }
 		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/bin"))
