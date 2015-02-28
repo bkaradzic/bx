@@ -367,7 +367,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "x64", "vs*" }
 		defines { "_WIN64" }
-		targetdir (path.join(_buildDir, "win64_" .. _ACTION, "/bin"))
+		targetdir (path.join(_buildDir, "win64_" .. _ACTION, "bin"))
 		objdir (path.join(_buildDir, "win64_" .. _ACTION, "obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_" .. _ACTION),
@@ -384,12 +384,12 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "x32", "vs*-clang" }
-		targetdir (path.join(_buildDir, "win32_" .. _ACTION, "-clang", "bin"))
+		targetdir (path.join(_buildDir, "win32_" .. _ACTION, "-clang/bin"))
 		objdir (path.join(_buildDir, "win32_" .. _ACTION, "-clang/obj"))
 
 	configuration { "x64", "vs*-clang" }
-		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang", "bin"))
-		objdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang", "obj"))
+		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/bin"))
+		objdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/obj"))
 
 	configuration { "winphone8*" }
 		removeflags {
@@ -416,8 +416,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "x32", "mingw-gcc" }
-		targetdir (path.join(_buildDir, "win32_mingw-gcc", "bin"))
-		objdir (path.join(_buildDir, "win32_mingw-gcc", "obj"))
+		targetdir (path.join(_buildDir, "win32_mingw-gcc/bin"))
+		objdir (path.join(_buildDir, "win32_mingw-gcc/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-gcc"),
 			"$(DXSDK_DIR)/lib/x86",
@@ -425,8 +425,8 @@ function toolchain(_buildDir, _libDir)
 		buildoptions { "-m32" }
 
 	configuration { "x64", "mingw-gcc" }
-		targetdir (path.join(_buildDir, "win64_mingw-gcc", "bin"))
-		objdir (path.join(_buildDir, "win64_mingw-gcc", "obj"))
+		targetdir (path.join(_buildDir, "win64_mingw-gcc/bin"))
+		objdir (path.join(_buildDir, "win64_mingw-gcc/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_mingw-gcc"),
 			"$(DXSDK_DIR)/lib/x64",
@@ -446,8 +446,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "x32", "mingw-clang" }
-		targetdir (path.join(_buildDir, "win32_mingw-clang", "bin"))
-		objdir (path.join(_buildDir, "win32_mingw-clang", "obj"))
+		targetdir (path.join(_buildDir, "win32_mingw-clang/bin"))
+		objdir (path.join(_buildDir, "win32_mingw-clang/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-clang"),
 			"$(DXSDK_DIR)/lib/x86",
@@ -455,8 +455,8 @@ function toolchain(_buildDir, _libDir)
 		buildoptions { "-m32" }
 
 	configuration { "x64", "mingw-clang" }
-		targetdir (path.join(_buildDir, "win64_mingw-clang", "bin"))
-		objdir (path.join(_buildDir, "win64_mingw-clang", "obj"))
+		targetdir (path.join(_buildDir, "win64_mingw-clang/bin"))
+		objdir (path.join(_buildDir, "win64_mingw-clang/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_mingw-clang"),
 			"$(DXSDK_DIR)/lib/x64",
@@ -487,32 +487,32 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "linux-gcc", "x32" }
-		targetdir (path.join(_buildDir, "linux32_gcc", "bin"))
-		objdir (path.join(_buildDir, "linux32_gcc", "obj"))
+		targetdir (path.join(_buildDir, "linux32_gcc/bin"))
+		objdir (path.join(_buildDir, "linux32_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux32_gcc") }
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-gcc", "x64" }
-		targetdir (path.join(_buildDir, "linux64_gcc", "bin"))
-		objdir (path.join(_buildDir, "linux64_gcc", "obj"))
+		targetdir (path.join(_buildDir, "linux64_gcc/bin"))
+		objdir (path.join(_buildDir, "linux64_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux64_gcc") }
 		buildoptions {
 			"-m64",
 		}
 
 	configuration { "linux-clang", "x32" }
-		targetdir (path.join(_buildDir, "linux32_clang", "bin"))
-		objdir (path.join(_buildDir, "linux32_clang", "obj"))
+		targetdir (path.join(_buildDir, "linux32_clang/bin"))
+		objdir (path.join(_buildDir, "linux32_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux32_clang") }
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "linux-clang", "x64" }
-		targetdir (path.join(_buildDir, "linux64_clang", "bin"))
-		objdir (path.join(_buildDir, "linux64_clang", "obj"))
+		targetdir (path.join(_buildDir, "linux64_clang/bin"))
+		objdir (path.join(_buildDir, "linux64_clang/obj"))
 		libdirs { path.join(_libDir, "lib/linux64_clang") }
 		buildoptions {
 			"-m64",
@@ -559,8 +559,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "android-arm" }
-		targetdir (path.join(_buildDir, "android-arm", "bin"))
-		objdir (path.join(_buildDir, "android-arm", "obj"))
+		targetdir (path.join(_buildDir, "android-arm/bin"))
+		objdir (path.join(_buildDir, "android-arm/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-arm"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/armeabi-v7a",
@@ -586,8 +586,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "android-mips" }
-		targetdir (path.join(_buildDir, "android-mips", "bin"))
-		objdir (path.join(_buildDir, "android-mips", "obj"))
+		targetdir (path.join(_buildDir, "android-mips/bin"))
+		objdir (path.join(_buildDir, "android-mips/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-mips"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/mips",
@@ -607,8 +607,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "android-x86" }
-		targetdir (path.join(_buildDir, "android-x86", "bin"))
-		objdir (path.join(_buildDir, "android-x86", "obj"))
+		targetdir (path.join(_buildDir, "android-x86/bin"))
+		objdir (path.join(_buildDir, "android-x86/obj"))
 		libdirs {
 			path.join(_libDir, "lib/android-x86"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/gnu-libstdc++/4.8/libs/x86",
@@ -633,8 +633,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "asmjs" }
-		targetdir (path.join(_buildDir, "asmjs", "bin"))
-		objdir (path.join(_buildDir, "asmjs", "obj"))
+		targetdir (path.join(_buildDir, "asmjs/bin"))
+		objdir (path.join(_buildDir, "asmjs/obj"))
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
 			"-isystem$(EMSCRIPTEN)/system/include",
@@ -644,8 +644,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "freebsd" }
-		targetdir (path.join(_buildDir, "freebsd", "bin"))
-		objdir (path.join(_buildDir, "freebsd", "obj"))
+		targetdir (path.join(_buildDir, "freebsd/bin"))
+		objdir (path.join(_buildDir, "freebsd/obj"))
 		libdirs { path.join(_libDir, "lib/freebsd") }
 		includedirs {
 			path.join(bxDir, "include/compat/freebsd"),
@@ -678,8 +678,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "x32", "nacl" }
-		targetdir (path.join(_buildDir, "nacl-x86", "bin"))
-		objdir (path.join(_buildDir, "nacl-x86", "obj"))
+		targetdir (path.join(_buildDir, "nacl-x86/bin"))
+		objdir (path.join(_buildDir, "nacl-x86/obj"))
 		libdirs { path.join(_libDir, "lib/nacl-x86") }
 		linkoptions { "-melf32_nacl" }
 
@@ -690,8 +690,8 @@ function toolchain(_buildDir, _libDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
 
 	configuration { "x64", "nacl" }
-		targetdir (path.join(_buildDir, "nacl-x64", "bin"))
-		objdir (path.join(_buildDir, "nacl-x64", "obj"))
+		targetdir (path.join(_buildDir, "nacl-x64/bin"))
+		objdir (path.join(_buildDir, "nacl-x64/obj"))
 		libdirs { path.join(_libDir, "lib/nacl-x64") }
 		linkoptions { "-melf64_nacl" }
 
@@ -705,8 +705,8 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wno-psabi", -- note: the mangling of 'va_list' has changed in GCC 4.4.0
 		}
-		targetdir (path.join(_buildDir, "nacl-arm", "bin"))
-		objdir (path.join(_buildDir, "nacl-arm", "obj"))
+		targetdir (path.join(_buildDir, "nacl-arm/bin"))
+		objdir (path.join(_buildDir, "nacl-arm/obj"))
 		libdirs { path.join(_libDir, "lib/nacl-arm") }
 
 	configuration { "nacl-arm", "Debug" }
@@ -716,8 +716,8 @@ function toolchain(_buildDir, _libDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
 
 	configuration { "pnacl" }
-		targetdir (path.join(_buildDir, "pnacl", "bin"))
-		objdir (path.join(_buildDir, "pnacl", "obj"))
+		targetdir (path.join(_buildDir, "pnacl/bin"))
+		objdir (path.join(_buildDir, "pnacl/obj"))
 		libdirs { path.join(_libDir, "lib/pnacl") }
 
 	configuration { "pnacl", "Debug" }
@@ -727,8 +727,8 @@ function toolchain(_buildDir, _libDir)
 		libdirs { "$(NACL_SDK_ROOT)/lib/pnacl/Release" }
 
 	configuration { "Xbox360" }
-		targetdir (path.join(_buildDir, "xbox360", "bin"))
-		objdir (path.join(_buildDir, "xbox360", "obj"))
+		targetdir (path.join(_buildDir, "xbox360/bin"))
+		objdir (path.join(_buildDir, "xbox360/obj"))
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		libdirs { path.join(_libDir, "lib/xbox360") }
 		defines {
@@ -737,16 +737,16 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "osx", "x32" }
-		targetdir (path.join(_buildDir, "osx32_clang", "bin"))
-		objdir (path.join(_buildDir, "osx32_clang", "obj"))
+		targetdir (path.join(_buildDir, "osx32_clang/bin"))
+		objdir (path.join(_buildDir, "osx32_clang/obj"))
 		libdirs { path.join(_libDir, "lib/osx32_clang") }
 		buildoptions {
 			"-m32",
 		}
 
 	configuration { "osx", "x64" }
-		targetdir (path.join(_buildDir, "osx64_clang", "bin"))
-		objdir (path.join(_buildDir, "osx64_clang", "obj"))
+		targetdir (path.join(_buildDir, "osx64_clang/bin"))
+		objdir (path.join(_buildDir, "osx64_clang/obj"))
 		libdirs { path.join(_libDir, "lib/osx64_clang") }
 		buildoptions {
 			"-m64",
@@ -773,8 +773,8 @@ function toolchain(_buildDir, _libDir)
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
 	configuration { "ios-arm" }
-		targetdir (path.join(_buildDir, "ios-arm", "bin"))
-		objdir (path.join(_buildDir, "ios-arm", "obj"))
+		targetdir (path.join(_buildDir, "ios-arm/bin"))
+		objdir (path.join(_buildDir, "ios-arm/obj"))
 		libdirs { path.join(_libDir, "lib/ios-arm") }
 		linkoptions {
 			"-miphoneos-version-min=7.0",
@@ -791,8 +791,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "ios-simulator" }
-		targetdir (path.join(_buildDir, "ios-simulator", "bin"))
-		objdir (path.join(_buildDir, "ios-simulator", "obj"))
+		targetdir (path.join(_buildDir, "ios-simulator/bin"))
+		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
 			"-mios-simulator-version-min=7.0",
@@ -809,8 +809,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "qnx-arm" }
-		targetdir (path.join(_buildDir, "qnx-arm", "bin"))
-		objdir (path.join(_buildDir, "qnx-arm", "obj"))
+		targetdir (path.join(_buildDir, "qnx-arm/bin"))
+		objdir (path.join(_buildDir, "qnx-arm/obj"))
 		libdirs { path.join(_libDir, "lib/qnx-arm") }
 --		includedirs { path.join(bxDir, "include/compat/qnx") }
 		buildoptions {
@@ -821,8 +821,8 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "rpi" }
-		targetdir (path.join(_buildDir, "rpi", "bin"))
-		objdir (path.join(_buildDir, "rpi", "obj"))
+		targetdir (path.join(_buildDir, "rpi/bin"))
+		objdir (path.join(_buildDir, "rpi/obj"))
 		libdirs {
 			path.join(_libDir, "lib/rpi"),
 			"/opt/vc/lib",
