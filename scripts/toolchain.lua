@@ -421,6 +421,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -490,6 +491,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		links {
 			"rt",
@@ -674,6 +676,7 @@ function toolchain(_buildDir, _libDir)
 			"-ffunction-sections",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs {
 			"$(NACL_SDK_ROOT)/include",
@@ -771,6 +774,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
@@ -782,6 +786,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
@@ -848,6 +853,7 @@ function toolchain(_buildDir, _libDir)
 			"-std=c++0x",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs {
 			"/opt/vc/include",
