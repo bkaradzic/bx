@@ -298,12 +298,12 @@ function toolchain(_buildDir, _libDir)
 			premake.vstudio.toolset = ("v110_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 		end
-		
+
 		if ("vs2013-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v120_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 		end
-		
+
 	elseif _ACTION == "xcode4" then
 
 		if "osx" == _OPTIONS["xcode"] then
@@ -414,7 +414,7 @@ function toolchain(_buildDir, _libDir)
 		defines { "WIN32" }
 		includedirs { path.join(bxDir, "include/compat/mingw") }
 		buildoptions {
-			"-std=c++11",
+			"-std=c++0x",
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
