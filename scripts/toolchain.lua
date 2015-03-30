@@ -760,7 +760,7 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx", "x32" }
 		targetdir (path.join(_buildDir, "osx32_clang/bin"))
 		objdir (path.join(_buildDir, "osx32_clang/obj"))
-		libdirs { path.join(_libDir, "lib/osx32_clang") }
+		--libdirs { path.join(_libDir, "lib/osx32_clang") }
 		buildoptions {
 			"-m32",
 		}
@@ -768,7 +768,7 @@ function toolchain(_buildDir, _libDir)
 	configuration { "osx", "x64" }
 		targetdir (path.join(_buildDir, "osx64_clang/bin"))
 		objdir (path.join(_buildDir, "osx64_clang/obj"))
-		libdirs { path.join(_libDir, "lib/osx64_clang") }
+		--libdirs { path.join(_libDir, "lib/osx64_clang") }
 		buildoptions {
 			"-m64",
 		}
