@@ -403,6 +403,11 @@ function toolchain(_buildDir, _libDir)
 			"NoExceptions",
 		}
 
+	configuration { "*-gcc*" }
+		buildoptions {
+			"-Wshadow",
+		}
+
 	configuration { "mingw-*" }
 		defines { "WIN32" }
 		includedirs { path.join(bxDir, "include/compat/mingw") }
