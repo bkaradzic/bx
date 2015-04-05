@@ -403,7 +403,7 @@ function toolchain(_buildDir, _libDir)
 			"NoExceptions",
 		}
 
-	configuration { "*-gcc*" }
+	configuration { "*-gcc* or osx" }
 		buildoptions {
 			"-Wshadow",
 		}
