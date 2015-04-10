@@ -79,7 +79,11 @@
 #	define BX_NO_INLINE __declspec(noinline)
 #	define BX_NO_RETURN
 #	define BX_NO_VTABLE __declspec(novtable)
+#if BX_COMPILER_MSVC >= 1700
 #	define BX_OVERRIDE override
+#else
+#	define BX_OVERRIDE
+#endif
 #	define BX_PRINTF_ARGS(_format, _args)
 #	define BX_THREAD __declspec(thread)
 #	define BX_ATTRIBUTE(_x)
