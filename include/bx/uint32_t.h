@@ -85,6 +85,11 @@ namespace bx
 		return _a & _b;
 	}
 
+	inline uint32_t uint32_andc(uint32_t _a, uint32_t _b)
+	{
+		return _a & ~_b;
+	}
+
 	inline uint32_t uint32_xor(uint32_t _a, uint32_t _b)
 	{
 		return _a ^ _b;
@@ -95,14 +100,14 @@ namespace bx
 		return !_a != !_b;
 	}
 
-	inline uint32_t uint32_andc(uint32_t _a, uint32_t _b)
-	{
-		return _a & ~_b;
-	}
-
 	inline uint32_t uint32_or(uint32_t _a, uint32_t _b)
 	{
 		return _a | _b;
+	}
+
+	inline uint32_t uint32_orc(uint32_t _a, uint32_t _b)
+	{
+		return _a | ~_b;
 	}
 
 	inline uint32_t uint32_sll(uint32_t _a, int _sa)
