@@ -108,7 +108,7 @@ namespace bx
 		int32_t size = 0;
 		while (0 < _size)
 		{
-			int32_t bytes = write(_writer, temp, uint32_max(blockSize, _size) );
+			int32_t bytes = write(_writer, temp, uint32_min(blockSize, _size) );
 			size  += bytes;
 			_size -= bytes;
 		}
