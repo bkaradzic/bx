@@ -334,7 +334,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		targetsuffix "Release"
 
-	configuration { "vs*", "x86" }
+	configuration { "vs*", "x32" }
 		flags {
 			"EnableSSE2",
 		}
