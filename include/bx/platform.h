@@ -200,6 +200,7 @@
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
 						|| BX_PLATFORM_QNX \
+						|| BX_PLATFORM_PS4 \
 						|| BX_PLATFORM_RPI \
 						)
 
