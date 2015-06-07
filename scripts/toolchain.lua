@@ -29,6 +29,7 @@ function toolchain(_buildDir, _libDir)
 			{ "nacl-arm",      "Native Client - ARM"    },
 			{ "osx",           "OSX"                    },
 			{ "pnacl",         "Native Client - PNaCl"  },
+			{ "ps4",           "PS4"                    },
 			{ "qnx-arm",       "QNX/Blackberry - ARM"   },
 			{ "rpi",           "RaspberryPi"            },
 		},
@@ -256,6 +257,19 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = naclToolchain .. "clang++"
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-pnacl"))
+
+		elseif "ps4" == _OPTIONS["gcc"] then
+
+			if not os.getenv("PS4_SDK_ROOT") then
+				print("Set PS4_SDK_ROOT enviroment variables.")
+			end
+
+			ps4Toolchain = "$(PS4_SDK_ROOT)/host_tools/bin/orbis-"
+
+			premake.gcc.cc  = ps4Toolchain .. "clang"
+			premake.gcc.cxx = ps4Toolchain .. "clang++"
+			premake.gcc.ar  = ps4Toolchain .. "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ps4"))
 
 		elseif "qnx-arm" == _OPTIONS["gcc"] then
 
@@ -853,6 +867,23 @@ function toolchain(_buildDir, _libDir)
 			"-mios-simulator-version-min=7.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
+	configuration { "ps4" }
+		targetdir (path.join(_buildDir, "ps4/bin"))
+		objdir (path.join(_buildDir, "ps4/obj"))
+		libdirs { path.join(_libDir, "lib/ps4") }
+		includedirs {
+			path.join(bxDir, "include/compat/freebsd"),
+			"$(PS4_SDK_ROOT)/target/include",
+			"$(PS4_SDK_ROOT)/target/include_common",
+		}
+		buildoptions {
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+		linkoptions {
 		}
 
 	configuration { "qnx-arm" }
