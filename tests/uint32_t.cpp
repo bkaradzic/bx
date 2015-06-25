@@ -19,4 +19,10 @@ TEST(StrideAlign)
 	{
 		CHECK(48 == bx::strideAlign16(ii+1, 12) );
 	}
+
+	CHECK(0  == bx::uint64_cnttz(UINT64_C(1) ) );
+	CHECK(0  == bx::uint64_cnttz_ref(UINT64_C(1) ) );
+
+	CHECK(63 == bx::uint64_cntlz(UINT64_C(1) ) );
+	CHECK(63 == bx::uint64_cntlz_ref(UINT64_C(1) ) );
 }
