@@ -813,6 +813,10 @@ function toolchain(_buildDir, _libDir)
 			"-m64",
 		}
 
+	configuration { "osx", "Universal" }
+		targetdir (path.join(_buildDir, "osx_universal/bin"))
+		objdir (path.join(_buildDir, "osx_universal/bin"))
+
 	configuration { "osx" }
 		buildoptions {
 			"-Wfatal-errors",
