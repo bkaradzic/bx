@@ -902,7 +902,7 @@ namespace bx
 			sumX,  sumY,  float(_numPoints),
 		};
 		float invMtx[9];
-		bx::mtx3Inverse(invMtx, mtx);
+		mtx3Inverse(invMtx, mtx);
 
 		_result[0] = invMtx[0]*sumXZ + invMtx[1]*sumYZ + invMtx[2]*sumZ;
 		_result[1] = invMtx[3]*sumXZ + invMtx[4]*sumYZ + invMtx[5]*sumZ;
