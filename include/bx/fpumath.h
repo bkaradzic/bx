@@ -121,6 +121,25 @@ namespace bx
 		return result;
 	}
 
+	// References:
+	//  - Bias And Gain Are Your Friend
+	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+	//  - http://demofox.org/biasgain.html
+	inline float fbias(float _time, float _bias)
+	{
+		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
+	}
+
+	inline float fgain(float _time, float _gain)
+	{
+		if (_time < 0.5f)
+		{
+			return fbias(_time * 2.0f, _gain) * 0.5f;
+		}
+
+		return fbias(_time * 2.0f - 1.0f, 1.0f - _gain) * 0.5f + 0.5f;
+	}
+
 	inline void vec3Move(float* __restrict _result, const float* __restrict _a)
 	{
 		_result[0] = _a[0];
