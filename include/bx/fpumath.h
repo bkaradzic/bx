@@ -31,7 +31,7 @@ namespace bx
 
 	inline float fround(float _f)
 	{
-		return float(int(_f) );
+		return floorf(_f + 0.5f);
 	}
 
 	inline float fmin(float _a, float _b)
