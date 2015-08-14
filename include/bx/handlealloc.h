@@ -20,11 +20,7 @@ namespace bx
 			: m_numHandles(0)
 			, m_maxHandles(_maxHandles)
 		{
-			uint16_t* dense = getDensePtr();
-			for (uint16_t ii = 0; ii < _maxHandles; ++ii)
-			{
-				dense[ii] = ii;
-			}
+			reset();
 		}
 
 		~HandleAlloc()
@@ -91,6 +87,16 @@ namespace bx
 			dense[index] = temp;
 		}
 
+		void reset()
+		{
+			m_numHandles = 0;
+			uint16_t* dense = getDensePtr();
+			for (uint16_t ii = 0, num = m_maxHandles; ii < num; ++ii)
+			{
+				dense[ii] = ii;
+			}
+		}
+
 	private:
 		HandleAlloc();
 
@@ -148,7 +154,7 @@ namespace bx
 			: m_front(invalid)
 			, m_back(invalid)
 		{
-			memset(m_links, 0xff, sizeof(m_links) );
+			reset();
 		}
 
 		void pushBack(uint16_t _handle)
@@ -200,22 +206,22 @@ namespace bx
 
 		uint16_t getNext(uint16_t _handle) const
 		{
+			BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
 			const Link& curr = m_links[_handle];
-			BX_CHECK(!isValid(_handle), "Invalid handle %d!", _handle);
 			return curr.m_next;
 		}
 
 		uint16_t getPrev(uint16_t _handle) const
 		{
+			BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
 			const Link& curr = m_links[_handle];
-			BX_CHECK(!isValid(_handle), "Invalid handle %d!", _handle);
 			return curr.m_prev;
 		}
 
 		void remove(uint16_t _handle)
 		{
+			BX_CHECK(isValid(_handle), "Invalid handle %d!", _handle);
 			Link& curr = m_links[_handle];
-			BX_CHECK(!isValid(_handle), "Invalid handle %d!", _handle);
 
 			if (invalid != curr.m_prev)
 			{
@@ -239,6 +245,11 @@ namespace bx
 
 			curr.m_prev = invalid;
 			curr.m_next = invalid;
+		}
+
+		void reset()
+		{
+			memset(m_links, 0xff, sizeof(m_links) );
 		}
 
 	private:
@@ -322,6 +333,15 @@ namespace bx
 	public:
 		static const uint16_t invalid = UINT16_MAX;
 
+		HandleAllocLruT()
+		{
+			reset();
+		}
+
+		~HandleAllocLruT()
+		{
+		}
+
 		const uint16_t* getHandles() const
 		{
 			return m_alloc.getHandles();
@@ -389,6 +409,12 @@ namespace bx
 		uint16_t getPrev(uint16_t _handle) const
 		{
 			return m_list.getPrev(_handle);
+		}
+
+		void reset()
+		{
+			m_list.reset();
+			m_alloc.reset();
 		}
 
 	private:
