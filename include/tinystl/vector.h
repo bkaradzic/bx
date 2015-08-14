@@ -280,7 +280,7 @@ namespace tinystl {
 	}
 
 	template<typename T, typename Alloc>
-	inline void vector<T, Alloc>::insert(vector::iterator where) {
+	inline void vector<T, Alloc>::insert(iterator where) {
 		buffer_insert(&m_buffer, where, 1);
 	}
 
@@ -316,7 +316,7 @@ namespace tinystl {
 
 	template<typename T, typename Alloc>
 	template<typename Param>
-	void vector<T, Alloc>::emplace(vector::iterator where, const Param& param) {
+	void vector<T, Alloc>::emplace(iterator where, const Param& param) {
 		buffer_insert(&m_buffer, where, &param, &param + 1);
 	}
 }
