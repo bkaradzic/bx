@@ -260,7 +260,7 @@ namespace bx
 				link.m_prev = _handle;
 			}
 
-			updateFirstLast(_handle);
+			updateFrontBack(_handle);
 		}
 
 		void insertAfter(uint16_t _after, uint16_t _handle)
@@ -281,7 +281,7 @@ namespace bx
 				link.m_next = _handle;
 			}
 
-			updateFirstLast(_handle);
+			updateFrontBack(_handle);
 		}
 
 		bool isValid(uint16_t _handle) const
@@ -289,7 +289,7 @@ namespace bx
 			return _handle < MaxHandlesT;
 		}
 
-		void updateFirstLast(uint16_t _handle)
+		void updateFrontBack(uint16_t _handle)
 		{
 			Link& curr = m_links[_handle];
 

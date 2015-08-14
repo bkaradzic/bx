@@ -68,9 +68,9 @@ TEST(HandleAllocLruT)
 		lru.alloc(),
 	};
 
-	lru.touch(handle[3]);
+	lru.touch(handle[1]);
 
-	uint16_t expected0[] = { handle[3], handle[0], handle[1], handle[2] };
+	uint16_t expected0[] = { handle[1], handle[3], handle[2], handle[0] };
 	uint16_t count = 0;
 	for (uint16_t it = lru.getFront(); it != UINT16_MAX; it = lru.getNext(it), ++count)
 	{
