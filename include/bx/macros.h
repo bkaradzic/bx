@@ -53,6 +53,8 @@
 #	define BX_ALLOW_UNUSED __attribute__( (unused) )
 #	define BX_FORCE_INLINE __extension__ static __inline __attribute__( (__always_inline__) )
 #	define BX_FUNCTION __PRETTY_FUNCTION__
+#	define BX_LIKELY(_x)   __builtin_expect(!!(_x), 1)
+#	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
 #	define BX_NO_INLINE __attribute__( (noinline) )
 #	define BX_NO_RETURN __attribute__( (noreturn) )
 #	define BX_NO_VTABLE
@@ -76,6 +78,8 @@
 #	define BX_ALLOW_UNUSED
 #	define BX_FORCE_INLINE __forceinline
 #	define BX_FUNCTION __FUNCTION__
+#	define BX_LIKELY(_x)   (_x)
+#	define BX_UNLIKELY(_x) (_x)
 #	define BX_NO_INLINE __declspec(noinline)
 #	define BX_NO_RETURN
 #	define BX_NO_VTABLE __declspec(novtable)
