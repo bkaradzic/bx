@@ -37,7 +37,11 @@ namespace bx
 
 			while(_len >= 4)
 			{
+#if BX_PLATFORM_EMSCRIPTEN
+				uint32_t kk = data[0]<<24|data[1]<<16|data[2]<<8|data[3];
+#else
 				uint32_t kk = *(uint32_t*)data;
+#endif
 
 				mmix(m_hash, kk);
 
