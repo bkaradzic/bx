@@ -42,7 +42,7 @@
 
 #define __ecount(size)
 #define __bcount(size)
-#define __in
+// #define __in // Conflicts with STL.
 #define __in_ecount(size)
 #define __in_bcount(size)
 #define __in_z
@@ -52,7 +52,7 @@
 #define __in_ecount_nz(size)
 #define __in_bcount_nz(size)
 #define __in_xcount_opt(size)
-#define __out
+// #define __out // Conflicts with STL.
 #define __out_ecount(size)
 #define __out_bcount(size)
 #define __out_ecount_part(size,length)
