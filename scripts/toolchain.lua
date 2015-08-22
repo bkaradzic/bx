@@ -992,6 +992,7 @@ function strip()
 				.. "-s TOTAL_MEMORY=268435456 "
 				.. "--memory-init-file 1 "
 				.. "\"$(TARGET)\" -o \"$(TARGET)\".html"
+--				.. "--preload-file ../../../examples/runtime"
 			-- ALLOW_MEMORY_GROWTH
 		}
 
