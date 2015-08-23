@@ -141,22 +141,11 @@ namespace bx
 
 		void setThreadName(const char* name)
 		{
-			if (name != NULL)
-			{
-				strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
-			}
-			else
-			{
-				memset(m_name, 0, BX_CONFIG_THREAD_NAME_LENGTH);
-			}
-
 #if BX_PLATFORM_WINDOWS
 #elif BX_PLATFORM_OSX|BX_PLATFORM_IOS
-			strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
-			pthread_setname_np(m_name);
+			pthread_setname_np(name);
 #elif BX_PLATFORM_POSIX
-			strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
-			pthread_setname_np(m_handle, m_name);
+			pthread_setname_np(m_handle, name);
 #endif // BX_PLATFORM_
 		}
 
