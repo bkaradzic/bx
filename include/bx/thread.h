@@ -139,6 +139,16 @@ namespace bx
 			return m_exitCode;
 		}
 
+		void setThreadName(const char* name)
+		{
+#if BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_OSX|BX_PLATFORM_IOS
+			pthread_setname_np(name);
+#elif BX_PLATFORM_POSIX
+			pthread_setname_np(m_handle, name);
+#endif // BX_PLATFORM_
+		}
+
 	private:
 		int32_t entry()
 		{
@@ -179,6 +189,7 @@ namespace bx
 		uint32_t m_stackSize;
 		int32_t m_exitCode;
 		bool m_running;
+        char m_name[BX_CONFIG_THREAD_NAME_LENGTH];
 	};
 
 #if BX_PLATFORM_WINDOWS
