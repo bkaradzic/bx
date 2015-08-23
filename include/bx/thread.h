@@ -139,6 +139,27 @@ namespace bx
 			return m_exitCode;
 		}
 
+		void setThreadName(const char* name)
+		{
+			if (name != NULL)
+			{
+				strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
+			}
+			else
+			{
+				memset(m_name, 0, BX_CONFIG_THREAD_NAME_LENGTH);
+			}
+
+#if BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_OSX|BX_PLATFORM_IOS
+			strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
+			pthread_setname_np(m_name);
+#elif BX_PLATFORM_POSIX
+			strncpy(m_name, name, BX_CONFIG_THREAD_NAME_LENGTH);
+			pthread_setname_np(m_handle, m_name);
+#endif // BX_PLATFORM_
+		}
+
 	private:
 		int32_t entry()
 		{
@@ -179,6 +200,7 @@ namespace bx
 		uint32_t m_stackSize;
 		int32_t m_exitCode;
 		bool m_running;
+        char m_name[BX_CONFIG_THREAD_NAME_LENGTH];
 	};
 
 #if BX_PLATFORM_WINDOWS
