@@ -40,15 +40,15 @@ function toolchain(_buildDir, _libDir)
 		value = "toolset",
 		description = "Choose VS toolset",
 		allowed = {
-			{ "vs2012-clang",  "Clang 3.6"         },
-			{ "vs2013-clang",  "Clang 3.6"         },
+			{ "vs2012-clang",  "Clang 3.6"                       },
+			{ "vs2013-clang",  "Clang 3.6"                       },
 			{ "vs2012-xp",     "Visual Studio 2012 targeting XP" },
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
-			{ "winphone8",     "Windows Phone 8.0" },
-			{ "winphone81",    "Windows Phone 8.1" },
-			{ "winstore81",    "Windows Store 8.1" },
-			{ "winstore82",    "Universal Windows App" }
+			{ "winphone8",     "Windows Phone 8.0"               },
+			{ "winphone81",    "Windows Phone 8.1"               },
+			{ "winstore81",    "Windows Store 8.1"               },
+			{ "winstore82",    "Universal Windows App"           },
 		},
 	}
 
