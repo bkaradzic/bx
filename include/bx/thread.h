@@ -52,7 +52,7 @@ namespace bx
 			}
 		}
 
-		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0)
+		void init(ThreadFn _fn, void* _userData = NULL, uint32_t _stackSize = 0, const char* _name = NULL)
 		{
 			BX_CHECK(!m_running, "Already running!");
 
@@ -101,6 +101,10 @@ namespace bx
 			BX_CHECK(0 == result, "pthread_attr_setschedparam failed! %d", result);
 #endif // BX_PLATFORM_
 
+			if (NULL != _name)
+			{
+				setThreadName(_name);
+			}
 			m_sem.wait();
 		}
 
@@ -146,6 +150,7 @@ namespace bx
 #elif BX_PLATFORM_POSIX
 			pthread_setname_np(m_handle, _name);
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
+#	pragma pack(push, 8)
 			struct ThreadName
 			{
 				DWORD  type;
@@ -153,6 +158,7 @@ namespace bx
 				DWORD  id;
 				DWORD  flags;
 			};
+#	pragma pack(pop)
 			ThreadName tn;
 			tn.type  = 0x1000;
 			tn.name  = _name;
