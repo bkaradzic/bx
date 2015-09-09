@@ -141,10 +141,35 @@ namespace bx
 
 		void setThreadName(const char* _name)
 		{
-#if BX_PLATFORM_OSX|BX_PLATFORM_IOS
+#if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
 #elif BX_PLATFORM_POSIX
 			pthread_setname_np(m_handle, _name);
+#elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
+			struct ThreadName
+			{
+				DWORD  type;
+				LPCSTR name;
+				DWORD  id;
+				DWORD  flags;
+			};
+			ThreadName tn;
+			tn.type  = 0x1000;
+			tn.name  = _name;
+			tn.id    = GetThreadId(m_handle);
+			tn.flags = 0;
+
+			__try
+			{
+				RaiseException(0x406d1388
+					, 0
+					, sizeof(tn)/4
+					, reinterpret_cast<ULONG_PTR*>(&tn)
+					);
+			}
+			__except(EXCEPTION_EXECUTE_HANDLER)
+			{
+			}
 #else
 			BX_UNUSED(_name);
 #endif // BX_PLATFORM_
