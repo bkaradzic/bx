@@ -42,9 +42,9 @@
 #	if BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
-#	endif // BX_PLATFORM_LINUX || BX_PLATFORM_RPI
-
-#	if BX_PLATFORM_ANDROID
+#	elif BX_PLATFORM_OSX
+#		include <mach/mach.h> // mach_task_basic_info
+#	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
@@ -108,6 +108,46 @@ namespace bx
 		debugOutput("getTid is not implemented"); debugBreak();
 		return 0;
 #endif //
+	}
+
+	inline size_t getProcessMemoryUsed()
+	{
+#if BX_PLATFORM_LINUX
+		FILE* file = fopen("/proc/self/statm", "r");
+		if (NULL == file)
+		{
+			return 0;
+		}
+
+		long pages = 0;
+		fscanf(file, "%*s%ld", &pages)
+		fclose(file);
+		return pages * sysconf(_SC_PAGESIZE);
+#elif BX_PLATFORM_OSX
+		mach_task_basic_info info;
+		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
+
+		int result = task_info(mach_task_self()
+				, MACH_TASK_BASIC_INFO
+				, (task_info_t)&info
+				, &infoCount
+				);
+		if (KERN_SUCCESS != result)
+		{
+			return 0;
+		}
+
+		return info.resident_size;
+#elif BX_PLATFORM_WINDOWS
+		PROCESS_MEMORY_COUNTERS pmc;
+		GetProcessMemoryInfo(GetCurrentProcess()
+			, &pmc
+			, sizeof(pmc)
+			);
+		return pmc.WorkingSetSize;
+#else
+		return 0;
+#endif // BX_PLATFORM_*
 	}
 
 	inline void* dlopen(const char* _filePath)
