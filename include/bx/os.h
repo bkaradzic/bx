@@ -120,7 +120,7 @@ namespace bx
 		}
 
 		long pages = 0;
-		fscanf(file, "%*s%ld", &pages)
+		fscanf(file, "%*s%ld", &pages);
 		fclose(file);
 		return pages * sysconf(_SC_PAGESIZE);
 #elif BX_PLATFORM_OSX
