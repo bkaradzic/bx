@@ -40,7 +40,9 @@
 #		endif // !BX_PLATFORM_PS4
 #	endif // BX_PLATFORM_NACL
 
-#	if BX_PLATFORM_LINUX || BX_PLATFORM_RPI
+#	if BX_PLATFORM_ANDROID
+#		include <malloc.h> // mallinfo
+#	elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
@@ -113,7 +115,10 @@ namespace bx
 
 	inline size_t getProcessMemoryUsed()
 	{
-#if BX_PLATFORM_LINUX
+#if BX_PLATFORM_ANDROID
+		struct mallinfo mi = mallinfo();
+		return mi.uordblks;
+#elif BX_PLATFORM_LINUX
 		FILE* file = fopen("/proc/self/statm", "r");
 		if (NULL == file)
 		{
