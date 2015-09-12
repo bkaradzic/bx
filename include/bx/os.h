@@ -126,9 +126,12 @@ namespace bx
 		}
 
 		long pages = 0;
-		fscanf(file, "%*s%ld", &pages);
+		int items = fscanf(file, "%*s%ld", &pages);
 		fclose(file);
-		return pages * sysconf(_SC_PAGESIZE);
+		return 1 == items
+			? pages * sysconf(_SC_PAGESIZE)
+			: 0
+			;
 #elif BX_PLATFORM_OSX
 		mach_task_basic_info info;
 		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
