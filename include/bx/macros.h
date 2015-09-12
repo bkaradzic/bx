@@ -63,11 +63,7 @@
 #	if BX_COMPILER_CLANG && (BX_PLATFORM_OSX || BX_PLATFORM_IOS)
 #		define BX_THREAD /* not supported right now */
 #	else
-#		if (__GNUC__ == 4) && (__GNUC_MINOR__ <= 2)
-#			define BX_THREAD /* not supported right now */
-#		else
-#			define BX_THREAD __thread
-#		endif // __GNUC__ <= 4.2
+#		define BX_THREAD __thread
 #	endif // BX_COMPILER_CLANG
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
 #	if BX_COMPILER_MSVC_COMPATIBLE
