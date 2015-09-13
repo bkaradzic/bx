@@ -51,9 +51,9 @@ namespace bx
 	inline void debugOutput(const char* _out)
 	{
 #if BX_PLATFORM_ANDROID
-#	ifndef BX_ANDROID_LOG_TAGS
-#		define BX_ANDROID_LOG_TAGS ""
-#	endif // BX_ANDROID_LOG_TAGS
+#	ifndef BX_ANDROID_LOG_TAG
+#		define BX_ANDROID_LOG_TAG ""
+#	endif // BX_ANDROID_LOG_TAG
 		__android_log_write(ANDROID_LOG_DEBUG, BX_ANDROID_LOG_TAG, _out);
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOX360
 		OutputDebugStringA(_out);
