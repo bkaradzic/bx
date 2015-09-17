@@ -79,7 +79,7 @@ namespace bx
 	inline int32_t atomicFetchAndAdd(volatile int32_t* _ptr, int32_t _add)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedExchangeAdd(_ptr, _add);
+		return _InterlockedExchangeAdd( (volatile long*)_ptr, _add);
 #else
 		return __sync_fetch_and_add(_ptr, _add);
 #endif // BX_COMPILER_
@@ -88,7 +88,7 @@ namespace bx
 	inline int32_t atomicAddAndFetch(volatile int32_t* _ptr, int32_t _add)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedExchangeAdd(_ptr, _add) + _add;
+		return atomicFetchAndAdd(_ptr, _add) + _add;
 #else
 		return __sync_add_and_fetch(_ptr, _add);
 #endif // BX_COMPILER_
@@ -97,7 +97,7 @@ namespace bx
 	inline int32_t atomicFetchAndSub(volatile int32_t* _ptr, int32_t _sub)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedExchangeAdd(_ptr, -_sub);
+		return atomicFetchAndAdd(_ptr, -_sub);
 #else
 		return __sync_fetch_and_sub(_ptr, _sub);
 #endif // BX_COMPILER_
@@ -106,7 +106,7 @@ namespace bx
 	inline int32_t atomicSubAndFetch(volatile int32_t* _ptr, int32_t _sub)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedExchangeAdd(_ptr, -_sub) - _sub;
+		return atomicFetchAndAdd(_ptr, -_sub) - _sub;
 #else
 		return __sync_sub_and_fetch(_ptr, _sub);
 #endif // BX_COMPILER_
