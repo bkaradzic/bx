@@ -25,8 +25,7 @@ extern "C" void _ReadWriteBarrier();
 #	pragma intrinsic(_ReadBarrier)
 #	pragma intrinsic(_WriteBarrier)
 #	pragma intrinsic(_ReadWriteBarrier)
-#	pragma intrinsic(_InterlockedIncrement)
-#	pragma intrinsic(_InterlockedDecrement)
+#	pragma intrinsic(_InterlockedExchangeAdd)
 #	pragma intrinsic(_InterlockedCompareExchange)
 #endif // BX_COMPILER_MSVC
 
@@ -77,24 +76,52 @@ namespace bx
 #endif // BX_COMPILER
 	}
 
-	/// Returns the resulting incremented value.
-	inline int32_t atomicInc(volatile void* _ptr)
+	inline int32_t atomicFetchAndAdd(volatile int32_t* _ptr, int32_t _add)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedIncrement( (volatile LONG*)(_ptr) );
+		return _InterlockedExchangeAdd(_ptr, _add);
 #else
-		return __sync_add_and_fetch( (volatile int32_t*)_ptr, 1);
-#endif // BX_COMPILER
+		return __sync_fetch_and_add(_ptr, _add);
+#endif // BX_COMPILER_
+	}
+
+	inline int32_t atomicAddAndFetch(volatile int32_t* _ptr, int32_t _add)
+	{
+#if BX_COMPILER_MSVC
+		return _InterlockedExchangeAdd(_ptr, _add) + _add;
+#else
+		return __sync_add_and_fetch(_ptr, _add);
+#endif // BX_COMPILER_
+	}
+
+	inline int32_t atomicFetchAndSub(volatile int32_t* _ptr, int32_t _sub)
+	{
+#if BX_COMPILER_MSVC
+		return _InterlockedExchangeAdd(_ptr, -_sub);
+#else
+		return __sync_fetch_and_sub(_ptr, _sub);
+#endif // BX_COMPILER_
+	}
+
+	inline int32_t atomicSubAndFetch(volatile int32_t* _ptr, int32_t _sub)
+	{
+#if BX_COMPILER_MSVC
+		return _InterlockedExchangeAdd(_ptr, -_sub) - _sub;
+#else
+		return __sync_sub_and_fetch(_ptr, _sub);
+#endif // BX_COMPILER_
+	}
+
+	/// Returns the resulting incremented value.
+	inline int32_t atomicInc(volatile int32_t* _ptr)
+	{
+		return atomicAddAndFetch(_ptr, 1);
 	}
 
 	/// Returns the resulting decremented value.
-	inline int32_t atomicDec(volatile void* _ptr)
+	inline int32_t atomicDec(volatile int32_t* _ptr)
 	{
-#if BX_COMPILER_MSVC
-		return _InterlockedDecrement( (volatile LONG*)(_ptr) );
-#else
-		return __sync_sub_and_fetch( (volatile int32_t*)_ptr, 1);
-#endif // BX_COMPILER
+		return atomicSubAndFetch(_ptr, 1);
 	}
 
 	///
@@ -111,7 +138,7 @@ namespace bx
 	inline void* atomicExchangePtr(void** _ptr, void* _new)
 	{
 #if BX_COMPILER_MSVC
-		return InterlockedExchangePointer(_ptr, _new); /* VS2012 no intrinsics */
+		return InterlockedExchangePointer(_ptr, _new);
 #else
 		return __sync_lock_test_and_set(_ptr, _new);
 #endif // BX_COMPILER
