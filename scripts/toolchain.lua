@@ -584,6 +584,28 @@ function toolchain(_buildDir, _libDir)
 		}
 
 	configuration { "linux-mips-gcc" }
+		targetdir (path.join(_buildDir, "linux32_mips_clang/bin"))
+		objdir (path.join(_buildDir, "linux32_mips_clang/obj"))
+		libdirs { path.join(_libDir, "lib/linux32_mips_clang") }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
+	configuration { "linux-arm-gcc" }
+		targetdir (path.join(_buildDir, "linux32_arm_clang/bin"))
+		objdir (path.join(_buildDir, "linux32_arm_clang/obj"))
+		libdirs { path.join(_libDir, "lib/linux32_arm_clang") }
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
