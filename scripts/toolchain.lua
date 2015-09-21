@@ -13,25 +13,27 @@ function toolchain(_buildDir, _libDir)
 		value = "GCC",
 		description = "Choose GCC flavor",
 		allowed = {
-			{ "android-arm",   "Android - ARM"          },
-			{ "android-mips",  "Android - MIPS"         },
-			{ "android-x86",   "Android - x86"          },
-			{ "asmjs",         "Emscripten/asm.js"      },
-			{ "freebsd",       "FreeBSD"                },
-			{ "linux-gcc",     "Linux (GCC compiler)"   },
-			{ "linux-gcc-5",   "Linux (GCC-5 compiler)" },
-			{ "linux-clang",   "Linux (Clang compiler)" },
-			{ "ios-arm",       "iOS - ARM"              },
-			{ "ios-simulator", "iOS - Simulator"        },
-			{ "mingw-gcc",     "MinGW"                  },
-			{ "mingw-clang",   "MinGW (clang compiler)" },
-			{ "nacl",          "Native Client"          },
-			{ "nacl-arm",      "Native Client - ARM"    },
-			{ "osx",           "OSX"                    },
-			{ "pnacl",         "Native Client - PNaCl"  },
-			{ "ps4",           "PS4"                    },
-			{ "qnx-arm",       "QNX/Blackberry - ARM"   },
-			{ "rpi",           "RaspberryPi"            },
+			{ "android-arm",    "Android - ARM"              },
+			{ "android-mips",   "Android - MIPS"             },
+			{ "android-x86",    "Android - x86"              },
+			{ "asmjs",          "Emscripten/asm.js"          },
+			{ "freebsd",        "FreeBSD"                    },
+			{ "linux-gcc",      "Linux (GCC compiler)"       },
+			{ "linux-gcc-5",    "Linux (GCC-5 compiler)"     },
+			{ "linux-clang",    "Linux (Clang compiler)"     },
+			{ "linux-mips-gcc", "Linux (MIPS, GCC compiler)" },
+			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
+			{ "ios-arm",        "iOS - ARM"                  },
+			{ "ios-simulator",  "iOS - Simulator"            },
+			{ "mingw-gcc",      "MinGW"                      },
+			{ "mingw-clang",    "MinGW (clang compiler)"     },
+			{ "nacl",           "Native Client"              },
+			{ "nacl-arm",       "Native Client - ARM"        },
+			{ "osx",            "OSX"                        },
+			{ "pnacl",          "Native Client - PNaCl"      },
+			{ "ps4",            "PS4"                        },
+			{ "qnx-arm",        "QNX/Blackberry - ARM"       },
+			{ "rpi",            "RaspberryPi"                },
 		},
 	}
 
@@ -179,6 +181,12 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-clang"))
+
+		elseif "linux-mips-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-mips-gcc"))
+
+		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
@@ -521,12 +529,12 @@ function toolchain(_buildDir, _libDir)
 --			"ubsan",
 		}
 
-	configuration { "linux-g*" }
+	configuration { "linux-gcc" }
 		buildoptions {
-			"-mfpmath=sse", -- force SSE to get 32-bit and 64-bit builds deterministic.
+			"-mfpmath=sse",
 		}
 
-	configuration { "linux-*" }
+	configuration { "linux-gcc or linux-clang" }
 		buildoptions {
 			"-msse2",
 			"-Wunused-value",
@@ -543,7 +551,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--gc-sections",
 		}
 
-	configuration { "linux-g*", "x32" }
+	configuration { "linux-gcc*", "x32" }
 		targetdir (path.join(_buildDir, "linux32_gcc/bin"))
 		objdir (path.join(_buildDir, "linux32_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux32_gcc") }
@@ -551,7 +559,7 @@ function toolchain(_buildDir, _libDir)
 			"-m32",
 		}
 
-	configuration { "linux-g*", "x64" }
+	configuration { "linux-gcc*", "x64" }
 		targetdir (path.join(_buildDir, "linux64_gcc/bin"))
 		objdir (path.join(_buildDir, "linux64_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux64_gcc") }
@@ -573,6 +581,22 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/linux64_clang") }
 		buildoptions {
 			"-m64",
+		}
+
+	configuration { "linux-mips-gcc" }
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
 		}
 
 	configuration { "android-*" }
