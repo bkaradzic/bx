@@ -79,6 +79,24 @@ namespace bx
 	template<typename Ty>
 	inline Ty atomicFetchAndAdd(volatile Ty* _ptr, Ty _value);
 
+	template<typename Ty>
+	inline Ty atomicAddAndFetch(volatile Ty* _ptr, Ty _value);
+
+	template<typename Ty>
+	inline Ty atomicFetchAndSub(volatile Ty* _ptr, Ty _value);
+
+	template<typename Ty>
+	inline Ty atomicSubAndFetch(volatile Ty* _ptr, Ty _value);
+
+	template<typename Ty>
+	inline Ty atomicCompareAndSwap(volatile void* _ptr, Ty _old, Ty _new);
+
+	template<>
+	inline int32_t atomicCompareAndSwap(volatile void* _ptr, int32_t _old, int32_t _new);
+
+	template<>
+	inline int64_t atomicCompareAndSwap(volatile void* _ptr, int64_t _old, int64_t _new);
+
 	template<>
 	inline int32_t atomicFetchAndAdd<int32_t>(volatile int32_t* _ptr, int32_t _add)
 	{
@@ -93,7 +111,20 @@ namespace bx
 	inline int64_t atomicFetchAndAdd<int64_t>(volatile int64_t* _ptr, int64_t _add)
 	{
 #if BX_COMPILER_MSVC
+#	if _WIN32_WINNT >= 0x600
 		return _InterlockedExchangeAdd64( (volatile int64_t*)_ptr, _add);
+#	else
+		int64_t oldVal;
+		int64_t newVal = *(int64_t volatile*)_ptr;
+		do
+		{
+			oldVal = newVal;
+			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal);
+
+		} while (oldVal != newVal);
+
+		return oldVal;
+#	endif
 #else
 		return __sync_fetch_and_add(_ptr, _add);
 #endif // BX_COMPILER_
@@ -110,9 +141,6 @@ namespace bx
 	{
 		return uint64_t(atomicFetchAndAdd<int64_t>( (volatile int64_t*)_ptr, int64_t(_add) ) );
 	}
-
-	template<typename Ty>
-	inline Ty atomicAddAndFetch(volatile Ty* _ptr, Ty _value);
 
 	template<>
 	inline int32_t atomicAddAndFetch<int32_t>(volatile int32_t* _ptr, int32_t _add)
@@ -146,9 +174,6 @@ namespace bx
 		return uint64_t(atomicAddAndFetch<int64_t>( (volatile int64_t*)_ptr, int64_t(_add) ) );
 	}
 
-	template<typename Ty>
-	inline Ty atomicFetchAndSub(volatile Ty* _ptr, Ty _value);
-
 	template<>
 	inline int32_t atomicFetchAndSub<int32_t>(volatile int32_t* _ptr, int32_t _sub)
 	{
@@ -180,9 +205,6 @@ namespace bx
 	{
 		return uint64_t(atomicFetchAndSub<int64_t>( (volatile int64_t*)_ptr, int64_t(_add) ) );
 	}
-
-	template<typename Ty>
-	inline Ty atomicSubAndFetch(volatile Ty* _ptr, Ty _value);
 
 	template<>
 	inline int32_t atomicSubAndFetch<int32_t>(volatile int32_t* _ptr, int32_t _sub)
@@ -231,12 +253,24 @@ namespace bx
 	}
 
 	///
+	template<>
 	inline int32_t atomicCompareAndSwap(volatile void* _ptr, int32_t _old, int32_t _new)
 	{
 #if BX_COMPILER_MSVC
 		return _InterlockedCompareExchange( (volatile LONG*)(_ptr), _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
+#endif // BX_COMPILER
+	}
+
+	///
+	template<>
+	inline int64_t atomicCompareAndSwap(volatile void* _ptr, int64_t _old, int64_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return _InterlockedCompareExchange64( (volatile LONG64*)(_ptr), _new, _old);
+#else
+		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
 	}
 
