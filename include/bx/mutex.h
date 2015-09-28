@@ -70,8 +70,11 @@ namespace bx
 		Mutex()
 		{
 			pthread_mutexattr_t attr;
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#else
 			pthread_mutexattr_init(&attr);
 			pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
 			pthread_mutex_init(&m_handle, &attr);
 		}
 
