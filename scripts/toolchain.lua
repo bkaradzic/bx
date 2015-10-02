@@ -405,7 +405,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win32_" .. _ACTION, "obj"))
 		libdirs {
 			path.join(_libDir, "lib/win32_" .. _ACTION),
-			"$(DXSDK_DIR)/lib/x86",
 		}
 
 	configuration { "x64", "vs*" }
@@ -414,7 +413,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win64_" .. _ACTION, "obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_" .. _ACTION),
-			"$(DXSDK_DIR)/lib/x64",
 		}
 
 	configuration { "ARM", "vs*" }
@@ -470,7 +468,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win32_mingw-gcc/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-gcc"),
-			"$(DXSDK_DIR)/lib/x86",
 		}
 		buildoptions { "-m32" }
 
@@ -479,8 +476,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win64_mingw-gcc/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_mingw-gcc"),
-			"$(DXSDK_DIR)/lib/x64",
-			"$(GLES_X64_DIR)",
 		}
 		buildoptions { "-m64" }
 
@@ -500,7 +495,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win32_mingw-clang/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-clang"),
-			"$(DXSDK_DIR)/lib/x86",
 		}
 		buildoptions { "-m32" }
 
@@ -509,8 +503,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "win64_mingw-clang/obj"))
 		libdirs {
 			path.join(_libDir, "lib/win64_mingw-clang"),
-			"$(DXSDK_DIR)/lib/x64",
-			"$(GLES_X64_DIR)",
 		}
 		buildoptions { "-m64" }
 
