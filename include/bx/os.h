@@ -11,7 +11,9 @@
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
-#	include <psapi.h>
+#   if !BX_PLATFORM_WINPHONE
+#	    include <psapi.h>
+#   endif
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_FREEBSD \
