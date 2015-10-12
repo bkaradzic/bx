@@ -905,6 +905,10 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
+	configuration { "xcode4", "ios*" }
+		targetdir (path.join(_buildDir, "ios-arm/bin"))
+		objdir (path.join(_buildDir, "ios-arm/obj"))
+
 	configuration { "ios-arm" }
 		targetdir (path.join(_buildDir, "ios-arm/bin"))
 		objdir (path.join(_buildDir, "ios-arm/obj"))
@@ -951,6 +955,10 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
+
+	configuration { "xcode4", "tvos*" }
+		targetdir (path.join(_buildDir, "tvos-arm64/bin"))
+		objdir (path.join(_buildDir, "tvos-arm64/obj"))
 
 	configuration { "tvos-arm64" }
 		targetdir (path.join(_buildDir, "tvos-arm64/bin"))
