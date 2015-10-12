@@ -25,6 +25,8 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
 			{ "ios-arm",        "iOS - ARM"                  },
 			{ "ios-simulator",  "iOS - Simulator"            },
+			{ "tvOS-arm",       "tvOS - ARM"                 },
+			{ "tvOS-simulator", "tvOS - Simulator"           },
 			{ "mingw-gcc",      "MinGW"                      },
 			{ "mingw-clang",    "MinGW (clang compiler)"     },
 			{ "nacl",           "Native Client"              },
@@ -62,6 +64,7 @@ function toolchain(_buildDir, _libDir)
 		allowed = {
 			{ "osx", "OSX" },
 			{ "ios", "iOS" },
+			{ "tvos", "tvOS" },
 		}
 	}
 
@@ -75,6 +78,12 @@ function toolchain(_buildDir, _libDir)
 		trigger = "with-ios",
 		value   = "#",
 		description = "Set iOS target version (default: 8.0).",
+	}
+
+	newoption {
+		trigger = "with-tvos",
+		value   = "#",
+		description = "Set tvOS target version (default: 9.0).",
 	}
 
 	-- Avoid error when invoking genie --help.
@@ -94,6 +103,11 @@ function toolchain(_buildDir, _libDir)
 	local iosPlatform = ""
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
+	end
+
+	local tvosPlatform = ""
+	if _OPTIONS["with-tvos"] then
+		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
 	if _ACTION == "gmake" then
@@ -166,6 +180,18 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
+
+		elseif "tvos-arm" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-arm"))
+
+		elseif "tvos-simulator" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
 		elseif "linux-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
@@ -343,6 +369,10 @@ function toolchain(_buildDir, _libDir)
 		elseif "ios" == _OPTIONS["xcode"] then
 			premake.xcode.toolset = "iphoneos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
+
+		elseif "tvos" == _OPTIONS["xcode"] then
+			premake.xcode.toolset = "appletvos"
+			location (path.join(_buildDir, "projects", _ACTION .. "-tvos"))
 		end
 	end
 
@@ -909,6 +939,53 @@ function toolchain(_buildDir, _libDir)
 			"-mios-simulator-version-min=7.0",
 			"-arch i386",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
+	configuration { "tvos*" }
+		linkoptions {
+			"-lc++",
+		}
+		buildoptions {
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		includedirs { path.join(bxDir, "include/compat/ios") }
+
+	configuration { "tvos-arm" }
+		targetdir (path.join(_buildDir, "tvos-arm/bin"))
+		objdir (path.join(_buildDir, "tvos-arm/obj"))
+		libdirs { path.join(_libDir, "lib/tvos-arm") }
+		linkoptions {
+			"-mtvos-version-min=9.0",
+			"-arch arm64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"-mtvos-version-min=9.0",
+			"-arch arm64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk",
+		}
+
+	configuration { "tvos-simulator" }
+		targetdir (path.join(_buildDir, "tvos-simulator/bin"))
+		objdir (path.join(_buildDir, "tvos-simulator/obj"))
+		libdirs { path.join(_libDir, "lib/tvos-simulator") }
+		linkoptions {
+			"-mtvos-simulator-version-min=9.0",
+			"-arch i386",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"-mtvos-simulator-version-min=9.0",
+			"-arch i386",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
 		}
 
 	configuration { "ps4" }
