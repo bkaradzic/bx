@@ -25,8 +25,8 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-arm-gcc",  "Linux (ARM, GCC compiler)"  },
 			{ "ios-arm",        "iOS - ARM"                  },
 			{ "ios-simulator",  "iOS - Simulator"            },
-			{ "tvOS-arm",       "tvOS - ARM"                 },
-			{ "tvOS-simulator", "tvOS - Simulator"           },
+			{ "tvos-arm64",     "tvOS - ARM64"               },
+			{ "tvos-simulator", "tvOS - Simulator"           },
 			{ "mingw-gcc",      "MinGW"                      },
 			{ "mingw-clang",    "MinGW (clang compiler)"     },
 			{ "nacl",           "Native Client"              },
@@ -170,26 +170,26 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
 
 		elseif "ios-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-arm"))
 
 		elseif "ios-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
 
-		elseif "tvos-arm" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+		elseif "tvos-arm64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-arm"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-arm64"))
 
 		elseif "tvos-simulator" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos-simulator"))
 
@@ -952,10 +952,10 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
-	configuration { "tvos-arm" }
-		targetdir (path.join(_buildDir, "tvos-arm/bin"))
-		objdir (path.join(_buildDir, "tvos-arm/obj"))
-		libdirs { path.join(_libDir, "lib/tvos-arm") }
+	configuration { "tvos-arm64" }
+		targetdir (path.join(_buildDir, "tvos-arm64/bin"))
+		objdir (path.join(_buildDir, "tvos-arm64/obj"))
+		libdirs { path.join(_libDir, "lib/tvos-arm64") }
 		linkoptions {
 			"-mtvos-version-min=9.0",
 			"-arch arm64",
