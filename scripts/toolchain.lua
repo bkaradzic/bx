@@ -489,6 +489,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+			"-static",
 			"-static-libgcc",
 			"-static-libstdc++",
 		}
