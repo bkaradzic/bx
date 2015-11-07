@@ -265,7 +265,7 @@ namespace bx
 	class MemoryBlock : public MemoryBlockI
 	{
 	public:
-		MemoryBlock(ReallocatorI* _allocator)
+		MemoryBlock(AllocatorI* _allocator)
 			: m_allocator(_allocator)
 			, m_data(NULL)
 			, m_size(0)
@@ -294,7 +294,7 @@ namespace bx
 		}
 
 	private:
-		ReallocatorI* m_allocator;
+		AllocatorI* m_allocator;
 		void* m_data;
 		uint32_t m_size;
 	};
