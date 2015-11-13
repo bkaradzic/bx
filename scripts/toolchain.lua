@@ -31,6 +31,7 @@ function toolchain(_buildDir, _libDir)
 			{ "mingw-clang",    "MinGW (clang compiler)"     },
 			{ "nacl",           "Native Client"              },
 			{ "nacl-arm",       "Native Client - ARM"        },
+			{ "netbsd",         "NetBSD"                     },
 			{ "osx",            "OSX"                        },
 			{ "pnacl",          "Native Client - PNaCl"      },
 			{ "ps4",            "PS4"                        },
@@ -263,6 +264,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = naclToolchain .. "g++"
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-nacl-arm"))
+
+		elseif "netbsd" == _OPTIONS["gcc"] then
+			location (path.join(_buildDir, "projects", _ACTION .. "-netbsd"))
 
 		elseif "osx" == _OPTIONS["gcc"] then
 
@@ -864,6 +868,14 @@ function toolchain(_buildDir, _libDir)
 		defines {
 			"NOMINMAX",
 			"_XBOX",
+		}
+
+	configuration { "netbsd" }
+		targetdir (path.join(_buildDir, "netbsd/bin"))
+		objdir (path.join(_buildDir, "netbsd/obj"))
+		libdirs { path.join(_libDir, "lib/netbsd") }
+		includedirs {
+			path.join(bxDir, "include/compat/freebsd"),
 		}
 
 	configuration { "osx", "x32" }
