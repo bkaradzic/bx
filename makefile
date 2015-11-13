@@ -3,17 +3,6 @@
 # License: http://www.opensource.org/licenses/BSD-2-Clause
 #
 
-UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
-ifeq ($(UNAME),$(filter $(UNAME),Darwin))
-OS=darwin
-else
-OS=linux
-endif
-else
-OS=windows
-endif
-
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
@@ -191,11 +180,18 @@ clean:
 SILENT ?= @
 
 UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin))
+ifeq ($(UNAME),$(filter $(UNAME),Linux Darwin NetBSD))
 ifeq ($(UNAME),$(filter $(UNAME),Darwin))
 OS=darwin
 BUILD_PROJECT_DIR=gmake-osx
 BUILD_OUTPUT_DIR=osx64_clang
+BUILD_TOOLS_CONFIG=release64
+EXE=
+else
+ifeq ($(UNAME),$(filter $(UNAME),NetBSD))
+OS=netbsd
+BUILD_PROJECT_DIR=gmake-netbsd
+BUILD_OUTPUT_DIR=netbsd_gcc
 BUILD_TOOLS_CONFIG=release64
 EXE=
 else
@@ -204,6 +200,7 @@ BUILD_PROJECT_DIR=gmake-linux
 BUILD_OUTPUT_DIR=linux64_gcc
 BUILD_TOOLS_CONFIG=release64
 EXE=
+endif
 endif
 else
 OS=windows
