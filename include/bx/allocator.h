@@ -61,6 +61,14 @@ namespace bx
 	struct BX_NO_VTABLE AllocatorI
 	{
 		virtual ~AllocatorI() = 0;
+
+		/// Allocated, resizes memory block or frees memory.
+		///
+		/// @param[in] _ptr If _ptr is NULL new block will be allocated.
+		/// @param[in] _size If _ptr is set, and _size is 0, memory will be freed.
+		/// @param[in] _align Alignment.
+		/// @param[in] _file Debug file path info.
+		/// @param[in] _line Debug file line info.
 		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
 	};
 
