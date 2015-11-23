@@ -89,6 +89,11 @@ namespace bx
 		return fabsf(_a);
 	}
 
+	inline float fsq(float _a)
+	{
+		return _a * _a;
+	}
+
 	inline float fsqrt(float _a)
 	{
 		return sqrtf(_a);
@@ -204,6 +209,20 @@ namespace bx
 	inline float vec3Length(const float* _a)
 	{
 		return fsqrt(vec3Dot(_a, _a) );
+	}
+
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, float _t)
+	{
+		_result[0] = flerp(_a[0], _b[0], _t);
+		_result[1] = flerp(_a[1], _b[1], _t);
+		_result[2] = flerp(_a[2], _b[2], _t);
+	}
+
+	inline void vec3Lerp(float* __restrict _result, const float* __restrict _a, const float* __restrict _b, const float* __restrict _c)
+	{
+		_result[0] = flerp(_a[0], _b[0], _c[0]);
+		_result[1] = flerp(_a[1], _b[1], _c[1]);
+		_result[2] = flerp(_a[2], _b[2], _c[2]);
 	}
 
 	inline float vec3Norm(float* __restrict _result, const float* __restrict _a)
