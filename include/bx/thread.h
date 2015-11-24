@@ -63,9 +63,9 @@ namespace bx
 			m_running = true;
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
-			m_handle = CreateThread(NULL
+			m_handle = ::CreateThread(NULL
 				, m_stackSize
-				, threadFunc
+				, (LPTHREAD_START_ROUTINE)threadFunc
 				, this
 				, 0
 				, NULL
