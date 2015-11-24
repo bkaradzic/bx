@@ -159,6 +159,12 @@ namespace bx
 
 		return info.resident_size;
 #elif BX_PLATFORM_WINDOWS
+		typedef BOOL(__stdcall *PGetProcessMemoryInfo)(
+			HANDLE Process,                          // handle to process
+			PROCESS_MEMORY_COUNTERS *ppsmemCounters, // buffer
+			DWORD cb                                 // size of buffer
+			);
+		static PGetProcessMemoryInfo GetProcessMemoryInfo = (PGetProcessMemoryInfo)GetProcAddress(LoadLibrary("psapi"), "GetProcessMemoryInfo");
 		PROCESS_MEMORY_COUNTERS pmc;
 		GetProcessMemoryInfo(GetCurrentProcess()
 			, &pmc
