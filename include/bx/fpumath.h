@@ -235,6 +235,27 @@ namespace bx
 		return len;
 	}
 
+	inline void vec3Min(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmin(_a[0], _b[0]);
+		_result[1] = fmin(_a[1], _b[1]);
+		_result[2] = fmin(_a[2], _b[2]);
+	}
+
+	inline void vec3Max(float* __restrict _result, const float* __restrict _a, const float* __restrict _b)
+	{
+		_result[0] = fmax(_a[0], _b[0]);
+		_result[1] = fmax(_a[1], _b[1]);
+		_result[2] = fmax(_a[2], _b[2]);
+	}
+
+	inline void vec3Rcp(float* __restrict _result, const float* __restrict _a)
+	{
+		_result[0] = 1.0f / _a[0];
+		_result[1] = 1.0f / _a[1];
+		_result[2] = 1.0f / _a[2];
+	}
+
 	inline void quatIdentity(float* _result)
 	{
 		_result[0] = 0.0f;
