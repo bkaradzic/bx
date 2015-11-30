@@ -278,6 +278,14 @@ namespace bx
 		_result[3] = 1.0f;
 	}
 
+	inline void quatMove(float* __restrict _result, const float* __restrict _a)
+	{
+		_result[0] = _a[0];
+		_result[1] = _a[1];
+		_result[2] = _a[2];
+		_result[3] = _a[3];
+	}
+
 	inline void quatMulXYZ(float* __restrict _result, const float* __restrict _qa, const float* __restrict _qb)
 	{
 		const float ax = _qa[0];
@@ -321,6 +329,32 @@ namespace bx
 		_result[3] =  _quat[3];
 	}
 
+	inline float quatDot(const float* __restrict _a, const float* __restrict _b)
+	{
+		return _a[0]*_b[0]
+			 + _a[1]*_b[1]
+			 + _a[2]*_b[2]
+			 + _a[3]*_b[3]
+			 ;
+	}
+
+	inline void quatNorm(float* __restrict _result, const float* __restrict _quat)
+	{
+		const float norm = quatDot(_quat, _quat);
+		if (0.0f < norm)
+		{
+			const float invNorm = 1.0f / fsqrt(norm);
+			_result[0] = _quat[0] * invNorm;
+			_result[1] = _quat[1] * invNorm;
+			_result[2] = _quat[2] * invNorm;
+			_result[3] = _quat[3] * invNorm;
+		}
+		else
+		{
+			quatIdentity(_result);
+		}
+	}
+
 	inline void quatToEuler(float* __restrict _result, const float* __restrict _quat)
 	{
 		const float x = _quat[0];
@@ -335,6 +369,17 @@ namespace bx
 		_result[0] = atan2f(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz) );
 		_result[1] = atan2f(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz) );
 		_result[2] = asinf (2.0f * (x * y + z * w) );
+	}
+
+	inline void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle)
+	{
+		const float ha = _angle * 0.5f;
+		const float ca = cosf(ha);
+		const float sa = sinf(ha);
+		_result[0] = _axis[0] * sa;
+		_result[1] = _axis[1] * sa;
+		_result[2] = _axis[2] * sa;
+		_result[3] = ca;
 	}
 
 	inline void quatRotateX(float* _result, float _ax)
