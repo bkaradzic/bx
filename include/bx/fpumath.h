@@ -94,6 +94,16 @@ namespace bx
 		return _a * _a;
 	}
 
+	inline float fsin(float _a)
+	{
+		return sinf(_a);
+	}
+
+	inline float fcos(float _a)
+	{
+		return cosf(_a);
+	}
+
 	inline float fsqrt(float _a)
 	{
 		return sqrtf(_a);
