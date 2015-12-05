@@ -104,6 +104,26 @@ namespace bx
 		return cosf(_a);
 	}
 
+	inline float fpow(float _a, float _b)
+	{
+		return powf(_a, _b);
+	}
+
+	inline float fexp2(float _a)
+	{
+		return fpow(2.0f, _a);
+	}
+
+	inline float flog(float _a)
+	{
+		return logf(_a);
+	}
+
+	inline float flog2(float _a)
+	{
+		return flog(_a) * 1.442695041f;
+	}
+
 	inline float fsqrt(float _a)
 	{
 		return sqrtf(_a);
