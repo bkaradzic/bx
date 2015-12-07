@@ -129,6 +129,11 @@ namespace bx
 		return sqrtf(_a);
 	}
 
+	inline float frsqrt(float _a)
+	{
+		return 1.0f/fsqrt(_a);
+	}
+
 	inline float ffract(float _a)
 	{
 		return _a - floorf(_a);
