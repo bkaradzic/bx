@@ -14,10 +14,10 @@
 
 namespace bx
 {
-	static const float pi     = 3.14159265358979323846f;
-	static const float invPi  = 1.0f/3.14159265358979323846f;
-	static const float piHalf = 1.57079632679489661923f;
-	static const float sqrt2  = 1.41421356237309504880f;
+	static const float pi      = 3.14159265358979323846f;
+	static const float invPi   = 1.0f/3.14159265358979323846f;
+	static const float piHalf  = 1.57079632679489661923f;
+	static const float sqrt2   = 1.41421356237309504880f;
 
 	inline float toRad(float _deg)
 	{
@@ -141,7 +141,10 @@ namespace bx
 
 	inline bool fequal(float _a, float _b, float _epsilon)
 	{
-		return fabsolute(_a - _b) <= _epsilon;
+		// http://realtimecollisiondetection.net/blog/?p=89
+		const float lhs = fabsolute(_a - _b);
+		const float rhs = _epsilon * fmax3(1.0f, fabsolute(_a), fabsolute(_b) );
+		return lhs <= rhs;
 	}
 
 	inline bool fequal(const float* __restrict _a, const float* __restrict _b, uint32_t _num, float _epsilon)
