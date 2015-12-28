@@ -159,13 +159,7 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
-			if (NULL != eol)
-			{
-				return eol + 2;
-			}
-
-			eol = strnstr(_str, "\n", 1024);
+			const char* eol = strnstr(_str, "\n", 1024);
 			if (NULL != eol)
 			{
 				return eol + 1;
@@ -180,15 +174,19 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
+			const char* eol = strnstr(_str, "\n", 1024);
 			if (NULL != eol)
 			{
-				return eol;
-			}
-
-			eol = strnstr(_str, "\n", 1024);
-			if (NULL != eol)
-			{
+				if (_str != eol)
+				{
+					// check for \r\n
+					const char* eolrn = eol;
+					eolrn--;
+					if (*eolrn == '\r')
+					{
+						return eolrn;
+					}
+				}
 				return eol;
 			}
 		}
