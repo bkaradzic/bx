@@ -552,14 +552,8 @@ namespace bx
 		mtxQuatTranslation(_result, quat, _translation);
 	}
 
-	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	inline void mtxLookAt_Impl(float* __restrict _result, const float* __restrict _eye, const float* __restrict _view, const float* __restrict _up = NULL)
 	{
-		float tmp[4];
-		vec3Sub(tmp, _at, _eye);
-
-		float view[4];
-		vec3Norm(view, tmp);
-
 		float up[3] = { 0.0f, 1.0f, 0.0f };
 		if (NULL != _up)
 		{
@@ -567,37 +561,66 @@ namespace bx
 			up[1] = _up[1];
 			up[2] = _up[2];
 		}
-		vec3Cross(tmp, up, view);
+
+		float tmp[4];
+		vec3Cross(tmp, up, _view);
 
 		float right[4];
 		vec3Norm(right, tmp);
 
-		vec3Cross(up, view, right);
+		vec3Cross(up, _view, right);
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = right[0];
 		_result[ 1] = up[0];
-		_result[ 2] = view[0];
+		_result[ 2] = _view[0];
 
 		_result[ 4] = right[1];
 		_result[ 5] = up[1];
-		_result[ 6] = view[1];
+		_result[ 6] = _view[1];
 
 		_result[ 8] = right[2];
 		_result[ 9] = up[2];
-		_result[10] = view[2];
+		_result[10] = _view[2];
 
 		_result[12] = -vec3Dot(right, _eye);
 		_result[13] = -vec3Dot(up, _eye);
-		_result[14] = -vec3Dot(view, _eye);
+		_result[14] = -vec3Dot(_view, _eye);
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	inline void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		float tmp[4];
+		vec3Sub(tmp, _eye, _at);
+
+		float view[4];
+		vec3Norm(view, tmp);
+
+		mtxLookAt_Impl(_result, _eye, view, _up);
+	}
+
+	inline void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		float tmp[4];
+		vec3Sub(tmp, _at, _eye);
+
+		float view[4];
+		vec3Norm(view, tmp);
+
+		mtxLookAt_Impl(_result, _eye, view, _up);
+	}
+
+	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
+	{
+		mtxLookAtRh(_result, _eye, _at, _up);
+	}
+
+	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
-		const float bb = _oglNdc ? -(2.0f*_far*_near)/diff : -_near*aa;
+		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
 
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
@@ -606,28 +629,80 @@ namespace bx
 		_result[ 9] = -_y;
 		_result[10] = aa;
 		_result[11] = 1.0f;
-		_result[14] = bb;
+		_result[14] = -bb;
 	}
 
-	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
 		const float width  = 2.0f / (_lt + _rt);
 		const float height = 2.0f / (_ut + _dt);
 		const float xx     = (_lt - _rt) * width  * 0.5f;
 		const float yy     = (_ut - _dt) * height * 0.5f;
-		mtxProjXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjRh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjRhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	{
+		const float diff = _far-_near;
+		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
+		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
+
+		memset(_result, 0, sizeof(float)*16);
+		_result[ 0] = _width;
+		_result[ 5] = _height;
+		_result[ 8] =  _x;
+		_result[ 9] = -_y;
+		_result[10] = -aa;
+		_result[11] = -1.0f;
+		_result[14] = -bb;
+	}
+
+	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	{
+		const float width  = 2.0f / (_lt + _rt);
+		const float height = 2.0f / (_ut + _dt);
+		const float xx     = (_lt - _rt) * width  * 0.5f;
+		const float yy     = (_ut - _dt) * height * 0.5f;
+		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjLh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjLhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProjRh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+		mtxProjRh(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f)
