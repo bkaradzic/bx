@@ -29,9 +29,19 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
+	inline float ffloor(float _f)
+	{
+		return floorf(_f);
+	}
+
+	inline float fceil(float _f)
+	{
+		return ceilf(_f);
+	}
+
 	inline float fround(float _f)
 	{
-		return floorf(_f + 0.5f);
+		return ffloor(_f + 0.5f);
 	}
 
 	inline float fmin(float _a, float _b)
