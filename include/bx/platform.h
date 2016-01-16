@@ -22,6 +22,7 @@
 #define BX_PLATFORM_PS4        0
 #define BX_PLATFORM_QNX        0
 #define BX_PLATFORM_RPI        0
+#define BX_PLATFORM_STEAMLINK  0
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOX360    0
@@ -152,20 +153,24 @@
 #		undef  BX_PLATFORM_WINRT
 #		define BX_PLATFORM_WINRT 1
 #	endif
-#elif defined(__VCCOREVER__)
-// RaspberryPi compiler defines __linux__
-#	undef  BX_PLATFORM_RPI
-#	define BX_PLATFORM_RPI 1
-#elif defined(__native_client__)
-// NaCl compiler defines __linux__
-#	include <ppapi/c/pp_macros.h>
-#	undef  BX_PLATFORM_NACL
-#	define BX_PLATFORM_NACL PPAPI_RELEASE
 #elif defined(__ANDROID__)
 // Android compiler defines __linux__
 #	include <android/api-level.h>
 #	undef  BX_PLATFORM_ANDROID
 #	define BX_PLATFORM_ANDROID __ANDROID_API__
+#elif defined(__native_client__)
+// NaCl compiler defines __linux__
+#	include <ppapi/c/pp_macros.h>
+#	undef  BX_PLATFORM_NACL
+#	define BX_PLATFORM_NACL PPAPI_RELEASE
+#elif defined(__STEAMLINK__)
+// SteamLink compiler defines __linux__
+#	undef  BX_PLATFORM_STEAMLINK
+#	define BX_PLATFORM_STEAMLINK 1
+#elif defined(__VCCOREVER__)
+// RaspberryPi compiler defines __linux__
+#	undef  BX_PLATFORM_RPI
+#	define BX_PLATFORM_RPI 1
 #elif defined(__linux__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
@@ -204,6 +209,7 @@
 						|| BX_PLATFORM_NACL \
 						|| BX_PLATFORM_OSX \
 						|| BX_PLATFORM_QNX \
+						|| BX_PLATFORM_STEAMLINK \
 						|| BX_PLATFORM_PS4 \
 						|| BX_PLATFORM_RPI \
 						)
@@ -263,6 +269,8 @@
 #	define BX_PLATFORM_NAME "QNX"
 #elif BX_PLATFORM_RPI
 #	define BX_PLATFORM_NAME "RaspberryPi"
+#elif BX_PLATFORM_STEAMLINK
+#	define BX_PLATFORM_NAME "SteamLink"
 #elif BX_PLATFORM_WINDOWS
 #	define BX_PLATFORM_NAME "Windows"
 #elif BX_PLATFORM_WINRT

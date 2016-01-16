@@ -702,6 +702,9 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "steamlink/obj"))
 		libdirs { path.join(_libDir, "lib/steamlink") }
 		includedirs { path.join(bxDir, "include/compat/linux") }
+		defines {
+			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
+		}
 		buildoptions {
 			"-std=c++0x",
 			"-Wfatal-errors",
