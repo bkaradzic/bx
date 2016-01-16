@@ -719,7 +719,7 @@ namespace bx
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
-		const float cc = _oglNdc ? 2.0f/(_far - _near) : 1.0f/(_far - _near);
+		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
 		const float dd = (_left + _right)/(_left - _right);
 		const float ee = (_top + _bottom)/(_bottom - _top);
 		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
