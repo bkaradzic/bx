@@ -87,6 +87,11 @@ function toolchain(_buildDir, _libDir)
 		description = "Set tvOS target version (default: 9.0).",
 	}
 
+	newoption {
+		trigger = "with-dynamic-runtime",
+		description = "Dynamically link with the runtime rather than statically",
+	}
+
 	-- Avoid error when invoking genie --help.
 	if (_ACTION == nil) then return false end
 
@@ -387,8 +392,11 @@ function toolchain(_buildDir, _libDir)
 		end
 	end
 
+	if not _OPTIONS["with-dynamic-runtime"] then
+		flags { "StaticRuntime" }
+	end
+
 	flags {
-		"StaticRuntime",
 		"NoPCH",
 		"NativeWChar",
 		"NoRTTI",
