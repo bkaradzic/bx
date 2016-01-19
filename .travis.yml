@@ -1,0 +1,20 @@
+language: cpp
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+    - compiler: clang
+      os: osx
+
+script:
+  make && make --no-print-directory -C .build/projects/gmake-osx config=release64 bx.test
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+
+osx_image:
+  xcode61
