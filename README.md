@@ -3,6 +3,8 @@ bx
 
 Base library.
 
+[![Build Status](https://travis-ci.org/bkaradzic/bx.svg?branch=master)](https://travis-ci.org/bkaradzic/bx)
+
 Contact
 -------
 
