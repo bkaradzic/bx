@@ -7,7 +7,7 @@ matrix:
       os: osx
 
 script:
-  make && make -C .build/projects/gmake-osx config=release64 bx.test
+  make test
 
 branches:
   only:
