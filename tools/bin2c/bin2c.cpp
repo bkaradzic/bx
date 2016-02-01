@@ -148,14 +148,14 @@ int main(int _argc, const char* _argv[])
 	size_t size = 0;
 
 	bx::CrtFileReader fr;
-	if (0 == bx::open(&fr, filePath) )
+	if (bx::open(&fr, filePath) )
 	{
 		size = (size_t)bx::getSize(&fr);
 		data = malloc(size);
 		bx::read(&fr, data, size);
 
 		bx::CrtFileWriter fw;
-		if (0 == bx::open(&fw, outFilePath) )
+		if (bx::open(&fw, outFilePath) )
 		{
 			Bin2cWriter writer(&fw, name);
 			bx::write(&writer, data, size);
