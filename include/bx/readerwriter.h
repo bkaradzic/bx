@@ -571,7 +571,7 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			int32_t size = fread(_data, 1, _size, m_file);
+			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
 			if (size != _size)
 			{
 				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileReader: read failed.");
@@ -625,7 +625,7 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			int32_t size = fwrite(_data, 1, _size, m_file);
+			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
 			if (size != _size)
 			{
 				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "CrtFileWriter: write failed.");
