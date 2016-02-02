@@ -90,6 +90,7 @@ namespace bx
 	template<typename Ty>
 	inline int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err = NULL)
 	{
+		BX_ERROR_SCOPE(_err);
 		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		Ty value;
 		int32_t result = _reader->read(&value, sizeof(Ty), _err);
