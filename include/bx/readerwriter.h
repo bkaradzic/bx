@@ -224,7 +224,7 @@ namespace bx
 
 	inline bool open(FileReaderI* _reader, const char* _filePath, Error* _err = NULL)
 	{
-		BX_ERROR_SCOPE(_err);
+		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _reader->open(_filePath, _err);
 	}
 
@@ -235,7 +235,7 @@ namespace bx
 
 	inline bool open(FileWriterI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL)
 	{
-		BX_ERROR_SCOPE(_err);
+		BX_ERROR_USE_TEMP_WHEN_NULL(_err);
 		return _writer->open(_filePath, _append, _err);
 	}
 
