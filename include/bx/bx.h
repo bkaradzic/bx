@@ -54,29 +54,29 @@ namespace bx
 	}
 
 	/// Scatter/gather memcpy.
-	inline void memcpy(void* _dst, const void* _src, uint32_t _size, uint32_t _num = 1, uint32_t _srcPitch = 0, uint32_t _dstPitch = 0)
+	inline void memCopy(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch, uint32_t _dstPitch)
 	{
 		const uint8_t* src = (const uint8_t*)_src;
 		uint8_t* dst = (uint8_t*)_dst;
 
 		for (uint32_t ii = 0; ii < _num; ++ii)
 		{
-			::memcpy(dst, src, _size);
+			memcpy(dst, src, _size);
 			src += _srcPitch;
 			dst += _dstPitch;
 		}
 	}
 
 	///
-	inline void gather(void* _dst, const void* _src, uint32_t _size, uint32_t _num = 1, uint32_t _srcPitch = 0)
+	inline void gather(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch)
 	{
-		memcpy(_dst, _src, _size, _num, _srcPitch, _size);
+		memCopy(_dst, _src, _size, _num, _srcPitch, _size);
 	}
 
 	///
-	inline void scatter(void* _dst, const void* _src, uint32_t _size, uint32_t _num = 1, uint32_t _dstPitch = 0)
+	inline void scatter(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _dstPitch)
 	{
-		memcpy(_dst, _src, _size, _num, _size, _dstPitch);
+		memCopy(_dst, _src, _size, _num, _size, _dstPitch);
 	}
 
 } // namespace bx
