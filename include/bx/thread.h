@@ -8,8 +8,10 @@
 
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
-	#if !((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12)))
-		#include <sys/prctl.h>
+	#if defined(__GLIBC__)
+		#if!((__GLIBC__ > 2) || ((__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12)))
+			#include <sys/prctl.h>
+		#endif
 	#endif
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
