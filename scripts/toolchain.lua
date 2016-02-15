@@ -23,7 +23,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
-			{ "linux-steamlink", "Steam Link"                 },
+			{ "steamlink", 		 "Steam Link"                 },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-simulator",   "iOS - Simulator"            },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
@@ -220,7 +220,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
 
-		elseif "linux-steamlink" == _OPTIONS["gcc"] then
+		elseif "steamlink" == _OPTIONS["gcc"] then
 			if not os.getenv("MARVELL_SDK_PATH") then
 				print("Set MARVELL_SDK_PATH enviroment variable.")
 			end
@@ -228,7 +228,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cc  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-gcc"
 			premake.gcc.cxx = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-g++"
 			premake.gcc.ar  = "$(MARVELL_SDK_PATH)/toolchain/bin/armv7a-cros-linux-gnueabi-ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-steamlink"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
@@ -705,14 +705,14 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,-z,now",
 		}
 
-	configuration { "linux-steamlink" }
+	configuration { "steamlink" }
 		targetdir (path.join(_buildDir, "steamlink/bin"))
 		objdir (path.join(_buildDir, "steamlink/obj"))
 		libdirs { path.join(_libDir, "lib/steamlink") }
 		includedirs { path.join(bxDir, "include/compat/linux") }
 		defines {
 			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
-		}
+			}
 		buildoptions {
 			"-std=c++0x",
 			"-Wfatal-errors",
