@@ -359,8 +359,8 @@ namespace bx
 				m_top += morecore;
 			}
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			m_pos += size;
 			if (size != _size)
 			{
@@ -412,8 +412,8 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			int64_t reminder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_top-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(_data, &m_data[m_pos], size);
 			m_pos += size;
 			if (size != _size)
@@ -493,8 +493,8 @@ namespace bx
 				m_size = m_memBlock->getSize();
 			}
 
-			int64_t reminder = m_size-m_pos;
-			int32_t size = uint32_min(_size, int32_t(reminder > INT32_MAX ? INT32_MAX : reminder) );
+			int64_t remainder = m_size-m_pos;
+			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
 			memcpy(&m_data[m_pos], _data, size);
 			m_pos += size;
 			m_top = int64_max(m_top, m_pos);
