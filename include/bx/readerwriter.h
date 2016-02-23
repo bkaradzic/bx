@@ -6,6 +6,7 @@
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
+#include <alloca.h>
 #include <stdarg.h> // va_list
 #include <stdio.h>
 #include <string.h>
