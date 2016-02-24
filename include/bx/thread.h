@@ -10,6 +10,8 @@
 #	include <pthread.h>
 #	if defined(__GLIBC__) && !( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
 #		include <sys/prctl.h>
+#	elif !defined(__GLIBC__)
+#		include <sys/prctl.h>
 #	endif // defined(__GLIBC__) ...
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
@@ -153,7 +155,7 @@ namespace bx
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
 #elif BX_PLATFORM_LINUX
-#	if defined(__GLIBC__) && (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) )
+#	if defined(__GLIBC__) && ( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
 			pthread_setname_np(m_handle, _name);
 #	else
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
