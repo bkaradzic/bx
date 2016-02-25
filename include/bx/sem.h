@@ -226,7 +226,7 @@ namespace bx
 		Semaphore()
 		{
 #if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
-			m_handle = CreateSemaphoreEx(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+			m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
 #else
 			m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
 #endif
