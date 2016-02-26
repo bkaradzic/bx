@@ -628,7 +628,7 @@ namespace bx
 
 	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
-		mtxLookAtRh(_result, _eye, _at, _up);
+		mtxLookAtLh(_result, _eye, _at, _up);
 	}
 
 	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
@@ -707,17 +707,17 @@ namespace bx
 
 	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
+		mtxProjLh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _fov, _near, _far, _oglNdc);
+		mtxProjLh(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProjLh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
