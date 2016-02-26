@@ -720,7 +720,26 @@ namespace bx
 		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
-	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	{
+		const float aa = 2.0f/(_right - _left);
+		const float bb = 2.0f/(_top - _bottom);
+		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
+		const float dd = (_left + _right)/(_left - _right);
+		const float ee = (_top + _bottom)/(_bottom - _top);
+		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
+
+		memset(_result, 0, sizeof(float)*16);
+		_result[ 0] = aa;
+		_result[ 5] = bb;
+		_result[10] = -cc;
+		_result[12] = dd + _offset;
+		_result[13] = ee;
+		_result[14] = ff;
+		_result[15] = 1.0f;
+	}
+
+	inline void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
@@ -737,6 +756,11 @@ namespace bx
 		_result[13] = ee;
 		_result[14] = ff;
 		_result[15] = 1.0f;
+	}
+
+	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	{
+	    return mtxOrthoRh(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxRotateX(float* _result, float _ax)
