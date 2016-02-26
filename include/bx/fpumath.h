@@ -607,7 +607,7 @@ namespace bx
 	inline void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
 		float tmp[4];
-		vec3Sub(tmp, _eye, _at);
+		vec3Sub(tmp, _at, _eye);
 
 		float view[4];
 		vec3Norm(view, tmp);
@@ -618,7 +618,7 @@ namespace bx
 	inline void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
 		float tmp[4];
-		vec3Sub(tmp, _at, _eye);
+		vec3Sub(tmp, _eye, _at);
 
 		float view[4];
 		vec3Norm(view, tmp);
@@ -640,10 +640,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = -_x;
-		_result[ 9] =  _y;
-		_result[10] = aa;
-		_result[11] = 1.0f;
+		_result[ 8] = _x;
+		_result[ 9] = _y;
+		_result[10] = -aa;
+		_result[11] = -1.0f;
 		_result[14] = -bb;
 	}
 
@@ -677,10 +677,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] =  _x;
+		_result[ 8] = -_x;
 		_result[ 9] = -_y;
-		_result[10] = -aa;
-		_result[11] = -1.0f;
+		_result[10] = aa;
+		_result[11] = 1.0f;
 		_result[14] = -bb;
 	}
 
@@ -732,7 +732,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = -cc;
+		_result[10] = cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
@@ -751,7 +751,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = cc;
+		_result[10] = -cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
