@@ -649,10 +649,12 @@ namespace bx
 
 	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		const float width  = 2.0f / (_rt - _lt);
-		const float height = 2.0f / (_ut - _dt);
-		const float xx     = (_lt + _rt) * width  * 0.5f;
-		const float yy     = (_ut + _dt) * height * 0.5f;
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
 		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
@@ -686,10 +688,12 @@ namespace bx
 
 	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		const float width  = 2.0f / (_rt - _lt);
-		const float height = 2.0f / (_ut - _dt);
-		const float xx     = (_lt + _rt) * width  * 0.5f;
-		const float yy     = (_ut + _dt) * height * 0.5f;
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
 		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
