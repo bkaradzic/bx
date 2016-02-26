@@ -640,8 +640,8 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] =  _x;
-		_result[ 9] = -_y;
+		_result[ 8] = -_x;
+		_result[ 9] =  _y;
 		_result[10] = aa;
 		_result[11] = 1.0f;
 		_result[14] = -bb;
