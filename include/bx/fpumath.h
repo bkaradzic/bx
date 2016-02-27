@@ -607,7 +607,7 @@ namespace bx
 	inline void mtxLookAtLh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
 		float tmp[4];
-		vec3Sub(tmp, _eye, _at);
+		vec3Sub(tmp, _at, _eye);
 
 		float view[4];
 		vec3Norm(view, tmp);
@@ -618,7 +618,7 @@ namespace bx
 	inline void mtxLookAtRh(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
 		float tmp[4];
-		vec3Sub(tmp, _at, _eye);
+		vec3Sub(tmp, _eye, _at);
 
 		float view[4];
 		vec3Norm(view, tmp);
@@ -628,7 +628,7 @@ namespace bx
 
 	inline void mtxLookAt(float* __restrict _result, const float* __restrict _eye, const float* __restrict _at, const float* __restrict _up = NULL)
 	{
-		mtxLookAtRh(_result, _eye, _at, _up);
+		mtxLookAtLh(_result, _eye, _at, _up);
 	}
 
 	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
@@ -640,19 +640,21 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = -_x;
-		_result[ 9] =  _y;
-		_result[10] = aa;
-		_result[11] = 1.0f;
+		_result[ 8] = _x;
+		_result[ 9] = _y;
+		_result[10] = -aa;
+		_result[11] = -1.0f;
 		_result[14] = -bb;
 	}
 
 	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		const float width  = 2.0f / (_lt + _rt);
-		const float height = 2.0f / (_ut + _dt);
-		const float xx     = (_lt - _rt) * width  * 0.5f;
-		const float yy     = (_ut - _dt) * height * 0.5f;
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
 		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
@@ -677,19 +679,21 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] =  _x;
+		_result[ 8] = -_x;
 		_result[ 9] = -_y;
-		_result[10] = -aa;
-		_result[11] = -1.0f;
+		_result[10] = aa;
+		_result[11] = 1.0f;
 		_result[14] = -bb;
 	}
 
 	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		const float width  = 2.0f / (_lt + _rt);
-		const float height = 2.0f / (_ut + _dt);
-		const float xx     = (_lt - _rt) * width  * 0.5f;
-		const float yy     = (_ut - _dt) * height * 0.5f;
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
 		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
@@ -707,17 +711,17 @@ namespace bx
 
 	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
+		mtxProjLh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _fov, _near, _far, _oglNdc);
+		mtxProjLh(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjRh(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProjLh(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
@@ -732,7 +736,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = -cc;
+		_result[10] = cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
@@ -751,7 +755,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = cc;
+		_result[10] = -cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
