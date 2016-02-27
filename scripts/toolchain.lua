@@ -927,7 +927,7 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/durango") }
 		removeflags { "StaticRuntime" }
 		defines {
-			"WINAPI_FAMILY=WINAPI_FAMILY_TV_TITLE",
+			"NOMINMAX",
 		}
 
 	configuration { "osx", "x32" }
