@@ -764,7 +764,7 @@ namespace bx
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-	    return mtxOrthoRh(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+	    return mtxOrthoLh(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxRotateX(float* _result, float _ax)
