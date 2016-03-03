@@ -192,6 +192,33 @@ namespace bx
 #endif // BX_PLATFORM_
 		}
 
+		void setAffinityMask(const uint32_t _coreAffinityMask)
+		{
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+			DWORD_PTR result;
+			BX_UNUSED(result);
+
+			result = SetThreadAffinityMask(m_handle, (DWORD*)&_coreAffinityMask)
+			BX_CHECK(0 != result, "SetThreadAffinityMask failed!");
+#elif BX_PLATFORM_WINRT
+			// We use ThreadPool::RunAsync to run the thread, we cannot set thread affinity!
+			BX_UNUSED(_coreAffinityMask);
+#elif BX_PLATFORM_POSIX
+			int result;
+			BX_UNUSED(result);
+
+			cpu_set_t cpuset;
+			CPU_ZERO(&cpuset);
+			for(uint32_t cpuId=0; cpuId < 32; cpuId++)
+			{
+				if(_coreAffinityMask & (1 << cpuId))
+					CPU_SET(cpuId, &cpuset);
+			}
+			result = pthread_setaffinity_np(m_handle, sizeof(cpu_set_t), &cpuset);
+			BX_CHECK(0 == result, "pthread_setaffinity_np failed! %d", result);
+#endif // BX_PLATFORM_
+		}
+
 	private:
 		int32_t entry()
 		{
