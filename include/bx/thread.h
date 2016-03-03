@@ -198,7 +198,7 @@ namespace bx
 			DWORD_PTR result;
 			BX_UNUSED(result);
 
-			result = SetThreadAffinityMask(m_handle, (DWORD*)&_coreAffinityMask)
+			result = SetThreadAffinityMask(m_handle, _coreAffinityMask);
 			BX_CHECK(0 != result, "SetThreadAffinityMask failed!");
 #elif BX_PLATFORM_WINRT
 			// We use ThreadPool::RunAsync to run the thread, we cannot set thread affinity!
