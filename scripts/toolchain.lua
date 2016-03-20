@@ -1191,6 +1191,7 @@ function strip()
 --				.. "-s EMTERPRETIFY_ASYNC=1 "
 				.. "-s TOTAL_MEMORY=268435456 "
 --				.. "-s ALLOW_MEMORY_GROWTH=1 "
+--				.. "-s USE_WEBGL2=1 "
 				.. "--memory-init-file 1 "
 				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
 --				.. "--preload-file ../../../examples/runtime@/"
