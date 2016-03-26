@@ -235,7 +235,7 @@ namespace bx
 
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
 
 			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
 			if (size != _size)
@@ -286,7 +286,7 @@ namespace bx
 
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
 		{
-			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
 
 			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
 			if (size != _size)
