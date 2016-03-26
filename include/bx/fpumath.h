@@ -631,7 +631,8 @@ namespace bx
 		mtxLookAtLh(_result, _eye, _at, _up);
 	}
 
-	inline void mtxProjRhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
+	template <bool LeftHanded = true>
+	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
 		const float diff = _far-_near;
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
@@ -640,132 +641,121 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = _x;
-		_result[ 9] = _y;
-		_result[10] = -aa;
-		_result[11] = -1.0f;
+		_result[ 8] = LeftHanded ?  -_x :    _x;
+		_result[ 9] = LeftHanded ?  -_y :    _y;
+		_result[10] = LeftHanded ?   aa :   -aa;
+		_result[11] = LeftHanded ? 1.0f : -1.0f;
 		_result[14] = -bb;
 	}
 
-	inline void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
-	{
-		const float invDiffRl = 1.0f/(_rt - _lt);
-		const float invDiffUd = 1.0f/(_ut - _dt);
-		const float width  =  2.0f*_near * invDiffRl;
-		const float height =  2.0f*_near * invDiffUd;
-		const float xx     = (_rt + _lt) * invDiffRl;
-		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjRhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
-	{
-		mtxProjRh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
-	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjRhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLhXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
-	{
-		const float diff = _far-_near;
-		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
-		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = _width;
-		_result[ 5] = _height;
-		_result[ 8] = -_x;
-		_result[ 9] = -_y;
-		_result[10] = aa;
-		_result[11] = 1.0f;
-		_result[14] = -bb;
-	}
-
-	inline void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
-	{
-		const float invDiffRl = 1.0f/(_rt - _lt);
-		const float invDiffUd = 1.0f/(_ut - _dt);
-		const float width  =  2.0f*_near * invDiffRl;
-		const float height =  2.0f*_near * invDiffUd;
-		const float xx     = (_rt + _lt) * invDiffRl;
-		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjLhXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
-	{
-		mtxProjLh(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
-	}
-
-	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
-	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
-		const float width  = height * 1.0f/_aspect;
-		mtxProjLhXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
-	}
-
+	template <bool LeftHanded = true>
 	inline void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
+		mtxProjXYWH<LeftHanded>(_result, xx, yy, width, height, _near, _far, _oglNdc);
 	}
 
+	template <bool LeftHanded = true>
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _fov, _near, _far, _oglNdc);
+		mtxProj<LeftHanded>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
 	}
 
+	template <bool LeftHanded = true>
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProjLh(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjXYWH<LeftHanded>(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
 
-	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	#define mtxProjLh mtxProj<true>
+	#define mtxProjRh mtxProj<false>
+
+	template <bool Reverse = false, bool LeftHanded = true>
+	inline void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc = false)
 	{
-		const float aa = 2.0f/(_right - _left);
-		const float bb = 2.0f/(_top - _bottom);
-		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
-		const float dd = (_left + _right)/(_left - _right);
-		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
+		float aa;
+		float bb;
+		if (Reverse)
+		{
+			aa = _oglNdc ?       -1.0f :   0.0f;
+			bb = _oglNdc ? -2.0f*_near : -_near;
+		}
+		else
+		{
+			aa = 1.0f;
+			bb = _oglNdc ? 2.0f*_near : _near;
+		}
 
 		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = aa;
-		_result[ 5] = bb;
-		_result[10] = cc;
-		_result[12] = dd + _offset;
-		_result[13] = ee;
-		_result[14] = ff;
-		_result[15] = 1.0f;
+		_result[ 0] = _width;
+		_result[ 5] = _height;
+		_result[ 8] = LeftHanded ?  -_x :    _x;
+		_result[ 9] = LeftHanded ?  -_y :    _y;
+		_result[10] = LeftHanded ?   aa :   -aa;
+		_result[11] = LeftHanded ? 1.0f : -1.0f;
+		_result[14] = -bb;
 	}
 
-	inline void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
+	template <bool Reverse = false, bool LeftHanded = true>
+	inline void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false)
 	{
-		const float aa = 2.0f/(_right - _left);
-		const float bb = 2.0f/(_top - _bottom);
-		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
-		const float dd = (_left + _right)/(_left - _right);
-		const float ee = (_top + _bottom)/(_bottom - _top);
-		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
-
-		memset(_result, 0, sizeof(float)*16);
-		_result[ 0] = aa;
-		_result[ 5] = bb;
-		_result[10] = -cc;
-		_result[12] = dd + _offset;
-		_result[13] = ee;
-		_result[14] = ff;
-		_result[15] = 1.0f;
+		const float invDiffRl = 1.0f/(_rt - _lt);
+		const float invDiffUd = 1.0f/(_ut - _dt);
+		const float width  =  2.0f*_near * invDiffRl;
+		const float height =  2.0f*_near * invDiffUd;
+		const float xx     = (_rt + _lt) * invDiffRl;
+		const float yy     = (_ut + _dt) * invDiffUd;
+		mtxProjInfXYWH<Reverse,LeftHanded>(_result, xx, yy, width, height, _near, _oglNdc);
 	}
 
+	template <bool Reverse = false, bool LeftHanded = true>
+	inline void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
+	{
+		mtxProjInf<Reverse,LeftHanded>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+	}
+
+	template <bool Reverse = false, bool LeftHanded = true>
+	inline void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
+	{
+		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float width  = height * 1.0f/_aspect;
+		mtxProjInfXYWH<Reverse,LeftHanded>(_result, 0.0f, 0.0f, width, height, _near, _oglNdc);
+	}
+
+	#define mtxProjInfLh    mtxProjInf<false, true>
+	#define mtxProjInfRh    mtxProjInf<false, false>
+	#define mtxProjRevInfLh mtxProjInf<true, true>
+	#define mtxProjRevInfRh mtxProjInf<true, false>
+
+	template <bool LeftHanded = true>
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-	    return mtxOrthoLh(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		const float aa = 2.0f/(_right - _left);
+		const float bb = 2.0f/(_top - _bottom);
+		const float cc = (_oglNdc ? 2.0f : 1.0f) / (_far - _near);
+		const float dd = (_left + _right)/(_left - _right);
+		const float ee = (_top + _bottom)/(_bottom - _top);
+		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
+
+		memset(_result, 0, sizeof(float)*16);
+		_result[ 0] = aa;
+		_result[ 5] = bb;
+		_result[10] = LeftHanded ? cc : -cc;
+		_result[12] = dd + _offset;
+		_result[13] = ee;
+		_result[14] = ff;
+		_result[15] = 1.0f;
 	}
+
+	#define mtxOrthoLh mtxOrtho<true>
+	#define mtxOrthoRh mtxOrtho<false>
 
 	inline void mtxRotateX(float* _result, float _ax)
 	{
