@@ -37,6 +37,7 @@ function toolchain(_buildDir, _libDir)
 			{ "ps4",             "PS4"                        },
 			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
 			{ "rpi",             "RaspberryPi"                },
+			{ "riscv",           "RISC-V"                     },
 		},
 	}
 
@@ -336,6 +337,13 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "rpi" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-rpi"))
+
+		elseif "riscv" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/opt/riscv/bin/riscv64-unknown-elf-gcc"
+			premake.gcc.cxx = "/opt/riscv/bin/riscv64-unknown-elf-g++"
+			premake.gcc.ar  = "/opt/riscv/bin/riscv64-unknown-elf-ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
+
 		end
 	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
 
@@ -1126,6 +1134,17 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+		}
+
+	configuration { "riscv" }
+		targetdir (path.join(_buildDir, "riscv/bin"))
+		objdir (path.join(_buildDir, "riscv/obj"))
+		buildoptions {
+			"-Wunused-value",
+			"-Wundef",
+		}
+		buildoptions_cpp {
+			"-std=c++0x",
 		}
 
 	configuration {} -- reset configuration
