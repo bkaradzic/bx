@@ -212,7 +212,7 @@ namespace bx
 			BX_CHECK(NULL == m_file, "Process not closed!");
 		}
 
-		bool open(const char* _command, Error* _err) BX_OVERRIDE
+		virtual bool open(const char* _command, Error* _err) BX_OVERRIDE
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -226,7 +226,7 @@ namespace bx
 			return true;
 		}
 
-		void close() BX_OVERRIDE
+		virtual void close() BX_OVERRIDE
 		{
 			BX_CHECK(NULL != m_file, "Process not open!");
 			pclose(m_file);
@@ -263,7 +263,7 @@ namespace bx
 			BX_CHECK(NULL == m_file, "Process not closed!");
 		}
 
-		bool open(const char* _command, bool, Error* _err) BX_OVERRIDE
+		virtual bool open(const char* _command, bool, Error* _err) BX_OVERRIDE
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -277,7 +277,7 @@ namespace bx
 			return true;
 		}
 
-		void close() BX_OVERRIDE
+		virtual void close() BX_OVERRIDE
 		{
 			BX_CHECK(NULL != m_file, "Process not open!");
 			pclose(m_file);
