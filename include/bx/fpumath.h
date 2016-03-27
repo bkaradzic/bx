@@ -650,10 +650,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::LeftHanded == HandnessT) ?  -_x :    _x;
-		_result[ 9] = (Handness::LeftHanded == HandnessT) ?  -_y :    _y;
-		_result[10] = (Handness::LeftHanded == HandnessT) ?   aa :   -aa;
-		_result[11] = (Handness::LeftHanded == HandnessT) ? 1.0f : -1.0f;
+		_result[ 8] = (Handness::RightHanded == HandnessT) ?    _x :  -_x;
+		_result[ 9] = (Handness::RightHanded == HandnessT) ?    _y :  -_y;
+		_result[10] = (Handness::RightHanded == HandnessT) ?   -aa :   aa;
+		_result[11] = (Handness::RightHanded == HandnessT) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
@@ -741,10 +741,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::LeftHanded == HandnessT) ?  -_x :    _x;
-		_result[ 9] = (Handness::LeftHanded == HandnessT) ?  -_y :    _y;
-		_result[10] = (Handness::LeftHanded == HandnessT) ?   aa :   -aa;
-		_result[11] = (Handness::LeftHanded == HandnessT) ? 1.0f : -1.0f;
+		_result[ 8] = (Handness::RightHanded == HandnessT) ?    _x :  -_x;
+		_result[ 9] = (Handness::RightHanded == HandnessT) ?    _y :  -_y;
+		_result[10] = (Handness::RightHanded == HandnessT) ?   -aa :   aa;
+		_result[11] = (Handness::RightHanded == HandnessT) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
@@ -793,7 +793,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = (Handness::LeftHanded == HandnessT) ? cc : -cc;
+		_result[10] = (Handness::RightHanded == HandnessT) ? -cc : cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
