@@ -19,6 +19,24 @@ namespace bx
 	static const float piHalf  = 1.57079632679489661923f;
 	static const float sqrt2   = 1.41421356237309504880f;
 
+	struct Handness
+	{
+		enum Enum
+		{
+			Right,
+			Left,
+		};
+	};
+
+	struct NearFar
+	{
+		enum Enum
+		{
+			Default,
+			Reverse,
+		};
+	};
+
 	inline float toRad(float _deg)
 	{
 		return _deg * pi / 180.0f;
@@ -631,15 +649,6 @@ namespace bx
 		mtxLookAtLh(_result, _eye, _at, _up);
 	}
 
-	struct Handness
-	{
-		enum Enum
-		{
-			RightHanded,
-			LeftHanded,
-		};
-	};
-
 	template <Handness::Enum HandnessT>
 	inline void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc = false)
 	{
@@ -650,10 +659,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::RightHanded == HandnessT) ?    _x :  -_x;
-		_result[ 9] = (Handness::RightHanded == HandnessT) ?    _y :  -_y;
-		_result[10] = (Handness::RightHanded == HandnessT) ?   -aa :   aa;
-		_result[11] = (Handness::RightHanded == HandnessT) ? -1.0f : 1.0f;
+		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
+		_result[ 9] = (Handness::Right == HandnessT) ?    _y :  -_y;
+		_result[10] = (Handness::Right == HandnessT) ?   -aa :   aa;
+		_result[11] = (Handness::Right == HandnessT) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
@@ -677,17 +686,17 @@ namespace bx
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::LeftHanded>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::LeftHanded>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::RightHanded>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Right>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	template <Handness::Enum HandnessT>
@@ -700,27 +709,18 @@ namespace bx
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::LeftHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Left>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::LeftHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Left>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<Handness::RightHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::Right>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
-
-	struct NearFar
-	{
-		enum Enum
-		{
-			Default = false,
-			Reverse = true,
-		};
-	};
 
 	template <bool NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc = false)
@@ -741,10 +741,10 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::RightHanded == HandnessT) ?    _x :  -_x;
-		_result[ 9] = (Handness::RightHanded == HandnessT) ?    _y :  -_y;
-		_result[10] = (Handness::RightHanded == HandnessT) ?   -aa :   aa;
-		_result[11] = (Handness::RightHanded == HandnessT) ? -1.0f : 1.0f;
+		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
+		_result[ 9] = (Handness::Right == HandnessT) ?    _y :  -_y;
+		_result[10] = (Handness::Right == HandnessT) ?   -aa :   aa;
+		_result[11] = (Handness::Right == HandnessT) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
@@ -768,17 +768,17 @@ namespace bx
 
 	inline void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::LeftHanded>(_result, _fov, _near, _oglNdc);
+		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::Left>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::LeftHanded>(_result, _fov, _near, _oglNdc);
+		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::Left>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::RightHanded>(_result, _fov, _near, _oglNdc);
+		mtxProjInf_impl<bx::NearFar::Default, bx::Handness::Right>(_result, _fov, _near, _oglNdc);
 	}
 
 	template <bool NearFarT, Handness::Enum HandnessT>
@@ -791,12 +791,12 @@ namespace bx
 
 	inline void mtxProjRevInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<bx::NearFar::Reverse, bx::Handness::LeftHanded>(_result, _fovy, _aspect, _near, _oglNdc);
+		mtxProjInf_impl<bx::NearFar::Reverse, bx::Handness::Left>(_result, _fovy, _aspect, _near, _oglNdc);
 	}
 
 	inline void mtxProjRevInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<bx::NearFar::Reverse, bx::Handness::RightHanded>(_result, _fovy, _aspect, _near, _oglNdc);
+		mtxProjInf_impl<bx::NearFar::Reverse, bx::Handness::Right>(_result, _fovy, _aspect, _near, _oglNdc);
 	}
 
 	template <Handness::Enum HandnessT>
@@ -812,7 +812,7 @@ namespace bx
 		memset(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = (Handness::RightHanded == HandnessT) ? -cc : cc;
+		_result[10] = (Handness::Right == HandnessT) ? -cc : cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
@@ -821,17 +821,17 @@ namespace bx
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::LeftHanded>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<bx::Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::LeftHanded>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<bx::Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::RightHanded>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<bx::Handness::Right>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxRotateX(float* _result, float _ax)
