@@ -14,10 +14,10 @@
 
 namespace bx
 {
-	static const float pi      = 3.14159265358979323846f;
-	static const float invPi   = 1.0f/3.14159265358979323846f;
-	static const float piHalf  = 1.57079632679489661923f;
-	static const float sqrt2   = 1.41421356237309504880f;
+	static const float pi     = 3.14159265358979323846f;
+	static const float invPi  = 1.0f/3.14159265358979323846f;
+	static const float piHalf = 1.57079632679489661923f;
+	static const float sqrt2  = 1.41421356237309504880f;
 
 	struct Handness
 	{
@@ -737,7 +737,7 @@ namespace bx
 		mtxProj_impl<Handness::Right>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
-	template <bool NearFarT, Handness::Enum HandnessT>
+	template <NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc = false)
 	{
 		float aa;
@@ -763,7 +763,7 @@ namespace bx
 		_result[14] = -bb;
 	}
 
-	template <bool NearFarT, Handness::Enum HandnessT>
+	template <NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInf_impl(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false)
 	{
 		const float invDiffRl = 1.0f/(_rt - _lt);
@@ -775,13 +775,13 @@ namespace bx
 		mtxProjInfXYWH<NearFarT,HandnessT>(_result, xx, yy, width, height, _near, _oglNdc);
 	}
 
-	template <bool NearFarT, Handness::Enum HandnessT>
+	template <NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInf_impl(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
 		mtxProjInf_impl<NearFarT,HandnessT>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
 	}
 
-	template <bool NearFarT, Handness::Enum HandnessT>
+	template <NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInf_impl(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
 	{
 		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
