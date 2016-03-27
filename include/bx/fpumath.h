@@ -23,8 +23,8 @@ namespace bx
 	{
 		enum Enum
 		{
-			Right,
 			Left,
+			Right,
 		};
 	};
 
