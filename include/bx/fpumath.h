@@ -674,9 +674,35 @@ namespace bx
 		mtxProjXYWH<LeftHanded>(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
 
-	#define mtxProj   mtxProj_impl<true>
-	#define mtxProjLh mtxProj_impl<true>
-	#define mtxProjRh mtxProj_impl<false>
+	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<true>(_result, _fov, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<true>(_result, _fov, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<false>(_result, _fov, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<true>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<true>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+	}
+
+	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
+	{
+		mtxProj_impl<false>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+	}
 
 	template <bool Reverse, bool LeftHanded>
 	inline void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc = false)
