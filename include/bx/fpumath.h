@@ -776,7 +776,7 @@ namespace bx
 
 	inline void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<NearFar::Default,Handness::Left>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+		mtxProjInf_impl<NearFar::Default,Handness::Left>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc = false)
@@ -796,7 +796,7 @@ namespace bx
 
 	inline void mtxProjInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<NearFar::Default,Handness::Left>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+		mtxProjInf_impl<NearFar::Default,Handness::Left>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
@@ -811,7 +811,7 @@ namespace bx
 
 	inline void mtxProjInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<NearFar::Default,Handness::Right>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+		mtxProjInf_impl<NearFar::Default,Handness::Right>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
@@ -826,7 +826,7 @@ namespace bx
 
 	inline void mtxProjRevInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc = false)
 	{
-		mtxProjInf_impl<NearFar::Reverse,Handness::Left>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+		mtxProjInf_impl<NearFar::Reverse,Handness::Left>(_result, _fov, _near, _oglNdc);
 	}
 
 	inline void mtxProjRevInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc = false)
@@ -871,17 +871,17 @@ namespace bx
 
 	inline void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset = 0.0f, bool _oglNdc = false)
 	{
-		mtxOrtho_impl<bx::Handness::Right>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
+		mtxOrtho_impl<Handness::Right>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	inline void mtxRotateX(float* _result, float _ax)
