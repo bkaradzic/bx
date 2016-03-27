@@ -685,32 +685,32 @@ namespace bx
 
 	inline void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<true>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::LeftHanded>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<true>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::LeftHanded>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<false>(_result, _fov, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::RightHanded>(_result, _fov, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<true>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::LeftHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<true>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::LeftHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	inline void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc = false)
 	{
-		mtxProj_impl<false>(_result, _fovy, _aspect, _near, _far, _oglNdc);
+		mtxProj_impl<Handness::RightHanded>(_result, _fovy, _aspect, _near, _far, _oglNdc);
 	}
 
 	struct NearFar
