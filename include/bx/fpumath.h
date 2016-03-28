@@ -742,7 +742,7 @@ namespace bx
 	{
 		float aa;
 		float bb;
-		if (NearFar::Reverse == NearFarT)
+		if (BX_ENABLED(NearFar::Reverse == NearFarT) )
 		{
 			aa = _oglNdc ?       -1.0f :   0.0f;
 			bb = _oglNdc ? -2.0f*_near : -_near;
