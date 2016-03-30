@@ -194,10 +194,10 @@ namespace bx
 
 #if BX_CONFIG_CRT_PROCESS
 
-#if BX_COMPILER_MSVC
+#if BX_COMPILER_MSVC_COMPATIBLE
 #	define popen  _popen
 #	define pclose _pclose
-#endif // BX_COMPILER_MSVC
+#endif // BX_COMPILER_MSVC_COMPATIBLE
 
 	class ProcessReader : public ReaderOpenI, public CloserI, public ReaderI
 	{
