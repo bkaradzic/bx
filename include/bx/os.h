@@ -294,7 +294,25 @@ namespace bx
 		_fileInfo.m_size = 0;
 		_fileInfo.m_type = FileInfo::Count;
 
-		struct stat st;
+#if BX_COMPILER_MSVC
+		struct ::_stat64 st;
+		int32_t result = ::_stat64(_filePath, &st);
+
+		if (0 != result)
+		{
+			return false;
+		}
+
+		if (0 != (st.st_mode & _S_IFREG) )
+		{
+			_fileInfo.m_type = FileInfo::Regular;
+		}
+		else if (0 != (st.st_mode & _S_IFDIR) )
+		{
+			_fileInfo.m_type = FileInfo::Directory;
+		}
+#else
+		struct ::stat st;
 		int32_t result = ::stat(_filePath, &st);
 		if (0 != result)
 		{
@@ -309,6 +327,7 @@ namespace bx
 		{
 			_fileInfo.m_type = FileInfo::Directory;
 		}
+#endif // BX_COMPILER_MSVC
 
 		_fileInfo.m_size = st.st_size;
 
