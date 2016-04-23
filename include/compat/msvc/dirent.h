@@ -27,7 +27,11 @@
 #ifndef DIRENT_H
 #define DIRENT_H
 
-#pragma warning(disable:4505) // error C4505: '_wreaddir': unreferenced local function has been removed
+#ifdef _MSC_VER
+#	pragma warning(disable:4505) // error C4505: '_wreaddir': unreferenced local function has been removed
+#else
+#	pragma GCC diagnostic ignored "-Wunused-function"
+#endif // _MSC_VER
 
 /*
  * Define architecture flags so we don't need to include windows.h.
@@ -145,13 +149,33 @@
  * only defined for compatibility.  These macros should always return false
  * on Windows.
  */
-#define	S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFIFO)
-#define	S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
-#define	S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
-#define	S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
-#define	S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
-#define	S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
-#define	S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
+#ifndef S_ISFIFO
+#   define S_ISFIFO(mode) (((mode) & S_IFMT) == S_IFIFO)
+#endif
+
+#ifndef S_ISDIR
+#   define S_ISDIR(mode)  (((mode) & S_IFMT) == S_IFDIR)
+#endif
+
+#ifndef S_ISREG
+#   define S_ISREG(mode)  (((mode) & S_IFMT) == S_IFREG)
+#endif
+
+#ifndef S_ISLNK
+#   define S_ISLNK(mode)  (((mode) & S_IFMT) == S_IFLNK)
+#endif
+
+#ifndef S_ISSOCK
+#   define S_ISSOCK(mode) (((mode) & S_IFMT) == S_IFSOCK)
+#endif
+
+#ifndef S_ISCHR
+#   define S_ISCHR(mode)  (((mode) & S_IFMT) == S_IFCHR)
+#endif
+
+#ifndef S_ISBLK
+#   define S_ISBLK(mode)  (((mode) & S_IFMT) == S_IFBLK)
+#endif
 
 /* Return the exact length of d_namlen without zero terminator */
 #define _D_EXACT_NAMLEN(p) ((p)->d_namlen)
