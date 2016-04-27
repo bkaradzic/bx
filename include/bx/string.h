@@ -19,7 +19,7 @@ namespace bx
 	///
 	inline bool toBool(const char* _str)
 	{
-		char ch = (char)tolower(_str[0]);
+		char ch = (char)::tolower(_str[0]);
 		return ch == 't' ||  ch == '1';
 	}
 
@@ -27,9 +27,9 @@ namespace bx
 	inline int32_t stricmp(const char* _a, const char* _b)
 	{
 #if BX_COMPILER_MSVC_COMPATIBLE
-		return _stricmp(_a, _b);
+		return ::_stricmp(_a, _b);
 #else
-		return strcasecmp(_a, _b);
+		return ::strcasecmp(_a, _b);
 #endif // BX_COMPILER_
 	}
 
