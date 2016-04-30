@@ -440,6 +440,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "Release" }
 		flags {
+			"NoBufferSecurityCheck",
 			"OptimizeSpeed",
 		}
 		targetsuffix "Release"
