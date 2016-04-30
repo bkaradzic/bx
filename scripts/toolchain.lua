@@ -544,7 +544,10 @@ function toolchain(_buildDir, _libDir)
 		libdirs {
 			path.join(_libDir, "lib/win32_mingw-gcc"),
 		}
-		buildoptions { "-m32" }
+		buildoptions {
+			"-m32",
+			"-mstackrealign",
+		}
 
 	configuration { "x64", "mingw-gcc" }
 		targetdir (path.join(_buildDir, "win64_mingw-gcc/bin"))
