@@ -314,6 +314,7 @@ namespace bx
 		va_list argListCopy;
 		va_copy(argListCopy, _argList);
 		int32_t len = ::vsnprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+		va_end(argListCopy);
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
 #else
 		return ::vsnprintf(_str, _count, _format, _argList);
@@ -329,6 +330,7 @@ namespace bx
 		va_list argListCopy;
 		va_copy(argListCopy, _argList);
 		int32_t len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+		va_end(argListCopy);
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif defined(__MINGW32__)
 		return ::vsnwprintf(_str, _count, _format, _argList);
