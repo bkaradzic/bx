@@ -168,9 +168,9 @@ function toolchain(_buildDir, _libDir)
 				print("Set EMSCRIPTEN enviroment variable.")
 			end
 
-			premake.gcc.cc   = "$(EMSCRIPTEN)/emcc"
-			premake.gcc.cxx  = "$(EMSCRIPTEN)/em++"
-			premake.gcc.ar   = "$(EMSCRIPTEN)/emar"
+			premake.gcc.cc   = "\"$(EMSCRIPTEN)/emcc\""
+			premake.gcc.cxx  = "\"$(EMSCRIPTEN)/em++\""
+			premake.gcc.ar   = "\"$(EMSCRIPTEN)/emar\""
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-asmjs"))
 
@@ -840,8 +840,8 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "asmjs/obj"))
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
-			"-isystem$(EMSCRIPTEN)/system/include",
-			"-isystem$(EMSCRIPTEN)/system/include/libc",
+			"-i\"system$(EMSCRIPTEN)/system/include\"",
+			"-i\"system$(EMSCRIPTEN)/system/include/libc\"",
 			"-Wunused-value",
 			"-Wundef",
 		}
@@ -1223,7 +1223,7 @@ function strip()
 	configuration { "asmjs" }
 		postbuildcommands {
 			"$(SILENT) echo Running asmjs finalize.",
-			"$(SILENT) $(EMSCRIPTEN)/emcc -O2 "
+			"$(SILENT) \"$(EMSCRIPTEN)/emcc\" -O2 "
 --				.. "-s EMTERPRETIFY=1 "
 --				.. "-s EMTERPRETIFY_ASYNC=1 "
 				.. "-s TOTAL_MEMORY=268435456 "
