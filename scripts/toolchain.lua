@@ -428,6 +428,7 @@ function toolchain(_buildDir, _libDir)
 		"NoRTTI",
 		"NoExceptions",
 		"NoEditAndContinue",
+		"NoFramePointer",
 		"Symbols",
 	}
 
@@ -466,7 +467,6 @@ function toolchain(_buildDir, _libDir)
 			"_CRT_SECURE_NO_DEPRECATE",
 		}
 		buildoptions {
-			"/Oy-", -- Suppresses creation of frame pointers on the call stack.
 			"/Ob2", -- The Inline Function Expansion
 		}
 		linkoptions {
