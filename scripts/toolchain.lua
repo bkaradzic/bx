@@ -467,7 +467,9 @@ function toolchain(_buildDir, _libDir)
 			"_CRT_SECURE_NO_DEPRECATE",
 		}
 		buildoptions {
-			"/Ob2", -- The Inline Function Expansion
+			"/wd4201", -- warning C4201: nonstandard extension used: nameless struct/union
+			"/wd4324", -- warning C4324: '': structure was padded due to alignment specifier
+			"/Ob2",    -- The Inline Function Expansion
 		}
 		linkoptions {
 			"/ignore:4221", -- LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
