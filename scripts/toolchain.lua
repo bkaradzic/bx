@@ -100,7 +100,9 @@ function toolchain(_buildDir, _libDir)
 	location (path.join(_buildDir, "projects", _ACTION))
 
 	if _ACTION == "clean" then
-		os.rmdir(BUILD_DIR)
+		os.rmdir(_buildDir)
+		os.mkdir(_buildDir)
+		os.exit(1)
 	end
 
 	local androidPlatform = "android-14"
