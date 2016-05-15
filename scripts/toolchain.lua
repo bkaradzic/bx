@@ -290,7 +290,7 @@ function toolchain(_buildDir, _libDir)
 		elseif "osx" == _OPTIONS["gcc"] then
 
 			if os.is("linux") then
-				local osxToolchain = "x86_64-apple-darwin13-"
+				local osxToolchain = "x86_64-apple-darwin15-"
 				premake.gcc.cc  = osxToolchain .. "clang"
 				premake.gcc.cxx = osxToolchain .. "clang++"
 				premake.gcc.ar  = osxToolchain .. "ar"
