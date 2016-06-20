@@ -8,11 +8,9 @@
 
 namespace bx
 {
-	typedef __builtin_neon_sf  float4_t __attribute__( (__vector_size__(16) ) );
+#include <arm_neon.h>
+	typedef float32x4_t float4_t;
 
-	typedef __builtin_neon_sf  _f32x2_t __attribute__( (__vector_size__( 8) ) );
-	typedef __builtin_neon_si  _i32x4_t __attribute__( (__vector_size__(16) ) );
-	typedef __builtin_neon_usi _u32x4_t __attribute__( (__vector_size__(16) ) );
 
 #define ELEMx 0
 #define ELEMy 1
@@ -21,7 +19,7 @@ namespace bx
 #define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			BX_FLOAT4_FORCE_INLINE float4_t float4_swiz_##_x##_y##_z##_w(float4_t _a) \
 			{ \
-				return __builtin_shuffle(_a, (_u32x4_t){ ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w }); \
+				return __builtin_shuffle(_a, (uint32x4_t){ ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w }); \
 			}
 
 #include "float4_swizzle.inl"
@@ -33,8 +31,8 @@ namespace bx
 #undef ELEMx
 
 #define IMPLEMENT_TEST(_xyzw, _swizzle) \
-			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float4_t _test); \
-			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float4_t _test);
+			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float32x4_t _test); \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float32x4_t _test);
 
 IMPLEMENT_TEST(x    , xxxx);
 IMPLEMENT_TEST(y    , yyyy);
@@ -54,392 +52,392 @@ IMPLEMENT_TEST(xyzw , xyzw);
 
 #undef IMPLEMENT_TEST
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xyAB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_xyAB(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 0, 1, 4, 5 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 0, 1, 4, 5 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_ABxy(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_ABxy(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 4, 5, 0, 1 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 4, 5, 0, 1 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CDzw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_CDzw(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 6, 7, 2, 3 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 6, 7, 2, 3 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zwCD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_zwCD(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 2, 3, 6, 7 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 2, 3, 6, 7 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_xAyB(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_xAyB(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 0, 4, 1, 5 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 0, 4, 1, 5 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_yBxA(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_yBxA(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 1, 5, 0, 4 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 1, 5, 0, 4 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_zCwD(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_zCwD(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 2, 6, 3, 7 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 2, 6, 3, 7 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_shuf_CzDw(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_shuf_CzDw(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_shuffle(_a, _b, (_u32x4_t){ 6, 2, 7, 3 });
+		return __builtin_shuffle(_a, _b, (uint32x4_t){ 6, 2, 7, 3 });
 	}
 
-	BX_FLOAT4_FORCE_INLINE float float4_x(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_x(float32x4_t _a)
 	{
-		return __builtin_neon_vget_lanev4sf(_a, 0, 3);
+		return vgetq_lane_f32(_a, 0);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float float4_y(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_y(float32x4_t _a)
 	{
-		return __builtin_neon_vget_lanev4sf(_a, 1, 3);
+		return vgetq_lane_f32(_a, 1);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float float4_z(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_z(float32x4_t _a)
 	{
-		return __builtin_neon_vget_lanev4sf(_a, 2, 3);
+		return vgetq_lane_f32(_a, 2);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float float4_w(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float float4_w(float32x4_t _a)
 	{
-		return __builtin_neon_vget_lanev4sf(_a, 3, 3);
+		return vgetq_lane_f32(_a, 3);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_ld(const void* _ptr)
 	{
-		return __builtin_neon_vld1v4sf( (const __builtin_neon_sf*)_ptr);
+		return vld1q_f32((const float32_t *)_ptr);
 	}
 
-	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float32x4_t _a)
 	{
-		__builtin_neon_vst1v4sf( (__builtin_neon_sf*)_ptr, _a);
+		vst1q_f32((float32_t *)_ptr, _a);
 	}
 
-	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float32x4_t _a)
 	{
-		__builtin_neon_vst1_lanev4sf( (__builtin_neon_sf*)_ptr, _a, 0); 
+		vst1q_lane_f32(_ptr, _a, 0);
 	}
 
-	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float4_t _a)
+	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float32x4_t _a)
 	{
-		__builtin_neon_vst1v4sf( (__builtin_neon_sf*)_ptr, _a);
+		vst1q_f32(_ptr, _a);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_ld(float _x, float _y, float _z, float _w)
 	{
-		const float4_t val[4] = {_x, _y, _z, _w};
+		const float32_t val[4] = {_x, _y, _z, _w};
 		return float4_ld(val);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
 	{
 		const uint32_t val[4] = {_x, _y, _z, _w};
-		const _i32x4_t tmp    = __builtin_neon_vld1v4si( (const __builtin_neon_si*)val);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vld1q_u32(val);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(const void* _ptr)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_splat(const void* _ptr)
 	{
-		const float4_t tmp0   = __builtin_neon_vld1v4sf( (const __builtin_neon_sf *)_ptr);
-		const _f32x2_t tmp1   = __builtin_neon_vget_lowv4sf(tmp0);
-		const float4_t result = __builtin_neon_vdup_lanev4sf(tmp1, 0);
+		const float32x4_t tmp0   = vld1q_f32((const float32_t *)_ptr);
+		const float32x2_t tmp1   = vget_low_f32(tmp0);
+		const float32x4_t result = vdupq_lane_f32(tmp1, 0);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(float _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_splat(float _a)
 	{
-		return __builtin_neon_vdup_nv4sf(_a);
+		return vdupq_n_f32(_a);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_isplat(uint32_t _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_isplat(uint32_t _a)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vdup_nv4si( (__builtin_neon_si)_a);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const int32x4_t tmp    = vdupq_n_s32(_a);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_zero()
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_zero()
 	{
 		return float4_isplat(0);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_itof(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_itof(float32x4_t _a)
 	{
-		const _i32x4_t itof   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const float4_t result = __builtin_neon_vcvtv4si(itof, 1);
+		const int32x4_t itof   = vreinterpretq_s32_f32(_a);
+		const float32x4_t result = vcvtq_f32_s32(itof);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_ftoi(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_ftoi(float32x4_t _a)
 	{
-		const _i32x4_t ftoi   = __builtin_neon_vcvtv4sf(_a, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(ftoi);
+		const int32x4_t ftoi   = vcvtq_s32_f32(_a);
+		const float32x4_t result = vreinterpretq_f32_s32(ftoi);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_add(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_add(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_neon_vaddv4sf(_a, _b, 3);
+		return vaddq_f32(_a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_sub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_sub(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_neon_vsubv4sf(_a, _b, 3);
+		return vsubq_f32(_a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_mul(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_mul(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_neon_vmulv4sf(_a, _b, 3);
+		return vmulq_f32(_a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_rcp_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_rcp_est(float32x4_t _a)
 	{
-		return __builtin_neon_vrecpev4sf(_a, 3);
+		return vrecpeq_f32(_a);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_rsqrt_est(float4_t _a)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_rsqrt_est(float32x4_t _a)
 	{
-		return __builtin_neon_vrsqrtev4sf(_a, 3);
+		return vrsqrteq_f32(_a);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_cmpeq(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vceqv4sf(_a, _b, 3);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vceqq_f32(_a, _b);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_cmplt(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vcgtv4sf(_b, _a, 3);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vcltq_f32(_a, _b);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_cmple(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vcgev4sf(_b, _a, 3);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vcleq_f32(_a, _b);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_cmpgt(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vcgtv4sf(_a, _b, 3);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vcgtq_f32(_a, _b);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_cmpge(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp    = __builtin_neon_vcgev4sf(_a, _b, 3);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp);
+		const uint32x4_t tmp    = vcgeq_f32(_a, _b);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_min(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_min(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_neon_vminv4sf(_a, _b, 3);
+		return vminq_f32(_a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_max(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_max(float32x4_t _a, float32x4_t _b)
 	{
-		return __builtin_neon_vmaxv4sf(_a, _b, 3);
+		return vmaxq_f32(_a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_and(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_and(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vandv4si(tmp0, tmp1, 0);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vandq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_andc(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_andc(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vbicv4si(tmp0, tmp1, 0);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vbicq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_or(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_or(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vorrv4si(tmp0, tmp1, 0);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vorrq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_xor(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_xor(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_veorv4si(tmp0, tmp1, 0);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = veorq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_sll(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_sll(float32x4_t _a, int _count)
 	{
 		if (__builtin_constant_p(_count) )
 		{
-			const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-			const _i32x4_t tmp1   = __builtin_neon_vshl_nv4si(tmp0, _count, 0);
-			const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
+			const uint32x4_t tmp1   = vshlq_n_u32(tmp0, _count);
+			const float32x4_t result = vreinterpretq_f32_u32(tmp1);
 
 			return result;
 		}
 
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t shift  = __builtin_neon_vdup_nv4si( (__builtin_neon_si)_count);
-		const _i32x4_t tmp1   = __builtin_neon_vshlv4si(tmp0, shift, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
+		const int32x4_t shift  = vdupq_n_s32(_count);
+		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp1);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_srl(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_srl(float32x4_t _a, int _count)
 	{
 		if (__builtin_constant_p(_count) )
 		{
-			const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-			const _i32x4_t tmp1   = __builtin_neon_vshr_nv4si(tmp0, _count, 0);
-			const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
+			const uint32x4_t tmp1   = vshrq_n_u32(tmp0, _count);
+			const float32x4_t result = vreinterpretq_f32_u32(tmp1);
 
 			return result;
 		}
 
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t shift  = __builtin_neon_vdup_nv4si( (__builtin_neon_si)-_count);
-		const _i32x4_t tmp1   = __builtin_neon_vshlv4si(tmp0, shift, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
+		const int32x4_t shift  = vdupq_n_s32(-_count);
+		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp1);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_sra(float4_t _a, int _count)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_sra(float32x4_t _a, int _count)
 	{
 		if (__builtin_constant_p(_count) )
 		{
-			const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-			const _i32x4_t tmp1   = __builtin_neon_vshr_nv4si(tmp0, _count, 1);
-			const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+			const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+			const int32x4_t tmp1   = vshrq_n_s32(tmp0, _count);
+			const float32x4_t result = vreinterpretq_f32_s32(tmp1);
 
 			return result;
 		}
 
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t shift  = __builtin_neon_vdup_nv4si( (__builtin_neon_si)-_count);
-		const _i32x4_t tmp1   = __builtin_neon_vshlv4si(tmp0, shift, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp1);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t shift  = vdupq_n_s32(-_count);
+		const int32x4_t tmp1   = vshlq_s32(tmp0, shift);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp1);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_madd(float4_t _a, float4_t _b, float4_t _c)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_madd(float32x4_t _a, float32x4_t _b, float32x4_t _c)
 	{
-		return __builtin_neon_vmlav4sf(_c, _a, _b, 3);
+		return vmlaq_f32(_c, _a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_nmsub(float4_t _a, float4_t _b, float4_t _c)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_nmsub(float32x4_t _a, float32x4_t _b, float32x4_t _c)
 	{
-		return __builtin_neon_vmlsv4sf(_c, _a, _b, 3);
+		return vmlsq_f32(_c, _a, _b);
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_icmpeq(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vceqv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const uint32x4_t tmp2   = vceqq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_icmplt(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vcgtv4si(tmp1, tmp0, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const uint32x4_t tmp2   = vcltq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_icmpgt(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vcgtv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const uint32x4_t tmp2   = vcgtq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_imin(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_imin(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vminv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vminq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_imax(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_imax(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vmaxv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vmaxq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_iadd(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_iadd(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vaddv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vaddq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
 
-	BX_FLOAT4_FORCE_INLINE float4_t float4_isub(float4_t _a, float4_t _b)
+	BX_FLOAT4_FORCE_INLINE float32x4_t float4_isub(float32x4_t _a, float32x4_t _b)
 	{
-		const _i32x4_t tmp0   = __builtin_neon_vreinterpretv4siv4sf(_a);
-		const _i32x4_t tmp1   = __builtin_neon_vreinterpretv4siv4sf(_b);
-		const _i32x4_t tmp2   = __builtin_neon_vsubv4si(tmp0, tmp1, 1);
-		const float4_t result = __builtin_neon_vreinterpretv4sfv4si(tmp2);
+		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t tmp2   = vsubq_s32(tmp0, tmp1);
+		const float32x4_t result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -482,15 +480,15 @@ IMPLEMENT_TEST(xyzw , xyzw);
 namespace bx
 {
 #define IMPLEMENT_TEST(_xyzw, _swizzle) \
-			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float32x4_t _test) \
 			{ \
-				const float4_t tmp0 = float4_swiz_##_swizzle(_test); \
+				const float32x4_t tmp0 = float4_swiz_##_swizzle(_test); \
 				return float4_test_any_ni(tmp0); \
 			} \
 			\
-			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float4_t _test) \
+			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float32x4_t _test) \
 			{ \
-				const float4_t tmp0 = float4_swiz_##_swizzle(_test); \
+				const float32x4_t tmp0 = float4_swiz_##_swizzle(_test); \
 				return float4_test_all_ni(tmp0); \
 			}
 
@@ -509,12 +507,12 @@ IMPLEMENT_TEST(zw   , zwww);
 IMPLEMENT_TEST(xzw  , xzww);
 IMPLEMENT_TEST(yzw  , yzww);
 
-	BX_FLOAT4_FORCE_INLINE bool float4_test_any_xyzw(float4_t _test)
+	BX_FLOAT4_FORCE_INLINE bool float4_test_any_xyzw(float32x4_t _test)
 	{
 		return float4_test_any_ni(_test);
 	}
 
-	BX_FLOAT4_FORCE_INLINE bool float4_test_all_xyzw(float4_t _test)
+	BX_FLOAT4_FORCE_INLINE bool float4_test_all_xyzw(float32x4_t _test)
 	{
 		return float4_test_all_ni(_test);
 	}
