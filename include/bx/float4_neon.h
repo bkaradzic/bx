@@ -115,22 +115,22 @@ IMPLEMENT_TEST(xyzw , xyzw);
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(const void* _ptr)
 	{
-		return vld1q_f32((const float32_t *)_ptr);
+		return vld1q_f32( (const float32_t*)_ptr);
 	}
 
 	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float4_t _a)
 	{
-		vst1q_f32((float32_t *)_ptr, _a);
+		vst1q_f32( (float32_t*)_ptr, _a);
 	}
 
 	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float4_t _a)
 	{
-		vst1q_lane_f32((float32_t *)_ptr, _a, 0);
+		vst1q_lane_f32( (float32_t*)_ptr, _a, 0);
 	}
 
 	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float4_t _a)
 	{
-		vst1q_f32((float32_t *)_ptr, _a);
+		vst1q_f32( (float32_t*)_ptr, _a);
 	}
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_ld(float _x, float _y, float _z, float _w)
@@ -141,18 +141,18 @@ IMPLEMENT_TEST(xyzw , xyzw);
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
 	{
-		const uint32_t val[4] = {_x, _y, _z, _w};
+		const uint32_t   val[4] = {_x, _y, _z, _w};
 		const uint32x4_t tmp    = vld1q_u32(val);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_splat(const void* _ptr)
 	{
-		const float4_t tmp0   = vld1q_f32((const float32_t *)_ptr);
+		const float4_t    tmp0   = vld1q_f32( (const float32_t*)_ptr);
 		const float32x2_t tmp1   = vget_low_f32(tmp0);
-		const float4_t result = vdupq_lane_f32(tmp1, 0);
+		const float4_t    result = vdupq_lane_f32(tmp1, 0);
 
 		return result;
 	}
@@ -165,7 +165,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_isplat(uint32_t _a)
 	{
 		const int32x4_t tmp    = vdupq_n_s32(_a);
-		const float4_t result = vreinterpretq_f32_s32(tmp);
+		const float4_t  result = vreinterpretq_f32_s32(tmp);
 
 		return result;
 	}
@@ -178,14 +178,14 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_itof(float4_t _a)
 	{
 		const int32x4_t itof   = vreinterpretq_s32_f32(_a);
-		const float4_t result = vcvtq_f32_s32(itof);
+		const float4_t  result = vcvtq_f32_s32(itof);
 
 		return result;
 	}
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_ftoi(float4_t _a)
 	{
-		const int32x4_t ftoi   = vcvtq_s32_f32(_a);
+		const int32x4_t ftoi  = vcvtq_s32_f32(_a);
 		const float4_t result = vreinterpretq_f32_s32(ftoi);
 
 		return result;
@@ -219,7 +219,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpeq(float4_t _a, float4_t _b)
 	{
 		const uint32x4_t tmp    = vceqq_f32(_a, _b);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -227,7 +227,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_cmplt(float4_t _a, float4_t _b)
 	{
 		const uint32x4_t tmp    = vcltq_f32(_a, _b);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -235,7 +235,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_cmple(float4_t _a, float4_t _b)
 	{
 		const uint32x4_t tmp    = vcleq_f32(_a, _b);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -243,7 +243,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpgt(float4_t _a, float4_t _b)
 	{
 		const uint32x4_t tmp    = vcgtq_f32(_a, _b);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -251,7 +251,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 	BX_FLOAT4_FORCE_INLINE float4_t float4_cmpge(float4_t _a, float4_t _b)
 	{
 		const uint32x4_t tmp    = vcgeq_f32(_a, _b);
-		const float4_t result = vreinterpretq_f32_u32(tmp);
+		const float4_t   result = vreinterpretq_f32_u32(tmp);
 
 		return result;
 	}
@@ -271,7 +271,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vandq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -281,7 +281,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vbicq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -291,7 +291,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vorrq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -301,7 +301,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = veorq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -312,15 +312,15 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		{
 			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
 			const uint32x4_t tmp1   = vshlq_n_u32(tmp0, _count);
-			const float4_t result = vreinterpretq_f32_u32(tmp1);
+			const float4_t   result = vreinterpretq_f32_u32(tmp1);
 
 			return result;
 		}
 
 		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
-		const int32x4_t shift  = vdupq_n_s32(_count);
+		const int32x4_t  shift  = vdupq_n_s32(_count);
 		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
-		const float4_t result = vreinterpretq_f32_u32(tmp1);
+		const float4_t   result = vreinterpretq_f32_u32(tmp1);
 
 		return result;
 	}
@@ -331,15 +331,15 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		{
 			const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
 			const uint32x4_t tmp1   = vshrq_n_u32(tmp0, _count);
-			const float4_t result = vreinterpretq_f32_u32(tmp1);
+			const float4_t   result = vreinterpretq_f32_u32(tmp1);
 
 			return result;
 		}
 
 		const uint32x4_t tmp0   = vreinterpretq_u32_f32(_a);
-		const int32x4_t shift  = vdupq_n_s32(-_count);
+		const int32x4_t  shift  = vdupq_n_s32(-_count);
 		const uint32x4_t tmp1   = vshlq_u32(tmp0, shift);
-		const float4_t result = vreinterpretq_f32_u32(tmp1);
+		const float4_t   result = vreinterpretq_f32_u32(tmp1);
 
 		return result;
 	}
@@ -350,7 +350,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		{
 			const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 			const int32x4_t tmp1   = vshrq_n_s32(tmp0, _count);
-			const float4_t result = vreinterpretq_f32_s32(tmp1);
+			const float4_t  result = vreinterpretq_f32_s32(tmp1);
 
 			return result;
 		}
@@ -358,7 +358,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t shift  = vdupq_n_s32(-_count);
 		const int32x4_t tmp1   = vshlq_s32(tmp0, shift);
-		const float4_t result = vreinterpretq_f32_s32(tmp1);
+		const float4_t  result = vreinterpretq_f32_s32(tmp1);
 
 		return result;
 	}
@@ -375,30 +375,30 @@ IMPLEMENT_TEST(xyzw , xyzw);
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpeq(float4_t _a, float4_t _b)
 	{
-		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
-		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t  tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t  tmp1   = vreinterpretq_s32_f32(_b);
 		const uint32x4_t tmp2   = vceqq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_u32(tmp2);
+		const float4_t   result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_icmplt(float4_t _a, float4_t _b)
 	{
-		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
-		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t  tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t  tmp1   = vreinterpretq_s32_f32(_b);
 		const uint32x4_t tmp2   = vcltq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_u32(tmp2);
+		const float4_t   result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
 
 	BX_FLOAT4_FORCE_INLINE float4_t float4_icmpgt(float4_t _a, float4_t _b)
 	{
-		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
-		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
+		const int32x4_t  tmp0   = vreinterpretq_s32_f32(_a);
+		const int32x4_t  tmp1   = vreinterpretq_s32_f32(_b);
 		const uint32x4_t tmp2   = vcgtq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_u32(tmp2);
+		const float4_t   result = vreinterpretq_f32_u32(tmp2);
 
 		return result;
 	}
@@ -408,7 +408,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vminq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -418,7 +418,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vmaxq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -428,7 +428,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vaddq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
@@ -438,7 +438,7 @@ IMPLEMENT_TEST(xyzw , xyzw);
 		const int32x4_t tmp0   = vreinterpretq_s32_f32(_a);
 		const int32x4_t tmp1   = vreinterpretq_s32_f32(_b);
 		const int32x4_t tmp2   = vsubq_s32(tmp0, tmp1);
-		const float4_t result = vreinterpretq_f32_s32(tmp2);
+		const float4_t  result = vreinterpretq_f32_s32(tmp2);
 
 		return result;
 	}
