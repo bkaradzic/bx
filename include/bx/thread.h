@@ -8,7 +8,7 @@
 
 #if BX_PLATFORM_POSIX
 #	include <pthread.h>
-#	if BX_PLATFORM_BSD
+#	if defined(__FreeBSD__)
 #		include <pthread_np.h>
 #	endif
 #	if defined(__GLIBC__) && !( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
