@@ -550,6 +550,11 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
+	inline void mtxScale(float* _result, float _scale)
+	{
+		mtxScale(_result, _scale, _scale, _scale);
+	}
+
 	inline void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos)
 	{
 		float tangent[3];
