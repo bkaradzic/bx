@@ -11,9 +11,9 @@
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>
 #	endif
-#	if defined(__GLIBC__) && !( (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) ) )
+#	if defined(__linux__) && (BX_CRT_GLIBC < 21200)
 #		include <sys/prctl.h>
-#	endif // defined(__GLIBC__) ...
+#	endif
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
@@ -157,12 +157,10 @@ namespace bx
 		{
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 			pthread_setname_np(_name);
-#elif BX_PLATFORM_LINUX
-#	if defined(__GLIBC__) && (__GLIBC__ > 2) || ( (__GLIBC__ == 2) && (__GLIBC_MINOR__ >= 12) )
+#elif (BX_CRT_GLIBC >= 21200)
 			pthread_setname_np(m_handle, _name);
-#	else
+#elif BX_PLATFORM_LINUX
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
-#	endif // defined(__GLIBC__) ...
 #elif BX_PLATFORM_BSD
 #ifdef __NetBSD__
 			pthread_setname_np(m_handle, "%s", (void *)_name);
