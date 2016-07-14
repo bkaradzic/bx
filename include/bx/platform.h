@@ -80,7 +80,10 @@
 #	if defined(__GLIBC__)
 #		undef  BX_CRT_GLIBC
 #		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	endif // defined(__GLIBC__)
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	endif //
 #else
 #	error "BX_COMPILER_* is not defined!"
 #endif //
