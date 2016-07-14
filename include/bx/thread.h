@@ -11,14 +11,14 @@
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>
 #	endif
-#	if defined(__linux__) && (BX_CRT_GLIBC < 21200)
+#	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
 #		include <sys/prctl.h>
-#	endif
+#	endif // BX_PLATFORM_
 #elif BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
-#endif
+#endif // BX_PLATFORM_
 
 #include "sem.h"
 
@@ -162,11 +162,11 @@ namespace bx
 #elif BX_PLATFORM_LINUX
 			prctl(PR_SET_NAME,_name, 0, 0, 0);
 #elif BX_PLATFORM_BSD
-#ifdef __NetBSD__
-			pthread_setname_np(m_handle, "%s", (void *)_name);
-#else
+#	ifdef __NetBSD__
+			pthread_setname_np(m_handle, "%s", (void*)_name);
+#	else
 			pthread_set_name_np(m_handle, _name);
-#endif
+#	endif // __NetBSD__
 #elif BX_PLATFORM_WINDOWS && BX_COMPILER_MSVC
 #	pragma pack(push, 8)
 			struct ThreadName
