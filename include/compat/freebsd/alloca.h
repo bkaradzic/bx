@@ -1,5 +1,5 @@
-#if BX_CRT_GLIBC
-#include_next <alloca.h>
+#if defined(__GLIBC__)
+#	include_next <alloca.h>
 #else
-#include <stdlib.h>
+#	include <stdlib.h>
 #endif
