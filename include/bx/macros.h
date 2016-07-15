@@ -79,9 +79,9 @@
 #		define BX_THREAD_LOCAL __thread
 #	endif // BX_COMPILER_GCC
 #	define BX_ATTRIBUTE(_x) __attribute__( (_x) )
-#	if BX_COMPILER_MSVC_COMPATIBLE
+#	if BX_CRT_MSVC
 #		define __stdcall
-#	endif // BX_COMPILER_MSVC_COMPATIBLE
+#	endif // BX_CRT_MSVC
 #elif BX_COMPILER_MSVC
 #	define BX_ALIGN_DECL(_align, _decl) __declspec(align(_align) ) _decl
 #	define BX_ALLOW_UNUSED

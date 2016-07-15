@@ -16,7 +16,7 @@
 #include "error.h"
 #include "uint32_t.h"
 
-#if BX_COMPILER_MSVC_COMPATIBLE
+#if BX_CRT_MSVC
 #	define fseeko64 _fseeki64
 #	define ftello64 _ftelli64
 #elif BX_PLATFORM_ANDROID || BX_PLATFORM_BSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX

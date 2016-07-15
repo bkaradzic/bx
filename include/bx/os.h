@@ -56,11 +56,11 @@
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
-#if BX_COMPILER_MSVC_COMPATIBLE
+#if BX_CRT_MSVC
 #	include <direct.h> // _getcwd
 #else
 #	include <unistd.h> // getcwd
-#endif // BX_COMPILER_MSVC
+#endif // BX_CRT_MSVC
 
 #if BX_PLATFORM_OSX
 #	define BX_DL_EXT "dylib"
@@ -254,7 +254,7 @@ namespace bx
  || BX_PLATFORM_WINRT
 		BX_UNUSED(_path);
 		return -1;
-#elif BX_COMPILER_MSVC_COMPATIBLE
+#elif BX_CRT_MSVC
 		return ::_chdir(_path);
 #else
 		return ::chdir(_path);
@@ -268,7 +268,7 @@ namespace bx
  || BX_PLATFORM_WINRT
 		BX_UNUSED(_buffer, _size);
 		return NULL;
-#elif BX_COMPILER_MSVC_COMPATIBLE
+#elif BX_CRT_MSVC
 		return ::_getcwd(_buffer, (int)_size);
 #else
 		return ::getcwd(_buffer, _size);
