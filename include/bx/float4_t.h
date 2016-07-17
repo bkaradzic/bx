@@ -11,12 +11,19 @@
 #define BX_FLOAT4_FORCE_INLINE BX_FORCE_INLINE
 #define BX_FLOAT4_INLINE inline
 
+#define BX_FLOAT4_SSE     0
+#define BX_FLOAT4_AVX     0
+#define BX_FLOAT4_NEON    0
+#define BX_FLOAT4_LANGEXT 0
+
 #if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include <emmintrin.h> // __m128i
 #	if defined(__SSE4_1__)
 #		include <smmintrin.h>
 #	endif // defined(__SSE4_1__)
 #	include <xmmintrin.h> // __m128
+#	undef  BX_FLOAT4_SSE
+#	define BX_FLOAT4_SSE 1
 
 namespace bx
 {
@@ -26,6 +33,8 @@ namespace bx
 
 #elif defined(__ARM_NEON__) && !BX_COMPILER_CLANG
 #	include <arm_neon.h>
+#	undef  BX_FLOAT4_NEON
+#	define BX_FLOAT4_NEON 1
 
 namespace bx
 {
@@ -38,10 +47,12 @@ namespace bx
 		&& !BX_PLATFORM_IOS \
 		&& BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
 #	include <math.h>
+#	undef  BX_FLOAT4_LANGEXT
+#	define BX_FLOAT4_LANGEXT 1
 
 namespace bx
 {
-	typedef union float4_langext_t
+	union float4_langext_t
 	{
 		float    __attribute__((vector_size(16))) vf;
 		int32_t  __attribute__((vector_size(16))) vi;
@@ -50,19 +61,19 @@ namespace bx
 		int32_t  ixyzw[4];
 		uint32_t uxyzw[4];
 
-	} float4_langext_t;
+	};
 } // namespace bx
 #endif //
 
 namespace bx
 {
-	typedef union float4_ref_t
+	union float4_ref_t
 	{
 		float    fxyzw[4];
 		int32_t  ixyzw[4];
 		uint32_t uxyzw[4];
 
-	} float4_ref_t;
+	};
 } // namespace bx
 
 namespace bx
@@ -351,16 +362,23 @@ IMPLEMENT_TEST(xyzw);
 
 } // namespace bx
 
-#if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
+#if BX_FLOAT4_SSE
 #	include "float4_sse.h"
-#elif defined(__ARM_NEON__) && !BX_COMPILER_CLANG
+#endif // BX_FLOAT4_SSE
+
+#if BX_FLOAT4_NEON
 #	include "float4_neon.h"
-#elif BX_COMPILER_CLANG \
-		&& !BX_PLATFORM_EMSCRIPTEN \
-		&& !BX_PLATFORM_IOS \
-		&& BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
+#endif // BX_FLOAT4_NEON
+
+#if BX_FLOAT4_LANGEXT
 #	include "float4_langext.h"
-#else
+#endif // BX_FLOAT4_LANGEXT
+
+#if !( BX_FLOAT4_SSE \
+	|| BX_FLOAT4_AVX \
+	|| BX_FLOAT4_NEON \
+	|| BX_FLOAT4_LANGEXT \
+	 )
 #	ifndef BX_FLOAT4_WARN_REFERENCE_IMPL
 #		define BX_FLOAT4_WARN_REFERENCE_IMPL 0
 #	endif // BX_FLOAT4_WARN_REFERENCE_IMPL
