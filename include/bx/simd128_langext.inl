@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_FLOAT4_LANGEXT_H_HEADER_GUARD
-#define BX_FLOAT4_LANGEXT_H_HEADER_GUARD
+#ifndef BX_SIMD_LANGEXT_H_HEADER_GUARD
+#define BX_SIMD_LANGEXT_H_HEADER_GUARD
 
 #define float4_rcp           float4_rcp_ni
 #define float4_orx           float4_orx_ni
@@ -37,7 +37,8 @@
 #define float4_max           float4_max_ni
 #define float4_imin          float4_imin_ni
 #define float4_imax          float4_imax_ni
-#include "float4_ni.h"
+
+#include "simd_ni.inl"
 
 namespace bx
 {
@@ -47,9 +48,9 @@ namespace bx
 #define ELEMw 3
 #define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			template<> \
-			BX_FLOAT4_FORCE_INLINE float4_langext_t float4_swiz_##_x##_y##_z##_w(float4_langext_t _a) \
+			BX_SIMD_FORCE_INLINE simd_langext_t float4_swiz_##_x##_y##_z##_w(simd_langext_t _a) \
 			{ \
-				float4_langext_t result; \
+				simd_langext_t result; \
 				result.vf = __builtin_shufflevector(_a.vf, _a.vf, ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w); \
 				return result; \
 			}
@@ -64,7 +65,7 @@ namespace bx
 
 #define IMPLEMENT_TEST(_xyzw, _mask) \
 			template<> \
-			BX_FLOAT4_FORCE_INLINE bool float4_test_any_##_xyzw(float4_langext_t _test) \
+			BX_SIMD_FORCE_INLINE bool simd_test_any_##_xyzw(simd_langext_t _test) \
 			{ \
 				uint32_t tmp = ( (_test.uxyzw[3]>>31)<<3) \
 				             | ( (_test.uxyzw[2]>>31)<<2) \
@@ -75,7 +76,7 @@ namespace bx
 			} \
 			\
 			template<> \
-			BX_FLOAT4_FORCE_INLINE bool float4_test_all_##_xyzw(float4_langext_t _test) \
+			BX_SIMD_FORCE_INLINE bool simd_test_all_##_xyzw(simd_langext_t _test) \
 			{ \
 				uint32_t tmp = ( (_test.uxyzw[3]>>31)<<3) \
 				             | ( (_test.uxyzw[2]>>31)<<2) \
@@ -104,114 +105,114 @@ IMPLEMENT_TEST(xyzw , 0xf);
 #undef IMPLEMENT_TEST
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_xyAB(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_xyAB(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 0, 1, 4, 5);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_ABxy(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_ABxy(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 4, 5, 0, 1);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_CDzw(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_CDzw(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 6, 7, 2, 3);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_zwCD(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_zwCD(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 2, 3, 6, 7);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_xAyB(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_xAyB(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 0, 4, 1, 5);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_yBxA(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_yBxA(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 1, 5, 0, 4);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_zCwD(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_zCwD(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 2, 6, 3, 7);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_CzDw(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_CzDw(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 6, 2, 7, 3);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_xAzC(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_xAzC(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 0, 4, 2, 6);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_shuf_yBwD(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_shuf_yBwD(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_shufflevector(_a.vf, _b.vf, 1, 5, 3, 7);
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float float4_x(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE float float4_x(simd_langext_t _a)
 	{
 		return _a.fxyzw[0];
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float float4_y(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE float float4_y(simd_langext_t _a)
 	{
 		return _a.fxyzw[1];
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float float4_z(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE float float4_z(simd_langext_t _a)
 	{
 		return _a.fxyzw[2];
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float float4_w(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE float float4_w(simd_langext_t _a)
 	{
 		return _a.fxyzw[3];
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_ld(const void* _ptr)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_ld(const void* _ptr)
 	{
 		const uint32_t* input = reinterpret_cast<const uint32_t*>(_ptr);
-		float4_langext_t result;
+		simd_langext_t result;
 		result.uxyzw[0] = input[0];
 		result.uxyzw[1] = input[1];
 		result.uxyzw[2] = input[2];
@@ -220,7 +221,7 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE void float4_st(void* _ptr, float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE void float4_st(void* _ptr, simd_langext_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
@@ -230,14 +231,14 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE void float4_stx(void* _ptr, float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE void float4_stx(void* _ptr, simd_langext_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE void float4_stream(void* _ptr, float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE void float4_stream(void* _ptr, simd_langext_t _a)
 	{
 		uint32_t* result = reinterpret_cast<uint32_t*>(_ptr);
 		result[0] = _a.uxyzw[0];
@@ -247,109 +248,109 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_ld(float _x, float _y, float _z, float _w)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_ld(float _x, float _y, float _z, float _w)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = (float __attribute__((vector_size(16)))){ _x, _y, _z, _w };
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = (uint32_t __attribute__((vector_size(16)))){ _x, _y, _z, _w };
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_splat(const void* _ptr)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_splat(const void* _ptr)
 	{
 		const uint32_t val = *reinterpret_cast<const uint32_t*>(_ptr);
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = (uint32_t __attribute__((vector_size(16)))){ val, val, val, val };
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_splat(float _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_splat(float _a)
 	{
-		return float4_ld<float4_langext_t>(_a, _a, _a, _a);
+		return float4_ld<simd_langext_t>(_a, _a, _a, _a);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_isplat(uint32_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_isplat(uint32_t _a)
 	{
-		return float4_ild<float4_langext_t>(_a, _a, _a, _a);
+		return float4_ild<simd_langext_t>(_a, _a, _a, _a);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_zero()
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_zero()
 	{
-		return float4_ild<float4_langext_t>(0, 0, 0, 0);
+		return float4_ild<simd_langext_t>(0, 0, 0, 0);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_itof(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_itof(simd_langext_t _a)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = __builtin_convertvector(_a.vi, float __attribute__((vector_size(16))) );
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_ftoi(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_ftoi(simd_langext_t _a)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = __builtin_convertvector(_a.vf, int32_t __attribute__((vector_size(16))) );
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_round(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_round(simd_langext_t _a)
 	{
-		const float4_langext_t tmp    = float4_ftoi(_a);
-		const float4_langext_t result = float4_itof(tmp);
+		const simd_langext_t tmp    = float4_ftoi(_a);
+		const simd_langext_t result = float4_itof(tmp);
 
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_add(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_add(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = _a.vf + _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_sub(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_sub(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = _a.vf - _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_mul(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_mul(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = _a.vf * _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_div(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_div(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf = _a.vf / _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_sqrt(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_sqrt(simd_langext_t _a)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf[0] = sqrtf(_a.vf[0]);
 		result.vf[1] = sqrtf(_a.vf[1]);
 		result.vf[2] = sqrtf(_a.vf[2]);
@@ -358,9 +359,9 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_rsqrt_est(float4_langext_t _a)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_rsqrt_est(simd_langext_t _a)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vf[0] = 1.0f / sqrtf(_a.vf[0]);
 		result.vf[1] = 1.0f / sqrtf(_a.vf[1]);
 		result.vf[2] = 1.0f / sqrtf(_a.vf[2]);
@@ -369,146 +370,146 @@ IMPLEMENT_TEST(xyzw , 0xf);
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_cmpeq(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_cmpeq(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vf == _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_cmplt(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_cmplt(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vf < _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_cmple(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_cmple(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vf <= _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_cmpgt(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_cmpgt(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vf > _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_cmpge(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_cmpge(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vf >= _b.vf;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_and(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_and(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = _a.vu & _b.vu;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_andc(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_andc(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = _a.vu & ~_b.vu;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_or(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_or(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = _a.vu | _b.vu;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_xor(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_xor(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vu = _a.vu ^ _b.vu;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_sll(float4_langext_t _a, int _count)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_sll(simd_langext_t _a, int _count)
 	{
-		float4_langext_t result;
-		const float4_langext_t count = float4_isplat<float4_langext_t>(_count);
+		simd_langext_t result;
+		const simd_langext_t count = float4_isplat<simd_langext_t>(_count);
 		result.vu = _a.vu << count.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_srl(float4_langext_t _a, int _count)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_srl(simd_langext_t _a, int _count)
 	{
-		float4_langext_t result;
-		const float4_langext_t count = float4_isplat<float4_langext_t>(_count);
+		simd_langext_t result;
+		const simd_langext_t count = float4_isplat<simd_langext_t>(_count);
 		result.vu = _a.vu >> count.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_sra(float4_langext_t _a, int _count)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_sra(simd_langext_t _a, int _count)
 	{
-		float4_langext_t result;
-		const float4_langext_t count = float4_isplat<float4_langext_t>(_count);
+		simd_langext_t result;
+		const simd_langext_t count = float4_isplat<simd_langext_t>(_count);
 		result.vi = _a.vi >> count.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_icmpeq(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_icmpeq(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vi == _b.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_icmplt(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_icmplt(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vi < _b.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_icmpgt(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_icmpgt(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vi > _b.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_iadd(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_iadd(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vi + _b.vi;
 		return result;
 	}
 
 	template<>
-	BX_FLOAT4_FORCE_INLINE float4_langext_t float4_isub(float4_langext_t _a, float4_langext_t _b)
+	BX_SIMD_FORCE_INLINE simd_langext_t float4_isub(simd_langext_t _a, simd_langext_t _b)
 	{
-		float4_langext_t result;
+		simd_langext_t result;
 		result.vi = _a.vi - _b.vi;
 		return result;
 	}
 
-	typedef float4_langext_t float4_t;
+	typedef simd_langext_t simd128_t;
 
 } // namespace bx
 
-#endif // BX_FLOAT4_LANGEXT_H_HEADER_GUARD
+#endif // BX_SIMD_LANGEXT_H_HEADER_GUARD
