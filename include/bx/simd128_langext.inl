@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD_LANGEXT_H_HEADER_GUARD
-#define BX_SIMD_LANGEXT_H_HEADER_GUARD
+#ifndef BX_SIMD128_LANGEXT_H_HEADER_GUARD
+#define BX_SIMD128_LANGEXT_H_HEADER_GUARD
 
 #define float4_rcp           float4_rcp_ni
 #define float4_orx           float4_orx_ni
@@ -512,4 +512,4 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 
 } // namespace bx
 
-#endif // BX_SIMD_LANGEXT_H_HEADER_GUARD
+#endif // BX_SIMD128_LANGEXT_H_HEADER_GUARD

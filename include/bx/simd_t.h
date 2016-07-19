@@ -11,10 +11,16 @@
 #define BX_SIMD_FORCE_INLINE BX_FORCE_INLINE
 #define BX_SIMD_INLINE inline
 
-#define BX_SIMD_SSE     0
 #define BX_SIMD_AVX     0
-#define BX_SIMD_NEON    0
 #define BX_SIMD_LANGEXT 0
+#define BX_SIMD_NEON    0
+#define BX_SIMD_SSE     0
+
+#if defined(__AVX__) || defined(__AVX2__)
+#	include <immintrin.h>
+#	undef  BX_SIMD_AVX
+#	define BX_SIMD_AVX 1
+#endif //
 
 #if defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) )
 #	include <emmintrin.h> // __m128i
@@ -46,7 +52,7 @@ namespace bx
 #define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			template<typename Ty> \
 			BX_SIMD_FORCE_INLINE Ty simd_swiz_##_x##_y##_z##_w(Ty _a);
-#include "simd_swizzle.inl"
+#include "simd128_swizzle.inl"
 
 #undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
@@ -321,13 +327,9 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	template<typename Ty>
 	BX_SIMD_INLINE Ty simd_floor(Ty _a);
 
-#if BX_SIMD_SSE
-	typedef __m128 simd128_sse_t;
+#if BX_SIMD_AVX
+	typedef __m256 simd256_avx_t;
 #endif // BX_SIMD_SSE
-
-#if BX_SIMD_NEON
-	typedef float32x4_t simd128_neon_t;
-#endif // BX_SIMD_NEON
 
 #if BX_SIMD_LANGEXT
 	union simd128_langext_t
@@ -342,6 +344,14 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	};
 #endif // BX_SIMD_LANGEXT
 
+#if BX_SIMD_NEON
+	typedef float32x4_t simd128_neon_t;
+#endif // BX_SIMD_NEON
+
+#if BX_SIMD_SSE
+	typedef __m128 simd128_sse_t;
+#endif // BX_SIMD_SSE
+
 	union simd128_ref_t
 	{
 		float    fxyzw[4];
@@ -352,26 +362,31 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 
 } // namespace bx
 
-#if BX_SIMD_SSE
-#	include "simd128_sse.inl"
-#endif // BX_SIMD_SSE
-
-#if BX_SIMD_NEON
-#	include "simd128_neon.inl"
-#endif // BX_SIMD_NEON
+#if BX_SIMD_AVX
+#	include "simd256_avx.inl"
+#endif // BX_SIMD_AVX
 
 #if BX_SIMD_LANGEXT
 #	include "simd128_langext.inl"
 #endif // BX_SIMD_LANGEXT
 
+#if BX_SIMD_NEON
+#	include "simd128_neon.inl"
+#endif // BX_SIMD_NEON
+
+#if BX_SIMD_SSE
+#	include "simd128_sse.inl"
+#endif // BX_SIMD_SSE
+
 #include "simd128_ref.inl"
+#include "simd256_ref.inl"
 
 namespace bx
 {
-#if !( BX_SIMD_SSE \
-	|| BX_SIMD_AVX \
-	|| BX_SIMD_NEON \
+#if !( BX_SIMD_AVX \
 	|| BX_SIMD_LANGEXT \
+	|| BX_SIMD_NEON \
+	|| BX_SIMD_SSE \
 	 )
 #	ifndef BX_SIMD_WARN_REFERENCE_IMPL
 #		define BX_SIMD_WARN_REFERENCE_IMPL 0
@@ -418,6 +433,6 @@ namespace bx
 	{
 		return simd_isplat<simd128_t>(_a);
 	}
-}
+} // namespace bx
 
 #endif // BX_SIMD_T_H_HEADER_GUARD

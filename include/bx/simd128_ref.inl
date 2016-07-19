@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD_REF_H_HEADER_GUARD
-#define BX_SIMD_REF_H_HEADER_GUARD
+#ifndef BX_SIMD128_REF_H_HEADER_GUARD
+#define BX_SIMD128_REF_H_HEADER_GUARD
 
 #include <math.h> // sqrtf
 
@@ -57,7 +57,7 @@ namespace bx
 				return result; \
 			}
 
-#include "simd_swizzle.inl"
+#include "simd128_swizzle.inl"
 
 #undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
@@ -647,4 +647,4 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 
 } // namespace bx
 
-#endif // BX_SIMD_REF_H_HEADER_GUARD
+#endif // BX_SIMD128_REF_H_HEADER_GUARD

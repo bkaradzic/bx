@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD_SSE_H_HEADER_GUARD
-#define BX_SIMD_SSE_H_HEADER_GUARD
+#ifndef BX_SIMD128_SSE_H_HEADER_GUARD
+#define BX_SIMD128_SSE_H_HEADER_GUARD
 
 #include "simd_ni.inl"
 
@@ -21,7 +21,7 @@ namespace bx
 				return _mm_shuffle_ps( _a, _a, _MM_SHUFFLE(ELEM##_w, ELEM##_z, ELEM##_y, ELEM##_x ) ); \
 			}
 
-#include "simd_swizzle.inl"
+#include "simd128_swizzle.inl"
 
 #undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
@@ -644,4 +644,4 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 
 } // namespace bx
 
-#endif // BX_SIMD_SSE_H_HEADER_GUARD
+#endif // BX_SIMD128_SSE_H_HEADER_GUARD
