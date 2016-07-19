@@ -95,12 +95,12 @@ TEST(simd_swizzle)
 #define ELEMy 1
 #define ELEMz 2
 #define ELEMw 3
-#define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
+#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			simd_check_string("" #_x #_y #_z #_w "", simd_swiz_##_x##_y##_z##_w(xyzw) ); \
 
 #include <bx/simd_swizzle.inl>
 
-#undef IMPLEMENT_SWIZZLE
+#undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
 #undef ELEMz
 #undef ELEMy

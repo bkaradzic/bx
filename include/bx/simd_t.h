@@ -24,24 +24,10 @@
 #	include <xmmintrin.h> // __m128
 #	undef  BX_SIMD_SSE
 #	define BX_SIMD_SSE 1
-
-namespace bx
-{
-	typedef __m128 simd128_sse_t;
-
-} // namespace bx
-
 #elif defined(__ARM_NEON__) && !BX_COMPILER_CLANG
 #	include <arm_neon.h>
 #	undef  BX_SIMD_NEON
 #	define BX_SIMD_NEON 1
-
-namespace bx
-{
-	typedef float32x4_t simd128_neon_t;
-
-} // namespace bx
-
 #elif   BX_COMPILER_CLANG \
 	&& !BX_PLATFORM_EMSCRIPTEN \
 	&& !BX_PLATFORM_IOS \
@@ -49,32 +35,7 @@ namespace bx
 #	include <math.h>
 #	undef  BX_SIMD_LANGEXT
 #	define BX_SIMD_LANGEXT 1
-
-namespace bx
-{
-	union simd128_langext_t
-	{
-		float    __attribute__((vector_size(16))) vf;
-		int32_t  __attribute__((vector_size(16))) vi;
-		uint32_t __attribute__((vector_size(16))) vu;
-		float    fxyzw[4];
-		int32_t  ixyzw[4];
-		uint32_t uxyzw[4];
-
-	};
-} // namespace bx
 #endif //
-
-namespace bx
-{
-	union simd128_ref_t
-	{
-		float    fxyzw[4];
-		int32_t  ixyzw[4];
-		uint32_t uxyzw[4];
-
-	};
-} // namespace bx
 
 namespace bx
 {
@@ -82,40 +43,40 @@ namespace bx
 #define ELEMy 1
 #define ELEMz 2
 #define ELEMw 3
-#define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
+#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			template<typename Ty> \
 			BX_SIMD_FORCE_INLINE Ty simd_swiz_##_x##_y##_z##_w(Ty _a);
 #include "simd_swizzle.inl"
 
-#undef IMPLEMENT_SWIZZLE
+#undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
 #undef ELEMz
 #undef ELEMy
 #undef ELEMx
 
-#define IMPLEMENT_TEST(_xyzw) \
+#define BX_SIMD128_IMPLEMENT_TEST(_xyzw) \
 			template<typename Ty> \
 			BX_SIMD_FORCE_INLINE bool simd_test_any_##_xyzw(Ty _test); \
 			\
 			template<typename Ty> \
 			BX_SIMD_FORCE_INLINE bool simd_test_all_##_xyzw(Ty _test)
 
-IMPLEMENT_TEST(x   );
-IMPLEMENT_TEST(y   );
-IMPLEMENT_TEST(xy  );
-IMPLEMENT_TEST(z   );
-IMPLEMENT_TEST(xz  );
-IMPLEMENT_TEST(yz  );
-IMPLEMENT_TEST(xyz );
-IMPLEMENT_TEST(w   );
-IMPLEMENT_TEST(xw  );
-IMPLEMENT_TEST(yw  );
-IMPLEMENT_TEST(xyw );
-IMPLEMENT_TEST(zw  );
-IMPLEMENT_TEST(xzw );
-IMPLEMENT_TEST(yzw );
-IMPLEMENT_TEST(xyzw);
-#undef IMPLEMENT_TEST
+BX_SIMD128_IMPLEMENT_TEST(x   );
+BX_SIMD128_IMPLEMENT_TEST(y   );
+BX_SIMD128_IMPLEMENT_TEST(xy  );
+BX_SIMD128_IMPLEMENT_TEST(z   );
+BX_SIMD128_IMPLEMENT_TEST(xz  );
+BX_SIMD128_IMPLEMENT_TEST(yz  );
+BX_SIMD128_IMPLEMENT_TEST(xyz );
+BX_SIMD128_IMPLEMENT_TEST(w   );
+BX_SIMD128_IMPLEMENT_TEST(xw  );
+BX_SIMD128_IMPLEMENT_TEST(yw  );
+BX_SIMD128_IMPLEMENT_TEST(xyw );
+BX_SIMD128_IMPLEMENT_TEST(zw  );
+BX_SIMD128_IMPLEMENT_TEST(xzw );
+BX_SIMD128_IMPLEMENT_TEST(yzw );
+BX_SIMD128_IMPLEMENT_TEST(xyzw);
+#undef BX_SIMD128_IMPLEMENT_TEST
 
 	template<typename Ty>
 	BX_SIMD_FORCE_INLINE Ty simd_shuf_xyAB(Ty _a, Ty _b);
@@ -360,6 +321,35 @@ IMPLEMENT_TEST(xyzw);
 	template<typename Ty>
 	BX_SIMD_INLINE Ty simd_floor(Ty _a);
 
+#if BX_SIMD_SSE
+	typedef __m128 simd128_sse_t;
+#endif // BX_SIMD_SSE
+
+#if BX_SIMD_NEON
+	typedef float32x4_t simd128_neon_t;
+#endif // BX_SIMD_NEON
+
+#if BX_SIMD_LANGEXT
+	union simd128_langext_t
+	{
+		float    __attribute__((vector_size(16))) vf;
+		int32_t  __attribute__((vector_size(16))) vi;
+		uint32_t __attribute__((vector_size(16))) vu;
+		float    fxyzw[4];
+		int32_t  ixyzw[4];
+		uint32_t uxyzw[4];
+
+	};
+#endif // BX_SIMD_LANGEXT
+
+	union simd128_ref_t
+	{
+		float    fxyzw[4];
+		int32_t  ixyzw[4];
+		uint32_t uxyzw[4];
+
+	};
+
 } // namespace bx
 
 #if BX_SIMD_SSE
@@ -374,6 +364,10 @@ IMPLEMENT_TEST(xyzw);
 #	include "simd128_langext.inl"
 #endif // BX_SIMD_LANGEXT
 
+#include "simd128_ref.inl"
+
+namespace bx
+{
 #if !( BX_SIMD_SSE \
 	|| BX_SIMD_AVX \
 	|| BX_SIMD_NEON \
@@ -387,16 +381,9 @@ IMPLEMENT_TEST(xyzw);
 #		pragma message("************************************\nUsing SIMD reference implementation!\n************************************")
 #	endif // BX_SIMD_WARN_REFERENCE_IMPL
 
-namespace bx
-{
 	typedef simd128_ref_t simd128_t;
-}
 #endif //
 
-#include "simd128_ref.inl"
-
-namespace bx
-{
 	BX_SIMD_FORCE_INLINE simd128_t simd_zero()
 	{
 		return simd_zero<simd128_t>();

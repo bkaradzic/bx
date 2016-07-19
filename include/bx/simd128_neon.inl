@@ -43,7 +43,7 @@ namespace bx
 #define ELEMy 1
 #define ELEMz 2
 #define ELEMw 3
-#define IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
+#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
 			template<> \
 			BX_SIMD_FORCE_INLINE simd128_neon_t simd_swiz_##_x##_y##_z##_w(simd128_neon_t _a) \
 			{ \
@@ -52,13 +52,13 @@ namespace bx
 
 #include "simd_swizzle.inl"
 
-#undef IMPLEMENT_SWIZZLE
+#undef BX_SIMD128_IMPLEMENT_SWIZZLE
 #undef ELEMw
 #undef ELEMz
 #undef ELEMy
 #undef ELEMx
 
-#define IMPLEMENT_TEST(_xyzw, _swizzle) \
+#define BX_SIMD128_IMPLEMENT_TEST(_xyzw, _swizzle) \
 			template<> \
 			BX_SIMD_FORCE_INLINE bool simd_test_any_##_xyzw(simd128_neon_t _test) \
 			{ \
@@ -73,21 +73,21 @@ namespace bx
 				return simd_test_all_ni(tmp0); \
 			}
 
-IMPLEMENT_TEST(x,   xxxx);
-IMPLEMENT_TEST(y,   yyyy);
-IMPLEMENT_TEST(xy,  xyyy);
-IMPLEMENT_TEST(z,   zzzz);
-IMPLEMENT_TEST(xz,  xzzz);
-IMPLEMENT_TEST(yz,  yzzz);
-IMPLEMENT_TEST(xyz, xyzz);
-IMPLEMENT_TEST(w,   wwww);
-IMPLEMENT_TEST(xw,  xwww);
-IMPLEMENT_TEST(yw,  ywww);
-IMPLEMENT_TEST(xyw, xyww);
-IMPLEMENT_TEST(zw,  zwww);
-IMPLEMENT_TEST(xzw, xzww);
-IMPLEMENT_TEST(yzw, yzww);
-#undef IMPLEMENT_TEST
+BX_SIMD128_IMPLEMENT_TEST(x,   xxxx);
+BX_SIMD128_IMPLEMENT_TEST(y,   yyyy);
+BX_SIMD128_IMPLEMENT_TEST(xy,  xyyy);
+BX_SIMD128_IMPLEMENT_TEST(z,   zzzz);
+BX_SIMD128_IMPLEMENT_TEST(xz,  xzzz);
+BX_SIMD128_IMPLEMENT_TEST(yz,  yzzz);
+BX_SIMD128_IMPLEMENT_TEST(xyz, xyzz);
+BX_SIMD128_IMPLEMENT_TEST(w,   wwww);
+BX_SIMD128_IMPLEMENT_TEST(xw,  xwww);
+BX_SIMD128_IMPLEMENT_TEST(yw,  ywww);
+BX_SIMD128_IMPLEMENT_TEST(xyw, xyww);
+BX_SIMD128_IMPLEMENT_TEST(zw,  zwww);
+BX_SIMD128_IMPLEMENT_TEST(xzw, xzww);
+BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
+#undef BX_SIMD128_IMPLEMENT_TEST
 
 	template<>
 	BX_SIMD_FORCE_INLINE bool simd_test_any_xyzw(simd128_neon_t _test)
