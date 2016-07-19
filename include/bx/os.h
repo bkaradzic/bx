@@ -16,7 +16,7 @@
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_BSD \
-	|| BX_PLATFORM_GNU \
+	|| BX_PLATFORM_HURD \
 	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_LINUX \
 	|| BX_PLATFORM_NACL \
@@ -52,7 +52,7 @@
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
-#	elif BX_PLATFORM_GNU
+#	elif BX_PLATFORM_HURD
 #		include <unistd.h> // getpid
 #	elif BX_PLATFORM_ANDROID
 #		include "debug.h" // getTid is not implemented...
@@ -113,7 +113,7 @@ namespace bx
 #elif BX_PLATFORM_BSD || BX_PLATFORM_NACL
 		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
-#elif BX_PLATFORM_GNU
+#elif BX_PLATFORM_HURD
 		return (pthread_t)::pthread_self();
 #else
 //#	pragma message "not implemented."
@@ -127,7 +127,7 @@ namespace bx
 #if BX_PLATFORM_ANDROID
 		struct mallinfo mi = mallinfo();
 		return mi.uordblks;
-#elif BX_PLATFORM_LINUX || BX_PLATFORM_GNU
+#elif BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 		FILE* file = fopen("/proc/self/statm", "r");
 		if (NULL == file)
 		{
