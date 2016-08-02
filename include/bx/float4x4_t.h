@@ -3,8 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMDX4_H_HEADER_GUARD
-#define BX_SIMDX4_H_HEADER_GUARD
+#ifndef BX_FLOAT4X4_H_HEADER_GUARD
+#define BX_FLOAT4X4_H_HEADER_GUARD
 
 #include "simd_t.h"
 
@@ -155,4 +155,4 @@ namespace bx
 
 } // namespace bx
 
-#endif // BX_SIMDX4_H_HEADER_GUARD
+#endif // BX_FLOAT4X4_H_HEADER_GUARD
