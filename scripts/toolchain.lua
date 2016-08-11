@@ -61,7 +61,6 @@ function toolchain(_buildDir, _libDir)
 		},
 	}
 
-
 	newoption {
 		trigger = "xcode",
 		value = "xcode_target",
@@ -74,26 +73,31 @@ function toolchain(_buildDir, _libDir)
 	}
 
 	newoption {
-		trigger = "with-android",
-		value   = "#",
+		trigger     = "with-android",
+		value       = "#",
 		description = "Set Android platform version (default: android-14).",
 	}
 
 	newoption {
-		trigger = "with-ios",
-		value   = "#",
+		trigger     = "with-ios",
+		value       = "#",
 		description = "Set iOS target version (default: 8.0).",
 	}
 
 	newoption {
-		trigger = "with-tvos",
-		value   = "#",
+		trigger     = "with-tvos",
+		value       = "#",
 		description = "Set tvOS target version (default: 9.0).",
 	}
 
 	newoption {
-		trigger = "with-dynamic-runtime",
+		trigger     = "with-dynamic-runtime",
 		description = "Dynamically link with the runtime rather than statically",
+	}
+
+	newoption {
+		trigger     = "with-32bit-compiler",
+		description = "Use 32-bit compiler instead 64-bit.",
 	}
 
 	-- Avoid error when invoking genie --help.
@@ -120,6 +124,11 @@ function toolchain(_buildDir, _libDir)
 	local tvosPlatform = ""
 	if _OPTIONS["with-tvos"] then
 		tvosPlatform = _OPTIONS["with-tvos"]
+	end
+
+	local compiler32bit = false
+	if _OPTIONS["with-32bit-compiler"] then
+		compiler32bit = true
 	end
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then
@@ -249,8 +258,17 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "$(MINGW)/bin/x86_64-w64-mingw32-gcc"
-			premake.gcc.cxx = "$(MINGW)/bin/x86_64-w64-mingw32-g++"
+			local mingwToolchain = "x86_64-w64-mingw32"
+			if compiler32bit then
+				if os.is("linux") then
+					mingwToolchain = "i686-w64-mingw32"
+				else
+					mingwToolchain = "mingw32"
+				end
+			end
+
+			premake.gcc.cc  = "$(MINGW)/bin/" .. mingwToolchain .. "-gcc"
+			premake.gcc.cxx = "$(MINGW)/bin/" .. mingwToolchain .. "-g++"
 			premake.gcc.ar  = "$(MINGW)/bin/ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-mingw-gcc"))
 
@@ -304,10 +322,14 @@ function toolchain(_buildDir, _libDir)
 		elseif "osx" == _OPTIONS["gcc"] then
 
 			if os.is("linux") then
+				if not os.getenv("OSXCROSS") then
+					print("Set OSXCROSS enviroment variable.")
+				end
+
 				local osxToolchain = "x86_64-apple-darwin15-"
-				premake.gcc.cc  = osxToolchain .. "clang"
-				premake.gcc.cxx = osxToolchain .. "clang++"
-				premake.gcc.ar  = osxToolchain .. "ar"
+				premake.gcc.cc  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang"
+				premake.gcc.cxx = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang++"
+				premake.gcc.ar  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "ar"
 			end
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
