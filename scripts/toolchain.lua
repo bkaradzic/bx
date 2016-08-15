@@ -100,6 +100,11 @@ function toolchain(_buildDir, _libDir)
 		description = "Use 32-bit compiler instead 64-bit.",
 	}
 
+	newoption {
+		trigger     = "with-avx",
+		description = "Use AVX extension.",
+	}
+
 	-- Avoid error when invoking genie --help.
 	if (_ACTION == nil) then return false end
 
@@ -458,6 +463,10 @@ function toolchain(_buildDir, _libDir)
 
 	if not _OPTIONS["with-dynamic-runtime"] then
 		flags { "StaticRuntime" }
+	end
+
+	if _OPTIONS["with-avx"] then
+		flags { "EnableAVX" }
 	end
 
 	flags {
