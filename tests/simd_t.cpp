@@ -53,6 +53,7 @@ void simd_check_int32(
 	CHECK_EQUAL(c.i[3], _3);
 }
 
+#if 0
 void simd_check_int32(
 	  const char* _str
 	, bx::simd256_t _a
@@ -82,6 +83,7 @@ void simd_check_int32(
 	CHECK_EQUAL(c.i[6], _6);
 	CHECK_EQUAL(c.i[7], _7);
 }
+#endif // 0
 
 void simd_check_uint32(
 	  const char* _str
@@ -106,6 +108,7 @@ void simd_check_uint32(
 	CHECK_EQUAL(c.ui[3], _3);
 }
 
+#if 0
 void simd_check_uint32(
 	  const char* _str
 	, bx::simd256_t _a
@@ -136,6 +139,7 @@ void simd_check_uint32(
 	CHECK_EQUAL(c.ui[6], _6);
 	CHECK_EQUAL(c.ui[7], _7);
 }
+#endif // 0
 
 void simd_check_float(
 	  const char* _str
@@ -160,6 +164,7 @@ void simd_check_float(
 	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
 }
 
+#if 0
 void simd_check_float(
 	  const char* _str
 	, bx::simd256_t _a
@@ -190,6 +195,7 @@ void simd_check_float(
 	CHECK(bx::fequal(c.f[6], _6, 0.0001f) );
 	CHECK(bx::fequal(c.f[7], _7, 0.0001f) );
 }
+#endif // 0
 
 void simd_check_string(const char* _str, bx::simd128_t _a)
 {
@@ -314,20 +320,20 @@ TEST(simd_load)
 		, 0.0f, 1.0f, 2.0f, 3.0f
 		);
 
-	simd_check_float("ld"
-		, simd_ld<simd256_t>(0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f)
-		, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f
-		);
+//	simd_check_float("ld"
+//		, simd_ld<simd256_t>(0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f)
+//		, 0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f
+//		);
 
 	simd_check_int32("ild"
 		, simd_ild(uint32_t(-1), 0, 1, 2)
 		, uint32_t(-1), 0, 1, 2
 		);
 
-	simd_check_int32("ild"
-		, simd_ild<simd256_t>(uint32_t(-1), 0, 1, 2, 3, 4, 5, 6)
-		, uint32_t(-1), 0, 1, 2, 3, 4, 5, 6
-		);
+//	simd_check_int32("ild"
+//		, simd_ild<simd256_t>(uint32_t(-1), 0, 1, 2, 3, 4, 5, 6)
+//		, uint32_t(-1), 0, 1, 2, 3, 4, 5, 6
+//		);
 
 	simd_check_int32("ild"
 		, simd_ild(uint32_t(-1), uint32_t(-2), uint32_t(-3), uint32_t(-4) )
