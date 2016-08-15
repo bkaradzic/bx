@@ -400,7 +400,7 @@ namespace bx
 	typedef simd128_ref_t simd128_t;
 #endif //
 
-	BX_ALIGN_DECL(32, struct) simd256_ref_t
+	struct simd256_ref_t
 	{
 		simd128_t simd128_0;
 		simd128_t simd128_1;
