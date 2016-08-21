@@ -136,13 +136,13 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	BX_SIMD_FORCE_INLINE Ty simd_ld(float _x, float _y, float _z, float _w);
 
 	template<typename Ty>
-	BX_SIMD_FORCE_INLINE Ty simd_ld(float _x, float _y, float _z, float _w, float _A, float _B, float _C, float _D);
+	BX_SIMD_FORCE_INLINE Ty simd_ld(float _x, float _y, float _z, float _w, float _a, float _b, float _c, float _d);
 
 	template<typename Ty>
 	BX_SIMD_FORCE_INLINE Ty simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w);
 
 	template<typename Ty>
-	BX_SIMD_FORCE_INLINE Ty simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w, uint32_t _A, uint32_t _B, uint32_t _C, uint32_t _D);
+	BX_SIMD_FORCE_INLINE Ty simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w, uint32_t _a, uint32_t _b, uint32_t _c, uint32_t _d);
 
 	template<typename Ty>
 	BX_SIMD_FORCE_INLINE Ty simd_splat(const void* _ptr);

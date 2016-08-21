@@ -29,20 +29,20 @@ namespace bx
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ld(float _x, float _y, float _z, float _w, float _A, float _B, float _C, float _D)
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ld(float _x, float _y, float _z, float _w, float _a, float _b, float _c, float _d)
 	{
 		simd256_ref_t result;
 		result.simd128_0 = simd_ld<simd128_t>(_x, _y, _z, _w);
-		result.simd128_1 = simd_ld<simd128_t>(_A, _B, _C, _D);
+		result.simd128_1 = simd_ld<simd128_t>(_a, _b, _c, _d);
 		return result;
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w, uint32_t _A, uint32_t _B, uint32_t _C, uint32_t _D)
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w, uint32_t _a, uint32_t _b, uint32_t _c, uint32_t _d)
 	{
 		simd256_ref_t result;
 		result.simd128_0 = simd_ild<simd128_t>(_x, _y, _z, _w);
-		result.simd128_1 = simd_ild<simd128_t>(_A, _B, _C, _D);
+		result.simd128_1 = simd_ild<simd128_t>(_a, _b, _c, _d);
 		return result;
 	}
 
