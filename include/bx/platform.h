@@ -344,7 +344,7 @@
 #	pragma warning(error:4100) // ENABLE warning C4100: '' : unreferenced formal parameter
 #	pragma warning(error:4189) // ENABLE warning C4189: '' : local variable is initialized but not referenced
 #	pragma warning(error:4121) // ENABLE warning C4121: 'symbol' : alignment of a member was sensitive to packing
-#	pragma warning(error:4127) // ENABLE warning C4127: conditional expression is constant
+//#	pragma warning(error:4127) // ENABLE warning C4127: conditional expression is constant
 #	pragma warning(error:4130) // ENABLE warning C4130: 'operator' : logical operation on address of string constant
 #	pragma warning(error:4239) // ENABLE warning C4239: nonstandard extension used : 'argument' : conversion from '*' to '* &' A non-const reference may only be bound to an lvalue
 //#	pragma warning(error:4244) // ENABLE warning C4244: 'argument' : conversion from 'type1' to 'type2', possible loss of data
