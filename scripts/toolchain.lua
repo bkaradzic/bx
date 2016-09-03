@@ -291,11 +291,11 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variable.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_newlib/bin/x86_64-nacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_x86_glibc/bin/x86_64-nacl-"
 			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_newlib/bin/x86_64-nacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_x86_glibc/bin/x86_64-nacl-"
 			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_newlib/bin/x86_64-nacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_x86_glibc/bin/x86_64-nacl-"
 			end
 
 			premake.gcc.cc  = naclToolchain .. "gcc"
@@ -309,11 +309,11 @@ function toolchain(_buildDir, _libDir)
 				print("Set NACL_SDK_ROOT enviroment variable.")
 			end
 
-			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_newlib/bin/arm-nacl-"
+			naclToolchain = "$(NACL_SDK_ROOT)/toolchain/win_arm_glibc/bin/arm-nacl-"
 			if os.is("macosx") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_newlib/bin/arm-nacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/mac_arm_glibc/bin/arm-nacl-"
 			elseif os.is("linux") then
-				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_arm_newlib/bin/arm-nacl-"
+				naclToolchain = "$(NACL_SDK_ROOT)/toolchain/linux_arm_glibc/bin/arm-nacl-"
 			end
 
 			premake.gcc.cc  = naclToolchain .. "gcc"
@@ -938,10 +938,10 @@ function toolchain(_buildDir, _libDir)
 		linkoptions { "-melf32_nacl" }
 
 	configuration { "x32", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_32/Debug" }
 
 	configuration { "x32", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_32/Release" }
 
 	configuration { "x64", "nacl" }
 		targetdir (path.join(_buildDir, "nacl-x64/bin"))
@@ -950,10 +950,10 @@ function toolchain(_buildDir, _libDir)
 		linkoptions { "-melf64_nacl" }
 
 	configuration { "x64", "nacl", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_64/Debug" }
 
 	configuration { "x64", "nacl", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_x86_64/Release" }
 
 	configuration { "nacl-arm" }
 		buildoptions {
@@ -964,10 +964,10 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/nacl-arm") }
 
 	configuration { "nacl-arm", "Debug" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Debug" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_arm/Debug" }
 
 	configuration { "nacl-arm", "Release" }
-		libdirs { "$(NACL_SDK_ROOT)/lib/newlib_arm/Release" }
+		libdirs { "$(NACL_SDK_ROOT)/lib/glibc_arm/Release" }
 
 	configuration { "pnacl" }
 		targetdir (path.join(_buildDir, "pnacl/bin"))
