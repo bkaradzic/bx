@@ -8,6 +8,12 @@
 #include <bx/fpumath.h>
 #include <string.h>
 
+#if 0
+#	define SIMD_DBG DBG
+#else
+#	define SIMD_DBG(_fmt, ...) BX_UNUSED(__VA_ARGS__);
+#endif // 0
+
 using namespace bx;
 
 union simd_cast
@@ -22,13 +28,13 @@ union simd_cast
 
 void simd_check_bool(const char* _str, bool _a, bool _0)
 {
-	DBG("%s %d == %d"
+	SIMD_DBG("%s %d == %d"
 		, _str
 		, _a
 		, _0
 		);
 
-	CHECK_EQUAL(_a, _0);
+	REQUIRE(_a == _0);
 }
 
 void simd_check_int32(
@@ -41,16 +47,16 @@ void simd_check_int32(
 	)
 {
 	simd_cast c; c.simd128 = _a;
-	DBG("%s (%d, %d, %d, %d) == (%d, %d, %d, %d)"
+	SIMD_DBG("%s (%d, %d, %d, %d) == (%d, %d, %d, %d)"
 		, _str
 		, c.i[0], c.i[1], c.i[2], c.i[3]
 		, _0, _1, _2, _3
 		);
 
-	CHECK_EQUAL(c.i[0], _0);
-	CHECK_EQUAL(c.i[1], _1);
-	CHECK_EQUAL(c.i[2], _2);
-	CHECK_EQUAL(c.i[3], _3);
+	REQUIRE(c.i[0] == _0);
+	REQUIRE(c.i[1] == _1);
+	REQUIRE(c.i[2] == _2);
+	REQUIRE(c.i[3] == _3);
 }
 
 #if 0
@@ -68,20 +74,20 @@ void simd_check_int32(
 	)
 {
 	simd_cast c; c.simd256 = _a;
-	DBG("%s (%d, %d, %d, %d, %d, %d, %d, %d) == (%d, %d, %d, %d, %d, %d, %d, %d)"
+	SIMD_DBG("%s (%d, %d, %d, %d, %d, %d, %d, %d) == (%d, %d, %d, %d, %d, %d, %d, %d)"
 		, _str
 		, c.i[0], c.i[1], c.i[2], c.i[3], c.i[4], c.i[5], c.i[6], c.i[7]
 		, _0, _1, _2, _3, _4, _5, _6, _7
 		);
 
-	CHECK_EQUAL(c.i[0], _0);
-	CHECK_EQUAL(c.i[1], _1);
-	CHECK_EQUAL(c.i[2], _2);
-	CHECK_EQUAL(c.i[3], _3);
-	CHECK_EQUAL(c.i[4], _4);
-	CHECK_EQUAL(c.i[5], _5);
-	CHECK_EQUAL(c.i[6], _6);
-	CHECK_EQUAL(c.i[7], _7);
+	REQUIRE(c.i[0] == _0);
+	REQUIRE(c.i[1] == _1);
+	REQUIRE(c.i[2] == _2);
+	REQUIRE(c.i[3] == _3);
+	REQUIRE(c.i[4] == _4);
+	REQUIRE(c.i[5] == _5);
+	REQUIRE(c.i[6] == _6);
+	REQUIRE(c.i[7] == _7);
 }
 #endif // 0
 
@@ -96,16 +102,16 @@ void simd_check_uint32(
 {
 	simd_cast c; c.simd128 = _a;
 
-	DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x)"
+	SIMD_DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x)"
 		, _str
 		, c.ui[0], c.ui[1], c.ui[2], c.ui[3]
 		, _0, _1, _2, _3
 		);
 
-	CHECK_EQUAL(c.ui[0], _0);
-	CHECK_EQUAL(c.ui[1], _1);
-	CHECK_EQUAL(c.ui[2], _2);
-	CHECK_EQUAL(c.ui[3], _3);
+	REQUIRE(c.ui[0] == _0);
+	REQUIRE(c.ui[1] == _1);
+	REQUIRE(c.ui[2] == _2);
+	REQUIRE(c.ui[3] == _3);
 }
 
 #if 0
@@ -124,20 +130,20 @@ void simd_check_uint32(
 {
 	simd_cast c; c.simd256 = _a;
 
-	DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x)"
+	SIMD_DBG("%s (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x) == (0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x, 0x%08x)"
 		, _str
 		, c.ui[0], c.ui[1], c.ui[2], c.ui[3], c.ui[4], c.ui[5], c.ui[6], c.ui[7]
 		, _0, _1, _2, _3, _4, _5, _6, _7
 		);
 
-	CHECK_EQUAL(c.ui[0], _0);
-	CHECK_EQUAL(c.ui[1], _1);
-	CHECK_EQUAL(c.ui[2], _2);
-	CHECK_EQUAL(c.ui[3], _3);
-	CHECK_EQUAL(c.ui[4], _4);
-	CHECK_EQUAL(c.ui[5], _5);
-	CHECK_EQUAL(c.ui[6], _6);
-	CHECK_EQUAL(c.ui[7], _7);
+	REQUIRE(c.ui[0] == _0);
+	REQUIRE(c.ui[1] == _1);
+	REQUIRE(c.ui[2] == _2);
+	REQUIRE(c.ui[3] == _3);
+	REQUIRE(c.ui[4] == _4);
+	REQUIRE(c.ui[5] == _5);
+	REQUIRE(c.ui[6] == _6);
+	REQUIRE(c.ui[7] == _7);
 }
 #endif // 0
 
@@ -152,7 +158,7 @@ void simd_check_float(
 {
 	simd_cast c; c.simd128 = _a;
 
-	DBG("%s (%f, %f, %f, %f) == (%f, %f, %f, %f)"
+	SIMD_DBG("%s (%f, %f, %f, %f) == (%f, %f, %f, %f)"
 		, _str
 		, c.f[0], c.f[1], c.f[2], c.f[3]
 		, _0, _1, _2, _3
@@ -180,7 +186,7 @@ void simd_check_float(
 {
 	simd_cast c; c.simd256 = _a;
 
-	DBG("%s (%f, %f, %f, %f, %f, %f, %f, %f) == (%f, %f, %f, %f, %f, %f, %f, %f)"
+	SIMD_DBG("%s (%f, %f, %f, %f, %f, %f, %f, %f) == (%f, %f, %f, %f, %f, %f, %f, %f)"
 		, _str
 		, c.f[0], c.f[1], c.f[2], c.f[3], c.f[4], c.f[5], c.f[6], c.f[7]
 		, _0, _1, _2, _3, _4, _5, _6, _7
@@ -202,12 +208,12 @@ void simd_check_string(const char* _str, bx::simd128_t _a)
 	simd_cast c; c.simd128 = _a;
 	const char test[5] = { c.c[0], c.c[4], c.c[8], c.c[12], '\0' };
 
-	DBG("%s %s", _str, test);
+	SIMD_DBG("%s %s", _str, test);
 
 	CHECK(0 == strcmp(_str, test) );
 }
 
-TEST(simd_swizzle)
+TEST_CASE("simd_swizzle", "")
 {
 	const simd128_t xyzw = simd_ild(0x78787878, 0x79797979, 0x7a7a7a7a, 0x77777777);
 
@@ -227,7 +233,7 @@ TEST(simd_swizzle)
 #undef ELEMx
 }
 
-TEST(simd_shuffle)
+TEST_CASE("simd_shuffle", "")
 {
 	const simd128_t xyzw = simd_ild(0x78787878, 0x79797979, 0x7a7a7a7a, 0x77777777);
 	const simd128_t ABCD = simd_ild(0x41414141, 0x42424242, 0x43434343, 0x44444444);
@@ -242,7 +248,7 @@ TEST(simd_shuffle)
 	simd_check_string("CzDw", simd_shuf_CzDw(xyzw, ABCD) );
 }
 
-TEST(simd_compare)
+TEST_CASE("simd_compare", "")
 {
 	simd_check_uint32("cmpeq"
 		, simd_cmpeq(simd_ld(1.0f, 2.0f, 3.0f, 4.0f), simd_ld(0.0f, 2.0f, 0.0f, 3.0f) )
@@ -285,7 +291,7 @@ TEST(simd_compare)
 		);
 }
 
-TEST(simd_test)
+TEST_CASE("simd_test", "")
 {
 	simd_check_bool("test_any_xyzw"
 		, simd_test_any_xyzw(simd_ild(0xffffffff, 0, 0, 0) )
@@ -313,7 +319,7 @@ TEST(simd_test)
 		);
 }
 
-TEST(simd_load)
+TEST_CASE("simd_load", "")
 {
 	simd_check_float("ld"
 		, simd_ld(0.0f, 1.0f, 2.0f, 3.0f)
@@ -353,7 +359,7 @@ TEST(simd_load)
 		);
 }
 
-TEST(simd_arithmetic)
+TEST_CASE("simd_arithmetic", "")
 {
 	simd_check_float("madd"
 		, simd_madd(simd_ld(0.0f, 1.0f, 2.0f, 3.0f), simd_ld(4.0f, 5.0f, 6.0f, 7.0f), simd_ld(8.0f, 9.0f, 10.0f, 11.0f) )
@@ -366,7 +372,7 @@ TEST(simd_arithmetic)
 		);
 }
 
-TEST(simd_sqrt)
+TEST_CASE("simd_sqrt", "")
 {
 	simd_check_float("simd_sqrt"
 		, simd_sqrt(simd_ld(1.0f, 16.0f, 65536.0f, 123456.0f) )
@@ -384,7 +390,7 @@ TEST(simd_sqrt)
 		);
 }
 
-TEST(float4)
+TEST_CASE("float4", "")
 {
 	const simd128_t isplat = simd_isplat(0x80000001);
 	simd_check_uint32("sll"
