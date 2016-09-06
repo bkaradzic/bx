@@ -32,7 +32,23 @@ namespace bx
 			clear();
 		}
 
+		StringView(const StringView& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+		}
+
+		StringView& operator=(const StringView& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+			return *this;
+		}
+
 		StringView(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			set(_ptr, _len);
+		}
+
+		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
 		{
 			clear();
 
@@ -91,7 +107,7 @@ namespace bx
 	}
 
 	/// ASCII string
-	template<bx::AllocatorI** allocator>
+	template<bx::AllocatorI** AllocatorT>
 	class StringT : public StringView
 	{
 	public:
@@ -100,42 +116,25 @@ namespace bx
 		{
 		}
 
-		StringT(const char* _rhs)
+		StringT(const StringT<AllocatorT>& _rhs)
 		{
-			clear();
-
-			if (NULL != _rhs)
-			{
-				uint32_t len = strlen(_rhs);
-				m_len = len;
-				if (0 != len)
-				{
-					++len;
-
-					char* ptr = (char*)BX_ALLOC(*allocator, len);
-
-					memcpy(ptr, _rhs, len);
-
-					*const_cast<char**>(&m_ptr) = ptr;
-				}
-			}
+			set(_rhs.m_ptr, _rhs.m_len);
 		}
 
-		StringT(const StringView& _str)
+		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs)
 		{
-			uint32_t len = _str.getLength();
-			m_len = len;
-			if (0 != len)
-			{
-				++len;
+			set(_rhs.m_ptr, _rhs.m_len);
+			return *this;
+		}
 
-				char* ptr = (char*)BX_ALLOC(*allocator, len);
+		StringT(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			set(_ptr, _len);
+		}
 
-				memcpy(ptr, _str.getPtr(), len-1);
-				ptr[len] = '\0';
-
-				*const_cast<char**>(&m_ptr) = ptr;
-			}
+		StringT(const StringView& _rhs)
+		{
+			set(_rhs.getPtr(), _rhs.getLength() );
 		}
 
 		~StringT()
@@ -143,11 +142,28 @@ namespace bx
 			clear();
 		}
 
+		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			clear();
+
+			if (0 != _len)
+			{
+				uint32_t len = UINT32_MAX == _len ? strlen(_ptr) : _len;
+				m_len = len;
+				char* ptr = (char*)BX_ALLOC(*AllocatorT, len+1);
+
+				memcpy(ptr, _ptr, len);
+				ptr[len] = '\0';
+
+				*const_cast<char**>(&m_ptr) = ptr;
+			}
+		}
+
 		void clear()
 		{
 			if (0 != m_len)
 			{
-				BX_FREE(*allocator, const_cast<char*>(m_ptr) );
+				BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
 
 				StringView::clear();
 			}
