@@ -692,6 +692,46 @@ namespace bx
 #endif // BX_COMPILER_
 	}
 
+	inline uint64_t uint64_sll(uint64_t _a, int _sa)
+	{
+		return _a << _sa;
+	}
+
+	inline uint64_t uint64_srl(uint64_t _a, int _sa)
+	{
+		return _a >> _sa;
+	}
+
+	inline uint64_t uint64_sra(uint64_t _a, int _sa)
+	{
+		return ( (int64_t)_a) >> _sa;
+	}
+
+	inline uint64_t uint64_rol(uint64_t _a, int _sa)
+	{
+		return ( _a << _sa) | (_a >> (32-_sa) );
+	}
+
+	inline uint64_t uint64_ror(uint64_t _a, int _sa)
+	{
+		return ( _a >> _sa) | (_a << (32-_sa) );
+	}
+
+	inline uint64_t uint64_add(uint64_t _a, uint64_t _b)
+	{
+		return _a + _b;
+	}
+
+	inline uint64_t uint64_sub(uint64_t _a, uint64_t _b)
+	{
+		return _a - _b;
+	}
+
+	inline uint64_t uint64_mul(uint64_t _a, uint64_t _b)
+	{
+		return _a * _b;
+	}
+
 	/// Greatest common divisor.
 	inline uint32_t uint32_gcd(uint32_t _a, uint32_t _b)
 	{

@@ -14,12 +14,146 @@
 #include <string.h>
 #include <wchar.h>  // wchar_t
 
+#include <bx/allocator.h>
+#include <bx/hash.h>
+
 #ifndef va_copy
 #	define va_copy(_a, _b) (_a) = (_b)
 #endif // va_copy
 
 namespace bx
 {
+	/// Non-zero-terminated string view.
+	class StringView
+	{
+	public:
+		StringView()
+		{
+			clear();
+		}
+
+		StringView(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			clear();
+
+			if (NULL != _ptr)
+			{
+				uint32_t len = UINT32_MAX == _len ? strlen(_ptr) : _len;
+				if (0 != len)
+				{
+					m_len = len;
+					m_ptr = _ptr;
+				}
+			}
+		}
+
+		void clear()
+		{
+			m_ptr = "";
+			m_len = 0;
+		}
+
+		const char* getPtr() const
+		{
+			return m_ptr;
+		}
+
+		const char* getTerm() const
+		{
+			return m_ptr + m_len;
+		}
+
+		bool isEmpty() const
+		{
+			return 0 == m_len;
+		}
+
+		uint32_t getLength() const
+		{
+			return m_len;
+		}
+
+	protected:
+		friend uint32_t hashMurmur2A(const StringView& _data);
+
+		const char* m_ptr;
+		uint32_t    m_len;
+	};
+
+	inline uint32_t hashMurmur2A(const StringView& _data)
+	{
+		return hashMurmur2A(_data.m_ptr, _data.m_len);
+	}
+
+	inline uint32_t hashMurmur2A(const char* _data)
+	{
+		return hashMurmur2A(StringView(_data) );
+	}
+
+	/// ASCII string
+	template<bx::AllocatorI** allocator>
+	class StringT : public StringView
+	{
+	public:
+		StringT()
+			: StringView("", 0)
+		{
+		}
+
+		StringT(const char* _rhs)
+		{
+			clear();
+
+			if (NULL != _rhs)
+			{
+				uint32_t len = strlen(_rhs);
+				m_len = len;
+				if (0 != len)
+				{
+					++len;
+
+					char* ptr = (char*)BX_ALLOC(*allocator, len);
+
+					memcpy(ptr, _rhs, len);
+
+					*const_cast<char**>(&m_ptr) = ptr;
+				}
+			}
+		}
+
+		StringT(const StringView& _str)
+		{
+			uint32_t len = _str.getLength();
+			m_len = len;
+			if (0 != len)
+			{
+				++len;
+
+				char* ptr = (char*)BX_ALLOC(*allocator, len);
+
+				memcpy(ptr, _str.getPtr(), len-1);
+				ptr[len] = '\0';
+
+				*const_cast<char**>(&m_ptr) = ptr;
+			}
+		}
+
+		~StringT()
+		{
+			clear();
+		}
+
+		void clear()
+		{
+			if (0 != m_len)
+			{
+				BX_FREE(*allocator, const_cast<char*>(m_ptr) );
+
+				StringView::clear();
+			}
+		}
+	};
+
 	///
 	inline bool toBool(const char* _str)
 	{
