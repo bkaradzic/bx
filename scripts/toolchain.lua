@@ -485,6 +485,11 @@ function toolchain(_buildDir, _libDir)
 		"__STDC_CONSTANT_MACROS",
 	}
 
+	configuration { "qbs" }
+		flags {
+			"ExtraWarnings",
+		}
+
 	configuration { "Debug" }
 		targetsuffix "Debug"
 
