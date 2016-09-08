@@ -10,6 +10,15 @@
 
 bx::AllocatorI* g_allocator;
 
+TEST_CASE("strnlen", "")
+{
+	const char* test = "test";
+
+	REQUIRE(0 == bx::strnlen(test, 0) );
+	REQUIRE(2 == bx::strnlen(test, 2) );
+	REQUIRE(4 == bx::strnlen(test, UINT32_MAX) );
+}
+
 TEST_CASE("StringView", "")
 {
 	bx::StringView sv("test");
