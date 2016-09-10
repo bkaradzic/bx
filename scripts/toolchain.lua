@@ -196,19 +196,14 @@ function toolchain(_buildDir, _libDir)
 		elseif "freebsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
 
-		elseif "ios-arm" == _OPTIONS["gcc"] then
+		elseif "ios-arm"   == _OPTIONS["gcc"]
+			or "ios-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-arm"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "ios-arm64" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
-			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-arm64"))
-
-			elseif "ios-simulator" == _OPTIONS["gcc"] then
+		elseif "ios-simulator" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
@@ -1068,17 +1063,10 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-arm/obj"))
 		libdirs { path.join(_libDir, "lib/ios-arm") }
 		linkoptions {
-			"-miphoneos-version-min=7.0",
 			"-arch armv7",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"-miphoneos-version-min=7.0",
 			"-arch armv7",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 		}
 
 	configuration { "ios-arm64" }
@@ -1086,8 +1074,15 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-arm64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-arm64") }
 		linkoptions {
-			"-miphoneos-version-min=7.0",
 			"-arch arm64",
+		}
+		buildoptions {
+			"-arch arm64",
+		}
+
+	configuration { "ios-arm*" }
+		linkoptions {
+			"-miphoneos-version-min=7.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
@@ -1095,7 +1090,6 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-miphoneos-version-min=7.0",
-			"-arch arm64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 		}
 
