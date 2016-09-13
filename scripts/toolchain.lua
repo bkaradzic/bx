@@ -26,6 +26,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
+			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
 			{ "tvos-simulator",  "tvOS - Simulator"           },
@@ -195,11 +196,12 @@ function toolchain(_buildDir, _libDir)
 		elseif "freebsd" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-freebsd"))
 
-		elseif "ios-arm" == _OPTIONS["gcc"] then
+		elseif "ios-arm"   == _OPTIONS["gcc"]
+			or "ios-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ios-arm"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
 		elseif "ios-simulator" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -484,6 +486,11 @@ function toolchain(_buildDir, _libDir)
 		"__STDC_FORMAT_MACROS",
 		"__STDC_CONSTANT_MACROS",
 	}
+
+	configuration { "qbs" }
+		flags {
+			"ExtraWarnings",
+		}
 
 	configuration { "Debug" }
 		targetsuffix "Debug"
@@ -1056,8 +1063,26 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-arm/obj"))
 		libdirs { path.join(_libDir, "lib/ios-arm") }
 		linkoptions {
-			"-miphoneos-version-min=7.0",
 			"-arch armv7",
+		}
+		buildoptions {
+			"-arch armv7",
+		}
+
+	configuration { "ios-arm64" }
+		targetdir (path.join(_buildDir, "ios-arm64/bin"))
+		objdir (path.join(_buildDir, "ios-arm64/obj"))
+		libdirs { path.join(_libDir, "lib/ios-arm64") }
+		linkoptions {
+			"-arch arm64",
+		}
+		buildoptions {
+			"-arch arm64",
+		}
+
+	configuration { "ios-arm*" }
+		linkoptions {
+			"-miphoneos-version-min=7.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
 			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
@@ -1065,7 +1090,6 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-miphoneos-version-min=7.0",
-			"-arch armv7",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 		}
 

@@ -452,8 +452,8 @@ namespace bx
 			}
 
 			const KeyT hash = mix(_key);
-			const uint32_t first = hash % MaxCapacityT;
-			uint32_t idx = first;
+			const uint32_t firstIdx = hash % MaxCapacityT;
+			uint32_t idx = firstIdx;
 			do
 			{
 				if (m_handle[idx] == invalid)
@@ -471,7 +471,7 @@ namespace bx
 
 				idx = (idx + 1) % MaxCapacityT;
 
-			} while (idx != first);
+			} while (idx != firstIdx);
 
 			return false;
 		}
@@ -577,8 +577,8 @@ namespace bx
 		{
 			const KeyT hash = mix(_key);
 
-			const uint32_t first = hash % MaxCapacityT;
-			uint32_t idx = first;
+			const uint32_t firstIdx = hash % MaxCapacityT;
+			uint32_t idx = firstIdx;
 			do
 			{
 				if (m_handle[idx] == invalid)
@@ -593,7 +593,7 @@ namespace bx
 
 				idx = (idx + 1) % MaxCapacityT;
 
-			} while (idx != first);
+			} while (idx != firstIdx);
 
 			return UINT32_MAX;
 		}

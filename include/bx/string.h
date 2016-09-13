@@ -43,9 +43,8 @@ namespace bx
 	///
 	inline size_t strnlen(const char* _str, size_t _max)
 	{
-		const char* end = _str + _max;
 		const char* ptr;
-		for (ptr = _str; ptr < end && *ptr != '\0'; ++ptr) {};
+		for (ptr = _str; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
 		return ptr - _str;
 	}
 
