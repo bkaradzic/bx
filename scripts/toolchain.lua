@@ -360,11 +360,11 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "ps4" == _OPTIONS["gcc"] then
 
-			if not os.getenv("PS4_SDK_ROOT") then
-				print("Set PS4_SDK_ROOT enviroment variable.")
+			if not os.getenv("SCE_ROOT_DIR") then
+				print("Set SCE_ROOT_DIR enviroment variable.")
 			end
 
-			ps4Toolchain = "$(PS4_SDK_ROOT)/host_tools/bin/orbis-"
+			ps4Toolchain = "$(SCE_ROOT_DIR)/host_tools/bin/orbis-"
 
 			premake.gcc.cc  = ps4Toolchain .. "clang"
 			premake.gcc.cxx = ps4Toolchain .. "clang++"
@@ -1168,8 +1168,8 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/ps4") }
 		includedirs {
 			path.join(bxDir, "include/compat/freebsd"),
-			"$(PS4_SDK_ROOT)/target/include",
-			"$(PS4_SDK_ROOT)/target/include_common",
+			"$(SCE_ROOT_DIR)/target/include",
+			"$(SCE_ROOT_DIR)/target/include_common",
 		}
 		buildoptions {
 		}

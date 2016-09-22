@@ -82,6 +82,23 @@ namespace bx
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
+
+#	if BX_CRT_MSVC
+#		define fseeko64 _fseeki64
+#		define ftello64 _ftelli64
+#	elif 0 \
+	  || BX_PLATFORM_ANDROID \
+	  || BX_PLATFORM_BSD \
+	  || BX_PLATFORM_IOS \
+	  || BX_PLATFORM_OSX \
+	  || BX_PLATFORM_QNX
+#		define fseeko64 fseeko
+#		define ftello64 ftello
+#	elif BX_PLATFORM_PS4
+#		define fseeko64 fseek
+#		define ftello64 ftell
+#	endif // BX_
+
 	class CrtFileReader : public FileReaderI
 	{
 	public:
