@@ -37,7 +37,7 @@ function toolchain(_buildDir, _libDir)
 			{ "netbsd",          "NetBSD"                     },
 			{ "osx",             "OSX"                        },
 			{ "pnacl",           "Native Client - PNaCl"      },
-			{ "ps4",             "PS4"                        },
+			{ "orbis",           "Orbis"                      },
 			{ "qnx-arm",         "QNX/Blackberry - ARM"       },
 			{ "rpi",             "RaspberryPi"                },
 		},
@@ -59,6 +59,7 @@ function toolchain(_buildDir, _libDir)
 			{ "winstore81",    "Windows Store 8.1"               },
 			{ "winstore82",    "Universal Windows App"           },
 			{ "durango",       "Durango"                         },
+			{ "orbis",         "Orbis"                           },
 		},
 	}
 
@@ -358,18 +359,18 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = naclToolchain .. "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-pnacl"))
 
-		elseif "ps4" == _OPTIONS["gcc"] then
+		elseif "orbis" == _OPTIONS["gcc"] then
 
-			if not os.getenv("SCE_ROOT_DIR") then
-				print("Set SCE_ROOT_DIR enviroment variable.")
+			if not os.getenv("SCE_ORBIS_SDK_DIR") then
+				print("Set SCE_ORBIS_SDK_DIR enviroment variable.")
 			end
 
-			ps4Toolchain = "$(SCE_ROOT_DIR)/host_tools/bin/orbis-"
+			orbisToolchain = "$(SCE_ORBIS_SDK_DIR)/host_tools/bin/orbis-"
 
-			premake.gcc.cc  = ps4Toolchain .. "clang"
-			premake.gcc.cxx = ps4Toolchain .. "clang++"
-			premake.gcc.ar  = ps4Toolchain .. "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-ps4"))
+			premake.gcc.cc  = orbisToolchain .. "clang"
+			premake.gcc.cxx = orbisToolchain .. "clang++"
+			premake.gcc.ar  = orbisToolchain .. "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-orbis"))
 
 		elseif "qnx-arm" == _OPTIONS["gcc"] then
 
@@ -433,6 +434,15 @@ function toolchain(_buildDir, _libDir)
 			premake.vstudio.storeapp = "durango"
 			platforms { "Durango" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-durango"))
+		elseif "orbis" == _OPTIONS["vs"] then
+
+			if not os.getenv("SCE_ORBIS_SDK_DIR") then
+				print("Set SCE_ORBIS_SDK_DIR enviroment variable.")
+			end
+
+			platforms { "Orbis" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-orbis"))
+
 		end
 
 		elseif ("vs2012-xp") == _OPTIONS["vs"] then
@@ -507,7 +517,7 @@ function toolchain(_buildDir, _libDir)
 			"EnableSSE2",
 		}
 
-	configuration { "vs*" }
+	configuration { "vs*", "not orbis" }
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		defines {
 			"WIN32",
@@ -1162,14 +1172,14 @@ function toolchain(_buildDir, _libDir)
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
 		}
 
-	configuration { "ps4" }
-		targetdir (path.join(_buildDir, "ps4/bin"))
-		objdir (path.join(_buildDir, "ps4/obj"))
-		libdirs { path.join(_libDir, "lib/ps4") }
+	configuration { "orbis" }
+		targetdir (path.join(_buildDir, "orbis/bin"))
+		objdir (path.join(_buildDir, "orbis/obj"))
+		libdirs { path.join(_libDir, "lib/orbis") }
 		includedirs {
 			path.join(bxDir, "include/compat/freebsd"),
-			"$(SCE_ROOT_DIR)/target/include",
-			"$(SCE_ROOT_DIR)/target/include_common",
+			"$(SCE_ORBIS_SDK_DIR)/target/include",
+			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
 		buildoptions {
 		}
