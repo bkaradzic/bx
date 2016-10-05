@@ -222,6 +222,31 @@ namespace bx
 #endif // BX_PLATFORM_
 	}
 
+	inline bool getenv(const char* _name, char* _out, uint32_t* _inOutSize)
+	{
+#if BX_PLATFORM_WINDOWS
+		DWORD len = ::GetEnvironmentVariableA(_name, _out, *_inOutSize);
+		bool result = len != 0 && len < *_inOutSize;
+		*_inOutSize = len;
+		return result;
+#elif  BX_PLATFORM_PS4 \
+	|| BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
+		BX_UNUSED(_name, _out, _inOutSize);
+		return false;
+#else
+		const char* ptr = ::getenv(_name);
+		uint32_t len = 0;
+		if (NULL != ptr)
+		{
+			len = (uint32_t)strlen(ptr);
+		}
+		bool result = len != 0 && len < *_inOutSize;
+		*_inOutSize = len;
+		return result;
+#endif // BX_PLATFORM_
+	}
+
 	inline void setenv(const char* _name, const char* _value)
 	{
 #if BX_PLATFORM_WINDOWS
