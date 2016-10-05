@@ -242,6 +242,11 @@ namespace bx
 			len = (uint32_t)strlen(ptr);
 		}
 		bool result = len != 0 && len < *_inOutSize;
+		if (len < *_inOutSize)
+		{
+			strcpy(_out, ptr);
+		}
+
 		*_inOutSize = len;
 		return result;
 #endif // BX_PLATFORM_
