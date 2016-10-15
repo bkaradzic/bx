@@ -7,7 +7,7 @@
 #define BX_CRTIMPL_H_HEADER_GUARD
 
 #if BX_CONFIG_ALLOCATOR_CRT
-#	include <malloc.h>
+#	include <cstdlib>
 #	include "allocator.h"
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
