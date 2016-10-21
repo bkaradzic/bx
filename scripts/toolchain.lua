@@ -20,7 +20,7 @@ function toolchain(_buildDir, _libDir)
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
-			{ "linux-gcc-5",     "Linux (GCC-5 compiler)"     },
+			{ "linux-gcc-6",     "Linux (GCC-6 compiler)"     },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
@@ -231,9 +231,9 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
-		elseif "linux-gcc-5" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "gcc-5"
-			premake.gcc.cxx = "g++-5"
+		elseif "linux-gcc-6" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "gcc-6"
+			premake.gcc.cxx = "g++-6"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
@@ -654,7 +654,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "linux-clang" }
 
-	configuration { "linux-gcc-5" }
+	configuration { "linux-gcc-6" }
 		buildoptions {
 --			"-fno-omit-frame-pointer",
 --			"-fsanitize=address",
