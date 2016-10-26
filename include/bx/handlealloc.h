@@ -476,20 +476,25 @@ namespace bx
 			return false;
 		}
 
-		void removeByKey(KeyT _key)
+		bool removeByKey(KeyT _key)
 		{
 			uint32_t idx = findIndex(_key);
 			if (UINT32_MAX != idx)
 			{
 				m_handle[idx] = invalid;
 				--m_numElements;
+				update();
+				return true;
 			}
+
+			return false;
 		}
 
-		void removeByHandle(uint16_t _handle)
+		bool removeByHandle(uint16_t _handle)
 		{
 			if (invalid != _handle)
 			{
+				const uint32_t numElements = m_numElements;
 				for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
 				{
 					if (m_handle[idx] == _handle)
@@ -498,7 +503,15 @@ namespace bx
 						--m_numElements;
 					}
 				}
+
+				if (numElements != m_numElements)
+				{
+					update();
+					return true;
+				}
 			}
+
+			return false;
 		}
 
 		uint16_t find(KeyT _key) const
@@ -612,6 +625,21 @@ namespace bx
 			const uint64_t tmp1   = uint64_rol(tmp0, 31);
 			const uint64_t result = uint64_mul(tmp1, UINT64_C(11400714785074694791) );
 			return result;
+		}
+
+		void update()
+		{
+			for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
+			{
+				if (m_handle[idx] != invalid)
+				{
+					const KeyT     key    = m_key[idx];
+					const uint16_t handle = m_handle[idx];
+					m_handle[idx] = invalid;
+					--m_numElements;
+					insert(key, handle);
+				}
+			}
 		}
 
 		uint32_t m_maxCapacity;
