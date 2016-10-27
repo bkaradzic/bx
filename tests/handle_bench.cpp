@@ -24,6 +24,7 @@ int main()
 		{
 			typedef tinystl::unordered_map<uint64_t, uint16_t> TinyStlUnorderedMap;
 			TinyStlUnorderedMap map;
+//			map.reserve(numElements);
 			for (uint32_t jj = 0; jj < numElements; ++jj)
 			{
 				tinystl::pair<TinyStlUnorderedMap::iterator, bool> ok = map.insert(tinystl::make_pair(uint64_t(jj), uint16_t(jj) ) );
@@ -51,6 +52,7 @@ int main()
 		{
 			typedef std::unordered_map<uint64_t, uint16_t> StdUnorderedMap;
 			StdUnorderedMap map;
+			map.reserve(numElements);
 			for (uint32_t jj = 0; jj < numElements; ++jj)
 			{
 				std::pair<StdUnorderedMap::iterator, bool> ok = map.insert(std::make_pair(uint64_t(jj), uint16_t(jj) ) );
