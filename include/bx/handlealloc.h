@@ -481,9 +481,7 @@ namespace bx
 			uint32_t idx = findIndex(_key);
 			if (UINT32_MAX != idx)
 			{
-				m_handle[idx] = invalid;
-				--m_numElements;
-				update();
+				removeIndex(idx);
 				return true;
 			}
 
@@ -494,20 +492,12 @@ namespace bx
 		{
 			if (invalid != _handle)
 			{
-				const uint32_t numElements = m_numElements;
 				for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
 				{
 					if (m_handle[idx] == _handle)
 					{
-						m_handle[idx] = invalid;
-						--m_numElements;
+						removeIndex(idx);
 					}
-				}
-
-				if (numElements != m_numElements)
-				{
-					update();
-					return true;
 				}
 			}
 
@@ -611,6 +601,29 @@ namespace bx
 			return UINT32_MAX;
 		}
 
+		void removeIndex(uint32_t _idx)
+		{
+			m_handle[_idx] = invalid;
+			--m_numElements;
+
+			for (uint32_t idx = (_idx + 1) % MaxCapacityT
+				; m_handle[idx] != invalid
+				; idx = (idx + 1) % MaxCapacityT)
+			{
+				if (m_handle[idx] != invalid)
+				{
+					const KeyT key = m_key[idx];
+					if (idx != findIndex(key) )
+					{
+						const uint16_t handle = m_handle[idx];
+						m_handle[idx] = invalid;
+						--m_numElements;
+						insert(key, handle);
+					}
+				}
+			}
+		}
+
 		uint32_t mix(uint32_t _x) const
 		{
 			const uint32_t tmp0   = uint32_mul(_x,   UINT32_C(2246822519) );
@@ -625,21 +638,6 @@ namespace bx
 			const uint64_t tmp1   = uint64_rol(tmp0, 31);
 			const uint64_t result = uint64_mul(tmp1, UINT64_C(11400714785074694791) );
 			return result;
-		}
-
-		void update()
-		{
-			for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
-			{
-				if (m_handle[idx] != invalid)
-				{
-					const KeyT     key    = m_key[idx];
-					const uint16_t handle = m_handle[idx];
-					m_handle[idx] = invalid;
-					--m_numElements;
-					insert(key, handle);
-				}
-			}
 		}
 
 		uint32_t m_maxCapacity;
