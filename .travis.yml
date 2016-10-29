@@ -6,9 +6,6 @@ matrix:
     - compiler: clang
       os: osx
 
-install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
-
 addons:
   apt:
     sources:
@@ -19,7 +16,8 @@ addons:
     - clang
 
 script:
-  make test
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make test CXX="g++-4.8" CC="gcc-4.8"; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then make test; fi
 
 branches:
   only:
