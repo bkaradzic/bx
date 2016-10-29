@@ -48,7 +48,13 @@ namespace bx
 		{
 		}
 
-		void setError(ErrorResult _errorResult, const char* _msg)
+		void reset()
+		{
+			m_code = 0;
+			m_msg.clear();
+		}
+
+		void setError(ErrorResult _errorResult, const StringView& _msg)
 		{
 			BX_CHECK(0 != _errorResult.code, "Invalid ErrorResult passed to setError!");
 
@@ -83,8 +89,8 @@ namespace bx
 		}
 
 	private:
-		const char* m_msg;
-		uint32_t    m_code;
+		StringView m_msg;
+		uint32_t   m_code;
 	};
 
 	///
