@@ -597,7 +597,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -679,7 +679,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		links {
 			"rt",
@@ -730,7 +730,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		links {
 			"rt",
@@ -749,7 +749,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		links {
 			"rt",
@@ -792,7 +792,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -811,7 +811,7 @@ function toolchain(_buildDir, _libDir)
 			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
 		}
 		buildoptions {
-			"-std=c++0x",
+			"-std=c++11",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -931,7 +931,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		includedirs {
 			"$(NACL_SDK_ROOT)/include",
@@ -1184,7 +1184,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		linkoptions {
 		}
@@ -1200,7 +1200,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 
 	configuration { "rpi" }
@@ -1219,7 +1219,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 		includedirs {
 			"/opt/vc/include",
@@ -1245,7 +1245,7 @@ function toolchain(_buildDir, _libDir)
 			"--sysroot=$(RISCV_DIR)/sysroot",
 		}
 		buildoptions_cpp {
-			"-std=c++0x",
+			"-std=c++11",
 		}
 
 	configuration {} -- reset configuration
