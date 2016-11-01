@@ -550,12 +550,12 @@ namespace bx
 			return *this;
 		}
 
-		StringView(const char* _ptr, uint32_t _len = UINT32_MAX)
+		StringView(const char* _ptr, uint32_t _len = UINT16_MAX)
 		{
 			set(_ptr, _len);
 		}
 
-		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
+		void set(const char* _ptr, uint32_t _len = UINT16_MAX)
 		{
 			clear();
 
