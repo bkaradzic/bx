@@ -223,6 +223,41 @@ namespace bx
 	{
 	};
 
+	/// Align reader stream.
+	inline int32_t align(ReaderSeekerI* _reader, uint32_t _alignment, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_reader);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			const int64_t offset  = bx::seek(_reader, size);
+			if (offset != aligned)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "Align: read truncated.");
+			}
+			return int32_t(offset - current);
+		}
+
+		return 0;
+	}
+
+	/// Align writer stream (pads stream with zeros).
+	inline int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err = NULL)
+	{
+		BX_ERROR_SCOPE(_err);
+		const int64_t current = bx::seek(_writer);
+		const int64_t aligned = ( (current + _alignment-1)/_alignment) * _alignment;
+		const int32_t size    = int32_t(aligned - current);
+		if (0 != size)
+		{
+			return writeRep(_writer, 0, size, _err);
+		}
+
+		return 0;
+	}
+
 	struct BX_NO_VTABLE ReaderOpenI
 	{
 		virtual ~ReaderOpenI() = 0;
