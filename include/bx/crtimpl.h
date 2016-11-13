@@ -6,6 +6,8 @@
 #ifndef BX_CRTIMPL_H_HEADER_GUARD
 #define BX_CRTIMPL_H_HEADER_GUARD
 
+#include "bx.h"
+
 #if BX_CONFIG_ALLOCATOR_CRT
 #	include <malloc.h>
 #	include "allocator.h"
