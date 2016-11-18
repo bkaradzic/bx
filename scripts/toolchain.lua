@@ -93,6 +93,12 @@ function toolchain(_buildDir, _libDir)
 	}
 
 	newoption {
+		trigger = "with-windows",
+		value = "#",
+		description = "Set the Windows target platform version (default: 10.0.10240.0).",
+	}
+
+	newoption {
 		trigger     = "with-dynamic-runtime",
 		description = "Dynamically link with the runtime rather than statically",
 	}
@@ -133,6 +139,11 @@ function toolchain(_buildDir, _libDir)
 		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
+	local windowsPlatform = "10.0.10240.0"
+	if _OPTIONS["with-windows"] then
+		windowsPlatform = _OPTIONS["with-windows"]
+	end
+	
 	local compiler32bit = false
 	if _OPTIONS["with-32bit-compiler"] then
 		compiler32bit = true
@@ -422,6 +433,11 @@ function toolchain(_buildDir, _libDir)
 		elseif "winstore82" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v140"
 			premake.vstudio.storeapp = "8.2"
+
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+			action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
+			
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
 
