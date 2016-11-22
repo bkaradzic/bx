@@ -256,7 +256,7 @@ namespace bx
 		virtual void close() BX_OVERRIDE
 		{
 			BX_CHECK(NULL != m_file, "Process not open!");
-			pclose(m_file);
+			m_exitCode = pclose(m_file);
 			m_file = NULL;
 		}
 
@@ -282,8 +282,14 @@ namespace bx
 			return size;
 		}
 
+		int32_t getExitCode() const
+		{
+			return m_exitCode;
+		}
+
 	private:
 		FILE* m_file;
+		int32_t m_exitCode;
 	};
 
 	class ProcessWriter : public WriterOpenI, public CloserI, public WriterI
@@ -316,7 +322,7 @@ namespace bx
 		virtual void close() BX_OVERRIDE
 		{
 			BX_CHECK(NULL != m_file, "Process not open!");
-			pclose(m_file);
+			m_exitCode = pclose(m_file);
 			m_file = NULL;
 		}
 
@@ -338,8 +344,14 @@ namespace bx
 			return size;
 		}
 
+		int32_t getExitCode() const
+		{
+			return m_exitCode;
+		}
+
 	private:
 		FILE* m_file;
+		int32_t m_exitCode;
 	};
 
 #endif // BX_CONFIG_CRT_PROCESS
