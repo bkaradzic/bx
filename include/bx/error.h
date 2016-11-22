@@ -79,6 +79,11 @@ namespace bx
 			return result;
 		}
 
+		const StringView& getMessage() const
+		{
+			return m_msg;
+		}
+
 		bool operator==(const ErrorResult& _rhs) const
 		{
 			return _rhs.code == m_code;
