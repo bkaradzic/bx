@@ -48,6 +48,23 @@ namespace bx
 		return ptr - _str;
 	}
 
+	/// Copy _num characters from string _src to _dst buffer of maximum _dstSize capacity
+	/// including zero terminator. Copy will be terminated with '\0'.
+	inline size_t strlncpy(char* _dst, size_t _dstSize, const char* _src, size_t _num = -1)
+	{
+		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
+		BX_CHECK(NULL != _src, "_src can't be NULL!");
+		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+
+		const size_t len = strnlen(_src, _num);
+		const size_t max = _dstSize-1;
+		const size_t num = (len < max ? len : max);
+		strncpy(_dst, _src, num);
+		_dst[num] = '\0';
+
+		return num;
+	}
+
 	/// Find substring in string. Limit search to _size.
 	inline const char* strnstr(const char* _str, const char* _find, size_t _size)
 	{
