@@ -669,15 +669,18 @@ namespace bx
 		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
 		{
 			clear();
+			append(_ptr, _len);
+		}
 
+		void append(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
 			if (0 != _len)
 			{
-				uint32_t len = uint32_t(strnlen(_ptr, _len) );
+				uint32_t old = m_len;
+				uint32_t len = m_len + uint32_t(strnlen(_ptr, _len) );
+				char* ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_len ? const_cast<char*>(m_ptr) : NULL, len+1);
 				m_len = len;
-				char* ptr = (char*)BX_ALLOC(*AllocatorT, len+1);
-
-				memcpy(ptr, _ptr, len);
-				ptr[len] = '\0';
+				strlncpy(ptr + old, len-old+1, _ptr, _len);
 
 				*const_cast<char**>(&m_ptr) = ptr;
 			}

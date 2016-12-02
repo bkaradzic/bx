@@ -53,9 +53,20 @@ TEST_CASE("StringView", "")
 	String st(sv);
 	REQUIRE(4 == st.getLength() );
 
+	st.append("test");
+	REQUIRE(8 == st.getLength() );
+
+	st.append("test", 2);
+	REQUIRE(10 == st.getLength() );
+
+	REQUIRE(0 == strcmp(st.getPtr(), "testtestte") );
+
 	st.clear();
 	REQUIRE(0 == st.getLength() );
 	REQUIRE(4 == sv.getLength() );
+
+	st.append("test");
+	REQUIRE(4 == st.getLength() );
 
 	sv.clear();
 	REQUIRE(0 == sv.getLength() );
