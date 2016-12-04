@@ -51,9 +51,11 @@ function toolchain(_buildDir, _libDir)
 			{ "vs2012-clang",  "Clang 3.6"                       },
 			{ "vs2013-clang",  "Clang 3.6"                       },
 			{ "vs2015-clang",  "Clang 3.9"                       },
+			{ "vs2017-clang",  "Clang with MS CodeGen"           },
 			{ "vs2012-xp",     "Visual Studio 2012 targeting XP" },
 			{ "vs2013-xp",     "Visual Studio 2013 targeting XP" },
 			{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
+			{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
 			{ "winphone8",     "Windows Phone 8.0"               },
 			{ "winphone81",    "Windows Phone 8.1"               },
 			{ "winstore81",    "Windows Store 8.1"               },
@@ -143,7 +145,7 @@ function toolchain(_buildDir, _libDir)
 	if _OPTIONS["with-windows"] then
 		windowsPlatform = _OPTIONS["with-windows"]
 	end
-	
+
 	local compiler32bit = false
 	if _OPTIONS["with-32bit-compiler"] then
 		compiler32bit = true
@@ -404,11 +406,17 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
 
 		end
-	elseif _ACTION == "vs2012" or _ACTION == "vs2013" or _ACTION == "vs2015" then
+	elseif _ACTION == "vs2012"
+		or _ACTION == "vs2013"
+		or _ACTION == "vs2015"
+		or _ACTION == "vs2017"
+		then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
-			if "vs2015-clang" == _OPTIONS["vs"] then
-				premake.vstudio.toolset = ("LLVM-vs2014")
+			if "vs2017-clang" == _OPTIONS["vs"] then
+				premake.vstudio.toolset = "v141_clang_c2"
+			elseif "vs2015-clang" == _OPTIONS["vs"] then
+				premake.vstudio.toolset = "LLVM-vs2014"
 			else
 				premake.vstudio.toolset = ("LLVM-" .. _ACTION)
 			end
@@ -437,7 +445,7 @@ function toolchain(_buildDir, _libDir)
 			local action = premake.action.current()
 			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
 			action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
-			
+
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
 
@@ -471,6 +479,10 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "vs2015-xp" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v140_xp")
+			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
+
+		elseif "vs2015-xp" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v141_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 
 	elseif _ACTION == "xcode4" then
