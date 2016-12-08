@@ -636,11 +636,12 @@ namespace bx
 	{
 	public:
 		StringT()
-			: StringView("", 0)
+			: StringView()
 		{
 		}
 
 		StringT(const StringT<AllocatorT>& _rhs)
+			: StringView()
 		{
 			set(_rhs.m_ptr, _rhs.m_len);
 		}
