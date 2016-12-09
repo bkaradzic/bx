@@ -117,6 +117,12 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "CrtFileReader: File is already open.");
+				return false;
+			}
+
 			m_file = fopen(_filePath, "rb");
 			if (NULL == m_file)
 			{
@@ -129,17 +135,21 @@ namespace bx
 
 		virtual void close() BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fclose(m_file);
+			m_file = NULL;
 		}
 
 		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = (int32_t)fread(_data, 1, _size, m_file);
@@ -147,11 +157,11 @@ namespace bx
 			{
 				if (0 != feof(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "CrtFileWriter: EOF.");
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "CrtFileReader: EOF.");
 				}
 				else if (0 != ferror(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileWriter: read error.");
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileReader: read error.");
 				}
 
 				return size >= 0 ? size : 0;
@@ -178,6 +188,14 @@ namespace bx
 
 		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
 		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "CrtFileReader: File is already open.");
+				return false;
+			}
+
 			m_file = fopen(_filePath, _append ? "ab" : "wb");
 
 			if (NULL == m_file)
@@ -191,17 +209,21 @@ namespace bx
 
 		virtual void close() BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fclose(m_file);
+			m_file = NULL;
 		}
 
 		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
 		{
+			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int32_t size = (int32_t)fwrite(_data, 1, _size, m_file);
@@ -243,6 +265,12 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessReader: File is already open.");
+				return false;
+			}
+
 			m_file = popen(_command, "r");
 			if (NULL == m_file)
 			{
@@ -269,11 +297,11 @@ namespace bx
 			{
 				if (0 != feof(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "CrtFileWriter: EOF.");
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "ProcessReader: EOF.");
 				}
 				else if (0 != ferror(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "CrtFileWriter: read error.");
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "ProcessReader: read error.");
 				}
 
 				return size >= 0 ? size : 0;
@@ -309,6 +337,12 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
+			if (NULL != m_file)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessWriter: File is already open.");
+				return false;
+			}
+
 			m_file = popen(_command, "w");
 			if (NULL == m_file)
 			{
@@ -335,7 +369,7 @@ namespace bx
 			{
 				if (0 != ferror(m_file) )
 				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "CrtFileWriter: write error.");
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "ProcessWriter: write error.");
 				}
 
 				return size >= 0 ? size : 0;
