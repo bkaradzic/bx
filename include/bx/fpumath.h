@@ -367,19 +367,16 @@ namespace bx
 	}
 
 	/// Calculate tangent frame from normal and angle.
-	inline void vec3TangentFrame(const float* __restrict _n, float _angle, float* __restrict _t, float* __restrict _b)
+	inline void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b, float _angle)
 	{
-		const float nx = _n[0];
-		const float ny = _n[1];
-		const float nz = _n[2];
+		vec3TangentFrame(_n, _t, _b);
 
-		const float sa   = fsin(_angle);
-		const float ca   = fcos(_angle);
-		const float omca = 1.0f - ca;
+		const float sa = fsin(_angle);
+		const float ca = fcos(_angle);
 
-		_t[0] = omca * nx * nx +      ca;
-		_t[1] = omca * nx * ny - nz * sa;
-		_t[2] = omca * nx * nz + ny * sa;
+		_t[0] = -sa * _b[0] + ca * _t[0];
+		_t[1] = -sa * _b[1] + ca * _t[1];
+		_t[2] = -sa * _b[2] + ca * _t[2];
 
 		bx::vec3Cross(_b, _n, _t);
 	}
@@ -593,11 +590,11 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _angle, float _scale, const float* __restrict _pos)
+	inline void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos, float _angle)
 	{
 		float tangent[3];
 		float bitangent[3];
-		vec3TangentFrame(_normal, _angle, tangent, bitangent);
+		vec3TangentFrame(_normal, tangent, bitangent, _angle);
 
 		vec3Mul(&_result[ 0], bitangent, _scale);
 		vec3Mul(&_result[ 4], _normal,   _scale);
