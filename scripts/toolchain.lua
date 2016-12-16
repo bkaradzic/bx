@@ -1088,6 +1088,9 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "osx_universal/bin"))
 
 	configuration { "osx" }
+		buildoptions_cpp {
+			"-std=c++11",
+		}
 		buildoptions {
 			"-Wfatal-errors",
 			"-msse2",
@@ -1099,6 +1102,9 @@ function toolchain(_buildDir, _libDir)
 	configuration { "ios*" }
 		linkoptions {
 			"-lc++",
+		}
+		buildoptions_cpp {
+			"-std=c++11",
 		}
 		buildoptions {
 			"-Wfatal-errors",
