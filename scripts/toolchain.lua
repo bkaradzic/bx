@@ -631,6 +631,9 @@ function toolchain(_buildDir, _libDir)
 	configuration { "mingw-*" }
 		defines { "WIN32" }
 		includedirs { path.join(bxDir, "include/compat/mingw") }
+		defines {
+			"MINGW_HAS_SECURE_API=1",
+		}
 		buildoptions {
 			"-Wunused-value",
 			"-fdata-sections",
