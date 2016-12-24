@@ -46,6 +46,42 @@ namespace bx
 		return result;
 	}
 
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_splat(float _a)
+	{
+		simd256_ref_t result;
+		result.simd128_0 = simd_splat<simd256_ref_t::type>(_a);
+		result.simd128_1 = simd_splat<simd256_ref_t::type>(_a);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_isplat(uint32_t _a)
+	{
+		simd256_ref_t result;
+		result.simd128_0 = simd_isplat<simd256_ref_t::type>(_a);
+		result.simd128_1 = simd_isplat<simd256_ref_t::type>(_a);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_itof(simd256_ref_t _a)
+	{
+		simd256_ref_t result;
+		result.simd128_0 = simd_itof(_a.simd128_0);
+		result.simd128_1 = simd_itof(_a.simd128_1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ftoi(simd256_ref_t _a)
+	{
+		simd256_ref_t result;
+		result.simd128_0 = simd_ftoi(_a.simd128_0);
+		result.simd128_1 = simd_ftoi(_a.simd128_1);
+		return result;
+	}
+
 } // namespace bx
 
 #endif // BX_SIMD256_REF_H_HEADER_GUARD
