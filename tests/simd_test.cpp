@@ -11,10 +11,12 @@
 #if 0
 #	define SIMD_DBG DBG
 #else
-#	define SIMD_DBG(_fmt, ...) BX_UNUSED(__VA_ARGS__);
+#	define SIMD_DBG unused
 #endif // 0
 
 using namespace bx;
+
+inline void unused(...) {}
 
 union simd_cast
 {
@@ -59,7 +61,6 @@ void simd_check_int32(
 	REQUIRE(c.i[3] == _3);
 }
 
-#if 0
 void simd_check_int32(
 	  const char* _str
 	, bx::simd256_t _a
@@ -89,7 +90,6 @@ void simd_check_int32(
 	REQUIRE(c.i[6] == _6);
 	REQUIRE(c.i[7] == _7);
 }
-#endif // 0
 
 void simd_check_uint32(
 	  const char* _str
@@ -114,7 +114,6 @@ void simd_check_uint32(
 	REQUIRE(c.ui[3] == _3);
 }
 
-#if 0
 void simd_check_uint32(
 	  const char* _str
 	, bx::simd256_t _a
@@ -145,7 +144,6 @@ void simd_check_uint32(
 	REQUIRE(c.ui[6] == _6);
 	REQUIRE(c.ui[7] == _7);
 }
-#endif // 0
 
 void simd_check_float(
 	  const char* _str
@@ -170,7 +168,6 @@ void simd_check_float(
 	CHECK(bx::fequal(c.f[3], _3, 0.0001f) );
 }
 
-#if 0
 void simd_check_float(
 	  const char* _str
 	, bx::simd256_t _a
@@ -201,7 +198,6 @@ void simd_check_float(
 	CHECK(bx::fequal(c.f[6], _6, 0.0001f) );
 	CHECK(bx::fequal(c.f[7], _7, 0.0001f) );
 }
-#endif // 0
 
 void simd_check_string(const char* _str, bx::simd128_t _a)
 {

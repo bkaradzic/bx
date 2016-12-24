@@ -10,7 +10,6 @@
 
 namespace bx
 {
-
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd_ld(const void* _ptr)
 	{
