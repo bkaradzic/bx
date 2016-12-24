@@ -402,8 +402,14 @@ namespace bx
 
 	struct simd256_ref_t
 	{
-		simd128_t simd128_0;
-		simd128_t simd128_1;
+#if BX_COMPILER_MSVC
+		typedef simd128_ref_t type;
+#else
+		typedef simd128_t type;
+#endif // BX_COMPILER_MSVC
+
+		type simd128_0;
+		type simd128_1;
 	};
 
 #if !BX_SIMD_AVX
