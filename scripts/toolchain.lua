@@ -739,6 +739,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
+			"-Wl,--as-needed",
 		}
 
 	configuration { "linux-gcc*", "x32" }
