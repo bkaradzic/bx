@@ -102,16 +102,6 @@ namespace bx
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline float fstep(float _edge, float _a)
-	{
-		return _a < _edge ? 0.0f : 1.0f;
-	}
-
-	inline float fpulse(float _a, float _start, float _end)
-	{
-		return fstep(_a, _start) - fstep(_a, _end);
-	}
-
 	inline float fabsolute(float _a)
 	{
 		return fabsf(_a);
@@ -127,9 +117,19 @@ namespace bx
 		return sinf(_a);
 	}
 
+	inline float fasin(float _a)
+	{
+		return asinf(_a);
+	}
+
 	inline float fcos(float _a)
 	{
 		return cosf(_a);
+	}
+
+	inline float facos(float _a)
+	{
+		return acosf(_a);
 	}
 
 	inline float fpow(float _a, float _b)
@@ -195,6 +195,21 @@ namespace bx
 		const float mod    = fmod(_a, _wrap);
 		const float result = mod < 0.0f ? _wrap + mod : mod;
 		return result;
+	}
+
+	inline float fstep(float _edge, float _a)
+	{
+		return _a < _edge ? 0.0f : 1.0f;
+	}
+
+	inline float fpulse(float _a, float _start, float _end)
+	{
+		return fstep(_a, _start) - fstep(_a, _end);
+	}
+
+	inline float fsmoothstep(float _a)
+	{
+		return fsq(_a)*(3.0f - 2.0f*_a);
 	}
 
 	// References:
