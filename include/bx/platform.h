@@ -202,7 +202,7 @@
 #	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
 #elif  defined(__linux__) \
-	|| defined(__riscv__)
+	|| BX_CPU_RISCV
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
