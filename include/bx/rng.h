@@ -109,16 +109,27 @@ namespace bx
 		return 2.0f * bx::frnd(_rng) - 1.0f;
 	}
 
+	/// Generate random point on unit circle.
+	template <typename Rng>
+	inline void randUnitCircle(float _result[3], Rng* _rng)
+	{
+		const float angle = frnd(_rng) * pi * 2.0f;
+
+		_result[0] = fcos(angle);
+		_result[1] = 0.0f;
+		_result[2] = fsin(angle);
+	}
+
 	/// Generate random point on unit sphere.
 	template <typename Rng>
 	inline void randUnitSphere(float _result[3], Rng* _rng)
 	{
-		float rand0 = frnd(_rng) * 2.0f - 1.0f;
-		float rand1 = frnd(_rng) * pi * 2.0f;
+		const float rand0  = frnd(_rng) * 2.0f - 1.0f;
+		const float rand1  = frnd(_rng) * pi * 2.0f;
+		const float sqrtf1 = fsqrt(1.0f - rand0*rand0);
 
-		float sqrtf1 = sqrtf(1.0f - rand0*rand0);
-		_result[0] = sqrtf1 * cosf(rand1);
-		_result[1] = sqrtf1 * sinf(rand1);
+		_result[0] = sqrtf1 * fcos(rand1);
+		_result[1] = sqrtf1 * fsin(rand1);
 		_result[2] = rand0;
 	}
 
@@ -165,15 +176,15 @@ namespace bx
 
 			tt = 2.0f * tt - 1.0f;
 
-			const float phi = (ii + 0.5f) / _num;
+			const float phi    = (ii + 0.5f) / _num;
 			const float phirad =  phi * 2.0f * pi;
-			const float st = sqrtf(1.0f-tt*tt) * _scale;
+			const float st     = fsqrt(1.0f-tt*tt) * _scale;
 
 			float* xyz = (float*)data;
 			data += _stride;
 
-			xyz[0] = st * cosf(phirad);
-			xyz[1] = st * sinf(phirad);
+			xyz[0] = st * fcos(phirad);
+			xyz[1] = st * fsin(phirad);
 			xyz[2] = tt * _scale;
 		}
 	}
