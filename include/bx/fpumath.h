@@ -132,6 +132,11 @@ namespace bx
 		return acosf(_a);
 	}
 
+	inline float fatan2(float _y, float _x)
+	{
+		return atan2f(_y, _x);
+	}
+
 	inline float fpow(float _a, float _b)
 	{
 		return powf(_a, _b);
@@ -492,9 +497,9 @@ namespace bx
 		const float zz = z * z;
 
 		const float xx = x * x;
-		_result[0] = atan2f(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz) );
-		_result[1] = atan2f(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz) );
-		_result[2] = asinf (2.0f * (x * y + z * w) );
+		_result[0] = fatan2(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz) );
+		_result[1] = fatan2(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz) );
+		_result[2] = fasin (2.0f * (x * y + z * w) );
 	}
 
 	inline void quatRotateAxis(float* __restrict _result, const float* _axis, float _angle)
