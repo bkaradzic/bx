@@ -237,14 +237,16 @@ namespace bx
 #else
 		const char* ptr = ::getenv(_name);
 		uint32_t len = 0;
+		bool result = false;
 		if (NULL != ptr)
 		{
 			len = (uint32_t)strlen(ptr);
-		}
-		bool result = len != 0 && len < *_inOutSize;
-		if (len < *_inOutSize)
-		{
-			strcpy(_out, ptr);
+
+			result = len != 0 && len < *_inOutSize;
+			if (len < *_inOutSize)
+			{
+				strcpy(_out, ptr);
+			}
 		}
 
 		*_inOutSize = len;
@@ -324,11 +326,14 @@ namespace bx
 			NULL
 		};
 
-		for (const char** tmp = s_tmp; tmp != NULL; ++tmp)
+		for (const char** tmp = s_tmp; *tmp != NULL; ++tmp)
 		{
 			uint32_t len = *_inOutSize;
+			*_out = '\0';
 			bool result = getenv(*tmp, _out, &len);
-			if (len != 0
+
+			if (result
+			&&  len != 0
 			&&  len < *_inOutSize)
 			{
 				*_inOutSize = len;
