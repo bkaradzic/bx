@@ -306,6 +306,40 @@ namespace bx
 #endif // BX_COMPILER_
 	}
 
+	inline bool getTempPath(char* _out, uint32_t* _inOutSize)
+	{
+#if BX_PLATFORM_WINDOWS
+		uint32_t len = ::GetTempPathA(*_inOutSize, _out);
+		bool result = len != 0 && len < *_inOutSize;
+		*_inOutSize = len;
+		return result;
+#else
+		static const char* s_tmp[] =
+		{
+			"TMPDIR",
+			"TMP",
+			"TEMP",
+			"TEMPDIR",
+
+			NULL
+		};
+
+		for (const char** tmp = s_tmp; tmp != NULL; ++tmp)
+		{
+			uint32_t len = *_inOutSize;
+			bool result = getenv(*tmp, _out, &len);
+			if (len != 0
+			&&  len < *_inOutSize)
+			{
+				*_inOutSize = len;
+				return result;
+			}
+		}
+
+		return false;
+#endif // BX_PLATFORM_*
+	}
+
 	struct FileInfo
 	{
 		enum Enum
