@@ -18,6 +18,11 @@ namespace bx
 	static const float invPi  = 1.0f/3.14159265358979323846f;
 	static const float piHalf = 1.57079632679489661923f;
 	static const float sqrt2  = 1.41421356237309504880f;
+#if BX_COMPILER_MSVC
+	static const float huge   = float(HUGE_VAL);
+#else
+	static const float huge   = HUGE_VALF;
+#endif // BX_COMPILER_MSVC
 
 	struct Handness
 	{
