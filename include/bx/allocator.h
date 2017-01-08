@@ -8,7 +8,6 @@
 
 #include "bx.h"
 
-#include <memory.h>
 #include <string.h> //::memmove
 #include <new>
 
