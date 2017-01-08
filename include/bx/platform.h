@@ -201,8 +201,7 @@
 // RaspberryPi compiler defines __linux__
 #	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
-#elif  defined(__linux__) \
-	|| BX_CPU_RISCV
+#elif  defined(__linux__)
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
@@ -231,8 +230,6 @@
 #elif defined(__GNU__)
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
-#else
-#	error "BX_PLATFORM_* is not defined!"
 #endif //
 
 #define BX_PLATFORM_POSIX (0 \
@@ -319,6 +316,8 @@
 #	define BX_PLATFORM_NAME "Xbox 360"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
+#else
+#	define BX_PLATFORM_NAME "None"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
