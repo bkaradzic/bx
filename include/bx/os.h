@@ -76,6 +76,9 @@ namespace bx
 	///
 	bool stat(const char* _filePath, FileInfo& _fileInfo);
 
+	///
+	void* exec(const char* const* _argv);
+
 } // namespace bx
 
 #endif // BX_OS_H_HEADER_GUARD
