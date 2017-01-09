@@ -5,6 +5,7 @@
 
 #include <bx/os.h>
 #include <bx/uint32_t.h>
+#include <bx/string.h>
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
@@ -416,7 +417,7 @@ namespace bx
 						);
 		}
 
-		bool ok = CreateProcessA(_argv[0]
+		bool ok = !!CreateProcessA(_argv[0]
 					, temp
 					, NULL
 					, NULL
