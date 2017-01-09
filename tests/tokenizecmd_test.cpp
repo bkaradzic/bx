@@ -4,7 +4,6 @@
  */
 
 #include "test.h"
-#include <bx/tokenizecmd.h>
 #include <bx/commandline.h>
 #include <string.h>
 
