@@ -6,8 +6,6 @@
 project "bx"
 	kind "StaticLib"
 
-	configuration {}
-
 	includedirs {
 		"../include",
 	}
@@ -17,3 +15,10 @@ project "bx"
 		"../include/**.inl",
 		"../src/**.cpp",
 	}
+
+	configuration { "linux-*" }
+		buildoptions {
+			"-fPIC",
+		}
+
+	configuration {}
