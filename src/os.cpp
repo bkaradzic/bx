@@ -435,6 +435,7 @@ namespace bx
 
 		return NULL;
 #else
+		BX_UNUSED(_argv);
 		return NULL;
 #endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 	}
