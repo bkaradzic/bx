@@ -214,15 +214,13 @@ namespace bx
 		}
 
 	protected:
-		friend uint32_t hashMurmur2A(const StringView& _data);
-
 		const char* m_ptr;
 		uint32_t    m_len;
 	};
 
 	inline uint32_t hashMurmur2A(const StringView& _data)
 	{
-		return hashMurmur2A(_data.m_ptr, _data.m_len);
+		return hashMurmur2A(_data.getPtr(), _data.getLength() );
 	}
 
 	inline uint32_t hashMurmur2A(const char* _data)
