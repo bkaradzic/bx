@@ -7,6 +7,8 @@
 #include <bx/uint32_t.h>
 #include <bx/string.h>
 
+#include <stdio.h>
+
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <psapi.h>

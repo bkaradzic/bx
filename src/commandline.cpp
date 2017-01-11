@@ -5,6 +5,8 @@
 
 #include <bx/commandline.h>
 
+#include <ctype.h>
+
 namespace bx
 {
 	// Reference:
