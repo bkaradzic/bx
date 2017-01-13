@@ -308,10 +308,14 @@ namespace bx
 	int32_t vsnprintf(char* _str, size_t _count, const char* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
-		va_list argListCopy;
-		va_copy(argListCopy, _argList);
-		int32_t len = ::vsnprintf_s(_str, _count, size_t(-1), _format, argListCopy);
-		va_end(argListCopy);
+		int32_t len = -1;
+		if (NULL != _str)
+		{
+			va_list argListCopy;
+			va_copy(argListCopy, _argList);
+			len = ::vsnprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+			va_end(argListCopy);
+		}
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
 #else
 		return ::vsnprintf(_str, _count, _format, _argList);
@@ -321,10 +325,14 @@ namespace bx
 	int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
-		va_list argListCopy;
-		va_copy(argListCopy, _argList);
-		int32_t len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, argListCopy);
-		va_end(argListCopy);
+		int32_t len = -1;
+		if (NULL != _str)
+		{
+			va_list argListCopy;
+			va_copy(argListCopy, _argList);
+			len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+			va_end(argListCopy);
+		}
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif defined(__MINGW32__)
 		return ::vsnwprintf(_str, _count, _format, _argList);
