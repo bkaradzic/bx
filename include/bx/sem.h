@@ -52,7 +52,7 @@ namespace bx
 		pthread_mutex_t m_mutex;
 		pthread_cond_t m_cond;
 		int32_t m_count;
-	#else
+#	else
 		sem_t m_handle;
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 #elif BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
