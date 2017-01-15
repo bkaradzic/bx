@@ -15,10 +15,6 @@
 #include <bx/allocator.h>
 #include <bx/hash.h>
 
-#ifndef va_copy
-#	define va_copy(_a, _b) (_a) = (_b)
-#endif // va_copy
-
 namespace bx
 {
 	bool toBool(const char* _str)

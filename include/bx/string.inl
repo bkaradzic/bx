@@ -7,6 +7,10 @@
 #	error "Must be included from bx/string.h!"
 #endif // BX_STRING_H_HEADER_GUARD
 
+#if BX_CRT_MSVC && !defined(va_copy)
+#	define va_copy(_a, _b) (_a) = (_b)
+#endif // BX_CRT_MSVC && !defined(va_copy)
+
 namespace bx
 {
 	template <typename Ty>
