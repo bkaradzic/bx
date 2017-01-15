@@ -43,13 +43,13 @@ namespace bx
 	{
 	}
 
-	inline void* StaticMemoryBlock::more(uint32_t _size) BX_OVERRIDE
+	inline void* StaticMemoryBlock::more(uint32_t _size)
 	{
 		BX_UNUSED(_size);
 		return m_data;
 	}
 
-	inline uint32_t StaticMemoryBlock::getSize() BX_OVERRIDE
+	inline uint32_t StaticMemoryBlock::getSize()
 	{
 		return m_size;
 	}
@@ -66,7 +66,7 @@ namespace bx
 		BX_FREE(m_allocator, m_data);
 	}
 
-	inline void* MemoryBlock::more(uint32_t _size) BX_OVERRIDE
+	inline void* MemoryBlock::more(uint32_t _size)
 	{
 		if (0 < _size)
 		{
@@ -77,7 +77,7 @@ namespace bx
 		return m_data;
 	}
 
-	inline uint32_t MemoryBlock::getSize() BX_OVERRIDE
+	inline uint32_t MemoryBlock::getSize()
 	{
 		return m_size;
 	}
@@ -92,7 +92,7 @@ namespace bx
 	{
 	}
 
-	inline int64_t SizerWriter::seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+	inline int64_t SizerWriter::seek(int64_t _offset, Whence::Enum _whence)
 	{
 		switch (_whence)
 		{
@@ -112,7 +112,7 @@ namespace bx
 		return m_pos;
 	}
 
-	inline int32_t SizerWriter::write(const void* /*_data*/, int32_t _size, Error* _err) BX_OVERRIDE
+	inline int32_t SizerWriter::write(const void* /*_data*/, int32_t _size, Error* _err)
 	{
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -144,7 +144,7 @@ namespace bx
 	{
 	}
 
-	inline int64_t MemoryReader::seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+	inline int64_t MemoryReader::seek(int64_t _offset, Whence::Enum _whence)
 	{
 		switch (_whence)
 		{
@@ -164,7 +164,7 @@ namespace bx
 		return m_pos;
 	}
 
-	inline int32_t MemoryReader::read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+	inline int32_t MemoryReader::read(void* _data, int32_t _size, Error* _err)
 	{
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -207,7 +207,7 @@ namespace bx
 	{
 	}
 
-	inline int64_t MemoryWriter::seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+	inline int64_t MemoryWriter::seek(int64_t _offset, Whence::Enum _whence)
 	{
 		switch (_whence)
 		{
@@ -227,7 +227,7 @@ namespace bx
 		return m_pos;
 	}
 
-	inline int32_t MemoryWriter::write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+	inline int32_t MemoryWriter::write(const void* _data, int32_t _size, Error* _err)
 	{
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
