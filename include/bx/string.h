@@ -14,12 +14,80 @@
 #include <bx/allocator.h>
 #include <bx/hash.h>
 
-#ifndef va_copy
-#	define va_copy(_a, _b) (_a) = (_b)
-#endif // va_copy
-
 namespace bx
 {
+	/// Non-zero-terminated string view.
+	class StringView
+	{
+	public:
+		///
+		StringView();
+
+		///
+		StringView(const StringView& _rhs);
+
+		///
+		StringView& operator=(const StringView& _rhs);
+
+		///
+		StringView(const char* _ptr, uint32_t _len = UINT16_MAX);
+
+		///
+		void set(const char* _ptr, uint32_t _len = UINT16_MAX);
+
+		///
+		void clear();
+
+		///
+		const char* getPtr() const;
+
+		///
+		const char* getTerm() const;
+
+		///
+		bool isEmpty() const;
+
+		///
+		uint32_t getLength() const;
+
+	protected:
+		const char* m_ptr;
+		uint32_t    m_len;
+	};
+
+	/// ASCII string
+	template<bx::AllocatorI** AllocatorT>
+	class StringT : public StringView
+	{
+	public:
+		///
+		StringT();
+
+		///
+		StringT(const StringT<AllocatorT>& _rhs);
+
+		///
+		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
+
+		///
+		StringT(const char* _ptr, uint32_t _len = UINT32_MAX);
+
+		///
+		StringT(const StringView& _rhs);
+
+		///
+		~StringT();
+
+		///
+		void set(const char* _ptr, uint32_t _len = UINT32_MAX);
+
+		///
+		void append(const char* _ptr, uint32_t _len = UINT32_MAX);
+
+		///
+		void clear();
+	};
+
 	///
 	bool toBool(const char* _str);
 
@@ -87,47 +155,15 @@ namespace bx
 
 	///
 	template <typename Ty>
-	inline void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList)
-	{
-		char temp[2048];
-
-		char* out = temp;
-		int32_t len = bx::vsnprintf(out, sizeof(temp), _format, _argList);
-		if ( (int32_t)sizeof(temp) < len)
-		{
-			out = (char*)alloca(len+1);
-			len = bx::vsnprintf(out, len, _format, _argList);
-		}
-		out[len] = '\0';
-		_out.append(out);
-	}
+	void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList);
 
 	///
 	template <typename Ty>
-	inline void stringPrintf(Ty& _out, const char* _format, ...)
-	{
-		va_list argList;
-		va_start(argList, _format);
-		stringPrintfVargs(_out, _format, argList);
-		va_end(argList);
-	}
+	void stringPrintf(Ty& _out, const char* _format, ...);
 
 	/// Replace all instances of substring.
 	template <typename Ty>
-	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
-	{
-		Ty str = _str;
-		size_t startPos = 0;
-		const size_t fromLen = strlen(_from);
-		const size_t toLen   = strlen(_to);
-		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
-		{
-			str.replace(startPos, fromLen, _to);
-			startPos += toLen;
-		}
-
-		return str;
-	}
+	Ty replaceAll(const Ty& _str, const char* _from, const char* _to);
 
 	/// Extract base file name from file path.
 	const char* baseName(const char* _filePath);
@@ -147,155 +183,14 @@ namespace bx
 	/// If retval >= siz, truncation occurred.
 	size_t strlcat(char* _dst, const char* _src, size_t _siz);
 
-	/// Non-zero-terminated string view.
-	class StringView
-	{
-	public:
-		StringView()
-		{
-			clear();
-		}
+	///
+	uint32_t hashMurmur2A(const StringView& _data);
 
-		StringView(const StringView& _rhs)
-		{
-			set(_rhs.m_ptr, _rhs.m_len);
-		}
-
-		StringView& operator=(const StringView& _rhs)
-		{
-			set(_rhs.m_ptr, _rhs.m_len);
-			return *this;
-		}
-
-		StringView(const char* _ptr, uint32_t _len = UINT16_MAX)
-		{
-			set(_ptr, _len);
-		}
-
-		void set(const char* _ptr, uint32_t _len = UINT16_MAX)
-		{
-			clear();
-
-			if (NULL != _ptr)
-			{
-				uint32_t len = uint32_t(strnlen(_ptr, _len) );
-				if (0 != len)
-				{
-					m_len = len;
-					m_ptr = _ptr;
-				}
-			}
-		}
-
-		void clear()
-		{
-			m_ptr = "";
-			m_len = 0;
-		}
-
-		const char* getPtr() const
-		{
-			return m_ptr;
-		}
-
-		const char* getTerm() const
-		{
-			return m_ptr + m_len;
-		}
-
-		bool isEmpty() const
-		{
-			return 0 == m_len;
-		}
-
-		uint32_t getLength() const
-		{
-			return m_len;
-		}
-
-	protected:
-		const char* m_ptr;
-		uint32_t    m_len;
-	};
-
-	inline uint32_t hashMurmur2A(const StringView& _data)
-	{
-		return hashMurmur2A(_data.getPtr(), _data.getLength() );
-	}
-
-	inline uint32_t hashMurmur2A(const char* _data)
-	{
-		return hashMurmur2A(StringView(_data) );
-	}
-
-	/// ASCII string
-	template<bx::AllocatorI** AllocatorT>
-	class StringT : public StringView
-	{
-	public:
-		StringT()
-			: StringView()
-		{
-		}
-
-		StringT(const StringT<AllocatorT>& _rhs)
-			: StringView()
-		{
-			set(_rhs.m_ptr, _rhs.m_len);
-		}
-
-		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs)
-		{
-			set(_rhs.m_ptr, _rhs.m_len);
-			return *this;
-		}
-
-		StringT(const char* _ptr, uint32_t _len = UINT32_MAX)
-		{
-			set(_ptr, _len);
-		}
-
-		StringT(const StringView& _rhs)
-		{
-			set(_rhs.getPtr(), _rhs.getLength() );
-		}
-
-		~StringT()
-		{
-			clear();
-		}
-
-		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
-		{
-			clear();
-			append(_ptr, _len);
-		}
-
-		void append(const char* _ptr, uint32_t _len = UINT32_MAX)
-		{
-			if (0 != _len)
-			{
-				uint32_t old = m_len;
-				uint32_t len = m_len + uint32_t(strnlen(_ptr, _len) );
-				char* ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_len ? const_cast<char*>(m_ptr) : NULL, len+1);
-				m_len = len;
-				strlncpy(ptr + old, len-old+1, _ptr, _len);
-
-				*const_cast<char**>(&m_ptr) = ptr;
-			}
-		}
-
-		void clear()
-		{
-			if (0 != m_len)
-			{
-				BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
-
-				StringView::clear();
-			}
-		}
-	};
+	///
+	uint32_t hashMurmur2A(const char* _data);
 
 } // namespace bx
+
+#include "string.inl"
 
 #endif // BX_STRING_H_HEADER_GUARD
