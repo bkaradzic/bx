@@ -1,12 +1,15 @@
 #include "test.h"
 #include <bx/os.h>
 
-TEST(getProcessMemoryUsed)
+TEST_CASE("getProcessMemoryUsed", "")
 {
-	CHECK(0 != bx::getProcessMemoryUsed() );
+	REQUIRE(0 != bx::getProcessMemoryUsed() );
 //	DBG("bx::getProcessMemoryUsed %d", bx::getProcessMemoryUsed() );
+}
 
+TEST_CASE("getTempPath", "")
+{
 	char tmpDir[512];
 	uint32_t len = BX_COUNTOF(tmpDir);
-	CHECK(bx::getTempPath(tmpDir, &len) );
+	REQUIRE(bx::getTempPath(tmpDir, &len) );
 }

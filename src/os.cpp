@@ -333,6 +333,15 @@ namespace bx
 			}
 		}
 
+		FileInfo fi;
+		if (stat("/tmp", fi)
+		&&  FileInfo::Directory == fi.m_type)
+		{
+			strlncpy(_out, *_inOutSize, "/tmp");
+			*_inOutSize = 4;
+			return true;
+		}
+
 		return false;
 #endif // BX_PLATFORM_*
 	}
