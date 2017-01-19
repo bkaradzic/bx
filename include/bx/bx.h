@@ -46,14 +46,6 @@ namespace bx
 		Ty tmp = _a; _a = _b; _b = tmp;
 	}
 
-	/// Check if pointer is aligned. _align must be power of two.
-	inline bool isPtrAligned(const void* _ptr, size_t _align)
-	{
-		union { const void* ptr; size_t addr; } un;
-		un.ptr = _ptr;
-		return 0 == (un.addr & (_align-1) );
-	}
-
 	/// Scatter/gather memcpy.
 	inline void memCopy(void* _dst, const void* _src, uint32_t _size, uint32_t _num, uint32_t _srcPitch, uint32_t _dstPitch)
 	{

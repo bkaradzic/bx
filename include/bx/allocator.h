@@ -55,6 +55,9 @@ namespace bx
 		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
 	};
 
+	/// Check if pointer is aligned. _align must be power of two.
+	bool isAligned(const void* _ptr, size_t _align);
+
 	/// Aligns pointer to nearest next aligned address. _align must be power of two.
 	void* alignPtr(
 		  void* _ptr

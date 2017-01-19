@@ -13,13 +13,20 @@ namespace bx
 	{
 	}
 
+	inline bool isAligned(const void* _ptr, size_t _align)
+	{
+		union { const void* ptr; uintptr_t addr; } un;
+		un.ptr = _ptr;
+		return 0 == (un.addr & (_align-1) );
+	}
+
 	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align)
 	{
-		union { void* ptr; size_t addr; } un;
+		union { void* ptr; uintptr_t addr; } un;
 		un.ptr = _ptr;
-		size_t unaligned = un.addr + _extra; // space for header
-		size_t mask = _align-1;
-		size_t aligned = BX_ALIGN_MASK(unaligned, mask);
+		uintptr_t unaligned = un.addr + _extra; // space for header
+		uintptr_t mask = _align-1;
+		uintptr_t aligned = BX_ALIGN_MASK(unaligned, mask);
 		un.addr = aligned;
 		return un.ptr;
 	}

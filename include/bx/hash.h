@@ -6,7 +6,7 @@
 #ifndef BX_HASH_H_HEADER_GUARD
 #define BX_HASH_H_HEADER_GUARD
 
-#include "bx.h"
+#include "allocator.h" // isAligned
 
 namespace bx
 {
@@ -30,7 +30,7 @@ namespace bx
 
 		void add(const void* _data, int _len)
 		{
-			if (BX_UNLIKELY(!isPtrAligned(_data, 4) ) )
+			if (BX_UNLIKELY(!isAligned(_data, 4) ) )
 			{
 				addUnaligned(_data, _len);
 				return;
