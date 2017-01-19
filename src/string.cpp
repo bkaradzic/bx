@@ -127,6 +127,17 @@ namespace bx
 		return num;
 	}
 
+	size_t strlncat(char* _dst, size_t _dstSize, const char* _src, size_t _num)
+	{
+		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
+		BX_CHECK(NULL != _src, "_src can't be NULL!");
+		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
+
+		const size_t max = _dstSize;
+		const size_t len = strnlen(_dst, max);
+		return strlncpy(&_dst[len], max-len, _src, _num);
+	}
+
 	const char* strnchr(const char* _str, char _ch, size_t _max)
 	{
 		for (size_t ii = 0, len = strnlen(_str, _max); ii < len; ++ii)
@@ -455,88 +466,14 @@ namespace bx
 		snprintf(_out, _count, "%0.2f %c%c", size, "BkMGTPEZY"[idx], idx > 0 ? 'B' : '\0');
 	}
 
-	/*
-	 * Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com>
-	 *
-	 * Permission to use, copy, modify, and distribute this software for any
-	 * purpose with or without fee is hereby granted, provided that the above
-	 * copyright notice and this permission notice appear in all copies.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
-	 * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
-	 * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
-	 * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
-	 * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
-	 * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
-	 * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-	 */
-	size_t strlcpy(char* _dst, const char* _src, size_t _siz)
+	size_t strlcpy(char* _dst, const char* _src, size_t _max)
 	{
-		char* dd = _dst;
-		const char* ss = _src;
-		size_t nn = _siz;
-
-		/* Copy as many bytes as will fit */
-		if (nn != 0)
-		{
-			while (--nn != 0)
-			{
-				if ( (*dd++ = *ss++) == '\0')
-				{
-					break;
-				}
-			}
-		}
-
-		/* Not enough room in dst, add NUL and traverse rest of src */
-		if (nn == 0)
-		{
-			if (_siz != 0)
-			{
-				*dd = '\0';  /* NUL-terminate dst */
-			}
-
-			while (*ss++)
-			{
-			}
-		}
-
-		return(ss - _src - 1); /* count does not include NUL */
+		return strlncpy(_dst, _max, _src);
 	}
 
-	size_t strlcat(char* _dst, const char* _src, size_t _siz)
+	size_t strlcat(char* _dst, const char* _src, size_t _max)
 	{
-		char* dd = _dst;
-		const char *s = _src;
-		size_t nn = _siz;
-		size_t dlen;
-
-		/* Find the end of dst and adjust bytes left but don't go past end */
-		while (nn-- != 0 && *dd != '\0')
-		{
-			dd++;
-		}
-
-		dlen = dd - _dst;
-		nn = _siz - dlen;
-
-		if (nn == 0)
-		{
-			return(dlen + strnlen(s));
-		}
-
-		while (*s != '\0')
-		{
-			if (nn != 1)
-			{
-				*dd++ = *s;
-				nn--;
-			}
-			s++;
-		}
-		*dd = '\0';
-
-		return(dlen + (s - _src)); /* count does not include NUL */
+		return strlncat(_dst, _max, _src);
 	}
 
 } // namespace bx

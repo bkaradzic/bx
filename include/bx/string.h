@@ -132,6 +132,9 @@ namespace bx
 	size_t strlncpy(char* _dst, size_t _dstSize, const char* _src, size_t _num = INT32_MAX);
 
 	///
+	size_t strlncat(char* _dst, size_t _dstSize, const char* _src, size_t _num = INT32_MAX);
+
+	///
 	const char* strnchr(const char* _str, char _ch, size_t _max = INT32_MAX);
 
 	///
@@ -207,14 +210,14 @@ namespace bx
 	/// Copy src to string dst of size siz.  At most siz-1 characters
 	/// will be copied.  Always NUL terminates (unless siz == 0).
 	/// Returns strlen(src); if retval >= siz, truncation occurred.
-	size_t strlcpy(char* _dst, const char* _src, size_t _siz);
+	size_t strlcpy(char* _dst, const char* _src, size_t _max);
 
 	/// Appends src to string dst of size siz (unlike strncat, siz is the
 	/// full size of dst, not space left).  At most siz-1 characters
 	/// will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
 	/// Returns strlen(src) + MIN(siz, strlen(initial dst)).
 	/// If retval >= siz, truncation occurred.
-	size_t strlcat(char* _dst, const char* _src, size_t _siz);
+	size_t strlcat(char* _dst, const char* _src, size_t _max);
 
 	///
 	uint32_t hashMurmur2A(const StringView& _data);

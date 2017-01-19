@@ -53,6 +53,21 @@ TEST_CASE("strlncpy", "")
 	REQUIRE(num == 4);
 }
 
+TEST_CASE("strlncat", "")
+{
+	char dst[128] = { '\0' };
+
+	REQUIRE(0 == bx::strlncat(dst, 1, "cat") );
+
+	REQUIRE(4 == bx::strlncpy(dst, 5, "copy") );
+	REQUIRE(3 == bx::strlncat(dst, 8, "cat") );
+	REQUIRE(0 == bx::strncmp(dst, "copycat") );
+
+	REQUIRE(1 == bx::strlncat(dst, BX_COUNTOF(dst), "------", 1) );
+	REQUIRE(3 == bx::strlncat(dst, BX_COUNTOF(dst), "cat") );
+	REQUIRE(0 == bx::strncmp(dst, "copycat-cat") );
+}
+
 TEST_CASE("strincmp", "")
 {
 	REQUIRE(0 == bx::strincmp("test", "test") );
