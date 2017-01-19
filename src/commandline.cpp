@@ -4,14 +4,15 @@
  */
 
 #include <bx/commandline.h>
+#include <bx/string.h>
 
 namespace bx
 {
 	// Reference:
 	// http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
-	const char* tokenizeCommandLine(const char* _commandLine, char* _buffer, uint32_t& _bufferSize, int& _argc, char* _argv[], int _maxArgvs, char _term)
+	const char* tokenizeCommandLine(const char* _commandLine, char* _buffer, uint32_t& _bufferSize, int32_t& _argc, char* _argv[], int32_t _maxArgvs, char _term)
 	{
-		int argc = 0;
+		int32_t argc = 0;
 		const char* curr = _commandLine;
 		char* currOut = _buffer;
 		char term = ' ';
@@ -89,10 +90,10 @@ namespace bx
 
 						if ('"' != *curr)
 						{
-							int count = (int)(curr-start);
+							int32_t count = (int32_t)(curr-start);
 
 							curr = start;
-							for (int ii = 0; ii < count; ++ii)
+							for (int32_t ii = 0; ii < count; ++ii)
 							{
 								*currOut = *curr;
 								++currOut;
@@ -136,7 +137,7 @@ namespace bx
 		return curr;
 	}
 
-	CommandLine::CommandLine(int _argc, char const* const* _argv)
+	CommandLine::CommandLine(int32_t _argc, char const* const* _argv)
 		: m_argc(_argc)
 		, m_argv(_argv)
 	{
@@ -154,19 +155,19 @@ namespace bx
 		return result == NULL ? _default : result;
 	}
 
-	const char* CommandLine::findOption(const char* _long, int _numParams) const
+	const char* CommandLine::findOption(const char* _long, int32_t _numParams) const
 	{
 		const char* result = find(0, '\0', _long, _numParams);
 		return result;
 	}
 
-	const char* CommandLine::findOption(const char _short, const char* _long, int _numParams) const
+	const char* CommandLine::findOption(const char _short, const char* _long, int32_t _numParams) const
 	{
 		const char* result = find(0, _short, _long, _numParams);
 		return result;
 	}
 
-	const char* CommandLine::findOption(int _skip, const char _short, const char* _long, int _numParams) const
+	const char* CommandLine::findOption(int32_t _skip, const char _short, const char* _long, int32_t _numParams) const
 	{
 		const char* result = find(_skip, _short, _long, _numParams);
 		return result;
@@ -191,7 +192,7 @@ namespace bx
 		return NULL != arg;
 	}
 
-	bool CommandLine::hasArg(int& _value, const char _short, const char* _long) const
+	bool CommandLine::hasArg(int32_t& _value, const char _short, const char* _long) const
 	{
 		const char* arg = findOption(_short, _long, 1);
 		if (NULL != arg)
@@ -203,7 +204,7 @@ namespace bx
 		return false;
 	}
 
-	bool CommandLine::hasArg(unsigned int& _value, const char _short, const char* _long) const
+	bool CommandLine::hasArg(uint32_t& _value, const char _short, const char* _long) const
 	{
 		const char* arg = findOption(_short, _long, 1);
 		if (NULL != arg)
@@ -259,9 +260,9 @@ namespace bx
 		return false;
 	}
 
-	const char* CommandLine::find(int _skip, const char _short, const char* _long, int _numParams) const
+	const char* CommandLine::find(int32_t _skip, const char _short, const char* _long, int32_t _numParams) const
 	{
-		for (int ii = 0; ii < m_argc; ++ii)
+		for (int32_t ii = 0; ii < m_argc; ++ii)
 		{
 			const char* arg = m_argv[ii];
 			if ('-' == *arg)

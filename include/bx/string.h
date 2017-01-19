@@ -107,6 +107,9 @@ namespace bx
 	bool isAlphaNum(char _ch);
 
 	///
+	bool isPrint(char _ch);
+
+	///
 	char toLower(char _ch);
 
 	///

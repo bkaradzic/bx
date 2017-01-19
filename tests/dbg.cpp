@@ -6,7 +6,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <inttypes.h>
-#include <ctype.h> // isprint
 
 #include "dbg.h"
 #include <bx/string.h>
@@ -61,7 +60,7 @@ void dbgPrintfData(const void* _data, uint32_t _size, const char* _format, ...)
 			bx::snprintf(&hex[hexPos], sizeof(hex)-hexPos, "%02x ", data[asciiPos]);
 			hexPos += 3;
 
-			ascii[asciiPos] = isprint(data[asciiPos]) ? data[asciiPos] : '.';
+			ascii[asciiPos] = bx::isPrint(data[asciiPos]) ? data[asciiPos] : '.';
 			asciiPos++;
 
 			if (HEX_DUMP_WIDTH == asciiPos)

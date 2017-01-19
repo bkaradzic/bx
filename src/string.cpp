@@ -50,6 +50,11 @@ namespace bx
 		return isAlpha(_ch) || isNumeric(_ch);
 	}
 
+	bool isPrint(char _ch)
+	{
+		return isAlphaNum(_ch) || isSpace(_ch);
+	}
+
 	char toLower(char _ch)
 	{
 		return _ch + (isUpper(_ch) ? 0x20 : 0);

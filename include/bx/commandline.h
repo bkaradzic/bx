@@ -7,20 +7,19 @@
 #define BX_COMMANDLINE_H_HEADER_GUARD
 
 #include "bx.h"
-#include "string.h"
 
 namespace bx
 {
 	/// Reference:
 	/// http://msdn.microsoft.com/en-us/library/a1y7w461.aspx
-	const char* tokenizeCommandLine(const char* _commandLine, char* _buffer, uint32_t& _bufferSize, int& _argc, char* _argv[], int _maxArgvs, char _term = '\0');
+	const char* tokenizeCommandLine(const char* _commandLine, char* _buffer, uint32_t& _bufferSize, int32_t& _argc, char* _argv[], int32_t _maxArgvs, char _term = '\0');
 
 	///
 	class CommandLine
 	{
 	public:
 		///
-		CommandLine(int _argc, char const* const* _argv);
+		CommandLine(int32_t _argc, char const* const* _argv);
 
 		///
 		const char* findOption(const char* _long, const char* _default) const;
@@ -29,13 +28,13 @@ namespace bx
 		const char* findOption(const char _short, const char* _long, const char* _default) const;
 
 		///
-		const char* findOption(const char* _long, int _numParams = 1) const;
+		const char* findOption(const char* _long, int32_t _numParams = 1) const;
 
 		///
-		const char* findOption(const char _short, const char* _long = NULL, int _numParams = 1) const;
+		const char* findOption(const char _short, const char* _long = NULL, int32_t _numParams = 1) const;
 
 		///
-		const char* findOption(int _skip, const char _short, const char* _long = NULL, int _numParams = 1) const;
+		const char* findOption(int32_t _skip, const char _short, const char* _long = NULL, int32_t _numParams = 1) const;
 
 		///
 		bool hasArg(const char _short, const char* _long = NULL) const;
@@ -47,10 +46,10 @@ namespace bx
 		bool hasArg(const char*& _value, const char _short, const char* _long = NULL) const;
 
 		///
-		bool hasArg(int& _value, const char _short, const char* _long = NULL) const;
+		bool hasArg(int32_t& _value, const char _short, const char* _long = NULL) const;
 
 		///
-		bool hasArg(unsigned int& _value, const char _short, const char* _long = NULL) const;
+		bool hasArg(uint32_t& _value, const char _short, const char* _long = NULL) const;
 
 		///
 		bool hasArg(float& _value, const char _short, const char* _long = NULL) const;
@@ -63,9 +62,9 @@ namespace bx
 
 	private:
 		///
-		const char* find(int _skip, const char _short, const char* _long, int _numParams) const;
+		const char* find(int32_t _skip, const char _short, const char* _long, int32_t _numParams) const;
 
-		int m_argc;
+		int32_t m_argc;
 		char const* const* m_argv;
 	};
 
