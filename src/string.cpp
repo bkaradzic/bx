@@ -67,7 +67,7 @@ namespace bx
 
 	bool toBool(const char* _str)
 	{
-		char ch = (char)toLower(_str[0]);
+		char ch = toLower(_str[0]);
 		return ch == 't' ||  ch == '1';
 	}
 
