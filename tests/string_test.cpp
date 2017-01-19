@@ -59,6 +59,18 @@ TEST_CASE("strincmp", "")
 	REQUIRE(0 == bx::strincmp("test", "testestes", 4) );
 	REQUIRE(0 == bx::strincmp("testestes", "test", 4) );
 	REQUIRE(0 != bx::strincmp("preprocess", "platform") );
+
+	const char* abvgd = "abvgd";
+	const char* abvgx = "abvgx";
+	const char* empty = "";
+	REQUIRE(0 == bx::strincmp(abvgd, abvgd) );
+	REQUIRE(0 == bx::strincmp(abvgd, abvgx, 4) );
+
+	REQUIRE(0 >  bx::strincmp(abvgd, abvgx) );
+	REQUIRE(0 >  bx::strincmp(empty, abvgd) );
+
+	REQUIRE(0 <  bx::strincmp(abvgx, abvgd) );
+	REQUIRE(0 <  bx::strincmp(abvgd, empty) );
 }
 
 TEST_CASE("strnchr", "")
