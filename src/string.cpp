@@ -52,12 +52,12 @@ namespace bx
 
 	char toLower(char _ch)
 	{
-		return _ch - (isUpper(_ch) ? 0x20 : 0);
+		return _ch + (isUpper(_ch) ? 0x20 : 0);
 	}
 
 	char toUpper(char _ch)
 	{
-		return _ch + (isLower(_ch) ? 0x20 : 0);
+		return _ch - (isLower(_ch) ? 0x20 : 0);
 	}
 
 	bool toBool(const char* _str)
@@ -73,14 +73,14 @@ namespace bx
 			; ++_lhs, ++_rhs, --_max
 			)
 		{
-			if (*_lhs != '\0'
-			||  *_rhs != '\0')
+			if (*_lhs == '\0'
+			||  *_rhs == '\0')
 			{
 				break;
 			}
 		}
 
-		return *_lhs - *_rhs;
+		return 0 == _max ? 0 : *_lhs - *_rhs;
 	}
 
 	int32_t strincmp(const char* _lhs, const char* _rhs, size_t _max)
@@ -90,14 +90,14 @@ namespace bx
 			; ++_lhs, ++_rhs, --_max
 			)
 		{
-			if (*_lhs != '\0'
-			||  *_rhs != '\0')
+			if (*_lhs == '\0'
+			||  *_rhs == '\0')
 			{
 				break;
 			}
 		}
 
-		return *_lhs - *_rhs;
+		return 0 == _max ? 0 : *_lhs - *_rhs;
 	}
 
 	size_t strnlen(const char* _str, size_t _max)
@@ -150,32 +150,42 @@ namespace bx
 
 	const char* strnstr(const char* _str, const char* _find, size_t _max)
 	{
-		char first = *_find;
-		if ('\0' == first)
-		{
-			return _str;
-		}
+		const char* ptr = _str;
 
-		const char* cmp = _find + 1;
-		size_t len = strnlen(cmp);
-		do
+		size_t       stringLen = strnlen(_str, _max);
+		const size_t findLen   = strnlen(_find);
+
+		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
-			for (char match = *_str++; match != first && 0 < _max; match = *_str++, --_max)
+			// Find start of the string.
+			while (*ptr != *_find)
 			{
-				if ('\0' == match)
+				++ptr;
+				--stringLen;
+
+				// Search pattern lenght can't be longer than the string.
+				if (findLen > stringLen)
 				{
 					return NULL;
 				}
 			}
 
-			if (0 == _max)
+			// Set pointers.
+			const char* string = ptr;
+			const char* search = _find;
+
+			// Start comparing.
+			while (*string++ == *search++)
 			{
-				return NULL;
+				// If end of the 'search' string is reached, all characters match.
+				if ('\0' == *search)
+				{
+					return ptr;
+				}
 			}
+		}
 
-		} while (0 != strncmp(_str, cmp, len) );
-
-		return --_str;
+		return NULL;
 	}
 
 	const char* stristr(const char* _str, const char* _find, size_t _max)

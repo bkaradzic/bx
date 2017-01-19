@@ -5,8 +5,6 @@
 
 #include <bx/commandline.h>
 
-#include <ctype.h>
-
 namespace bx
 {
 	// Reference:
@@ -37,7 +35,7 @@ namespace bx
 			switch (state)
 			{
 				case SkipWhitespace:
-					for (; isspace(*curr); ++curr) {}; // skip whitespace
+					for (; isSpace(*curr); ++curr) {}; // skip whitespace
 					state = SetTerm;
 					break;
 
@@ -68,7 +66,7 @@ namespace bx
 					{
 						sub = !sub;
 					}
-					else if (isspace(*curr) && !sub)
+					else if (isSpace(*curr) && !sub)
 					{
 						state = End;
 					}
@@ -271,7 +269,7 @@ namespace bx
 				++arg;
 				if (_short == *arg)
 				{
-					if (1 == strlen(arg) )
+					if (1 == strnlen(arg) )
 					{
 						if (0 == _skip)
 						{
@@ -280,7 +278,7 @@ namespace bx
 								return "";
 							}
 							else if (ii+_numParams < m_argc
-									&& '-' != *m_argv[ii+1] )
+								 && '-' != *m_argv[ii+1] )
 							{
 								return m_argv[ii+1];
 							}
@@ -293,8 +291,8 @@ namespace bx
 					}
 				}
 				else if (NULL != _long
-						&&  '-' == *arg
-						&&  0 == strincmp(arg+1, _long) )
+					 &&  '-'  == *arg
+					 &&  0 == strincmp(arg+1, _long) )
 				{
 					if (0 == _skip)
 					{
@@ -303,7 +301,7 @@ namespace bx
 							return "";
 						}
 						else if (ii+_numParams < m_argc
-								&&  '-' != *m_argv[ii+1] )
+							 &&  '-' != *m_argv[ii+1] )
 						{
 							return m_argv[ii+1];
 						}
