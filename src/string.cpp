@@ -73,8 +73,8 @@ namespace bx
 			; ++_lhs, ++_rhs, --_max
 			)
 		{
-			if (*_lhs != '\0'
-			||  *_rhs != '\0')
+			if (*_lhs == '\0'
+			||  *_rhs == '\0')
 			{
 				break;
 			}
