@@ -246,11 +246,11 @@ namespace bx
 		const char* arg = findOption(_short, _long, 1);
 		if (NULL != arg)
 		{
-			if ('0' == *arg || (0 == stricmp(arg, "false") ) )
+			if ('0' == *arg || (0 == strincmp(arg, "false") ) )
 			{
 				_value = false;
 			}
-			else if ('0' != *arg || (0 == stricmp(arg, "true") ) )
+			else if ('0' != *arg || (0 == strincmp(arg, "true") ) )
 			{
 				_value = true;
 			}
@@ -294,7 +294,7 @@ namespace bx
 				}
 				else if (NULL != _long
 						&&  '-' == *arg
-						&&  0 == stricmp(arg+1, _long) )
+						&&  0 == strincmp(arg+1, _long) )
 				{
 					if (0 == _skip)
 					{

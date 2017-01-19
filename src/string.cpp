@@ -4,11 +4,8 @@
  */
 
 #include <alloca.h>
-#include <ctype.h>  // tolower
 #include <stdarg.h> // va_list
 #include <stdio.h>  // vsnprintf, vsnwprintf
-#include <string.h>
-#include <wchar.h>  // wchar_t
 
 #include <bx/string.h>
 
@@ -17,19 +14,90 @@
 
 namespace bx
 {
+	bool isSpace(char _ch)
+	{
+		return ' '  == _ch
+			|| '\t' == _ch
+			|| '\n' == _ch
+			|| '\v' == _ch
+			|| '\f' == _ch
+			|| '\r' == _ch
+			;
+	}
+
+	bool isUpper(char _ch)
+	{
+		return _ch >= 'A' && _ch <= 'Z';
+	}
+
+	bool isLower(char _ch)
+	{
+		return _ch >= 'a' && _ch <= 'z';
+	}
+
+	bool isAlpha(char _ch)
+	{
+		return isLower(_ch) || isUpper(_ch);
+	}
+
+	bool isNumeric(char _ch)
+	{
+		return _ch >= '0' && _ch <= '9';
+	}
+
+	bool isAlphaNum(char _ch)
+	{
+		return isAlpha(_ch) || isNumeric(_ch);
+	}
+
+	char toLower(char _ch)
+	{
+		return _ch - (isUpper(_ch) ? 0x20 : 0);
+	}
+
+	char toUpper(char _ch)
+	{
+		return _ch + (isLower(_ch) ? 0x20 : 0);
+	}
+
 	bool toBool(const char* _str)
 	{
-		char ch = (char)::tolower(_str[0]);
+		char ch = (char)toLower(_str[0]);
 		return ch == 't' ||  ch == '1';
 	}
 
-	int32_t stricmp(const char* _a, const char* _b)
+	int32_t strncmp(const char* _lhs, const char* _rhs, size_t _max)
 	{
-#if BX_CRT_MSVC
-		return ::_stricmp(_a, _b);
-#else
-		return ::strcasecmp(_a, _b);
-#endif // BX_COMPILER_
+		for (
+			; 0 < _max && *_lhs == *_rhs
+			; ++_lhs, ++_rhs, --_max
+			)
+		{
+			if (*_lhs != '\0'
+			||  *_rhs != '\0')
+			{
+				break;
+			}
+		}
+
+		return *_lhs - *_rhs;
+	}
+
+	int32_t strincmp(const char* _lhs, const char* _rhs, size_t _max)
+	{
+		for (
+			; 0 < _max && toLower(*_lhs) == toLower(*_rhs)
+			; ++_lhs, ++_rhs, --_max
+			)
+		{
+			if (*_lhs != '\0'
+			||  *_rhs != '\0')
+			{
+				break;
+			}
+		}
+
+		return *_lhs - *_rhs;
 	}
 
 	size_t strnlen(const char* _str, size_t _max)
@@ -48,13 +116,39 @@ namespace bx
 		const size_t len = strnlen(_src, _num);
 		const size_t max = _dstSize-1;
 		const size_t num = (len < max ? len : max);
-		strncpy(_dst, _src, num);
+		memcpy(_dst, _src, num);
 		_dst[num] = '\0';
 
 		return num;
 	}
 
-	const char* strnstr(const char* _str, const char* _find, size_t _size)
+	const char* strnchr(const char* _str, char _ch, size_t _max)
+	{
+		for (size_t ii = 0, len = strnlen(_str, _max); ii < len; ++ii)
+		{
+			if (_str[ii] == _ch)
+			{
+				return &_str[ii];
+			}
+		}
+
+		return NULL;
+	}
+
+	const char* strnrchr(const char* _str, char _ch, size_t _max)
+	{
+		for (size_t ii = strnlen(_str, _max); 0 < ii; --ii)
+		{
+			if (_str[ii] == _ch)
+			{
+				return &_str[ii];
+			}
+		}
+
+		return NULL;
+	}
+
+	const char* strnstr(const char* _str, const char* _find, size_t _max)
 	{
 		char first = *_find;
 		if ('\0' == first)
@@ -63,10 +157,10 @@ namespace bx
 		}
 
 		const char* cmp = _find + 1;
-		size_t len = strlen(cmp);
+		size_t len = strnlen(cmp);
 		do
 		{
-			for (char match = *_str++; match != first && 0 < _size; match = *_str++, --_size)
+			for (char match = *_str++; match != first && 0 < _max; match = *_str++, --_max)
 			{
 				if ('\0' == match)
 				{
@@ -74,7 +168,7 @@ namespace bx
 				}
 			}
 
-			if (0 == _size)
+			if (0 == _max)
 			{
 				return NULL;
 			}
@@ -84,56 +178,17 @@ namespace bx
 		return --_str;
 	}
 
-	const char* stristr(const char* _str, const char* _find)
-	{
-		const char* ptr = _str;
-
-		for (size_t len = strlen(_str), searchLen = strlen(_find)
-		    ; len >= searchLen
-		    ; ++ptr, --len)
-		{
-			// Find start of the string.
-			while (tolower(*ptr) != tolower(*_find) )
-			{
-				++ptr;
-				--len;
-
-				// Search pattern lenght can't be longer than the string.
-				if (searchLen > len)
-				{
-					return NULL;
-				}
-			}
-
-			// Set pointers.
-			const char* string = ptr;
-			const char* search = _find;
-
-			// Start comparing.
-			while (tolower(*string++) == tolower(*search++) )
-			{
-				// If end of the 'search' string is reached, all characters match.
-				if ('\0' == *search)
-				{
-					return ptr;
-				}
-			}
-		}
-
-		return NULL;
-	}
-
 	const char* stristr(const char* _str, const char* _find, size_t _max)
 	{
 		const char* ptr = _str;
 
 		size_t       stringLen = strnlen(_str, _max);
-		const size_t findLen   = strlen(_find);
+		const size_t findLen   = strnlen(_find);
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
 			// Find start of the string.
-			while (tolower(*ptr) != tolower(*_find) )
+			while (toLower(*ptr) != toLower(*_find) )
 			{
 				++ptr;
 				--stringLen;
@@ -150,7 +205,7 @@ namespace bx
 			const char* search = _find;
 
 			// Start comparing.
-			while (tolower(*string++) == tolower(*search++) )
+			while (toLower(*string++) == toLower(*search++) )
 			{
 				// If end of the 'search' string is reached, all characters match.
 				if ('\0' == *search)
@@ -205,19 +260,19 @@ namespace bx
 
 	const char* strws(const char* _str)
 	{
-		for (; isspace(*_str); ++_str) {};
+		for (; isSpace(*_str); ++_str) {};
 		return _str;
 	}
 
 	const char* strnws(const char* _str)
 	{
-		for (; !isspace(*_str); ++_str) {};
+		for (; !isSpace(*_str); ++_str) {};
 		return _str;
 	}
 
 	const char* strword(const char* _str)
 	{
-		for (char ch = *_str++; isalnum(ch) || '_' == ch; ch = *_str++) {};
+		for (char ch = *_str++; isAlphaNum(ch) || '_' == ch; ch = *_str++) {};
 		return _str-1;
 	}
 
@@ -262,21 +317,21 @@ namespace bx
 
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
-		size_t len = strlen(_word);
-		const char* ptr = strstr(_str, _word);
-		for (; NULL != ptr; ptr = strstr(ptr + len, _word) )
+		size_t len = strnlen(_word);
+		const char* ptr = strnstr(_str, _word);
+		for (; NULL != ptr; ptr = strnstr(ptr + len, _word) )
 		{
 			if (ptr != _str)
 			{
 				char ch = *(ptr - 1);
-				if (isalnum(ch) || '_' == ch)
+				if (isAlphaNum(ch) || '_' == ch)
 				{
 					continue;
 				}
 			}
 
 			char ch = ptr[len];
-			if (isalnum(ch) || '_' == ch)
+			if (isAlphaNum(ch) || '_' == ch)
 			{
 				continue;
 			}
@@ -357,10 +412,10 @@ namespace bx
 
 	const char* baseName(const char* _filePath)
 	{
-		const char* bs       = strrchr(_filePath, '\\');
-		const char* fs       = strrchr(_filePath, '/');
+		const char* bs       = strnrchr(_filePath, '\\');
+		const char* fs       = strnrchr(_filePath, '/');
 		const char* slash    = (bs > fs ? bs : fs);
-		const char* colon    = strrchr(_filePath, ':');
+		const char* colon    = strnrchr(_filePath, ':');
 		const char* basename = slash > colon ? slash : colon;
 		if (NULL != basename)
 		{
@@ -452,7 +507,7 @@ namespace bx
 
 		if (nn == 0)
 		{
-			return(dlen + strlen(s));
+			return(dlen + strnlen(s));
 		}
 
 		while (*s != '\0')

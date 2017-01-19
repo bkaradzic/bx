@@ -89,26 +89,56 @@ namespace bx
 	};
 
 	///
-	bool toBool(const char* _str);
-
-	/// Case insensitive string compare.
-	int32_t stricmp(const char* _a, const char* _b);
+	bool isSpace(char _ch);
 
 	///
-	size_t strnlen(const char* _str, size_t _max);
+	bool isUpper(char _ch);
+
+	///
+	bool isLower(char _ch);
+
+	///
+	bool isAlpha(char _ch);
+
+	///
+	bool isNumeric(char _ch);
+
+	///
+	bool isAlphaNum(char _ch);
+
+	///
+	char toLower(char _ch);
+
+	///
+	char toUpper(char _ch);
+
+	///
+	bool toBool(const char* _str);
+
+	/// String compare.
+	int32_t strncmp(const char* _lhs, const char* _rhs, size_t _max = -1);
+
+	/// Case insensitive string compare.
+	int32_t strincmp(const char* _lhs, const char* _rhs, size_t _max = -1);
+
+	///
+	size_t strnlen(const char* _str, size_t _max = -1);
 
 	/// Copy _num characters from string _src to _dst buffer of maximum _dstSize capacity
 	/// including zero terminator. Copy will be terminated with '\0'.
 	size_t strlncpy(char* _dst, size_t _dstSize, const char* _src, size_t _num = -1);
 
-	/// Find substring in string. Limit search to _size.
-	const char* strnstr(const char* _str, const char* _find, size_t _size);
+	///
+	const char* strnchr(const char* _str, char _ch, size_t _max = -1);
 
-	/// Find substring in string. Case insensitive.
-	const char* stristr(const char* _str, const char* _find);
+	///
+	const char* strnrchr(const char* _str, char _ch, size_t _max = -1);
+
+	/// Find substring in string. Limit search to _size.
+	const char* strnstr(const char* _str, const char* _find, size_t _max = -1);
 
 	/// Find substring in string. Case insensitive. Limit search to _max.
-	const char* stristr(const char* _str, const char* _find, size_t _max);
+	const char* stristr(const char* _str, const char* _find, size_t _max = -1);
 
 	/// Find new line. Returns pointer after new line terminator.
 	const char* strnl(const char* _str);

@@ -40,6 +40,29 @@ TEST_CASE("strlncpy", "")
 	REQUIRE(num == 4);
 }
 
+TEST_CASE("strincmp", "")
+{
+	REQUIRE(0 == bx::strincmp("test", "test") );
+	REQUIRE(0 == bx::strincmp("test", "testestes", 4) );
+	REQUIRE(0 == bx::strincmp("testestes", "test", 4) );
+}
+
+TEST_CASE("strnchr", "")
+{
+	const char* test = "test";
+	REQUIRE(NULL == bx::strnchr(test, 's', 0) );
+	REQUIRE(NULL == bx::strnchr(test, 's', 2) );
+	REQUIRE(&test[2] == bx::strnchr(test, 's') );
+}
+
+TEST_CASE("strnrchr", "")
+{
+	const char* test = "test";
+	REQUIRE(NULL == bx::strnrchr(test, 's', 0) );
+	REQUIRE(NULL == bx::strnrchr(test, 's', 1) );
+	REQUIRE(&test[2] == bx::strnrchr(test, 's') );
+}
+
 TEST_CASE("StringView", "")
 {
 	bx::StringView sv("test");
