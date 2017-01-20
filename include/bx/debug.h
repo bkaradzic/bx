@@ -7,6 +7,7 @@
 #define BX_DEBUG_H_HEADER_GUARD
 
 #include "bx.h"
+#include <stdarg.h> // va_list
 
 namespace bx
 {
@@ -15,6 +16,15 @@ namespace bx
 
 	///
 	void debugOutput(const char* _out);
+
+	///
+	void debugPrintfVargs(const char* _format, va_list _argList);
+
+	///
+	void debugPrintf(const char* _format, ...);
+
+	///
+	void debugPrintfData(const void* _data, uint32_t _size, const char* _format, ...);
 
 } // namespace bx
 
