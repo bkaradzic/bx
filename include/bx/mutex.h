@@ -7,6 +7,7 @@
 #define BX_MUTEX_H_HEADER_GUARD
 
 #include "bx.h"
+#include "cpu.h"
 #include "os.h"
 #include "sem.h"
 
