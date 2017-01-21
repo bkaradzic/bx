@@ -12,6 +12,15 @@
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
+#if 0 \
+	|| BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX \
+	|| BX_PLATFORM_NACL \
+	|| BX_PLATFORM_IOS \
+	|| BX_PLATFORM_OSX
+#	include <pthread.h>
+#endif //
+
 namespace bx
 {
 	///
