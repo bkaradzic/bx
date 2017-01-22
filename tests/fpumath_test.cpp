@@ -6,8 +6,8 @@
 #include "test.h"
 #include <bx/fpumath.h>
 
+#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 #include <cmath>
-
 TEST_CASE("isFinite, isInfinite, isNan", "")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
@@ -18,6 +18,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 		REQUIRE(std::isinf(u.f) == bx::isInfinite(u.f) );
 	}
 }
+#endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 
 void mtxCheck(const float* _a, const float* _b)
 {
