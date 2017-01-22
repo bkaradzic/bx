@@ -7,7 +7,6 @@
 #define BX_SEM_H_HEADER_GUARD
 
 #include "bx.h"
-#include "mutex.h"
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
@@ -22,6 +21,8 @@
 #	include <windows.h>
 #	include <limits.h>
 #endif // BX_PLATFORM_
+
+#include "mutex.h"
 
 namespace bx
 {
