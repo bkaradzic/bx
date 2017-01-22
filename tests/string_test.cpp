@@ -129,6 +129,53 @@ TEST_CASE("strnstr", "")
 	REQUIRE(&test[4] == bx::strnstr(test, "Quick") );
 }
 
+template<typename Ty>
+static bool testToString(Ty _value, const char* _expected)
+{
+	char tmp[1024];
+	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
+	int32_t len = (int32_t)bx::strnlen(_expected);
+	return true
+		&& 0 == bx::strncmp(tmp, _expected)
+		&& num == len
+		;
+}
+
+TEST_CASE("toString int32_t/uint32_t", "")
+{
+	REQUIRE(testToString(0,          "0") );
+	REQUIRE(testToString(-256,       "-256") );
+	REQUIRE(testToString(INT32_MAX,  "2147483647") );
+	REQUIRE(testToString(UINT32_MAX, "4294967295") );
+}
+
+TEST_CASE("toString double", "")
+{
+	REQUIRE(testToString(0.0,                     "0.0") );
+	REQUIRE(testToString(-0.0,                    "0.0") );
+	REQUIRE(testToString(1.0,                     "1.0") );
+	REQUIRE(testToString(-1.0,                    "-1.0") );
+	REQUIRE(testToString(1.2345,                  "1.2345") );
+	REQUIRE(testToString(1.2345678,               "1.2345678") );
+	REQUIRE(testToString(0.123456789012,          "0.123456789012") );
+	REQUIRE(testToString(1234567.8,               "1234567.8") );
+	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testToString(0.000001,                "0.000001") );
+	REQUIRE(testToString(0.0000001,               "1e-7") );
+	REQUIRE(testToString(1e30,                    "1e30") );
+	REQUIRE(testToString(1.234567890123456e30,    "1.234567890123456e30") );
+	REQUIRE(testToString(-5e-324,                 "-5e-324") );
+	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testToString(2.2250738585072014e-308, "2.2250738585072014e-308") );
+	REQUIRE(testToString(1.7976931348623157e308,  "1.7976931348623157e308") );
+	REQUIRE(testToString(0.00000123123123,        "0.00000123123123") );
+	REQUIRE(testToString(0.000000123123123,       "1.23123123e-7") );
+	REQUIRE(testToString(123123.123,              "123123.123") );
+	REQUIRE(testToString(1231231.23,              "1231231.23") );
+	REQUIRE(testToString(0.000000000123123,       "1.23123e-10") );
+	REQUIRE(testToString(0.0000000001,            "1e-10") );
+}
+
 TEST_CASE("StringView", "")
 {
 	bx::StringView sv("test");

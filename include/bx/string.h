@@ -220,6 +220,15 @@ namespace bx
 	size_t strlcat(char* _dst, const char* _src, size_t _max);
 
 	///
+	int32_t toString(char* _dst, size_t _max, double _value);
+
+	///
+	int32_t toString(char* _dst, size_t _max, int32_t _value, uint32_t _base = 10);
+
+	///
+	int32_t toString(char* _dst, size_t _max, uint32_t _value, uint32_t _base = 10);
+
+	///
 	uint32_t hashMurmur2A(const StringView& _data);
 
 	///

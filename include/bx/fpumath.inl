@@ -25,6 +25,48 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
+	inline bool isNan(float _f)
+	{
+		union { float f; uint32_t ui; } u = { _f };
+		u.ui &= INT32_MAX;
+		return u.ui > UINT32_C(0x7f800000);
+	}
+
+	inline bool isNan(double _f)
+	{
+		union { double f; uint64_t ui; } u = { _f };
+		u.ui &= INT64_MAX;
+		return u.ui > UINT64_C(0x7ff0000000000000);
+	}
+
+	inline bool isFinite(float _f)
+	{
+		union { float f; uint32_t ui; } u = { _f };
+		u.ui &= INT32_MAX;
+		return u.ui < UINT32_C(0x7f800000);
+	}
+
+	inline bool isFinite(double _f)
+	{
+		union { double f; uint64_t ui; } u = { _f };
+		u.ui &= INT64_MAX;
+		return u.ui < UINT64_C(0x7ff0000000000000);
+	}
+
+	inline bool isInfinite(float _f)
+	{
+		union { float f; uint32_t ui; } u = { _f };
+		u.ui &= INT32_MAX;
+		return u.ui == UINT32_C(0x7f800000);
+	}
+
+	inline bool isInfinite(double _f)
+	{
+		union { double f; uint64_t ui; } u = { _f };
+		u.ui &= INT64_MAX;
+		return u.ui == UINT64_C(0x7ff0000000000000);
+	}
+
 	inline float ffloor(float _f)
 	{
 		return floorf(_f);

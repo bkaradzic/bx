@@ -6,6 +6,19 @@
 #include "test.h"
 #include <bx/fpumath.h>
 
+#include <cmath>
+
+TEST_CASE("isFinite, isInfinite, isNan", "")
+{
+	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
+	{
+		union { uint32_t ui; float f; } u = { uint32_t(ii) };
+		REQUIRE(std::isnan(u.f) == bx::isNan(u.f) );
+		REQUIRE(std::isfinite(u.f) == bx::isFinite(u.f) );
+		REQUIRE(std::isinf(u.f) == bx::isInfinite(u.f) );
+	}
+}
+
 void mtxCheck(const float* _a, const float* _b)
 {
 	if (!bx::fequal(_a, _b, 16, 0.01f) )
@@ -35,7 +48,7 @@ void mtxCheck(const float* _a, const float* _b)
 	}
 }
 
-TEST(Quaternion)
+TEST_CASE("quaternion", "")
 {
 	float mtxQ[16];
 	float mtx[16];

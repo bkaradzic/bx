@@ -47,6 +47,24 @@ namespace bx
 	float toDeg(float _rad);
 
 	///
+	bool isNan(float _f);
+
+	///
+	bool isNan(double _f);
+
+	///
+	bool isFinite(float _f);
+
+	///
+	bool isFinite(double _f);
+
+	///
+	bool isInfinite(float _f);
+
+	///
+	bool isInfinite(double _f);
+
+	///
 	float ffloor(float _f);
 
 	///

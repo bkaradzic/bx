@@ -399,6 +399,15 @@ namespace bx
 #endif // BX_COMPILER_MSVC
 	}
 
+	int32_t snprintf(char* _str, size_t _count, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
+		int32_t len = vsnprintf(_str, _count, _format, argList);
+		va_end(argList);
+		return len;
+	}
+
 	int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList)
 	{
 #if BX_COMPILER_MSVC
@@ -416,15 +425,6 @@ namespace bx
 #else
 		return ::vswprintf(_str, _count, _format, _argList);
 #endif // BX_COMPILER_MSVC
-	}
-
-	int32_t snprintf(char* _str, size_t _count, const char* _format, ...)
-	{
-		va_list argList;
-		va_start(argList, _format);
-		int32_t len = vsnprintf(_str, _count, _format, argList);
-		va_end(argList);
-		return len;
 	}
 
 	int32_t swnprintf(wchar_t* _out, size_t _count, const wchar_t* _format, ...)
