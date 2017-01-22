@@ -20,6 +20,8 @@ extern "C" void NSLog(CFStringRef _format, ...);
 #	endif // defined(__OBJC__)
 #elif 0 // BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
+#else
+#	include <stdio.h> // fputs, fflush
 #endif // BX_PLATFORM_WINDOWS
 
 namespace bx
