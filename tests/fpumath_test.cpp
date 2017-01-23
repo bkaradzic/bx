@@ -20,6 +20,12 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 }
 #endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 
+TEST_CASE("ToBits", "")
+{
+	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );
+	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::doubleToBits(bx::bitsToDouble(UINT32_C(0x123456789abcdef0) ) ) );
+}
+
 void mtxCheck(const float* _a, const float* _b)
 {
 	if (!bx::fequal(_a, _b, 16, 0.01f) )
