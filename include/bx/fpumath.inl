@@ -25,46 +25,64 @@ namespace bx
 		return _rad * 180.0f / pi;
 	}
 
+	inline uint32_t floatToBits(float _a)
+	{
+		union { float f; uint32_t ui; } u = { _a };
+		return u.ui;
+	}
+
+	inline float bitsToFloat(uint32_t _a)
+	{
+		union { uint32_t ui; float f; } u = { _a };
+		return u.f;
+	}
+
+	inline uint64_t doubleToBits(double _a)
+	{
+		union { double f; uint64_t ui; } u = { _a };
+		return u.ui;
+	}
+
+	inline double bitsToDouble(uint64_t _a)
+	{
+		union { uint64_t ui; double f; } u = { _a };
+		return u.f;
+	}
+
 	inline bool isNan(float _f)
 	{
-		union { float f; uint32_t ui; } u = { _f };
-		u.ui &= INT32_MAX;
-		return u.ui > UINT32_C(0x7f800000);
+		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
+		return tmp > UINT32_C(0x7f800000);
 	}
 
 	inline bool isNan(double _f)
 	{
-		union { double f; uint64_t ui; } u = { _f };
-		u.ui &= INT64_MAX;
-		return u.ui > UINT64_C(0x7ff0000000000000);
+		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
+		return tmp > UINT64_C(0x7ff0000000000000);
 	}
 
 	inline bool isFinite(float _f)
 	{
-		union { float f; uint32_t ui; } u = { _f };
-		u.ui &= INT32_MAX;
-		return u.ui < UINT32_C(0x7f800000);
+		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
+		return tmp < UINT32_C(0x7f800000);
 	}
 
 	inline bool isFinite(double _f)
 	{
-		union { double f; uint64_t ui; } u = { _f };
-		u.ui &= INT64_MAX;
-		return u.ui < UINT64_C(0x7ff0000000000000);
+		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
+		return tmp < UINT64_C(0x7ff0000000000000);
 	}
 
 	inline bool isInfinite(float _f)
 	{
-		union { float f; uint32_t ui; } u = { _f };
-		u.ui &= INT32_MAX;
-		return u.ui == UINT32_C(0x7f800000);
+		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
+		return tmp == UINT32_C(0x7f800000);
 	}
 
 	inline bool isInfinite(double _f)
 	{
-		union { double f; uint64_t ui; } u = { _f };
-		u.ui &= INT64_MAX;
-		return u.ui == UINT64_C(0x7ff0000000000000);
+		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
+		return tmp == UINT64_C(0x7ff0000000000000);
 	}
 
 	inline float ffloor(float _f)
