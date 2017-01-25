@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include <bx/cpu.h>
 #include <bx/fpumath.h>
 #include <bx/string.h>
 
@@ -109,7 +110,7 @@ namespace bx
 		DiyFp Normalize() const
 		{
 #if defined(_MSC_VER) && defined(_M_AMD64)
-			uint32_t long index;
+			unsigned long index;
 			_BitScanReverse64(&index, f);
 			return DiyFp(f << (63 - index), e - (63 - index));
 #elif defined(__GNUC__)
@@ -131,7 +132,7 @@ namespace bx
 		DiyFp NormalizeBoundary() const
 		{
 #if defined(_MSC_VER) && defined(_M_AMD64)
-			uint32_t long index;
+			unsigned long index;
 			_BitScanReverse64(&index, f);
 			return DiyFp (f << (63 - index), e - (63 - index));
 #else
