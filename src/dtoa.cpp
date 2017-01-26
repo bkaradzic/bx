@@ -6,6 +6,7 @@
 #include <bx/cpu.h>
 #include <bx/fpumath.h>
 #include <bx/string.h>
+#include <bx/uint32_t.h>
 
 namespace bx
 {
@@ -74,24 +75,6 @@ namespace bx
 
 		DiyFp operator*(const DiyFp& rhs) const
 		{
-#if defined(_MSC_VER) && defined(_M_AMD64)
-			uint64_t h;
-			uint64_t l = _umul128(f, rhs.f, &h);
-			if (l & (uint64_t(1) << 63)) // rounding
-			{
-				h++;
-			}
-			return DiyFp(h, e + rhs.e + 64);
-#elif (__GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 6)) && defined(__x86_64__)
-			unsigned __int128 p = static_cast<unsigned __int128>(f) * static_cast<unsigned __int128>(rhs.f);
-			uint64_t h = p >> 64;
-			uint64_t l = static_cast<uint64_t>(p);
-			if (l & (uint64_t(1) << 63)) // rounding
-			{
-				h++;
-			}
-			return DiyFp(h, e + rhs.e + 64);
-#else
 			const uint64_t M32 = 0xFFFFFFFF;
 			const uint64_t a = f >> 32;
 			const uint64_t b = f & M32;
@@ -104,48 +87,18 @@ namespace bx
 			uint64_t tmp = (bd >> 32) + (ad & M32) + (bc & M32);
 			tmp += 1U << 31;  /// mult_round
 			return DiyFp(ac + (ad >> 32) + (bc >> 32) + (tmp >> 32), e + rhs.e + 64);
-#endif
 		}
 
 		DiyFp Normalize() const
 		{
-#if defined(_MSC_VER) && defined(_M_AMD64)
-			unsigned long index;
-			_BitScanReverse64(&index, f);
-			return DiyFp(f << (63 - index), e - (63 - index));
-#elif defined(__GNUC__)
-			int32_t s = __builtin_clzll(f);
+			uint32_t s = uint64_cntlz(f);
 			return DiyFp(f << s, e - s);
-#else
-			DiyFp res = *this;
-			while (!(res.f & kDpHiddenBit))
-			{
-				res.f <<= 1;
-				res.e--;
-			}
-			res.f <<= (kDiySignificandSize - kDpSignificandSize - 1);
-			res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 1);
-			return res;
-#endif
 		}
 
 		DiyFp NormalizeBoundary() const
 		{
-#if defined(_MSC_VER) && defined(_M_AMD64)
-			unsigned long index;
-			_BitScanReverse64(&index, f);
-			return DiyFp (f << (63 - index), e - (63 - index));
-#else
-			DiyFp res = *this;
-			while (!(res.f & (kDpHiddenBit << 1)))
-			{
-				res.f <<= 1;
-				res.e--;
-			}
-			res.f <<= (kDiySignificandSize - kDpSignificandSize - 2);
-			res.e = res.e - (kDiySignificandSize - kDpSignificandSize - 2);
-			return res;
-#endif
+			uint32_t index = uint64_cntlz(f);
+			return DiyFp (f << index, e - index);
 		}
 
 		void NormalizedBoundaries(DiyFp* minus, DiyFp* plus) const
@@ -320,13 +273,8 @@ namespace bx
 				case  2: d = p1 /         10; p1 %=         10; break;
 				case  1: d = p1;              p1  =          0; break;
 				default:
-#if defined(_MSC_VER)
-					__assume(0);
-#elif __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 5)
-					__builtin_unreachable();
-#else
 					d = 0;
-#endif
+					break;
 			}
 
 			if (d || *len)
@@ -533,7 +481,7 @@ namespace bx
 			}
 
 			*_dst = '-';
-			return _max + 1;
+			return int32_t(_max + 1);
 		}
 
 		return toString(_dst, _max, uint32_t(_value), _base);
@@ -556,11 +504,11 @@ namespace bx
 			_value /= _base;
 			if (rem < 10)
 			{
-				data[len++] = '0' + rem;
+				data[len++] = char('0' + rem);
 			}
 			else
 			{
-				data[len++] = 'a' + rem - 10;
+				data[len++] = char('a' + rem - 10);
 			}
 
 		} while (_value != 0);
@@ -574,7 +522,7 @@ namespace bx
 
 		memcpy(_dst, data, len);
 		_dst[len] = '\0';
-		return len;
+		return int32_t(len);
 	}
 
 } // namespace bx

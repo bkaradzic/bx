@@ -182,7 +182,7 @@ namespace bx
 		return m_fn(m_userData);
 	}
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 	DWORD WINAPI Thread::threadFunc(LPVOID _arg)
 	{
 		Thread* thread = (Thread*)_arg;

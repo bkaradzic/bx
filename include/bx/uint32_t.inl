@@ -615,30 +615,29 @@ namespace bx
 		return result;
 	}
 
-	inline uint64_t uint64_cntbits_ref(uint64_t _val)
+	inline uint32_t uint64_cntbits_ref(uint64_t _val)
 	{
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
 		const uint32_t hi = uint32_t(_val>>32);
 
 		const uint32_t total = bx::uint32_cntbits(lo)
 							 + bx::uint32_cntbits(hi);
-
 		return total;
 	}
 
 	/// Count number of bits set.
-	inline uint64_t uint64_cntbits(uint64_t _val)
+	inline uint32_t uint64_cntbits(uint64_t _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcountll(_val);
 #elif BX_COMPILER_MSVC && BX_ARCH_64BIT
-		return __popcnt64(_val);
+		return uint32_t(__popcnt64(_val) );
 #else
 		return uint64_cntbits_ref(_val);
 #endif // BX_COMPILER_
 	}
 
-	inline uint64_t uint64_cntlz_ref(uint64_t _val)
+	inline uint32_t uint64_cntlz_ref(uint64_t _val)
 	{
 		return _val & UINT64_C(0xffffffff00000000)
 			 ? uint32_cntlz(uint32_t(_val>>32) )
@@ -647,20 +646,20 @@ namespace bx
 	}
 
 	/// Count number of leading zeros.
-	inline uint64_t uint64_cntlz(uint64_t _val)
+	inline uint32_t uint64_cntlz(uint64_t _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_clzll(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
 		_BitScanReverse64(&index, _val);
-		return 63 - index;
+		return uint32_t(63 - index);
 #else
 		return uint64_cntlz_ref(_val);
 #endif // BX_COMPILER_
 	}
 
-	inline uint64_t uint64_cnttz_ref(uint64_t _val)
+	inline uint32_t uint64_cnttz_ref(uint64_t _val)
 	{
 		return _val & UINT64_C(0xffffffff)
 			? uint32_cnttz(uint32_t(_val) )
@@ -668,14 +667,14 @@ namespace bx
 			;
 	}
 
-	inline uint64_t uint64_cnttz(uint64_t _val)
+	inline uint32_t uint64_cnttz(uint64_t _val)
 	{
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_ctzll(_val);
 #elif BX_COMPILER_MSVC && BX_PLATFORM_WINDOWS && BX_ARCH_64BIT
 		unsigned long index;
 		_BitScanForward64(&index, _val);
-		return index;
+		return uint32_t(index);
 #else
 		return uint64_cnttz_ref(_val);
 #endif // BX_COMPILER_

@@ -220,24 +220,24 @@ namespace bx
 	int64_t int64_clamp(int64_t _a, int64_t _min, int64_t _max);
 
 	///
-	uint64_t uint64_cntbits_ref(uint64_t _val);
+	uint32_t uint64_cntbits_ref(uint64_t _val);
 
 	/// Count number of bits set.
 	///
-	uint64_t uint64_cntbits(uint64_t _val);
+	uint32_t uint64_cntbits(uint64_t _val);
 
 	///
-	uint64_t uint64_cntlz_ref(uint64_t _val);
+	uint32_t uint64_cntlz_ref(uint64_t _val);
 
 	/// Count number of leading zeros.
 	///
-	uint64_t uint64_cntlz(uint64_t _val);
+	uint32_t uint64_cntlz(uint64_t _val);
 
 	///
-	uint64_t uint64_cnttz_ref(uint64_t _val);
+	uint32_t uint64_cnttz_ref(uint64_t _val);
 
 	///
-	uint64_t uint64_cnttz(uint64_t _val);
+	uint32_t uint64_cnttz(uint64_t _val);
 
 	///
 	uint64_t uint64_sll(uint64_t _a, int _sa);
