@@ -232,20 +232,28 @@
 #	define BX_PLATFORM_HURD 1
 #endif //
 
-#define BX_PLATFORM_POSIX (0 \
-						|| BX_PLATFORM_ANDROID \
-						|| BX_PLATFORM_EMSCRIPTEN \
-						|| BX_PLATFORM_BSD \
-						|| BX_PLATFORM_HURD \
-						|| BX_PLATFORM_IOS \
-						|| BX_PLATFORM_LINUX \
-						|| BX_PLATFORM_NACL \
-						|| BX_PLATFORM_OSX \
-						|| BX_PLATFORM_QNX \
-						|| BX_PLATFORM_STEAMLINK \
-						|| BX_PLATFORM_PS4 \
-						|| BX_PLATFORM_RPI \
-						)
+#define BX_PLATFORM_POSIX (0      \
+		|| BX_PLATFORM_ANDROID    \
+		|| BX_PLATFORM_EMSCRIPTEN \
+		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_HURD       \
+		|| BX_PLATFORM_IOS        \
+		|| BX_PLATFORM_LINUX      \
+		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_OSX        \
+		|| BX_PLATFORM_QNX        \
+		|| BX_PLATFORM_STEAMLINK  \
+		|| BX_PLATFORM_PS4        \
+		|| BX_PLATFORM_RPI        \
+		)
+
+#define BX_CRT_NONE !(0  \
+		|| BX_CRT_MSVC   \
+		|| BX_CRT_GLIBC  \
+		|| BX_CRT_NEWLIB \
+		|| BX_CRT_MINGW  \
+		|| BX_CRT_MUSL   \
+		)
 
 #ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 #	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
@@ -333,6 +341,20 @@
 #elif BX_CPU_X86
 #	define BX_CPU_NAME "x86"
 #endif // BX_CPU_
+
+#if BX_CRT_MSVC
+#	define BX_CRT_NAME "MSVC C Runtime"
+#elif BX_CRT_GLIBC
+#	define BX_CRT_NAME "GNU C Library"
+#elif BX_CRT_NEWLIB
+#	define BX_CRT_NAME "Newlib"
+#elif BX_CRT_MINGW
+#	define BX_CRT_NAME "MinGW C Runtime"
+#elif BX_CRT_MUSL
+#	define BX_CRT_NAME "musl libc"
+#else
+#	define BX_CRT_NAME "None"
+#endif // BX_CRT_
 
 #if BX_ARCH_32BIT
 #	define BX_ARCH_NAME "32-bit"

@@ -176,18 +176,18 @@ namespace bx
 	/// Cross platform implementation of vsnprintf that returns number of
 	/// characters which would have been written to the final string if
 	/// enough space had been available.
-	int32_t vsnprintf(char* _str, size_t _count, const char* _format, va_list _argList);
+	int32_t vsnprintf(char* _out, size_t _max, const char* _format, va_list _argList);
 
 	/// Cross platform implementation of vsnwprintf that returns number of
 	/// characters which would have been written to the final string if
 	/// enough space had been available.
-	int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList);
+	int32_t vsnwprintf(wchar_t* _out, size_t _max, const wchar_t* _format, va_list _argList);
 
 	///
-	int32_t snprintf(char* _str, size_t _count, const char* _format, ...);
+	int32_t snprintf(char* _out, size_t _max, const char* _format, ...);
 
 	///
-	int32_t swnprintf(wchar_t* _out, size_t _count, const wchar_t* _format, ...);
+	int32_t swnprintf(wchar_t* _out, size_t _max, const wchar_t* _format, ...);
 
 	///
 	template <typename Ty>
@@ -220,13 +220,13 @@ namespace bx
 	size_t strlcat(char* _dst, const char* _src, size_t _max);
 
 	///
-	int32_t toString(char* _dst, size_t _max, double _value);
+	int32_t toString(char* _out, size_t _max, double _value);
 
 	///
-	int32_t toString(char* _dst, size_t _max, int32_t _value, uint32_t _base = 10);
+	int32_t toString(char* _out, size_t _max, int32_t _value, uint32_t _base = 10);
 
 	///
-	int32_t toString(char* _dst, size_t _max, uint32_t _value, uint32_t _base = 10);
+	int32_t toString(char* _out, size_t _max, uint32_t _value, uint32_t _base = 10);
 
 	///
 	uint32_t hashMurmur2A(const StringView& _data);

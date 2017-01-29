@@ -3,14 +3,13 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <alloca.h>
-#include <stdarg.h> // va_list
-#include <stdio.h>  // vsnprintf, vsnwprintf
-
 #include <bx/string.h>
-
 #include <bx/allocator.h>
 #include <bx/hash.h>
+
+#if !BX_CRT_NONE
+#	include <stdio.h> // vsnprintf, vsnwprintf
+#endif // !BX_CRT_NONE
 
 namespace bx
 {
@@ -382,59 +381,63 @@ namespace bx
 		return NULL;
 	}
 
-	int32_t vsnprintf(char* _str, size_t _count, const char* _format, va_list _argList)
+#if !BX_CRT_NONE
+	int32_t vsnprintf(char* _out, size_t _max, const char* _format, va_list _argList)
 	{
-#if BX_COMPILER_MSVC
+#if BX_CRT_MSVC
 		int32_t len = -1;
-		if (NULL != _str)
+		if (NULL != _out)
 		{
 			va_list argListCopy;
 			va_copy(argListCopy, _argList);
-			len = ::vsnprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+			len = ::vsnprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
 #else
-		return ::vsnprintf(_str, _count, _format, _argList);
+		return ::vsnprintf(_out, _max, _format, _argList);
 #endif // BX_COMPILER_MSVC
 	}
+#endif // !BX_CRT_NONE
 
-	int32_t snprintf(char* _str, size_t _count, const char* _format, ...)
+	int32_t snprintf(char* _out, size_t _max, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t len = vsnprintf(_str, _count, _format, argList);
+		int32_t len = vsnprintf(_out, _max, _format, argList);
 		va_end(argList);
 		return len;
 	}
 
-	int32_t vsnwprintf(wchar_t* _str, size_t _count, const wchar_t* _format, va_list _argList)
+#if !BX_CRT_NONE
+	int32_t vsnwprintf(wchar_t* _out, size_t _max, const wchar_t* _format, va_list _argList)
 	{
-#if BX_COMPILER_MSVC
+#if BX_CRT_MSVC
 		int32_t len = -1;
-		if (NULL != _str)
+		if (NULL != _out)
 		{
 			va_list argListCopy;
 			va_copy(argListCopy, _argList);
-			len = ::_vsnwprintf_s(_str, _count, size_t(-1), _format, argListCopy);
+			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
-#elif defined(__MINGW32__)
-		return ::vsnwprintf(_str, _count, _format, _argList);
+#elif BX_CRT_MINGW
+		return ::vsnwprintf(_out, _max, _format, _argList);
 #else
-		return ::vswprintf(_str, _count, _format, _argList);
+		return ::vswprintf(_out, _max, _format, _argList);
 #endif // BX_COMPILER_MSVC
 	}
 
-	int32_t swnprintf(wchar_t* _out, size_t _count, const wchar_t* _format, ...)
+	int32_t swnprintf(wchar_t* _out, size_t _max, const wchar_t* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t len = vsnwprintf(_out, _count, _format, argList);
+		int32_t len = vsnwprintf(_out, _max, _format, argList);
 		va_end(argList);
 		return len;
 	}
+#endif // !BX_CRT_NONE
 
 	const char* baseName(const char* _filePath)
 	{
