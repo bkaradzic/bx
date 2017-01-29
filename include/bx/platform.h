@@ -31,6 +31,7 @@
 // C Runtime
 #define BX_CRT_MSVC   0
 #define BX_CRT_GLIBC  0
+#define BX_CRT_LIBCXX 0
 #define BX_CRT_NEWLIB 0
 #define BX_CRT_MINGW  0
 #define BX_CRT_MUSL   0
@@ -68,7 +69,13 @@
 #	elif defined(__GLIBC__)
 #		undef  BX_CRT_GLIBC
 #		define BX_CRT_GLIBC (__GLIBC__ * 10000 + __GLIBC_MINOR__ * 100)
-#	endif // defined(__GLIBC__)
+#	elif defined(__MINGW32__) || defined(__MINGW64__)
+#		undef  BX_CRT_MINGW
+#		define BX_CRT_MINGW 1
+#	elif defined(__apple_build_version__)
+#		undef  BX_CRT_LIBCXX
+#		define BX_CRT_LIBCXX 1
+#	endif //
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
@@ -250,6 +257,7 @@
 #define BX_CRT_NONE !(0  \
 		|| BX_CRT_MSVC   \
 		|| BX_CRT_GLIBC  \
+		|| BX_CRT_LIBCXX \
 		|| BX_CRT_NEWLIB \
 		|| BX_CRT_MINGW  \
 		|| BX_CRT_MUSL   \
