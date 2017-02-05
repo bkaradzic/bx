@@ -46,7 +46,7 @@ static bool test(const char* _expected, const char* _format, ...)
 
 TEST_CASE("vsnprintf f", "")
 {
-	REQUIRE(test("1.337", "%0.3f", 1.337) );
+	REQUIRE(test("1.337",    "%0.3f", 1.337) );
 	REQUIRE(test("  13.370", "%8.3f", 13.37) );
 	REQUIRE(test("  13.370", "%*.*f", 8, 3, 13.37) );
 	REQUIRE(test("13.370  ", "%-8.3f", 13.37) );
