@@ -3,9 +3,10 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/string.h>
 #include <bx/allocator.h>
 #include <bx/hash.h>
+#include <bx/readerwriter.h>
+#include <bx/string.h>
 
 #if !BX_CRT_NONE
 #	include <stdio.h> // vsnprintf, vsnwprintf
@@ -381,10 +382,42 @@ namespace bx
 		return NULL;
 	}
 
-#if !BX_CRT_NONE
+	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err);
+
+	int32_t vsnprintfRef(char* _out, size_t _max, const char* _format, va_list _argList)
+	{
+		if (1 < _max)
+		{
+			StaticMemoryBlockWriter writer(_out, _max-1);
+			_out[_max-1] = '\0';
+
+			Error err;
+			va_list argListCopy;
+			va_copy(argListCopy, _argList);
+			int32_t size = write(&writer, _format, argListCopy, &err);
+			va_end(argListCopy);
+
+			if (err.isOk() )
+			{
+				return size;
+			}
+		}
+
+		Error err;
+		SizerWriter sizer;
+		va_list argListCopy;
+		va_copy(argListCopy, _argList);
+		int32_t size = write(&sizer, _format, argListCopy, &err);
+		va_end(argListCopy);
+
+		return size - 1 /* size without '\0' terminator */;
+	}
+
 	int32_t vsnprintf(char* _out, size_t _max, const char* _format, va_list _argList)
 	{
-#if BX_CRT_MSVC
+#if BX_CRT_NONE
+		return vsnprintfRef(_out, _max, _format, _argList);
+#elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
 		{
@@ -398,7 +431,6 @@ namespace bx
 		return ::vsnprintf(_out, _max, _format, _argList);
 #endif // BX_COMPILER_MSVC
 	}
-#endif // !BX_CRT_NONE
 
 	int32_t snprintf(char* _out, size_t _max, const char* _format, ...)
 	{
@@ -409,10 +441,12 @@ namespace bx
 		return len;
 	}
 
-#if !BX_CRT_NONE
 	int32_t vsnwprintf(wchar_t* _out, size_t _max, const wchar_t* _format, va_list _argList)
 	{
-#if BX_CRT_MSVC
+#if BX_CRT_NONE
+		BX_UNUSED(_out, _max, _format, _argList);
+		return 0;
+#elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
 		{
@@ -437,7 +471,6 @@ namespace bx
 		va_end(argList);
 		return len;
 	}
-#endif // !BX_CRT_NONE
 
 	const char* baseName(const char* _filePath)
 	{

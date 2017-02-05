@@ -52,3 +52,17 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("13.370  ", "%-8.3f", 13.37) );
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
 }
+
+TEST_CASE("vsnprintf d/u/x", "")
+{
+	REQUIRE(test("1337", "%d", 1337) );
+
+	REQUIRE(test("1337", "%x", 0x1337) );
+}
+
+TEST_CASE("vsnprintf", "")
+{
+	REQUIRE(test("x", "%c", 'x') );
+
+	REQUIRE(test("hello, world!", "%s, %s!", "hello", "world") );
+}
