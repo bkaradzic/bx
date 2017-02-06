@@ -83,6 +83,12 @@ TEST_CASE("vsnprintf d/i/o/u/x", "")
 	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcdu) );
 }
 
+TEST_CASE("vsnprintf p", "")
+{
+	REQUIRE(test("0xbadc0de", "%p", (void*)0xbadc0de) );
+	REQUIRE(test("0xbadc0de           ", "%-20p", (void*)0xbadc0de) );
+}
+
 TEST_CASE("vsnprintf", "")
 {
 	REQUIRE(test("x", "%c", 'x') );
