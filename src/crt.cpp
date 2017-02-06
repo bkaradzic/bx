@@ -115,11 +115,22 @@ namespace bx
 	{
 		struct Param
 		{
+			Param()
+				: width(0)
+				, base(10)
+				, prec(6)
+				, fill(' ')
+				, left(false)
+				, upper(false)
+			{
+			}
+
 			int32_t width;
 			uint32_t base;
 			uint32_t prec;
 			char fill;
 			bool left;
+			bool upper;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -133,7 +144,17 @@ namespace bx
 				size += writeRep(_writer, _param.fill, padding, _err);
 			}
 
-			size += write(_writer, _str, len, _err);
+			if (_param.upper)
+			{
+				for (int32_t ii = 0; ii < len; ++ii)
+				{
+					size += write(_writer, toUpper(_str[ii]), _err);
+				}
+			}
+			else
+			{
+				size += write(_writer, _str, len, _err);
+			}
 
 			if (_param.left)
 			{
@@ -141,6 +162,11 @@ namespace bx
 			}
 
 			return size;
+		}
+
+		static int32_t write(WriterI* _writer, char _ch, const Param& _param, Error* _err)
+		{
+			return write(_writer, &_ch, 1, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, const char* _str, const Param& _param, Error* _err)
@@ -235,11 +261,6 @@ namespace bx
 				read(&reader, ch);
 
 				Param param;
-				param.base  = 10;
-				param.prec  = 6;
-				param.left  = false;
-				param.fill  = ' ';
-				param.width = 0;
 
 				while (' ' == ch
 				||     '-' == ch
@@ -304,13 +325,14 @@ namespace bx
 				switch (toLower(ch) )
 				{
 					case 'c':
-						size += write(_writer, char(va_arg(_argList, int32_t) ), _err);
+						size += write(_writer, char(va_arg(_argList, int32_t) ), param, _err);
 						break;
 
 					case 's':
 						size += write(_writer, va_arg(_argList, const char*), param, _err);
 						break;
 
+					case 'i':
 					case 'd':
 						param.base = 10;
 						size += write(_writer, va_arg(_argList, int32_t), param, _err);
@@ -325,7 +347,8 @@ namespace bx
 						break;
 
 					case 'x':
-						param.base = 16;
+						param.base  = 16;
+						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, uint32_t), param, _err);
 						break;
 

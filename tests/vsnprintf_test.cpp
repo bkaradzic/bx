@@ -53,16 +53,36 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
 }
 
-TEST_CASE("vsnprintf d/u/x", "")
+TEST_CASE("vsnprintf d/i/u/x", "")
 {
 	REQUIRE(test("1337", "%d", 1337) );
+	REQUIRE(test("1337                ", "%-20d",  1337) );
+	REQUIRE(test("-1337               ", "%-20d", -1337) );
+
+	REQUIRE(test("1337", "%i", 1337) );
+	REQUIRE(test("1337                ", "%-20i",  1337) );
+	REQUIRE(test("-1337               ", "%-20i", -1337) );
+
+	REQUIRE(test("1337", "%u", 1337) );
+	REQUIRE(test("1337                ", "%-20u",  1337u) );
+	REQUIRE(test("4294965959          ", "%-20u", -1337u) );
 
 	REQUIRE(test("1337", "%x", 0x1337) );
+	REQUIRE(test("1234abcd            ", "%-20x",  0x1234abcdu) );
+	REQUIRE(test("1234ABCD            ", "%-20X",  0x1234abcdu) );
+	REQUIRE(test("edcb5433            ", "%-20x", -0x1234abcdu) );
+	REQUIRE(test("EDCB5433            ", "%-20X", -0x1234abcdu) );
+	REQUIRE(test("0000000000001234abcd", "%020x",  0x1234abcdu) );
+	REQUIRE(test("0000000000001234ABCD", "%020X",  0x1234abcdu) );
+	REQUIRE(test("000000000000edcb5433", "%020x", -0x1234abcdu) );
+	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcdu) );
 }
 
 TEST_CASE("vsnprintf", "")
 {
 	REQUIRE(test("x", "%c", 'x') );
+	REQUIRE(test("x                   ", "%-20c", 'x') );
 
+	REQUIRE(test("hello               ", "%-20s", "hello") );
 	REQUIRE(test("hello, world!", "%s, %s!", "hello", "world") );
 }
