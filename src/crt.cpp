@@ -388,3 +388,20 @@ namespace bx
 	}
 
 } // namespace bx
+
+#if BX_CRT_NONE
+extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
+{
+	return bx::memCopy(_dst, _src, _numBytes);
+}
+
+extern "C" void* memmove(void* _dst, const void* _src, size_t _numBytes)
+{
+	return bx::memMove(_dst, _src, _numBytes);
+}
+
+extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
+{
+	return bx::memSet(_dst, _ch, _numBytes);
+}
+#endif // BX_CRT_NONE
