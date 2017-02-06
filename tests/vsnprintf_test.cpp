@@ -53,7 +53,7 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
 }
 
-TEST_CASE("vsnprintf d/i/u/x", "")
+TEST_CASE("vsnprintf d/i/o/u/x", "")
 {
 	REQUIRE(test("1337", "%d", 1337) );
 	REQUIRE(test("1337                ", "%-20d",  1337) );
@@ -62,6 +62,11 @@ TEST_CASE("vsnprintf d/i/u/x", "")
 	REQUIRE(test("1337", "%i", 1337) );
 	REQUIRE(test("1337                ", "%-20i",  1337) );
 	REQUIRE(test("-1337               ", "%-20i", -1337) );
+
+	REQUIRE(test("1337", "%o", 01337) );
+	REQUIRE(test("2471", "%o", 1337) );
+	REQUIRE(test("1337                ", "%-20o",  01337) );
+	REQUIRE(test("37777776441         ", "%-20o", -01337) );
 
 	REQUIRE(test("1337", "%u", 1337) );
 	REQUIRE(test("1337                ", "%-20u",  1337u) );

@@ -332,6 +332,11 @@ namespace bx
 						size += write(_writer, va_arg(_argList, const char*), param, _err);
 						break;
 
+					case 'o':
+						param.base = 8;
+						size += write(_writer, va_arg(_argList, int32_t), param, _err);
+						break;
+
 					case 'i':
 					case 'd':
 						param.base = 10;
