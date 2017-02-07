@@ -7,10 +7,6 @@
 #	error "Must be included from bx/rng.h!"
 #endif // BX_RNG_H_HEADER_GUARD
 
-#include "bx.h"
-#include "fpumath.h"
-#include "uint32_t.h"
-
 namespace bx
 {
 	inline RngMwc::RngMwc(uint32_t _z, uint32_t _w)
