@@ -10,7 +10,6 @@
 
 #include "bx.h"
 #include <math.h>
-#include <string.h>
 
 namespace bx
 {

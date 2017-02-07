@@ -406,11 +406,11 @@ namespace bx
 		return (void*)uintptr_t(pid);
 #elif BX_PLATFORM_WINDOWS
 		STARTUPINFO si;
-		memset(&si, 0, sizeof(STARTUPINFO) );
+		memSet(&si, 0, sizeof(STARTUPINFO) );
 		si.cb = sizeof(STARTUPINFO);
 
 		PROCESS_INFORMATION pi;
-		memset(&pi, 0, sizeof(PROCESS_INFORMATION) );
+		memSet(&pi, 0, sizeof(PROCESS_INFORMATION) );
 
 		int32_t total = 0;
 		for (uint32_t ii = 0; NULL != _argv[ii]; ++ii)

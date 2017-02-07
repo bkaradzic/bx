@@ -384,7 +384,7 @@ namespace bx
 		if (0 < kk && kk <= 21)
 		{
 			// 1234e-2 -> 12.34
-			memmove(&buffer[kk + 1], &buffer[kk], length - kk);
+			memMove(&buffer[kk + 1], &buffer[kk], length - kk);
 			buffer[kk] = '.';
 			buffer[length + 1] = '\0';
 			return length + 1;
@@ -394,7 +394,7 @@ namespace bx
 		{
 			// 1234e-6 -> 0.001234
 			const int32_t offset = 2 - kk;
-			memmove(&buffer[offset], &buffer[0], length);
+			memMove(&buffer[offset], &buffer[0], length);
 			buffer[0] = '0';
 			buffer[1] = '.';
 			for (int32_t i = 2; i < offset; i++)
@@ -415,7 +415,7 @@ namespace bx
 		}
 
 		// 1234e30 -> 1.234e33
-		memmove(&buffer[2], &buffer[1], length - 1);
+		memMove(&buffer[2], &buffer[1], length - 1);
 		buffer[1] = '.';
 		buffer[length + 1] = 'e';
 		int32_t exp = WriteExponent(kk - 1, &buffer[length + 2]);
@@ -520,7 +520,7 @@ namespace bx
 
 		reverse(data, len);
 
-		memcpy(_dst, data, len);
+		memCopy(_dst, data, len);
 		_dst[len] = '\0';
 		return int32_t(len);
 	}

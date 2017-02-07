@@ -23,7 +23,7 @@ namespace bx
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -87,7 +87,7 @@ done:
 		uint32_t pass = 0;
 		for (; pass < 3; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -157,7 +157,7 @@ done:
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{
@@ -221,7 +221,7 @@ done:
 		uint32_t pass = 0;
 		for (; pass < 6; ++pass)
 		{
-			memset(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
+			memSet(histogram, 0, sizeof(uint32_t)*BX_RADIXSORT_HISTOGRAM_SIZE);
 
 			bool sorted = true;
 			{

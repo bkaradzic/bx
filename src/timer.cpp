@@ -3,11 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_TIMER_H_HEADER_GUARD
-#	error "Must be included from bx/timer.h!"
-#endif // BX_TIMER_H_HEADER_GUARD
-
-#include "bx.h"
+#include <bx/timer.h>
 
 #if BX_PLATFORM_ANDROID
 #	include <time.h> // clock, clock_gettime
@@ -21,7 +17,7 @@
 
 namespace bx
 {
-	inline int64_t getHPCounter()
+	int64_t getHPCounter()
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		LARGE_INTEGER li;
@@ -43,7 +39,7 @@ namespace bx
 		return i64;
 	}
 
-	inline int64_t getHPFrequency()
+	int64_t getHPFrequency()
 	{
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
 		LARGE_INTEGER li;

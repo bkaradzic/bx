@@ -6,8 +6,6 @@
 #ifndef BX_SIMD128_REF_H_HEADER_GUARD
 #define BX_SIMD128_REF_H_HEADER_GUARD
 
-#include <math.h> // sqrtf
-
 #define simd_shuf_xAzC simd_shuf_xAzC_ni
 #define simd_shuf_yBwD simd_shuf_yBwD_ni
 #define simd_rcp simd_rcp_ni
@@ -396,10 +394,10 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_sqrt(simd128_ref_t _a)
 	{
 		simd128_ref_t result;
-		result.fxyzw[0] = sqrtf(_a.fxyzw[0]);
-		result.fxyzw[1] = sqrtf(_a.fxyzw[1]);
-		result.fxyzw[2] = sqrtf(_a.fxyzw[2]);
-		result.fxyzw[3] = sqrtf(_a.fxyzw[3]);
+		result.fxyzw[0] = fsqrt(_a.fxyzw[0]);
+		result.fxyzw[1] = fsqrt(_a.fxyzw[1]);
+		result.fxyzw[2] = fsqrt(_a.fxyzw[2]);
+		result.fxyzw[3] = fsqrt(_a.fxyzw[3]);
 		return result;
 	}
 
@@ -407,10 +405,10 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd_rsqrt_est(simd128_ref_t _a)
 	{
 		simd128_ref_t result;
-		result.fxyzw[0] = 1.0f / sqrtf(_a.fxyzw[0]);
-		result.fxyzw[1] = 1.0f / sqrtf(_a.fxyzw[1]);
-		result.fxyzw[2] = 1.0f / sqrtf(_a.fxyzw[2]);
-		result.fxyzw[3] = 1.0f / sqrtf(_a.fxyzw[3]);
+		result.fxyzw[0] = 1.0f / fsqrt(_a.fxyzw[0]);
+		result.fxyzw[1] = 1.0f / fsqrt(_a.fxyzw[1]);
+		result.fxyzw[2] = 1.0f / fsqrt(_a.fxyzw[2]);
+		result.fxyzw[3] = 1.0f / fsqrt(_a.fxyzw[3]);
 		return result;
 	}
 

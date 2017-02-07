@@ -9,10 +9,6 @@
 #	error "Must be included from bx/fpumath.h!"
 #endif // BX_FPU_MATH_H_HEADER_GUARD
 
-#include "bx.h"
-#include <math.h>
-#include <string.h>
-
 namespace bx
 {
 	inline float toRad(float _deg)
@@ -597,7 +593,7 @@ namespace bx
 
 	inline void mtxIdentity(float* _result)
 	{
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[0] = _result[5] = _result[10] = _result[15] = 1.0f;
 	}
 
@@ -611,7 +607,7 @@ namespace bx
 
 	inline void mtxScale(float* _result, float _sx, float _sy, float _sz)
 	{
-		memset(_result, 0, sizeof(float) * 16);
+		memSet(_result, 0, sizeof(float) * 16);
 		_result[0]  = _sx;
 		_result[5]  = _sy;
 		_result[10] = _sz;
@@ -738,7 +734,7 @@ namespace bx
 
 		vec3Cross(up, _view, right);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = right[0];
 		_result[ 1] = up[0];
 		_result[ 2] = _view[0];
@@ -791,7 +787,7 @@ namespace bx
 		const float aa = _oglNdc ?       (_far+_near)/diff : _far/diff;
 		const float bb = _oglNdc ?  (2.0f*_far*_near)/diff : _near*aa;
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
 		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
@@ -888,7 +884,7 @@ namespace bx
 			bb = _oglNdc ? 2.0f*_near : _near;
 		}
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
 		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
@@ -1009,7 +1005,7 @@ namespace bx
 		const float ee = (_top + _bottom)/(_bottom - _top);
 		const float ff = _oglNdc ? (_near + _far)/(_near - _far) : _near/(_near - _far);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
 		_result[10] = (Handness::Right == HandnessT) ? -cc : cc;
@@ -1039,7 +1035,7 @@ namespace bx
 		const float sx = fsin(_ax);
 		const float cx = fcos(_ax);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = 1.0f;
 		_result[ 5] = cx;
 		_result[ 6] = -sx;
@@ -1053,7 +1049,7 @@ namespace bx
 		const float sy = fsin(_ay);
 		const float cy = fcos(_ay);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
 		_result[ 2] = sy;
 		_result[ 5] = 1.0f;
@@ -1067,7 +1063,7 @@ namespace bx
 		const float sz = fsin(_az);
 		const float cz = fcos(_az);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cz;
 		_result[ 1] = -sz;
 		_result[ 4] = sz;
@@ -1083,7 +1079,7 @@ namespace bx
 		const float sy = fsin(_ay);
 		const float cy = fcos(_ay);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy;
 		_result[ 2] = sy;
 		_result[ 4] = sx*sy;
@@ -1104,7 +1100,7 @@ namespace bx
 		const float sz = fsin(_az);
 		const float cz = fcos(_az);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
 		_result[ 1] = -cy*sz;
 		_result[ 2] = sy;
@@ -1126,7 +1122,7 @@ namespace bx
 		const float sz = fsin(_az);
 		const float cz = fcos(_az);
 
-		memset(_result, 0, sizeof(float)*16);
+		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
 		_result[ 1] = cz*sx*sy-cx*sz;
 		_result[ 2] = cx*cz*sy+sx*sz;
