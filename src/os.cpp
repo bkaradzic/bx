@@ -8,6 +8,7 @@
 #include <bx/string.h>
 
 #include <stdio.h>
+#include <sys/stat.h>
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>

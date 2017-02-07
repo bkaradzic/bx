@@ -8,7 +8,6 @@
 
 #include "bx.h"
 #include "debug.h"
-#include <sys/stat.h>
 
 #if BX_PLATFORM_OSX
 #	define BX_DL_EXT "dylib"

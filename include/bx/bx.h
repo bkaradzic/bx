@@ -6,6 +6,8 @@
 #ifndef BX_H_HEADER_GUARD
 #define BX_H_HEADER_GUARD
 
+#include <alloca.h> // alloca
+#include <stdarg.h> // va_list
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
 #include <stddef.h> // ptrdiff_t

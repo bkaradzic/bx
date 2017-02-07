@@ -7,12 +7,10 @@
 #define BX_STRING_H_HEADER_GUARD
 
 #include "bx.h"
-#include <alloca.h>
-#include <stdarg.h> // va_list
 #include <wchar.h>  // wchar_t
 
-#include <bx/allocator.h>
-#include <bx/hash.h>
+#include "allocator.h"
+#include "hash.h"
 
 namespace bx
 {
