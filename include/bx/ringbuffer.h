@@ -222,12 +222,12 @@ namespace bx
 			if (eof < m_read)
 			{
 				wrap = m_control.m_size - m_read;
-				memcpy(_data, from, wrap);
+				memCopy(_data, from, wrap);
 				_data += wrap;
 				from = (const char*)&m_buffer[0];
 			}
 
-			memcpy(_data, from, _len-wrap);
+			memCopy(_data, from, _len-wrap);
 
 			m_read = eof;
 		}
@@ -292,12 +292,12 @@ namespace bx
 			if (eof < m_write)
 			{
 				wrap = m_control.m_size - m_write;
-				memcpy(to, _data, wrap);
+				memCopy(to, _data, wrap);
 				_data += wrap;
 				to = (char*)&m_buffer[0];
 			}
 
-			memcpy(to, _data, _len-wrap);
+			memCopy(to, _data, _len-wrap);
 
 			m_write = eof;
 		}

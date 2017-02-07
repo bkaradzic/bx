@@ -170,7 +170,7 @@ namespace bx
 
 		int64_t remainder = m_top-m_pos;
 		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
-		memcpy(_data, &m_data[m_pos], size);
+		memCopy(_data, &m_data[m_pos], size);
 		m_pos += size;
 		if (size != _size)
 		{
@@ -242,7 +242,7 @@ namespace bx
 
 		int64_t remainder = m_size-m_pos;
 		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
-		memcpy(&m_data[m_pos], _data, size);
+		memCopy(&m_data[m_pos], _data, size);
 		m_pos += size;
 		m_top = int64_max(m_top, m_pos);
 		if (size != _size)
@@ -301,7 +301,7 @@ namespace bx
 		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
 		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
 		uint8_t* temp = (uint8_t*)alloca(blockSize);
-		memset(temp, _byte, blockSize);
+		memSet(temp, _byte, blockSize);
 
 		int32_t size = 0;
 		while (0 < _size)

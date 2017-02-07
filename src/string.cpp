@@ -121,7 +121,7 @@ namespace bx
 		const size_t len = strnlen(_src, _num);
 		const size_t max = _dstSize-1;
 		const size_t num = (len < max ? len : max);
-		memcpy(_dst, _src, num);
+		memCopy(_dst, _src, num);
 		_dst[num] = '\0';
 
 		return num;

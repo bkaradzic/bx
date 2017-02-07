@@ -70,7 +70,7 @@ done:
 		if (0 != (pass&1) )
 		{
 			// Odd number of passes needs to do copy to the destination.
-			memcpy(_keys, _tempKeys, _size*sizeof(uint32_t) );
+			memCopy(_keys, _tempKeys, _size*sizeof(uint32_t) );
 		}
 	}
 
@@ -139,7 +139,7 @@ done:
 		if (0 != (pass&1) )
 		{
 			// Odd number of passes needs to do copy to the destination.
-			memcpy(_keys, _tempKeys, _size*sizeof(uint32_t) );
+			memCopy(_keys, _tempKeys, _size*sizeof(uint32_t) );
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				_values[ii] = _tempValues[ii];
@@ -204,7 +204,7 @@ done:
 		if (0 != (pass&1) )
 		{
 			// Odd number of passes needs to do copy to the destination.
-			memcpy(_keys, _tempKeys, _size*sizeof(uint64_t) );
+			memCopy(_keys, _tempKeys, _size*sizeof(uint64_t) );
 		}
 	}
 
@@ -273,7 +273,7 @@ done:
 		if (0 != (pass&1) )
 		{
 			// Odd number of passes needs to do copy to the destination.
-			memcpy(_keys, _tempKeys, _size*sizeof(uint64_t) );
+			memCopy(_keys, _tempKeys, _size*sizeof(uint64_t) );
 			for (uint32_t ii = 0; ii < _size; ++ii)
 			{
 				_values[ii] = _tempValues[ii];

@@ -8,8 +8,6 @@
 
 #include <alloca.h>
 #include <stdarg.h> // va_list
-#include <stdio.h>
-#include <string.h>
 
 #include "bx.h"
 #include "allocator.h"

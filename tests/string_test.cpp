@@ -41,15 +41,15 @@ TEST_CASE("strlncpy", "")
 	REQUIRE(num == 0);
 
 	num = bx::strlncpy(dst, 3, "blah", 3);
-	REQUIRE(0 == strcmp(dst, "bl") );
+	REQUIRE(0 == bx::strncmp(dst, "bl") );
 	REQUIRE(num == 2);
 
 	num = bx::strlncpy(dst, sizeof(dst), "blah", 3);
-	REQUIRE(0 == strcmp(dst, "bla") );
+	REQUIRE(0 == bx::strncmp(dst, "bla") );
 	REQUIRE(num == 3);
 
 	num = bx::strlncpy(dst, sizeof(dst), "blah");
-	REQUIRE(0 == strcmp(dst, "blah") );
+	REQUIRE(0 == bx::strncmp(dst, "blah") );
 	REQUIRE(num == 4);
 }
 
@@ -195,7 +195,7 @@ TEST_CASE("StringView", "")
 	st.append("test", 2);
 	REQUIRE(10 == st.getLength() );
 
-	REQUIRE(0 == strcmp(st.getPtr(), "testtestte") );
+	REQUIRE(0 == bx::strncmp(st.getPtr(), "testtestte") );
 
 	st.clear();
 	REQUIRE(0 == st.getLength() );

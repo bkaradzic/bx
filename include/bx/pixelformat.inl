@@ -641,67 +641,67 @@ namespace bx
 	// R32I
 	inline void packR32I(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	inline void unpackR32I(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	// R32U
 	inline void packR32U(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	inline void unpackR32U(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	// R32F
 	inline void packR32F(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	inline void unpackR32F(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 4);
+		memCopy(_dst, _src, 4);
 	}
 
 	// RG32I
 	inline void packRg32I(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	inline void unpackRg32I(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	// RG32U
 	inline void packRg32U(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	inline void unpackRg32U(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	// RG32F
 	inline void packRg32F(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	inline void unpackRg32F(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 8);
+		memCopy(_dst, _src, 8);
 	}
 
 	template<int32_t MantissaBits, int32_t ExpBits>
@@ -775,34 +775,34 @@ namespace bx
 	// RGBA32I
 	inline void packRgba32I(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	inline void unpackRgba32I(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	// RGBA32U
 	inline void packRgba32U(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	inline void unpackRgba32U(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	// RGBA32F
 	inline void packRgba32F(void* _dst, const float* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	inline void unpackRgba32F(float* _dst, const void* _src)
 	{
-		memcpy(_dst, _src, 16);
+		memCopy(_dst, _src, 16);
 	}
 
 	// R5G6B5

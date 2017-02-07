@@ -7,6 +7,10 @@
 #include <bx/readerwriter.h>
 #include <bx/debug.h>
 
+#if !BX_CRT_NONE
+#	include <string.h> // memcpy, memmove, memset
+#endif // !BX_CRT_NONE
+
 namespace bx
 {
 	void* memCopyRef(void* _dst, const void* _src, size_t _numBytes)
@@ -70,7 +74,7 @@ namespace bx
 		//	if (src+_numBytes <= dst || end <= src)
 		if (dst < src)
 		{
-			return memcpy(_dst, _src, _numBytes);
+			return memCopy(_dst, _src, _numBytes);
 		}
 
 		for (intptr_t ii = _numBytes-1; ii >= 0; --ii)
@@ -402,6 +406,6 @@ extern "C" void* memmove(void* _dst, const void* _src, size_t _numBytes)
 
 extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 {
-	return bx::memSet(_dst, _ch, _numBytes);
+	return bx::memSet(_dst, uint8_t(_ch), _numBytes);
 }
 #endif // BX_CRT_NONE

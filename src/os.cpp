@@ -237,7 +237,7 @@ namespace bx
 			result = len != 0 && len < *_inOutSize;
 			if (len < *_inOutSize)
 			{
-				strcpy(_out, ptr);
+				strlncpy(_out, len, ptr);
 			}
 		}
 

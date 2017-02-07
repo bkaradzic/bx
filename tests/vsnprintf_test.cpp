@@ -18,12 +18,12 @@ TEST_CASE("vsnprintf truncated", "Truncated output buffer.")
 	char buffer[7];
 
 	REQUIRE(10 == bx::snprintf(buffer, BX_COUNTOF(buffer), "Ten chars!") );
-	REQUIRE(0  == strcmp(buffer, "Ten ch") );
+	REQUIRE(0  == bx::strncmp(buffer, "Ten ch") );
 }
 
 static bool test(const char* _expected, const char* _format, ...)
 {
-	int32_t max = (int32_t)strlen(_expected) + 1;
+	int32_t max = (int32_t)bx::strnlen(_expected) + 1;
 	char* temp = (char*)alloca(max);
 
 	va_list argList;
@@ -33,7 +33,7 @@ static bool test(const char* _expected, const char* _format, ...)
 
 	bool result = true
 		&& len == max-1
-		&& 0   == strcmp(_expected, temp)
+		&& 0   == bx::strncmp(_expected, temp)
 		;
 
 	if (!result)

@@ -8,7 +8,6 @@
 
 #include "bx.h"
 
-#include <string.h> //::memmove
 #include <new>
 
 #if BX_CONFIG_ALLOCATOR_DEBUG

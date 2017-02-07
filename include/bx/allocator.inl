@@ -85,7 +85,7 @@ namespace bx
 		}
 
 		aligned = ptr + offset;
-		::memmove(newAligned, aligned, _size);
+		memMove(newAligned, aligned, _size);
 		uint32_t* header = (uint32_t*)newAligned - 1;
 		*header = uint32_t(newAligned - ptr);
 		return newAligned;

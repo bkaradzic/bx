@@ -43,8 +43,8 @@ namespace bx
 	{
 		Ty str = _str;
 		size_t startPos = 0;
-		const size_t fromLen = strlen(_from);
-		const size_t toLen   = strlen(_to);
+		const size_t fromLen = strnlen(_from);
+		const size_t toLen   = strnlen(_to);
 		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
 		{
 			str.replace(startPos, fromLen, _to);

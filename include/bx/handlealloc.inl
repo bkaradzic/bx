@@ -7,10 +7,6 @@
 #	error "Must be included from bx/handlealloc.h!"
 #endif // BX_HANDLE_ALLOC_H_HEADER_GUARD
 
-#include "bx.h"
-#include "allocator.h"
-#include "uint32_t.h"
-
 namespace bx
 {
 	inline HandleAlloc::HandleAlloc(uint16_t _maxHandles)
@@ -236,7 +232,7 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline void HandleListT<MaxHandlesT>::reset()
 	{
-		memset(m_links, 0xff, sizeof(m_links) );
+		memSet(m_links, 0xff, sizeof(m_links) );
 		m_front = invalid;
 		m_back  = invalid;
 	}
@@ -496,7 +492,7 @@ namespace bx
 	template <uint32_t MaxCapacityT, typename KeyT>
 	inline void HandleHashMapT<MaxCapacityT, KeyT>::reset()
 	{
-		memset(m_handle, 0xff, sizeof(m_handle) );
+		memSet(m_handle, 0xff, sizeof(m_handle) );
 		m_numElements = 0;
 	}
 
