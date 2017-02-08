@@ -388,7 +388,7 @@ namespace bx
 	{
 		if (1 < _max)
 		{
-			StaticMemoryBlockWriter writer(_out, _max-1);
+			StaticMemoryBlockWriter writer(_out, uint32_t(_max-1) );
 			_out[_max-1] = '\0';
 
 			Error err;
