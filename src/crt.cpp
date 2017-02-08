@@ -13,7 +13,18 @@
 
 namespace bx
 {
-	void* memCopyRef(void* _dst, const void* _src, size_t _numBytes)
+	void xchg(void* _a, void* _b, size_t _numBytes)
+	{
+		uint8_t* lhs = (uint8_t*)_a;
+		uint8_t* rhs = (uint8_t*)_b;
+		const uint8_t* end = rhs + _numBytes;
+		while (rhs != end)
+		{
+			xchg(*lhs++, *rhs++);
+		}
+	}
+
+	void memCopyRef(void* _dst, const void* _src, size_t _numBytes)
 	{
 		uint8_t* dst = (uint8_t*)_dst;
 		const uint8_t* end = dst + _numBytes;
@@ -22,16 +33,14 @@ namespace bx
 		{
 			*dst++ = *src++;
 		}
-
-		return _dst;
 	}
 
-	void* memCopy(void* _dst, const void* _src, size_t _numBytes)
+	void memCopy(void* _dst, const void* _src, size_t _numBytes)
 	{
 #if BX_CRT_NONE
-		return memCopyRef(_dst, _src, _numBytes);
+		memCopyRef(_dst, _src, _numBytes);
 #else
-		return ::memcpy(_dst, _src, _numBytes);
+		::memcpy(_dst, _src, _numBytes);
 #endif // BX_CRT_NONE
 	}
 
@@ -60,7 +69,7 @@ namespace bx
 		memCopy(_dst, _src, _size, _num, _size, _dstPitch);
 	}
 
-	void* memMoveRef(void* _dst, const void* _src, size_t _numBytes)
+	void memMoveRef(void* _dst, const void* _src, size_t _numBytes)
 	{
 		uint8_t* dst = (uint8_t*)_dst;
 		const uint8_t* src = (const uint8_t*)_src;
@@ -68,33 +77,32 @@ namespace bx
 		if (_numBytes == 0
 		||  dst == src)
 		{
-			return dst;
+			return;
 		}
 
 		//	if (src+_numBytes <= dst || end <= src)
 		if (dst < src)
 		{
-			return memCopy(_dst, _src, _numBytes);
+			memCopy(_dst, _src, _numBytes);
+			return;
 		}
 
 		for (intptr_t ii = _numBytes-1; ii >= 0; --ii)
 		{
 			dst[ii] = src[ii];
 		}
-
-		return _dst;
 	}
 
-	void* memMove(void* _dst, const void* _src, size_t _numBytes)
+	void memMove(void* _dst, const void* _src, size_t _numBytes)
 	{
 #if BX_CRT_NONE
-		return memMoveRef(_dst, _src, _numBytes);
+		memMoveRef(_dst, _src, _numBytes);
 #else
-		return ::memmove(_dst, _src, _numBytes);
+		::memmove(_dst, _src, _numBytes);
 #endif // BX_CRT_NONE
 	}
 
-	void* memSetRef(void* _dst, uint8_t _ch, size_t _numBytes)
+	void memSetRef(void* _dst, uint8_t _ch, size_t _numBytes)
 	{
 		uint8_t* dst = (uint8_t*)_dst;
 		const uint8_t* end = dst + _numBytes;
@@ -102,16 +110,14 @@ namespace bx
 		{
 			*dst++ = char(_ch);
 		}
-
-		return _dst;
 	}
 
-	void* memSet(void* _dst, uint8_t _ch, size_t _numBytes)
+	void memSet(void* _dst, uint8_t _ch, size_t _numBytes)
 	{
 #if BX_CRT_NONE
-		return memSetRef(_dst, _ch, _numBytes);
+		memSetRef(_dst, _ch, _numBytes);
 #else
-		return ::memset(_dst, _ch, _numBytes);
+		::memset(_dst, _ch, _numBytes);
 #endif // BX_CRT_NONE
 	}
 
@@ -396,16 +402,19 @@ namespace bx
 #if BX_CRT_NONE
 extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
 {
-	return bx::memCopy(_dst, _src, _numBytes);
+	bx::memCopy(_dst, _src, _numBytes);
+	return _dst;
 }
 
 extern "C" void* memmove(void* _dst, const void* _src, size_t _numBytes)
 {
-	return bx::memMove(_dst, _src, _numBytes);
+	bx::memMove(_dst, _src, _numBytes);
+	return _dst;
 }
 
 extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 {
-	return bx::memSet(_dst, uint8_t(_ch), _numBytes);
+	bx::memSet(_dst, uint8_t(_ch), _numBytes);
+	return _dst;
 }
 #endif // BX_CRT_NONE
