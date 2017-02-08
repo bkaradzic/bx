@@ -246,7 +246,7 @@ namespace bx
 
 	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err)
 	{
-		MemoryReader reader(_format, strnlen(_format) );
+		MemoryReader reader(_format, uint32_t(strnlen(_format) ) );
 
 		int32_t size = 0;
 
