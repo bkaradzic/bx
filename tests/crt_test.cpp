@@ -10,10 +10,10 @@ TEST_CASE("memSet", "")
 {
 	char temp[] =  { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
 
-	REQUIRE(temp == bx::memSet(temp, 0, 0) );
+	bx::memSet(temp, 0, 0);
 	REQUIRE(temp[0] == 1);
 
-	REQUIRE(temp == bx::memSet(temp, 0, 5) );
+	bx::memSet(temp, 0, 5);
 	REQUIRE(temp[0] == 0);
 	REQUIRE(temp[1] == 0);
 	REQUIRE(temp[2] == 0);
@@ -24,17 +24,21 @@ TEST_CASE("memSet", "")
 
 TEST_CASE("memMove", "")
 {
+	const char* orignal = "xxxxabvgd";
 	char str[] = { 'x', 'x', 'x', 'x', 'a', 'b', 'v', 'g', 'd' };
 
-	REQUIRE(bx::memMove(&str[4], &str[4], 0) );
-	REQUIRE(bx::memMove(&str[4], &str[4], 5) );
+	bx::memMove(&str[4], &str[4], 0);
+	REQUIRE(0 == bx::strncmp(str, orignal) );
 
-	REQUIRE(&str[0] == bx::memMove(str, &str[4], 5) );
-	REQUIRE(      0 == bx::strncmp(str, "abvgd", 5) );
+	bx::memMove(&str[4], &str[4], 5);
+	REQUIRE(0 == bx::strncmp(str, orignal) );
 
-	REQUIRE(&str[4] == bx::memMove(&str[4], str, 5) );
-	REQUIRE( str[4] == 'a' );
+	bx::memMove(str, &str[4], 5);
+	REQUIRE(0 == bx::strncmp(str, "abvgd", 5) );
+
+	bx::memMove(&str[4], str, 5);
+	REQUIRE(str[4] == 'a' );
 
 	bx::memSet(str, 'x', 4);
-	REQUIRE(0 == bx::strncmp(str, "xxxxabvgd", 9) );
+	REQUIRE(0 == bx::strncmp(str, orignal) );
 }
