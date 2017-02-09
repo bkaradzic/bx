@@ -121,6 +121,18 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
+	int32_t memCmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+	{
+		for (
+			; 0 < _numBytes && *_lhs == *_rhs
+			; ++_lhs, ++_rhs, --_numBytes
+			)
+		{
+		}
+
+		return 0 == _numBytes ? 0 : *_lhs - *_rhs;
+	}
+
 	namespace
 	{
 		struct Param
@@ -416,5 +428,10 @@ extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 {
 	bx::memSet(_dst, uint8_t(_ch), _numBytes);
 	return _dst;
+}
+
+extern "C" int32_t memcmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+{
+	return bx::memCmp(_lhs, _rhs, _numBytes);
 }
 #endif // BX_CRT_NONE
