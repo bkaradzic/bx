@@ -38,7 +38,7 @@ static bool test(const char* _expected, const char* _format, ...)
 
 	if (!result)
 	{
-		printf("result (%d) %s, expected (%d) %s\n", len, temp, max-1, _expected);
+		printf("result (%d) '%s', expected (%d) '%s'\n", len, temp, max-1, _expected);
 	}
 
 	return result;
@@ -87,6 +87,11 @@ TEST_CASE("vsnprintf p", "")
 {
 	REQUIRE(test("0xbadc0de", "%p", (void*)0xbadc0de) );
 	REQUIRE(test("0xbadc0de           ", "%-20p", (void*)0xbadc0de) );
+}
+
+TEST_CASE("vsnprintf s", "")
+{
+	REQUIRE(test("(null)", "%s", NULL) );
 }
 
 TEST_CASE("vsnprintf", "")

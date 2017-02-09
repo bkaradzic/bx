@@ -166,7 +166,11 @@ namespace bx
 				size += writeRep(_writer, _param.fill, padding, _err);
 			}
 
-			if (_param.upper)
+			if (NULL == _str)
+			{
+				size += write(_writer, "(null)", 6, _err);
+			}
+			else if (_param.upper)
 			{
 				for (int32_t ii = 0; ii < len; ++ii)
 				{
