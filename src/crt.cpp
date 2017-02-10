@@ -121,19 +121,21 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
-	int32_t memCmpRef(const char* _lhs, const char* _rhs, size_t _numBytes)
+	int32_t memCmpRef(const void* _lhs, const void* _rhs, size_t _numBytes)
 	{
+		const char* lhs = (const char*)_lhs;
+		const char* rhs = (const char*)_rhs;
 		for (
-			; 0 < _numBytes && *_lhs == *_rhs
-			; ++_lhs, ++_rhs, --_numBytes
+			; 0 < _numBytes && *lhs == *rhs
+			; ++lhs, ++rhs, --_numBytes
 			)
 		{
 		}
 
-		return 0 == _numBytes ? 0 : *_lhs - *_rhs;
+		return 0 == _numBytes ? 0 : *lhs - *rhs;
 	}
 
-	int32_t memCmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes)
 	{
 #if BX_CRT_NONE
 		return memCmpRef(_lhs, _rhs, _numBytes);
@@ -443,7 +445,7 @@ extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 	return _dst;
 }
 
-extern "C" int32_t memcmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+extern "C" int32_t memcmp(const void* _lhs, const void* _rhs, size_t _numBytes)
 {
 	return bx::memCmp(_lhs, _rhs, _numBytes);
 }

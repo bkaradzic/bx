@@ -63,7 +63,7 @@ namespace bx
 	void memSet(void* _dst, uint8_t _ch, size_t _numBytes);
 
 	///
-	int32_t memCmp(const char* _lhs, const char* _rhs, size_t _numBytes);
+	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes);
 
 } // namespace bx
 
