@@ -83,6 +83,21 @@ TEST_CASE("vsnprintf d/i/o/u/x", "")
 	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcd) );
 }
 
+TEST_CASE("vsnprintf modifiers", "")
+{
+	REQUIRE(test("|  1.000000|", "|%10f|",      1.0f) );
+	REQUIRE(test("|1.000000  |", "|%-10f|",     1.0f) );
+	REQUIRE(test("|001.000000|", "|%010f|",     1.0f) );
+	REQUIRE(test("|0000000001|", "|%010.0f|",   1.0f) );
+	REQUIRE(test("|000000001.|", "|%#010.0f|",  1.0f) );
+	REQUIRE(test("|         1|", "|%10.0f|",    1.0f) );
+	REQUIRE(test("|        1.|", "|%#10.0f|",   1.0f) );
+	REQUIRE(test("|       +1.|", "|%#+10.0f|",  1.0f) );
+	REQUIRE(test("|1         |", "|%-10.0f|",   1.0f) );
+	REQUIRE(test("|1.        |", "|%#-10.0f|",  1.0f) );
+	REQUIRE(test("|+1.       |", "|%+#-10.0f|", 1.0f) );
+}
+
 TEST_CASE("vsnprintf p", "")
 {
 	REQUIRE(test("0xbadc0de", "%p", (void*)0xbadc0de) );

@@ -155,6 +155,8 @@ namespace bx
 				, fill(' ')
 				, left(false)
 				, upper(false)
+				, spec(false)
+				, sign(false)
 			{
 			}
 
@@ -164,6 +166,8 @@ namespace bx
 			char fill;
 			bool left;
 			bool upper;
+			bool spec;
+			bool sign;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -171,6 +175,8 @@ namespace bx
 			int32_t size = 0;
 			int32_t len = (int32_t)strnlen(_str, _len);
 			int32_t padding = _param.width > len ? _param.width - len : 0;
+			bool sign = _param.sign && len > 1 && _str[0] != '-';
+			padding = padding > 0 ? padding - sign : 0;
 
 			if (!_param.left)
 			{
@@ -187,6 +193,11 @@ namespace bx
 				{
 					size += write(_writer, toUpper(_str[ii]), _err);
 				}
+			}
+			else if (sign)
+			{
+				size += write(_writer, '+', _err);
+				size += write(_writer, _str, len, _err);
 			}
 			else
 			{
@@ -248,7 +259,12 @@ namespace bx
 			}
 
 			const char* dot = strnchr(str, '.');
-			const int32_t precLen = int32_t(dot + 1 + _param.prec - str);
+			const int32_t precLen = int32_t(
+					  dot
+					+ uint32_min(_param.prec + _param.spec, 1)
+					+ _param.prec
+					- str
+					);
 			if (precLen > len)
 			{
 				for (int32_t ii = len; ii < precLen; ++ii)
@@ -301,21 +317,25 @@ namespace bx
 
 				while (' ' == ch
 				||     '-' == ch
-				||     '0' == ch)
+				||     '+' == ch
+				||     '0' == ch
+				||     '#' == ch)
 				{
 					switch (ch)
 					{
 						case '-': param.left = true; break;
+						case '+': param.sign = true; break;
 						case ' ': param.fill = ' ';  break;
 						case '0': param.fill = '0';  break;
-					}
-
-					if (param.left)
-					{
-						param.fill = ' ';
+						case '#': param.spec = true; break;
 					}
 
 					read(&reader, ch);
+				}
+
+				if (param.left)
+				{
+					param.fill = ' ';
 				}
 
 				if ('*' == ch)
