@@ -29,12 +29,13 @@
 #define BX_CPU_X86   0
 
 // C Runtime
-#define BX_CRT_MSVC   0
 #define BX_CRT_GLIBC  0
 #define BX_CRT_LIBCXX 0
-#define BX_CRT_NEWLIB 0
 #define BX_CRT_MINGW  0
+#define BX_CRT_MSVC   0
 #define BX_CRT_MUSL   0
+#define BX_CRT_NEWLIB 0
+#define BX_CRT_NONE   0
 
 // Platform
 #define BX_PLATFORM_ANDROID    0
@@ -252,15 +253,6 @@
 		|| BX_PLATFORM_STEAMLINK  \
 		|| BX_PLATFORM_PS4        \
 		|| BX_PLATFORM_RPI        \
-		)
-
-#define BX_CRT_NONE !(0  \
-		|| BX_CRT_MSVC   \
-		|| BX_CRT_GLIBC  \
-		|| BX_CRT_LIBCXX \
-		|| BX_CRT_NEWLIB \
-		|| BX_CRT_MINGW  \
-		|| BX_CRT_MUSL   \
 		)
 
 #ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS

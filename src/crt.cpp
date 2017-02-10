@@ -121,7 +121,7 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
-	int32_t memCmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+	int32_t memCmpRef(const char* _lhs, const char* _rhs, size_t _numBytes)
 	{
 		for (
 			; 0 < _numBytes && *_lhs == *_rhs
@@ -131,6 +131,15 @@ namespace bx
 		}
 
 		return 0 == _numBytes ? 0 : *_lhs - *_rhs;
+	}
+
+	int32_t memCmp(const char* _lhs, const char* _rhs, size_t _numBytes)
+	{
+#if BX_CRT_NONE
+		return memCmpRef(_lhs, _rhs, _numBytes);
+#else
+		return ::memcmp(_lhs, _rhs, _numBytes);
+#endif // BX_CRT_NONE
 	}
 
 	namespace
