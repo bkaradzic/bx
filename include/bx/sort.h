@@ -23,35 +23,35 @@ namespace bx
 
 	///
 	void radixSort(
-		  uint32_t* __restrict _keys
-		, uint32_t* __restrict _tempKeys
+		  uint32_t* _keys
+		, uint32_t* _tempKeys
 		, uint32_t _size
 		);
 
 	///
 	template <typename Ty>
 	void radixSort(
-		  uint32_t* __restrict _keys
-		, uint32_t* __restrict _tempKeys
-		, Ty* __restrict _values
-		, Ty* __restrict _tempValues
+		  uint32_t* _keys
+		, uint32_t* _tempKeys
+		, Ty* _values
+		, Ty* _tempValues
 		, uint32_t _size
 		);
 
 	///
 	void radixSort(
-		  uint64_t* __restrict _keys
-		, uint64_t* __restrict _tempKeys
+		  uint64_t* _keys
+		, uint64_t* _tempKeys
 		, uint32_t _size
 		);
 
 	///
 	template <typename Ty>
 	void radixSort(
-		  uint64_t* __restrict _keys
-		, uint64_t* __restrict _tempKeys
-		, Ty* __restrict _values
-		, Ty* __restrict _tempValues
+		  uint64_t* _keys
+		, uint64_t* _tempKeys
+		, Ty* _values
+		, Ty* _tempValues
 		, uint32_t _size
 		);
 

@@ -13,10 +13,10 @@ namespace bx
 #define BX_RADIXSORT_HISTOGRAM_SIZE (1<<BX_RADIXSORT_BITS)
 #define BX_RADIXSORT_BIT_MASK (BX_RADIXSORT_HISTOGRAM_SIZE-1)
 
-	inline void radixSort(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, uint32_t _size)
+	inline void radixSort(uint32_t* _keys, uint32_t* _tempKeys, uint32_t _size)
 	{
-		uint32_t* __restrict keys = _keys;
-		uint32_t* __restrict tempKeys = _tempKeys;
+		uint32_t* keys = _keys;
+		uint32_t* tempKeys = _tempKeys;
 
 		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
@@ -75,12 +75,12 @@ done:
 	}
 
 	template <typename Ty>
-	inline void radixSort(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
+	inline void radixSort(uint32_t* _keys, uint32_t* _tempKeys, Ty* _values, Ty* _tempValues, uint32_t _size)
 	{
-		uint32_t* __restrict keys = _keys;
-		uint32_t* __restrict tempKeys = _tempKeys;
-		Ty* __restrict values = _values;
-		Ty* __restrict tempValues = _tempValues;
+		uint32_t* keys = _keys;
+		uint32_t* tempKeys = _tempKeys;
+		Ty* values = _values;
+		Ty* tempValues = _tempValues;
 
 		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
@@ -147,10 +147,10 @@ done:
 		}
 	}
 
-	inline void radixSort(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, uint32_t _size)
+	inline void radixSort(uint64_t* _keys, uint64_t* _tempKeys, uint32_t _size)
 	{
-		uint64_t* __restrict keys = _keys;
-		uint64_t* __restrict tempKeys = _tempKeys;
+		uint64_t* keys = _keys;
+		uint64_t* tempKeys = _tempKeys;
 
 		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;
@@ -209,12 +209,12 @@ done:
 	}
 
 	template <typename Ty>
-	inline void radixSort(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
+	inline void radixSort(uint64_t* _keys, uint64_t* _tempKeys, Ty* _values, Ty* _tempValues, uint32_t _size)
 	{
-		uint64_t* __restrict keys = _keys;
-		uint64_t* __restrict tempKeys = _tempKeys;
-		Ty* __restrict values = _values;
-		Ty* __restrict tempValues = _tempValues;
+		uint64_t* keys = _keys;
+		uint64_t* tempKeys = _tempKeys;
+		Ty* values = _values;
+		Ty* tempValues = _tempValues;
 
 		uint32_t histogram[BX_RADIXSORT_HISTOGRAM_SIZE];
 		uint16_t shift = 0;

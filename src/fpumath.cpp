@@ -17,7 +17,7 @@ namespace bx
 	const float huge   = HUGE_VALF;
 #endif // BX_COMPILER_MSVC
 
-	void mtx3Inverse(float* __restrict _result, const float* __restrict _a)
+	void mtx3Inverse(float* _result, const float* _a)
 	{
 		float xx = _a[0];
 		float xy = _a[1];
@@ -49,7 +49,7 @@ namespace bx
 		_result[8] = +(xx*yy - xy*yx) * invDet;
 	}
 
-	void mtxInverse(float* __restrict _result, const float* __restrict _a)
+	void mtxInverse(float* _result, const float* _a)
 	{
 		float xx = _a[ 0];
 		float xy = _a[ 1];
