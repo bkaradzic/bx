@@ -47,7 +47,7 @@ namespace bx
 
 	void quickSort(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
 	{
-		uint8_t pivot[_stride];
+		uint8_t* pivot = (uint8_t*)alloca(_stride);
 		quickSortR(pivot, _data, _num, _stride, _fn);
 	}
 
