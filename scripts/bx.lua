@@ -15,6 +15,7 @@ project "bx"
 		"../include/**.inl",
 		"../src/**.cpp",
 	}
+	excludes "../src/amalgamated.cpp"
 
 	configuration { "linux-*" }
 		buildoptions {
