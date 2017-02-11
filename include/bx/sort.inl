@@ -3,9 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_RADIXSORT_H_HEADER_GUARD
-#	error "Must be included from bx/radixsort.h!"
-#endif // BX_RADIXSORT_H_HEADER_GUARD
+#ifndef BX_SORT_H_HEADER_GUARD
+#	error "Must be included from bx/sort.h!"
+#endif // BX_SORT_H_HEADER_GUARD
 
 namespace bx
 {
