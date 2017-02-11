@@ -121,6 +121,29 @@ namespace bx
 #endif // BX_CRT_NONE
 	}
 
+	int32_t memCmpRef(const void* _lhs, const void* _rhs, size_t _numBytes)
+	{
+		const char* lhs = (const char*)_lhs;
+		const char* rhs = (const char*)_rhs;
+		for (
+			; 0 < _numBytes && *lhs == *rhs
+			; ++lhs, ++rhs, --_numBytes
+			)
+		{
+		}
+
+		return 0 == _numBytes ? 0 : *lhs - *rhs;
+	}
+
+	int32_t memCmp(const void* _lhs, const void* _rhs, size_t _numBytes)
+	{
+#if BX_CRT_NONE
+		return memCmpRef(_lhs, _rhs, _numBytes);
+#else
+		return ::memcmp(_lhs, _rhs, _numBytes);
+#endif // BX_CRT_NONE
+	}
+
 	namespace
 	{
 		struct Param
@@ -132,6 +155,8 @@ namespace bx
 				, fill(' ')
 				, left(false)
 				, upper(false)
+				, spec(false)
+				, sign(false)
 			{
 			}
 
@@ -141,6 +166,8 @@ namespace bx
 			char fill;
 			bool left;
 			bool upper;
+			bool spec;
+			bool sign;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -148,18 +175,29 @@ namespace bx
 			int32_t size = 0;
 			int32_t len = (int32_t)strnlen(_str, _len);
 			int32_t padding = _param.width > len ? _param.width - len : 0;
+			bool sign = _param.sign && len > 1 && _str[0] != '-';
+			padding = padding > 0 ? padding - sign : 0;
 
 			if (!_param.left)
 			{
 				size += writeRep(_writer, _param.fill, padding, _err);
 			}
 
-			if (_param.upper)
+			if (NULL == _str)
+			{
+				size += write(_writer, "(null)", 6, _err);
+			}
+			else if (_param.upper)
 			{
 				for (int32_t ii = 0; ii < len; ++ii)
 				{
 					size += write(_writer, toUpper(_str[ii]), _err);
 				}
+			}
+			else if (sign)
+			{
+				size += write(_writer, '+', _err);
+				size += write(_writer, _str, len, _err);
 			}
 			else
 			{
@@ -221,7 +259,12 @@ namespace bx
 			}
 
 			const char* dot = strnchr(str, '.');
-			const int32_t precLen = int32_t(dot + 1 + _param.prec - str);
+			const int32_t precLen = int32_t(
+					  dot
+					+ uint32_min(_param.prec + _param.spec, 1)
+					+ _param.prec
+					- str
+					);
 			if (precLen > len)
 			{
 				for (int32_t ii = len; ii < precLen; ++ii)
@@ -274,21 +317,25 @@ namespace bx
 
 				while (' ' == ch
 				||     '-' == ch
-				||     '0' == ch)
+				||     '+' == ch
+				||     '0' == ch
+				||     '#' == ch)
 				{
 					switch (ch)
 					{
 						case '-': param.left = true; break;
+						case '+': param.sign = true; break;
 						case ' ': param.fill = ' ';  break;
 						case '0': param.fill = '0';  break;
-					}
-
-					if (param.left)
-					{
-						param.fill = ' ';
+						case '#': param.spec = true; break;
 					}
 
 					read(&reader, ch);
+				}
+
+				if (param.left)
+				{
+					param.fill = ' ';
 				}
 
 				if ('*' == ch)
@@ -416,5 +463,10 @@ extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 {
 	bx::memSet(_dst, uint8_t(_ch), _numBytes);
 	return _dst;
+}
+
+extern "C" int32_t memcmp(const void* _lhs, const void* _rhs, size_t _numBytes)
+{
+	return bx::memCmp(_lhs, _rhs, _numBytes);
 }
 #endif // BX_CRT_NONE

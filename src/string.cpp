@@ -107,8 +107,13 @@ namespace bx
 
 	size_t strnlen(const char* _str, size_t _max)
 	{
-		const char* ptr;
-		for (ptr = _str; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
+		if (NULL == _str)
+		{
+			return 0;
+		}
+
+		const char* ptr = _str;
+		for (; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
 		return ptr - _str;
 	}
 

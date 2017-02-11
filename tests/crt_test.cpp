@@ -4,7 +4,6 @@
  */
 
 #include "test.h"
-#include <bx/string.h>
 
 TEST_CASE("memSet", "")
 {
@@ -28,17 +27,17 @@ TEST_CASE("memMove", "")
 	char str[] = { 'x', 'x', 'x', 'x', 'a', 'b', 'v', 'g', 'd' };
 
 	bx::memMove(&str[4], &str[4], 0);
-	REQUIRE(0 == bx::strncmp(str, orignal) );
+	REQUIRE(0 == bx::memCmp(str, orignal, 9) );
 
 	bx::memMove(&str[4], &str[4], 5);
-	REQUIRE(0 == bx::strncmp(str, orignal) );
+	REQUIRE(0 == bx::memCmp(str, orignal, 9) );
 
 	bx::memMove(str, &str[4], 5);
-	REQUIRE(0 == bx::strncmp(str, "abvgd", 5) );
+	REQUIRE(0 == bx::memCmp(str, "abvgd", 5) );
 
 	bx::memMove(&str[4], str, 5);
 	REQUIRE(str[4] == 'a' );
 
 	bx::memSet(str, 'x', 4);
-	REQUIRE(0 == bx::strncmp(str, orignal) );
+	REQUIRE(0 == bx::memCmp(str, orignal, 9) );
 }
