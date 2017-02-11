@@ -3,6 +3,11 @@
 -- License: https://github.com/bkaradzic/bx#license-bsd-2-clause
 --
 
+newoption {
+	trigger = "with-amalgamated",
+	description = "Enable amalgamated build.",
+}
+
 solution "bx"
 	configurations {
 		"Debug",
