@@ -343,6 +343,7 @@ namespace bx
 
 				Param param;
 
+				// flags
 				while (' ' == ch
 				||     '-' == ch
 				||     '+' == ch
@@ -367,6 +368,7 @@ namespace bx
 					param.fill = ' ';
 				}
 
+				// width
 				if ('*' == ch)
 				{
 					read(&reader, ch);
@@ -388,6 +390,7 @@ namespace bx
 					}
 				}
 
+				// .precision
 				if ('.' == ch)
 				{
 					read(&reader, ch);
@@ -450,6 +453,7 @@ namespace bx
 					read(&reader, ch);
 				}
 
+				// specifier
 				switch (toLower(ch) )
 				{
 					case 'c':

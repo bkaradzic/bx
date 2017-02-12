@@ -8,6 +8,8 @@
 #include <bx/string.h>
 #include <bx/uint32_t.h>
 
+#include <type_traits>
+
 namespace bx
 {
 	// https://github.com/miloyip/dtoa-benchmark
@@ -464,7 +466,8 @@ namespace bx
 		}
 	}
 
-	int32_t toString(char* _dst, size_t _max, int32_t _value, uint32_t _base)
+	template<typename Ty>
+	int32_t toStringSigned(char* _dst, size_t _max, Ty _value, uint32_t _base)
 	{
 		if (_base == 10
 		&&  _value < 0)
@@ -474,7 +477,11 @@ namespace bx
 				return 0;
 			}
 
-			_max = toString(_dst + 1, _max - 1, uint32_t(-_value), _base);
+			_max = toString(_dst + 1
+					, _max - 1
+					, typename std::make_unsigned<Ty>::type(-_value)
+					, _base
+					);
 			if (_max == 0)
 			{
 				return 0;
@@ -484,106 +491,70 @@ namespace bx
 			return int32_t(_max + 1);
 		}
 
-		return toString(_dst, _max, uint32_t(_value), _base);
+		return toString(_dst
+					, _max
+					, typename std::make_unsigned<Ty>::type(_value)
+					, _base
+					);
+	}
+
+	int32_t toString(char* _dst, size_t _max, int32_t _value, uint32_t _base)
+	{
+		return toStringSigned(_dst, _max, _value, _base);
 	}
 
 	int32_t toString(char* _dst, size_t _max, int64_t _value, uint32_t _base)
 	{
-		if (_base == 10
-		&&  _value < 0)
+		return toStringSigned(_dst, _max, _value, _base);
+	}
+
+	template<typename Ty>
+	int32_t toStringUnsigned(char* _dst, size_t _max, Ty _value, uint32_t _base)
+	{
+		char data[32];
+		size_t len = 0;
+
+		if (_base > 16
+		||  _base < 2)
 		{
-			if (_max < 1)
-			{
-				return 0;
-			}
-
-			_max = toString(_dst + 1, _max - 1, uint64_t(-_value), _base);
-			if (_max == 0)
-			{
-				return 0;
-			}
-
-			*_dst = '-';
-			return int32_t(_max + 1);
+			return 0;
 		}
 
-		return toString(_dst, _max, uint64_t(_value), _base);
+		do
+		{
+			const Ty rem = _value % _base;
+			_value /= _base;
+			if (rem < 10)
+			{
+				data[len++] = char('0' + rem);
+			}
+			else
+			{
+				data[len++] = char('a' + rem - 10);
+			}
+
+		} while (_value != 0);
+
+		if (_max < len + 1)
+		{
+			return 0;
+		}
+
+		reverse(data, len);
+
+		memCopy(_dst, data, len);
+		_dst[len] = '\0';
+		return int32_t(len);
 	}
 
 	int32_t toString(char* _dst, size_t _max, uint32_t _value, uint32_t _base)
 	{
-		char data[32];
-		size_t len = 0;
-
-		if (_base > 16
-		||  _base < 2)
-		{
-			return 0;
-		}
-
-		do
-		{
-			const uint32_t rem = _value % _base;
-			_value /= _base;
-			if (rem < 10)
-			{
-				data[len++] = char('0' + rem);
-			}
-			else
-			{
-				data[len++] = char('a' + rem - 10);
-			}
-
-		} while (_value != 0);
-
-		if (_max < len + 1)
-		{
-			return 0;
-		}
-
-		reverse(data, len);
-
-		memCopy(_dst, data, len);
-		_dst[len] = '\0';
-		return int32_t(len);
+		return toStringUnsigned(_dst, _max, _value, _base);
 	}
 
 	int32_t toString(char* _dst, size_t _max, uint64_t _value, uint32_t _base)
 	{
-		char data[32];
-		size_t len = 0;
-
-		if (_base > 16
-		||  _base < 2)
-		{
-			return 0;
-		}
-
-		do
-		{
-			const uint64_t rem = _value % _base;
-			_value /= _base;
-			if (rem < 10)
-			{
-				data[len++] = char('0' + rem);
-			}
-			else
-			{
-				data[len++] = char('a' + rem - 10);
-			}
-
-		} while (_value != 0);
-
-		if (_max < len + 1)
-		{
-			return 0;
-		}
-
-		reverse(data, len);
-
-		memCopy(_dst, data, len);
-		_dst[len] = '\0';
-		return int32_t(len);
+		return toStringUnsigned(_dst, _max, _value, _base);
 	}
 
 } // namespace bx
