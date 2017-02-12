@@ -338,7 +338,7 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[ -0][<width>][.<precision>]
+				// %[flags][width][.precision][length sub-specifier]specifier
 				read(&reader, ch);
 
 				Param param;
