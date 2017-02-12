@@ -5,6 +5,7 @@
 
 #include "test.h"
 #include <bx/string.h>
+#include <inttypes.h>
 
 TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
 {
@@ -81,6 +82,18 @@ TEST_CASE("vsnprintf d/i/o/u/x", "")
 	REQUIRE(test("0000000000001234ABCD", "%020X",  0x1234abcd) );
 	REQUIRE(test("000000000000edcb5433", "%020x", -0x1234abcd) );
 	REQUIRE(test("000000000000EDCB5433", "%020X", -0x1234abcd) );
+
+	if (BX_ENABLED(BX_ARCH_32BIT) )
+	{
+		REQUIRE(test("2147483647", "%jd", INTMAX_MAX) );
+	}
+	else
+	{
+		REQUIRE(test("9223372036854775807", "%jd", INTMAX_MAX) );
+	}
+
+	REQUIRE(test("18446744073709551615", "%" PRIu64, UINT64_MAX) );
+	REQUIRE(test("ffffffffffffffff", "%016" PRIx64, UINT64_MAX) );
 }
 
 TEST_CASE("vsnprintf modifiers", "")

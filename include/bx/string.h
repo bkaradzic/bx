@@ -224,7 +224,13 @@ namespace bx
 	int32_t toString(char* _out, size_t _max, int32_t _value, uint32_t _base = 10);
 
 	///
+	int32_t toString(char* _out, size_t _max, int64_t _value, uint32_t _base = 10);
+
+	///
 	int32_t toString(char* _out, size_t _max, uint32_t _value, uint32_t _base = 10);
+
+	///
+	int32_t toString(char* _out, size_t _max, uint64_t _value, uint32_t _base = 10);
 
 	///
 	uint32_t hashMurmur2A(const StringView& _data);

@@ -153,6 +153,7 @@ namespace bx
 				, base(10)
 				, prec(6)
 				, fill(' ')
+				, bits(0)
 				, left(false)
 				, upper(false)
 				, spec(false)
@@ -164,6 +165,7 @@ namespace bx
 			uint32_t base;
 			uint32_t prec;
 			char fill;
+			uint8_t bits;
 			bool left;
 			bool upper;
 			bool spec;
@@ -235,10 +237,36 @@ namespace bx
 			return write(_writer, str, len, _param, _err);
 		}
 
-		static int32_t write(WriterI* _writer, uint32_t _i, const Param& _param, Error* _err)
+		static int32_t write(WriterI* _writer, int64_t _i, const Param& _param, Error* _err)
 		{
 			char str[33];
 			int32_t len = toString(str, sizeof(str), _i, _param.base);
+
+			if (len == 0)
+			{
+				return 0;
+			}
+
+			return write(_writer, str, len, _param, _err);
+		}
+
+		static int32_t write(WriterI* _writer, uint32_t _u, const Param& _param, Error* _err)
+		{
+			char str[33];
+			int32_t len = toString(str, sizeof(str), _u, _param.base);
+
+			if (len == 0)
+			{
+				return 0;
+			}
+
+			return write(_writer, str, len, _param, _err);
+		}
+
+		static int32_t write(WriterI* _writer, uint64_t _u, const Param& _param, Error* _err)
+		{
+			char str[33];
+			int32_t len = toString(str, sizeof(str), _u, _param.base);
 
 			if (len == 0)
 			{
@@ -323,9 +351,10 @@ namespace bx
 				{
 					switch (ch)
 					{
+						default:
+						case ' ': param.fill = ' ';  break;
 						case '-': param.left = true; break;
 						case '+': param.sign = true; break;
-						case ' ': param.fill = ' ';  break;
 						case '0': param.fill = '0';  break;
 						case '#': param.spec = true; break;
 					}
@@ -379,6 +408,48 @@ namespace bx
 					}
 				}
 
+				// length sub-specifier
+				while ('h' == ch
+				||     'I' == ch
+				||     'l' == ch
+				||     'j' == ch
+				||     't' == ch
+				||     'z' == ch)
+				{
+					switch (ch)
+					{
+						default: break;
+
+						case 'j': param.bits = sizeof(intmax_t )*8; break;
+						case 't': param.bits = sizeof(size_t   )*8; break;
+						case 'z': param.bits = sizeof(ptrdiff_t)*8; break;
+
+						case 'h': case 'I': case 'l':
+							switch (ch)
+							{
+								case 'h': param.bits = sizeof(short int)*8; break;
+								case 'l': param.bits = sizeof(long int )*8; break;
+								default: break;
+							}
+
+							read(&reader, ch);
+							switch (ch)
+							{
+								case 'h': param.bits = sizeof(signed char  )*8; break;
+								case 'l': param.bits = sizeof(long long int)*8; break;
+								case '6':
+									read(&reader, ch);
+									if ('4' == ch) { param.bits = sizeof(int64_t)*8; }
+									break;
+
+								default: seek(&reader, -1); break;
+							}
+							break;
+					}
+
+					read(&reader, ch);
+				}
+
 				switch (toLower(ch) )
 				{
 					case 'c':
@@ -391,13 +462,21 @@ namespace bx
 
 					case 'o':
 						param.base = 8;
-						size += write(_writer, va_arg(_argList, int32_t), param, _err);
+						switch (param.bits)
+						{
+						default: size += write(_writer, va_arg(_argList, int32_t), param, _err); break;
+						case 64: size += write(_writer, va_arg(_argList, int64_t), param, _err); break;
+						}
 						break;
 
 					case 'i':
 					case 'd':
 						param.base = 10;
-						size += write(_writer, va_arg(_argList, int32_t), param, _err);
+						switch (param.bits)
+						{
+						default: size += write(_writer, va_arg(_argList, int32_t), param, _err); break;
+						case 64: size += write(_writer, va_arg(_argList, int64_t), param, _err); break;
+						};
 						break;
 
 					case 'f':
@@ -411,12 +490,20 @@ namespace bx
 					case 'x':
 						param.base  = 16;
 						param.upper = isUpper(ch);
-						size += write(_writer, va_arg(_argList, uint32_t), param, _err);
+						switch (param.bits)
+						{
+						default: size += write(_writer, va_arg(_argList, uint32_t), param, _err); break;
+						case 64: size += write(_writer, va_arg(_argList, uint64_t), param, _err); break;
+						}
 						break;
 
 					case 'u':
 						param.base = 10;
-						size += write(_writer, va_arg(_argList, uint32_t), param, _err);
+						switch (param.bits)
+						{
+						default: size += write(_writer, va_arg(_argList, uint32_t), param, _err); break;
+						case 64: size += write(_writer, va_arg(_argList, uint64_t), param, _err); break;
+						}
 						break;
 
 					default:
