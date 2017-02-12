@@ -7,6 +7,16 @@
 #include <string.h>
 #include <bx/bx.h>
 
+BX_STATIC_ASSERT(false
+	|| BX_CRT_BIONIC
+	|| BX_CRT_GLIBC
+	|| BX_CRT_LIBCXX
+	|| BX_CRT_MINGW
+	|| BX_CRT_MSVC
+	|| BX_CRT_MUSL
+	|| BX_CRT_NEWLIB
+	);
+
 BX_STATIC_ASSERT(1 == BX_VA_ARGS_COUNT(1) );
 BX_STATIC_ASSERT(2 == BX_VA_ARGS_COUNT(1, 2) );
 BX_STATIC_ASSERT(3 == BX_VA_ARGS_COUNT(1, 2, 3) );
