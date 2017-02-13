@@ -8,6 +8,10 @@
 #include <inttypes.h>
 #include <float.h>
 
+#ifndef NAN
+#	define NAN (0.0/0.0)
+#endif // NAN
+
 TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
 {
 	REQUIRE(4 == bx::snprintf(NULL, 0, "test") );
