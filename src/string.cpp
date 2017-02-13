@@ -60,14 +60,18 @@ namespace bx
 		return _ch + (isUpper(_ch) ? 0x20 : 0);
 	}
 
-	void toLower(char* _inOutStr, size_t _max)
+	void toLowerUnsafe(char* _inOutStr, size_t _len)
 	{
-		size_t len = strnlen(_inOutStr, _max);
-
-		for (size_t ii = 0; ii < len; ++ii)
+		for (size_t ii = 0; ii < _len; ++ii)
 		{
 			*_inOutStr = toLower(*_inOutStr);
 		}
+	}
+
+	void toLower(char* _inOutStr, size_t _max)
+	{
+		const size_t len = strnlen(_inOutStr, _max);
+		toLowerUnsafe(_inOutStr, len);
 	}
 
 	char toUpper(char _ch)
@@ -75,14 +79,18 @@ namespace bx
 		return _ch - (isLower(_ch) ? 0x20 : 0);
 	}
 
-	void toUpper(char* _inOutStr, size_t _max)
+	void toUpperUnsafe(char* _inOutStr, size_t _len)
 	{
-		size_t len = strnlen(_inOutStr, _max);
-
-		for (size_t ii = 0; ii < len; ++ii)
+		for (size_t ii = 0; ii < _len; ++ii)
 		{
 			*_inOutStr = toUpper(*_inOutStr);
 		}
+	}
+
+	void toUpper(char* _inOutStr, size_t _max)
+	{
+		const size_t len = strnlen(_inOutStr, _max);
+		toUpperUnsafe(_inOutStr, len);
 	}
 
 	bool toBool(const char* _str)

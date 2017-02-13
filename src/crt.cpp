@@ -288,7 +288,7 @@ namespace bx
 
 			if (_param.upper)
 			{
-				toUpper(str, len);
+				toUpperUnsafe(str, len);
 			}
 
 			const char* dot = strnchr(str, '.');
