@@ -286,22 +286,30 @@ namespace bx
 				return 0;
 			}
 
-			const char* dot = strnchr(str, '.');
-			const int32_t precLen = int32_t(
-					  dot
-					+ uint32_min(_param.prec + _param.spec, 1)
-					+ _param.prec
-					- str
-					);
-			if (precLen > len)
+			if (_param.upper)
 			{
-				for (int32_t ii = len; ii < precLen; ++ii)
-				{
-					str[ii] = '0';
-				}
-				str[precLen] = '\0';
+				toUpper(str, len);
 			}
-			len = precLen;
+
+			const char* dot = strnchr(str, '.');
+			if (NULL != dot)
+			{
+				const int32_t precLen = int32_t(
+						dot
+						+ uint32_min(_param.prec + _param.spec, 1)
+						+ _param.prec
+						- str
+						);
+				if (precLen > len)
+				{
+					for (int32_t ii = len; ii < precLen; ++ii)
+					{
+						str[ii] = '0';
+					}
+					str[precLen] = '\0';
+				}
+				len = precLen;
+			}
 
 			return write(_writer, str, len, _param, _err);
 		}
@@ -440,9 +448,15 @@ namespace bx
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
+								case '3':
 								case '6':
 									read(&reader, ch);
-									if ('4' == ch) { param.bits = sizeof(int64_t)*8; }
+									switch (ch)
+									{
+										case '2': param.bits = sizeof(int32_t)*8; break;
+										case '4': param.bits = sizeof(int64_t)*8; break;
+										default: break;
+									}
 									break;
 
 								default: seek(&reader, -1); break;
@@ -484,6 +498,7 @@ namespace bx
 						break;
 
 					case 'f':
+						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
 

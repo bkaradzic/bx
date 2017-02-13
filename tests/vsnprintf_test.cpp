@@ -6,6 +6,7 @@
 #include "test.h"
 #include <bx/string.h>
 #include <inttypes.h>
+#include <float.h>
 
 TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
 {
@@ -52,6 +53,13 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("  13.370", "%*.*f", 8, 3, 13.37) );
 	REQUIRE(test("13.370  ", "%-8.3f", 13.37) );
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
+
+	REQUIRE(test("nan     ", "%-8f",  NAN) );
+	REQUIRE(test("     nan", "%8f",   NAN) );
+	REQUIRE(test("-NAN    ", "%-8F", -NAN) );
+	REQUIRE(test("     inf", "%8f",   INFINITY) );
+	REQUIRE(test("inf     ", "%-8f",  INFINITY) );
+	REQUIRE(test("    -INF", "%8F",  -INFINITY) );
 }
 
 TEST_CASE("vsnprintf d/i/o/u/x", "")

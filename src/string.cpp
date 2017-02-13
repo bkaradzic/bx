@@ -60,9 +60,29 @@ namespace bx
 		return _ch + (isUpper(_ch) ? 0x20 : 0);
 	}
 
+	void toLower(char* _inOutStr, size_t _max)
+	{
+		size_t len = strnlen(_inOutStr, _max);
+
+		for (size_t ii = 0; ii < len; ++ii)
+		{
+			*_inOutStr = toLower(*_inOutStr);
+		}
+	}
+
 	char toUpper(char _ch)
 	{
 		return _ch - (isLower(_ch) ? 0x20 : 0);
+	}
+
+	void toUpper(char* _inOutStr, size_t _max)
+	{
+		size_t len = strnlen(_inOutStr, _max);
+
+		for (size_t ii = 0; ii < len; ++ii)
+		{
+			*_inOutStr = toUpper(*_inOutStr);
+		}
 	}
 
 	bool toBool(const char* _str)

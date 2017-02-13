@@ -152,7 +152,7 @@ TEST_CASE("toString int32_t/uint32_t", "")
 TEST_CASE("toString double", "")
 {
 	REQUIRE(testToString(0.0,                     "0.0") );
-	REQUIRE(testToString(-0.0,                    "0.0") );
+	REQUIRE(testToString(-0.0,                    "-0.0") );
 	REQUIRE(testToString(1.0,                     "1.0") );
 	REQUIRE(testToString(-1.0,                    "-1.0") );
 	REQUIRE(testToString(1.2345,                  "1.2345") );

@@ -424,34 +424,34 @@ namespace bx
 		return length + 2 + exp;
 	}
 
-	int32_t toString(char* _dst, size_t _max, double value)
+	int32_t toString(char* _dst, size_t _max, double _value)
 	{
-		if (isNan(value) )
-		{
-			return (int32_t)strlncpy(_dst, _max, "NaN");
-		}
-		else if (isInfinite(value) )
-		{
-			return (int32_t)strlncpy(_dst, _max, "Inf");
-		}
-
-		int32_t sign = 0.0 > value ? 1 : 0;
+		int32_t sign = 0 != (doubleToBits(_value) & (UINT64_C(1)<<63) ) ? 1 : 0;
 		if (1 == sign)
 		{
 			*_dst++ = '-';
 			--_max;
-			value = -value;
+			_value = -_value;
+		}
+
+		if (isNan(_value) )
+		{
+			return (int32_t)strlncpy(_dst, _max, "nan") + sign;
+		}
+		else if (isInfinite(_value) )
+		{
+			return (int32_t)strlncpy(_dst, _max, "inf") + sign;
 		}
 
 		int32_t len;
-		if (0.0 == value)
+		if (0.0 == _value)
 		{
 			len = (int32_t)strlncpy(_dst, _max, "0.0");
 		}
 		else
 		{
 			int32_t kk;
-			Grisu2(value, _dst, &len, &kk);
+			Grisu2(_value, _dst, &len, &kk);
 			len = Prettify(_dst, len, kk);
 		}
 

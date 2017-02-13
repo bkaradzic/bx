@@ -111,7 +111,13 @@ namespace bx
 	char toLower(char _ch);
 
 	///
+	void toLower(char* _inOutStr, size_t _max = INT32_MAX);
+
+	///
 	char toUpper(char _ch);
+
+	///
+	void toUpper(char* _inOutStr, size_t _max = INT32_MAX);
 
 	///
 	bool toBool(const char* _str);
