@@ -5,12 +5,8 @@
 
 #include "test.h"
 #include <bx/string.h>
+#include <limits>
 #include <inttypes.h>
-#include <float.h>
-
-#ifndef NAN
-#	define NAN (0.0/0.0)
-#endif // NAN
 
 TEST_CASE("vsnprintf NULL buffer", "No output buffer provided.")
 {
@@ -58,12 +54,12 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("13.370  ", "%-8.3f", 13.37) );
 	REQUIRE(test("13.370  ", "%*.*f", -8, 3, 13.37) );
 
-	REQUIRE(test("nan     ", "%-8f",  NAN) );
-	REQUIRE(test("     nan", "%8f",   NAN) );
-	REQUIRE(test("-NAN    ", "%-8F", -NAN) );
-	REQUIRE(test("     inf", "%8f",   INFINITY) );
-	REQUIRE(test("inf     ", "%-8f",  INFINITY) );
-	REQUIRE(test("    -INF", "%8F",  -INFINITY) );
+	REQUIRE(test("nan     ", "%-8f",  std::numeric_limits<double>::quiet_NaN() ) );
+	REQUIRE(test("     nan", "%8f",   std::numeric_limits<double>::quiet_NaN() ) );
+	REQUIRE(test("-NAN    ", "%-8F", -std::numeric_limits<double>::quiet_NaN() ) );
+	REQUIRE(test("     inf", "%8f",   std::numeric_limits<double>::infinity() ) );
+	REQUIRE(test("inf     ", "%-8f",  std::numeric_limits<double>::infinity() ) );
+	REQUIRE(test("    -INF", "%8F",  -std::numeric_limits<double>::infinity() ) );
 }
 
 TEST_CASE("vsnprintf d/i/o/u/x", "")
