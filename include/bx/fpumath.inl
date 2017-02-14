@@ -81,16 +81,6 @@ namespace bx
 		return tmp == UINT64_C(0x7ff0000000000000);
 	}
 
-	inline float ffloor(float _f)
-	{
-		return floorf(_f);
-	}
-
-	inline float fceil(float _f)
-	{
-		return ceilf(_f);
-	}
-
 	inline float fround(float _f)
 	{
 		return ffloor(_f + 0.5f);
@@ -136,44 +126,9 @@ namespace bx
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline float fabsolute(float _a)
-	{
-		return fabsf(_a);
-	}
-
 	inline float fsq(float _a)
 	{
 		return _a * _a;
-	}
-
-	inline float fsin(float _a)
-	{
-		return sinf(_a);
-	}
-
-	inline float fasin(float _a)
-	{
-		return asinf(_a);
-	}
-
-	inline float fcos(float _a)
-	{
-		return cosf(_a);
-	}
-
-	inline float facos(float _a)
-	{
-		return acosf(_a);
-	}
-
-	inline float fatan2(float _y, float _x)
-	{
-		return atan2f(_y, _x);
-	}
-
-	inline float fpow(float _a, float _b)
-	{
-		return powf(_a, _b);
 	}
 
 	inline float fexp2(float _a)
@@ -181,19 +136,9 @@ namespace bx
 		return fpow(2.0f, _a);
 	}
 
-	inline float flog(float _a)
-	{
-		return logf(_a);
-	}
-
 	inline float flog2(float _a)
 	{
 		return flog(_a) * 1.442695041f;
-	}
-
-	inline float fsqrt(float _a)
-	{
-		return sqrtf(_a);
 	}
 
 	inline float frsqrt(float _a)
@@ -203,12 +148,7 @@ namespace bx
 
 	inline float ffract(float _a)
 	{
-		return _a - floorf(_a);
-	}
-
-	inline float fmod(float _a, float _b)
-	{
-		return fmodf(_a, _b);
+		return _a - ffloor(_a);
 	}
 
 	inline bool fequal(float _a, float _b, float _epsilon)
@@ -818,7 +758,7 @@ namespace bx
 	template <Handness::Enum HandnessT>
 	inline void mtxProj_impl(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
 	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float height = 1.0f/ftan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
 		mtxProjXYWH<HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
 	}
@@ -915,7 +855,7 @@ namespace bx
 	template <NearFar::Enum NearFarT, Handness::Enum HandnessT>
 	inline void mtxProjInf_impl(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
 	{
-		const float height = 1.0f/tanf(toRad(_fovy)*0.5f);
+		const float height = 1.0f/ftan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
 		mtxProjInfXYWH<NearFarT,HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _oglNdc);
 	}

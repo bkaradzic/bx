@@ -9,7 +9,6 @@
 #define BX_FPU_MATH_H_HEADER_GUARD
 
 #include "bx.h"
-#include <math.h>
 
 namespace bx
 {
@@ -122,6 +121,9 @@ namespace bx
 
 	///
 	float fcos(float _a);
+
+	///
+	float ftan(float _a);
 
 	///
 	float facos(float _a);

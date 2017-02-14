@@ -4,6 +4,7 @@
  */
 
 #include <bx/fpumath.h>
+#include <math.h>
 
 namespace bx
 {
@@ -16,6 +17,71 @@ namespace bx
 #else
 	const float huge   = HUGE_VALF;
 #endif // BX_COMPILER_MSVC
+
+	float fabsolute(float _a)
+	{
+		return ::fabsf(_a);
+	}
+
+	float fsin(float _a)
+	{
+		return ::sinf(_a);
+	}
+
+	float fasin(float _a)
+	{
+		return ::asinf(_a);
+	}
+
+	float fcos(float _a)
+	{
+		return ::cosf(_a);
+	}
+
+	float ftan(float _a)
+	{
+		return ::tanf(_a);
+	}
+
+	float facos(float _a)
+	{
+		return ::acosf(_a);
+	}
+
+	float fatan2(float _y, float _x)
+	{
+		return ::atan2f(_y, _x);
+	}
+
+	float fpow(float _a, float _b)
+	{
+		return ::powf(_a, _b);
+	}
+
+	float flog(float _a)
+	{
+		return ::logf(_a);
+	}
+
+	float fsqrt(float _a)
+	{
+		return ::sqrtf(_a);
+	}
+
+	float ffloor(float _f)
+	{
+		return ::floorf(_f);
+	}
+
+	float fceil(float _f)
+	{
+		return ::ceilf(_f);
+	}
+
+	float fmod(float _a, float _b)
+	{
+		return ::fmodf(_a, _b);
+	}
 
 	void mtx3Inverse(float* _result, const float* _a)
 	{
