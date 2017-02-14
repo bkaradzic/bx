@@ -7,6 +7,7 @@
 #define BX_HASH_H_HEADER_GUARD
 
 #include "allocator.h" // isAligned
+#include "string.h" // StringView
 
 namespace bx
 {
@@ -54,6 +55,12 @@ namespace bx
 	///
 	template <typename Ty>
 	uint32_t hashMurmur2A(const Ty& _data);
+
+	///
+	uint32_t hashMurmur2A(const StringView& _data);
+
+	///
+	uint32_t hashMurmur2A(const char* _data);
 
 } // namespace bx
 
