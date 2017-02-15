@@ -29,7 +29,7 @@ TEST_CASE("strnlen", "")
 
 	REQUIRE(0 == bx::strnlen(test, 0) );
 	REQUIRE(2 == bx::strnlen(test, 2) );
-	REQUIRE(4 == bx::strnlen(test, UINT32_MAX) );
+	REQUIRE(4 == bx::strnlen(test, INT32_MAX) );
 }
 
 TEST_CASE("strlncpy", "")
@@ -135,10 +135,14 @@ static bool testToString(Ty _value, const char* _expected)
 	char tmp[1024];
 	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
 	int32_t len = (int32_t)bx::strnlen(_expected);
-	return true
-		&& 0 == bx::strncmp(tmp, _expected)
-		&& num == len
-		;
+	if (0 == bx::strncmp(tmp, _expected)
+	&&  num == len)
+	{
+		return true;
+	}
+
+	printf("result '%s' (%d), expected '%s' (%d)\n", tmp, num, _expected, len);
+	return false;
 }
 
 TEST_CASE("toString int32_t/uint32_t", "")

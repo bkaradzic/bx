@@ -424,7 +424,7 @@ namespace bx
 		return length + 2 + exp;
 	}
 
-	int32_t toString(char* _dst, size_t _max, double _value)
+	int32_t toString(char* _dst, int32_t _max, double _value)
 	{
 		int32_t sign = 0 != (doubleToBits(_value) & (UINT64_C(1)<<63) ) ? 1 : 0;
 		if (1 == sign)
@@ -458,16 +458,16 @@ namespace bx
 		return len + sign;
 	}
 
-	static void reverse(char* _dst, size_t _len)
+	static void reverse(char* _dst, int32_t _len)
 	{
-		for (size_t ii = 0, jj = _len - 1; ii < jj; ++ii, --jj)
+		for (int32_t ii = 0, jj = _len - 1; ii < jj; ++ii, --jj)
 		{
 			xchg(_dst[ii], _dst[jj]);
 		}
 	}
 
 	template<typename Ty>
-	int32_t toStringSigned(char* _dst, size_t _max, Ty _value, uint32_t _base)
+	int32_t toStringSigned(char* _dst, int32_t _max, Ty _value, uint32_t _base)
 	{
 		if (_base == 10
 		&&  _value < 0)
@@ -498,21 +498,21 @@ namespace bx
 					);
 	}
 
-	int32_t toString(char* _dst, size_t _max, int32_t _value, uint32_t _base)
+	int32_t toString(char* _dst, int32_t _max, int32_t _value, uint32_t _base)
 	{
 		return toStringSigned(_dst, _max, _value, _base);
 	}
 
-	int32_t toString(char* _dst, size_t _max, int64_t _value, uint32_t _base)
+	int32_t toString(char* _dst, int32_t _max, int64_t _value, uint32_t _base)
 	{
 		return toStringSigned(_dst, _max, _value, _base);
 	}
 
 	template<typename Ty>
-	int32_t toStringUnsigned(char* _dst, size_t _max, Ty _value, uint32_t _base)
+	int32_t toStringUnsigned(char* _dst, int32_t _max, Ty _value, uint32_t _base)
 	{
 		char data[32];
-		size_t len = 0;
+		int32_t len = 0;
 
 		if (_base > 16
 		||  _base < 2)
@@ -547,12 +547,12 @@ namespace bx
 		return int32_t(len);
 	}
 
-	int32_t toString(char* _dst, size_t _max, uint32_t _value, uint32_t _base)
+	int32_t toString(char* _dst, int32_t _max, uint32_t _value, uint32_t _base)
 	{
 		return toStringUnsigned(_dst, _max, _value, _base);
 	}
 
-	int32_t toString(char* _dst, size_t _max, uint64_t _value, uint32_t _base)
+	int32_t toString(char* _dst, int32_t _max, uint64_t _value, uint32_t _base)
 	{
 		return toStringUnsigned(_dst, _max, _value, _base);
 	}

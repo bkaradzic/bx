@@ -3,9 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/bx.h>
-#include <bx/readerwriter.h>
 #include <bx/debug.h>
+#include <bx/readerwriter.h>
 
 #if !BX_CRT_NONE
 #	include <string.h> // memcpy, memmove, memset

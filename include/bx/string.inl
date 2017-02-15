@@ -42,9 +42,9 @@ namespace bx
 	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
 	{
 		Ty str = _str;
-		size_t startPos = 0;
-		const size_t fromLen = strnlen(_from);
-		const size_t toLen   = strnlen(_to);
+		int32_t startPos = 0;
+		const int32_t fromLen = strnlen(_from);
+		const int32_t toLen   = strnlen(_to);
 		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
 		{
 			str.replace(startPos, fromLen, _to);
@@ -70,18 +70,18 @@ namespace bx
 		return *this;
 	}
 
-	inline StringView::StringView(const char* _ptr, uint32_t _len)
+	inline StringView::StringView(const char* _ptr, int32_t _len)
 	{
 		set(_ptr, _len);
 	}
 
-	inline void StringView::set(const char* _ptr, uint32_t _len)
+	inline void StringView::set(const char* _ptr, int32_t _len)
 	{
 		clear();
 
 		if (NULL != _ptr)
 		{
-			uint32_t len = uint32_t(strnlen(_ptr, _len) );
+			int32_t len = strnlen(_ptr, _len);
 			if (0 != len)
 			{
 				m_len = len;
@@ -111,7 +111,7 @@ namespace bx
 		return 0 == m_len;
 	}
 
-	inline uint32_t StringView::getLength() const
+	inline int32_t StringView::getLength() const
 	{
 		return m_len;
 	}
@@ -137,7 +137,7 @@ namespace bx
 	}
 
 	template<bx::AllocatorI** AllocatorT>
-	inline StringT<AllocatorT>::StringT(const char* _ptr, uint32_t _len)
+	inline StringT<AllocatorT>::StringT(const char* _ptr, int32_t _len)
 	{
 		set(_ptr, _len);
 	}
@@ -155,19 +155,19 @@ namespace bx
 	}
 
 	template<bx::AllocatorI** AllocatorT>
-	inline void StringT<AllocatorT>::set(const char* _ptr, uint32_t _len)
+	inline void StringT<AllocatorT>::set(const char* _ptr, int32_t _len)
 	{
 		clear();
 		append(_ptr, _len);
 	}
 
 	template<bx::AllocatorI** AllocatorT>
-	inline void StringT<AllocatorT>::append(const char* _ptr, uint32_t _len)
+	inline void StringT<AllocatorT>::append(const char* _ptr, int32_t _len)
 	{
 		if (0 != _len)
 		{
-			uint32_t old = m_len;
-			uint32_t len = m_len + uint32_t(strnlen(_ptr, _len) );
+			int32_t old = m_len;
+			int32_t len = m_len + strnlen(_ptr, _len);
 			char* ptr = (char*)BX_REALLOC(*AllocatorT, 0 != m_len ? const_cast<char*>(m_ptr) : NULL, len+1);
 			m_len = len;
 			strlncpy(ptr + old, len-old+1, _ptr, _len);
