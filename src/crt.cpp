@@ -550,28 +550,3 @@ namespace bx
 	}
 
 } // namespace bx
-
-#if BX_CRT_NONE
-extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
-{
-	bx::memCopy(_dst, _src, _numBytes);
-	return _dst;
-}
-
-extern "C" void* memmove(void* _dst, const void* _src, size_t _numBytes)
-{
-	bx::memMove(_dst, _src, _numBytes);
-	return _dst;
-}
-
-extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
-{
-	bx::memSet(_dst, uint8_t(_ch), _numBytes);
-	return _dst;
-}
-
-extern "C" int32_t memcmp(const void* _lhs, const void* _rhs, size_t _numBytes)
-{
-	return bx::memCmp(_lhs, _rhs, _numBytes);
-}
-#endif // BX_CRT_NONE
