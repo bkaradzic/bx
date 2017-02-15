@@ -420,7 +420,7 @@ namespace bx
 
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
-#if 1 // BX_CRT_NONE
+#if BX_CRT_NONE
 		return vsnprintfRef(_out, _max, _format, _argList);
 #elif BX_CRT_MSVC
 		int32_t len = -1;
