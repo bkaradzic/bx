@@ -428,7 +428,7 @@ namespace bx
 		{
 			va_list argListCopy;
 			va_copy(argListCopy, _argList);
-			len = ::vsnprintf_s(_out, _max, int32_t(-1), _format, argListCopy);
+			len = ::vsnprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
 		return -1 == len ? ::_vscprintf(_format, _argList) : len;
@@ -457,7 +457,7 @@ namespace bx
 		{
 			va_list argListCopy;
 			va_copy(argListCopy, _argList);
-			len = ::_vsnwprintf_s(_out, _max, int32_t(-1), _format, argListCopy);
+			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
 		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
