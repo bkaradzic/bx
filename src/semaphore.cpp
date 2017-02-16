@@ -3,7 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/sem.h>
+#include <bx/semaphore.h>
 
 #if BX_CONFIG_SUPPORTS_THREADING
 

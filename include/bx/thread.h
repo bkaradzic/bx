@@ -7,7 +7,7 @@
 #define BX_THREAD_H_HEADER_GUARD
 
 #include "bx.h"
-#include "sem.h"
+#include "semaphore.h"
 
 #if BX_CONFIG_SUPPORTS_THREADING
 

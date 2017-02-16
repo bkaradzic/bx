@@ -730,6 +730,31 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-mfpmath=sse",
 		}
+--[[
+		defines { "BX_CRT_NONE" }
+
+		buildoptions {
+			"-nostdlib",
+			"-nodefaultlibs",
+			"-nostartfiles",
+			"-Wa,--noexecstack",
+			"-ffreestanding",
+
+			"-mpreferred-stack-boundary=4",
+			"-mstackrealign",
+		}
+
+		linkoptions {
+			"-nostdlib",
+			"-nodefaultlibs",
+			"-nostartfiles",
+			"-Wa,--noexecstack",
+			"-ffreestanding",
+
+			"-mpreferred-stack-boundary=4",
+			"-mstackrealign",
+		}
+--]]
 
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
