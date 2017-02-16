@@ -12,28 +12,26 @@
 #include "semaphore.h"
 #include "uint32_t.h"
 
-#include <list>
-
 namespace bx
 {
 	// http://drdobbs.com/article/print?articleId=210604448&siteSectionName=
 	template <typename Ty>
-	class SpScUnboundedQueueLf
+	class SpScUnboundedQueue
 	{
-		BX_CLASS(SpScUnboundedQueueLf
+		BX_CLASS(SpScUnboundedQueue
 			, NO_COPY
 			, NO_ASSIGNMENT
 			);
 
 	public:
-		SpScUnboundedQueueLf()
+		SpScUnboundedQueue()
 			: m_first(new Node(NULL) )
 			, m_divider(m_first)
 			, m_last(m_first)
 		{
 		}
 
-		~SpScUnboundedQueueLf()
+		~SpScUnboundedQueue()
 		{
 			while (NULL != m_first)
 			{
@@ -95,67 +93,6 @@ namespace bx
 		Node* m_divider;
 		Node* m_last;
 	};
-
-#if BX_CONFIG_SUPPORTS_THREADING
-	template<typename Ty>
-	class SpScUnboundedQueueMutex
-	{
-		BX_CLASS(SpScUnboundedQueueMutex
-			, NO_COPY
-			, NO_ASSIGNMENT
-			);
-
-	public:
-		SpScUnboundedQueueMutex()
-		{
-		}
-
-		~SpScUnboundedQueueMutex()
-		{
-			BX_CHECK(m_queue.empty(), "Queue is not empty!");
-		}
-
-		void push(Ty* _item)
-		{
-			bx::LwMutexScope lock(m_mutex);
-			m_queue.push_back(_item);
-		}
-
-		Ty* peek()
-		{
-			bx::LwMutexScope lock(m_mutex);
-			if (!m_queue.empty() )
-			{
-				return m_queue.front();
-			}
-
-			return NULL;
-		}
-
-		Ty* pop()
-		{
-			bx::LwMutexScope lock(m_mutex);
-			if (!m_queue.empty() )
-			{
-				Ty* item = m_queue.front();
-				m_queue.pop_front();
-				return item;
-			}
-
-			return NULL;
-		}
-
-	private:
-		bx::LwMutex m_mutex;
-		std::list<Ty*> m_queue;
-	};
-#endif // BX_CONFIG_SUPPORTS_THREADING
-
-#if BX_CONFIG_SPSCQUEUE_USE_MUTEX && BX_CONFIG_SUPPORTS_THREADING
-#	define SpScUnboundedQueue SpScUnboundedQueueMutex
-#else
-#	define SpScUnboundedQueue SpScUnboundedQueueLf
-#endif // BX_CONFIG_SPSCQUEUE_USE_MUTEX
 
 #if BX_CONFIG_SUPPORTS_THREADING
 	template <typename Ty>
