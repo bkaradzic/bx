@@ -47,7 +47,7 @@ namespace bx
 		void setThreadName(const char* _name);
 
 	private:
-		friend class ThreadInternal;
+		friend struct ThreadInternal;
 		int32_t entry();
 
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
