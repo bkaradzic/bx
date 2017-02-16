@@ -10,21 +10,6 @@
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
-#if BX_PLATFORM_POSIX
-#	include <errno.h>
-#	include <semaphore.h>
-#	include <time.h>
-#	include <pthread.h>
-#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
-#	include <windows.h>
-#	include <limits.h>
-#	if BX_PLATFORM_XBOXONE
-#		include <synchapi.h>
-#	endif // BX_PLATFORM_XBOXONE
-#endif // BX_PLATFORM_
-
-#include "mutex.h"
-
 namespace bx
 {
 	///
@@ -49,17 +34,7 @@ namespace bx
 		bool wait(int32_t _msecs = -1);
 
 	private:
-#if BX_PLATFORM_POSIX
-#	if BX_CONFIG_SEMAPHORE_PTHREAD
-		pthread_mutex_t m_mutex;
-		pthread_cond_t m_cond;
-		int32_t m_count;
-#	else
-		sem_t m_handle;
-#	endif // BX_CONFIG_SEMAPHORE_PTHREAD
-#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
-		HANDLE m_handle;
-#endif // BX_PLATFORM_
+		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
 } // namespace bx

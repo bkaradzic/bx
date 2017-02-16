@@ -9,6 +9,7 @@
 #include "bx.h"
 #include "cpu.h"
 #include "mutex.h"
+#include "sem.h"
 #include "uint32_t.h"
 
 #include <list>

@@ -9,29 +9,56 @@
 
 #if BX_PLATFORM_POSIX
 #	include <errno.h>
+#	include <pthread.h>
 #	include <semaphore.h>
 #	include <time.h>
-#	include <pthread.h>
-#elif BX_PLATFORM_XBOXONE
-#	include <synchapi.h>
-#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOX360 \
+	|| BX_PLATFORM_XBOXONE
 #	include <windows.h>
 #	include <limits.h>
+#	if BX_PLATFORM_XBOXONE
+#		include <synchapi.h>
+#	endif // BX_PLATFORM_XBOXONE
 #endif // BX_PLATFORM_
 
 namespace bx
 {
+	struct SemaphoreInternal
+	{
+#if BX_PLATFORM_POSIX
+#	if BX_CONFIG_SEMAPHORE_PTHREAD
+		pthread_mutex_t m_mutex;
+		pthread_cond_t m_cond;
+		int32_t m_count;
+#	else
+		sem_t m_handle;
+#	endif // BX_CONFIG_SEMAPHORE_PTHREAD
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOX360 \
+	|| BX_PLATFORM_XBOXONE
+		HANDLE m_handle;
+#endif // BX_PLATFORM_
+	};
+
 #if BX_PLATFORM_POSIX
 
 #	if BX_CONFIG_SEMAPHORE_PTHREAD
 	Semaphore::Semaphore()
 		: m_count(0)
 	{
+		BX_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal) );
+
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 		int result;
-		result = pthread_mutex_init(&m_mutex, NULL);
+
+		result = pthread_mutex_init(&si->m_mutex, NULL);
 		BX_CHECK(0 == result, "pthread_mutex_init %d", result);
 
-		result = pthread_cond_init(&m_cond, NULL);
+		result = pthread_cond_init(&si->m_cond, NULL);
 		BX_CHECK(0 == result, "pthread_cond_init %d", result);
 
 		BX_UNUSED(result);
@@ -39,11 +66,13 @@ namespace bx
 
 	Semaphore::~Semaphore()
 	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 		int result;
-		result = pthread_cond_destroy(&m_cond);
+		result = pthread_cond_destroy(&si->m_cond);
 		BX_CHECK(0 == result, "pthread_cond_destroy %d", result);
 
-		result = pthread_mutex_destroy(&m_mutex);
+		result = pthread_mutex_destroy(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_destroy %d", result);
 
 		BX_UNUSED(result);
@@ -51,18 +80,20 @@ namespace bx
 
 	void Semaphore::post(uint32_t _count)
 	{
-		int result = pthread_mutex_lock(&m_mutex);
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		int result = pthread_mutex_lock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
 		for (uint32_t ii = 0; ii < _count; ++ii)
 		{
-			result = pthread_cond_signal(&m_cond);
+			result = pthread_cond_signal(&si->m_cond);
 			BX_CHECK(0 == result, "pthread_cond_signal %d", result);
 		}
 
 		m_count += _count;
 
-		result = pthread_mutex_unlock(&m_mutex);
+		result = pthread_mutex_unlock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
 
 		BX_UNUSED(result);
@@ -70,7 +101,9 @@ namespace bx
 
 	bool Semaphore::wait(int32_t _msecs)
 	{
-		int result = pthread_mutex_lock(&m_mutex);
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		int result = pthread_mutex_lock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
 #		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
@@ -79,7 +112,7 @@ namespace bx
 		while (0 == result
 		&&	 0 >= m_count)
 		{
-			result = pthread_cond_wait(&m_cond, &m_mutex);
+			result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
 		}
 #		elif BX_PLATFORM_IOS
 		if (-1 == _msecs)
@@ -87,7 +120,7 @@ namespace bx
 			while (0 == result
 			&&     0 >= m_count)
 			{
-				result = pthread_cond_wait(&m_cond, &m_mutex);
+				result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
 			}
 		}
 		else
@@ -99,7 +132,7 @@ namespace bx
 			while (0 == result
 			&&     0 >= m_count)
 			{
-				result = pthread_cond_timedwait_relative_np(&m_cond, &m_mutex, &ts);
+				result = pthread_cond_timedwait_relative_np(&si->m_cond, &si->m_mutex, &ts);
 			}
 		}
 #		else
@@ -111,7 +144,7 @@ namespace bx
 		while (0 == result
 		&&     0 >= m_count)
 		{
-			result = pthread_cond_timedwait(&m_cond, &m_mutex, &ts);
+			result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
 		}
 #		endif // BX_PLATFORM_NACL || BX_PLATFORM_OSX
 		bool ok = 0 == result;
@@ -121,7 +154,7 @@ namespace bx
 			--m_count;
 		}
 
-		result = pthread_mutex_unlock(&m_mutex);
+		result = pthread_mutex_unlock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
 
 		BX_UNUSED(result);
@@ -133,24 +166,32 @@ namespace bx
 
 	Semaphore::Semaphore()
 	{
-		int32_t result = sem_init(&m_handle, 0, 0);
+		BX_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal) );
+
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		int32_t result = sem_init(&si->m_handle, 0, 0);
 		BX_CHECK(0 == result, "sem_init failed. errno %d", errno);
 		BX_UNUSED(result);
 	}
 
 	Semaphore::~Semaphore()
 	{
-		int32_t result = sem_destroy(&m_handle);
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		int32_t result = sem_destroy(&si->m_handle);
 		BX_CHECK(0 == result, "sem_destroy failed. errno %d", errno);
 		BX_UNUSED(result);
 	}
 
 	void Semaphore::post(uint32_t _count)
 	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 		int32_t result;
 		for (uint32_t ii = 0; ii < _count; ++ii)
 		{
-			result = sem_post(&m_handle);
+			result = sem_post(&si->m_handle);
 			BX_CHECK(0 == result, "sem_post failed. errno %d", errno);
 		}
 		BX_UNUSED(result);
@@ -158,16 +199,18 @@ namespace bx
 
 	bool Semaphore::wait(int32_t _msecs)
 	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 #		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
 		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment."); BX_UNUSED(_msecs);
-		return 0 == sem_wait(&m_handle);
+		return 0 == sem_wait(&si->m_handle);
 #		else
 		if (0 > _msecs)
 		{
 			int32_t result;
 			do
 			{
-				result = sem_wait(&m_handle);
+				result = sem_wait(&si->m_handle);
 			} // keep waiting when interrupted by a signal handler...
 			while (-1 == result && EINTR == errno);
 			BX_CHECK(0 == result, "sem_wait failed. errno %d", errno);
@@ -178,40 +221,51 @@ namespace bx
 		clock_gettime(CLOCK_REALTIME, &ts);
 		ts.tv_sec += _msecs/1000;
 		ts.tv_nsec += (_msecs%1000)*1000;
-		return 0 == sem_timedwait(&m_handle, &ts);
+		return 0 == sem_timedwait(&si->m_handle, &ts);
 #		endif // BX_PLATFORM_
 	}
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
-#elif BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOX360 \
+	|| BX_PLATFORM_XBOXONE
 
 	Semaphore::Semaphore()
 	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 #if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
-		m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
+		si->m_handle = CreateSemaphoreExW(NULL, 0, LONG_MAX, NULL, 0, SEMAPHORE_ALL_ACCESS);
 #else
-		m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
+		si->m_handle = CreateSemaphoreA(NULL, 0, LONG_MAX, NULL);
 #endif
-		BX_CHECK(NULL != m_handle, "Failed to create Semaphore!");
+		BX_CHECK(NULL != si->m_handle, "Failed to create Semaphore!");
 	}
 
 	Semaphore::~Semaphore()
 	{
-		CloseHandle(m_handle);
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		CloseHandle(si->m_handle);
 	}
 
 	void Semaphore::post(uint32_t _count)
 	{
-		ReleaseSemaphore(m_handle, _count, NULL);
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		ReleaseSemaphore(si->m_handle, _count, NULL);
 	}
 
 	bool Semaphore::wait(int32_t _msecs)
 	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
 		DWORD milliseconds = (0 > _msecs) ? INFINITE : _msecs;
 #if BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
-		return WAIT_OBJECT_0 == WaitForSingleObjectEx(m_handle, milliseconds, FALSE);
+		return WAIT_OBJECT_0 == WaitForSingleObjectEx(si->m_handle, milliseconds, FALSE);
 #else
-		return WAIT_OBJECT_0 == WaitForSingleObject(m_handle, milliseconds);
+		return WAIT_OBJECT_0 == WaitForSingleObject(si->m_handle, milliseconds);
 #endif
 	}
 #endif // BX_PLATFORM_
