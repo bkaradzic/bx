@@ -47,11 +47,11 @@ namespace bx
 
 #	if BX_CONFIG_SEMAPHORE_PTHREAD
 	Semaphore::Semaphore()
-		: m_count(0)
 	{
 		BX_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal) );
 
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+		si->m_count = 0;
 
 		int result;
 
@@ -91,7 +91,7 @@ namespace bx
 			BX_CHECK(0 == result, "pthread_cond_signal %d", result);
 		}
 
-		m_count += _count;
+		si->m_count += _count;
 
 		result = pthread_mutex_unlock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_unlock %d", result);
@@ -110,7 +110,7 @@ namespace bx
 		BX_UNUSED(_msecs);
 		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
 		while (0 == result
-		&&	 0 >= m_count)
+		&&     0 >= si->m_count)
 		{
 			result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
 		}
@@ -118,7 +118,7 @@ namespace bx
 		if (-1 == _msecs)
 		{
 			while (0 == result
-			&&     0 >= m_count)
+			&&     0 >= si->m_count)
 			{
 				result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
 			}
@@ -130,7 +130,7 @@ namespace bx
 			ts.tv_nsec = (_msecs%1000)*1000;
 
 			while (0 == result
-			&&     0 >= m_count)
+			&&     0 >= si->m_count)
 			{
 				result = pthread_cond_timedwait_relative_np(&si->m_cond, &si->m_mutex, &ts);
 			}
@@ -142,7 +142,7 @@ namespace bx
 		ts.tv_nsec += (_msecs%1000)*1000;
 
 		while (0 == result
-		&&     0 >= m_count)
+		&&     0 >= si->m_count)
 		{
 			result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
 		}
@@ -151,7 +151,7 @@ namespace bx
 
 		if (ok)
 		{
-			--m_count;
+			--si->m_count;
 		}
 
 		result = pthread_mutex_unlock(&si->m_mutex);
