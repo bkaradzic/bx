@@ -44,7 +44,7 @@ namespace bx
 		}
 
 	private:
-		LwMutex m_write;
+		Mutex m_write;
 		SpScUnboundedQueue<Ty> m_queue;
 	};
 
