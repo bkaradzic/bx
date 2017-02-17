@@ -57,28 +57,6 @@ namespace bx
 		Mutex& m_mutex;
 	};
 
-	typedef Mutex LwMutex;
-
-	///
-	class LwMutexScope
-	{
-		BX_CLASS(LwMutexScope
-			, NO_DEFAULT_CTOR
-			, NO_COPY
-			, NO_ASSIGNMENT
-			);
-
-	public:
-		///
-		LwMutexScope(LwMutex& _mutex);
-
-		///
-		~LwMutexScope();
-
-	private:
-		LwMutex& m_mutex;
-	};
-
 } // namespace bx
 
 #include "mutex.inl"

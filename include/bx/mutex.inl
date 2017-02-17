@@ -20,15 +20,4 @@ namespace bx
 		m_mutex.unlock();
 	}
 
-	inline LwMutexScope::LwMutexScope(LwMutex& _mutex)
-		: m_mutex(_mutex)
-	{
-		m_mutex.lock();
-	}
-
-	inline LwMutexScope::~LwMutexScope()
-	{
-		m_mutex.unlock();
-	}
-
 } // namespace bx
