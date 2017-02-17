@@ -64,6 +64,6 @@ namespace bx
 
 } // namespace bx
 
-#include "hash.inl"
+#include "inline/hash.inl"
 
 #endif // BX_HASH_H_HEADER_GUARD

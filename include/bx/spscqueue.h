@@ -143,6 +143,6 @@ namespace bx
 
 } // namespace bx
 
-#include "spscqueue.inl"
+#include "inline/spscqueue.inl"
 
 #endif // BX_SPSCQUEUE_H_HEADER_GUARD

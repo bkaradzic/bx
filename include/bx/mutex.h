@@ -59,7 +59,7 @@ namespace bx
 
 } // namespace bx
 
-#include "mutex.inl"
+#include "inline/mutex.inl"
 
 #endif // BX_CONFIG_SUPPORTS_THREADING
 

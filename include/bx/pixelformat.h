@@ -238,6 +238,6 @@ namespace bx
 
 } // namespace bx
 
-#include "pixelformat.inl"
+#include "inline/pixelformat.inl"
 
 #endif // BX_PIXEL_FORMAT_H_HEADER_GUARD

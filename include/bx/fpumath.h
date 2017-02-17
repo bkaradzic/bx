@@ -471,6 +471,6 @@ namespace bx
 
 } // namespace bx
 
-#include "fpumath.inl"
+#include "inline/fpumath.inl"
 
 #endif // BX_FPU_MATH_H_HEADER_GUARD

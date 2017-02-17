@@ -67,6 +67,6 @@ namespace bx
 
 } // namespace bx
 
-#include "bx.inl"
+#include "inline/bx.inl"
 
 #endif // BX_H_HEADER_GUARD

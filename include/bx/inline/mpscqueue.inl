@@ -7,8 +7,6 @@
 #	error "Must be included from bx/mpscqueue.h!"
 #endif // BX_MPSCQUEUE_H_HEADER_GUARD
 
-#include "spscqueue.h"
-
 namespace bx
 {
 	template <typename Ty>

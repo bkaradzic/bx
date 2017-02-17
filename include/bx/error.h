@@ -94,6 +94,6 @@ namespace bx
 
 } // namespace bx
 
-#include "error.inl"
+#include "inline/error.inl"
 
 #endif // BX_ERROR_H_HEADER_GUARD

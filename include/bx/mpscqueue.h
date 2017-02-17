@@ -70,6 +70,6 @@ namespace bx
 
 } // namespace bx
 
-#include "mpscqueue.inl"
+#include "inline/mpscqueue.inl"
 
 #endif // BX_MPSCQUEUE_H_HEADER_GUARD

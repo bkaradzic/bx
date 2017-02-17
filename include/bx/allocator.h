@@ -132,6 +132,6 @@ namespace bx
 
 } // namespace bx
 
-#include "allocator.inl"
+#include "inline/allocator.inl"
 
 #endif // BX_ALLOCATOR_H_HEADER_GUARD

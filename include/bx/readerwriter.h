@@ -298,6 +298,6 @@ namespace bx
 
 } // namespace bx
 
-#include "readerwriter.inl"
+#include "inline/readerwriter.inl"
 
 #endif // BX_READERWRITER_H_HEADER_GUARD

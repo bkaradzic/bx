@@ -245,6 +245,6 @@ namespace bx
 
 } // namespace bx
 
-#include "string.inl"
+#include "inline/string.inl"
 
 #endif // BX_STRING_H_HEADER_GUARD

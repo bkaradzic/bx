@@ -57,6 +57,6 @@ namespace bx
 
 } // namespace bx
 
-#include "sort.inl"
+#include "inline/sort.inl"
 
 #endif // BX_SORT_H_HEADER_GUARD
