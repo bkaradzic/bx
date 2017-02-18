@@ -6,6 +6,36 @@
 local bxDir = path.getabsolute("..")
 local naclToolchain = ""
 
+local function crtNone()
+
+	if _OPTIONS["with-crtnone"] then
+		defines { "BX_CRT_NONE" }
+
+		buildoptions {
+			"-nostdlib",
+			"-nodefaultlibs",
+			"-nostartfiles",
+			"-Wa,--noexecstack",
+			"-ffreestanding",
+
+			"-mpreferred-stack-boundary=4",
+			"-mstackrealign",
+		}
+
+		linkoptions {
+			"-nostdlib",
+			"-nodefaultlibs",
+			"-nostartfiles",
+			"-Wa,--noexecstack",
+			"-ffreestanding",
+
+			"-mpreferred-stack-boundary=4",
+			"-mstackrealign",
+		}
+	end
+
+end
+
 function toolchain(_buildDir, _libDir)
 
 	newoption {
@@ -711,6 +741,9 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m64" }
 
+	configuration { "linux-*" }
+		crtNone()
+
 	configuration { "linux-clang" }
 
 	configuration { "linux-gcc-6" }
@@ -730,31 +763,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-mfpmath=sse",
 		}
---[[
-		defines { "BX_CRT_NONE" }
-
-		buildoptions {
-			"-nostdlib",
-			"-nodefaultlibs",
-			"-nostartfiles",
-			"-Wa,--noexecstack",
-			"-ffreestanding",
-
-			"-mpreferred-stack-boundary=4",
-			"-mstackrealign",
-		}
-
-		linkoptions {
-			"-nostdlib",
-			"-nodefaultlibs",
-			"-nostartfiles",
-			"-Wa,--noexecstack",
-			"-ffreestanding",
-
-			"-mpreferred-stack-boundary=4",
-			"-mstackrealign",
-		}
---]]
 
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {

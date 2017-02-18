@@ -6,7 +6,7 @@
 #include "test.h"
 #include <bx/simd_t.h>
 #include <bx/fpumath.h>
-#include <string.h>
+#include <bx/string.h>
 
 #if 0
 #	define SIMD_DBG DBG
@@ -206,7 +206,7 @@ void simd_check_string(const char* _str, bx::simd128_t _a)
 
 	SIMD_DBG("%s %s", _str, test);
 
-	CHECK(0 == strcmp(_str, test) );
+	CHECK(0 == bx::strncmp(_str, test) );
 }
 
 TEST_CASE("simd_swizzle", "")

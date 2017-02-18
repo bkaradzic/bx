@@ -8,6 +8,11 @@ newoption {
 	description = "Enable amalgamated build.",
 }
 
+newoption {
+	trigger = "with-crtnone",
+	description = "Enable build without CRT.",
+}
+
 solution "bx"
 	configurations {
 		"Debug",

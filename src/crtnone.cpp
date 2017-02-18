@@ -9,6 +9,9 @@
 
 #if BX_CRT_NONE
 
+typedef int64_t off64_t;
+typedef int32_t pid_t;
+
 extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
 {
 	bx::memCopy(_dst, _src, _numBytes);
@@ -80,7 +83,7 @@ extern "C" const char* strstr(const char* _str, const char* _find)
 	return bx::strnstr(_str, _find);
 }
 
-extern "C" void qsort(void* _base, size_t _num, size_t _size, ComparisonFn _fn)
+extern "C" void qsort(void* _base, size_t _num, size_t _size, bx::ComparisonFn _fn)
 {
 	BX_CHECK(_num <= UINT32_MAX && _size <= UINT32_MAX, "");
 	return bx::quickSort(_base, _num, _size, _fn);
