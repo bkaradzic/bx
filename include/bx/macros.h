@@ -225,6 +225,6 @@
 #endif // BX_CHECK
 
 // static_assert sometimes causes unused-local-typedef...
-BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wunused-local-typedef")
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")
 
 #endif // BX_MACROS_H_HEADER_GUARD
