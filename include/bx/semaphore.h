@@ -34,7 +34,7 @@ namespace bx
 		bool wait(int32_t _msecs = -1);
 
 	private:
-		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
+		BX_ALIGN_DECL(16, uint8_t) m_internal[128];
 	};
 
 } // namespace bx

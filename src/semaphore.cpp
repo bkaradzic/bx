@@ -146,7 +146,7 @@ namespace bx
 		{
 			result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
 		}
-#		endif // BX_PLATFORM_NACL || BX_PLATFORM_OSX
+#		endif // BX_PLATFORM_
 		bool ok = 0 == result;
 
 		if (ok)

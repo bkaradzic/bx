@@ -150,7 +150,7 @@ namespace bx
 	template<typename Ty>
 	inline Ty* SpScBlockingUnboundedQueueT<Ty>::pop(int32_t _msecs)
 	{
-		return (Ty*)m_queue.pop();
+		return (Ty*)m_queue.pop(_msecs);
 	}
 
 #endif // BX_CONFIG_SUPPORTS_THREADING

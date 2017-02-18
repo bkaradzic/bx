@@ -101,8 +101,7 @@
 #	error "Unknown BX_COMPILER_?"
 #endif
 
-// #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
-#define BX_STATIC_ASSERT(_condition, ...) typedef char BX_CONCATENATE(BX_STATIC_ASSERT_, __LINE__)[1][(_condition)] BX_ATTRIBUTE(unused)
+#define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
 
 ///
 #define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
