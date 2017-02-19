@@ -8,8 +8,6 @@
 
 #include "bx.h"
 
-#if BX_CONFIG_SUPPORTS_THREADING
-
 namespace bx
 {
 	///
@@ -60,7 +58,5 @@ namespace bx
 } // namespace bx
 
 #include "inline/mutex.inl"
-
-#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_MUTEX_H_HEADER_GUARD

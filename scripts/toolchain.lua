@@ -8,32 +8,39 @@ local naclToolchain = ""
 
 local function crtNone()
 
-	if _OPTIONS["with-crtnone"] then
-		defines { "BX_CRT_NONE" }
+	defines {
+		"BX_CRT_NONE=1",
+	}
+
+	buildoptions {
+		"-nostdlib",
+		"-nodefaultlibs",
+		"-nostartfiles",
+		"-Wa,--noexecstack",
+		"-ffreestanding",
+	}
+
+	linkoptions {
+		"-nostdlib",
+		"-nodefaultlibs",
+		"-nostartfiles",
+		"-Wa,--noexecstack",
+		"-ffreestanding",
+	}
+
+	configuration { "linux-*" }
 
 		buildoptions {
-			"-nostdlib",
-			"-nodefaultlibs",
-			"-nostartfiles",
-			"-Wa,--noexecstack",
-			"-ffreestanding",
-
 			"-mpreferred-stack-boundary=4",
 			"-mstackrealign",
 		}
 
 		linkoptions {
-			"-nostdlib",
-			"-nodefaultlibs",
-			"-nostartfiles",
-			"-Wa,--noexecstack",
-			"-ffreestanding",
-
 			"-mpreferred-stack-boundary=4",
 			"-mstackrealign",
 		}
-	end
 
+	configuration {}
 end
 
 function toolchain(_buildDir, _libDir)
@@ -546,6 +553,10 @@ function toolchain(_buildDir, _libDir)
 		flags { "EnableAVX" }
 	end
 
+	if _OPTIONS["with-crtnone"] then
+		crtNone()
+	end
+
 	flags {
 		"NoPCH",
 		"NativeWChar",
@@ -740,9 +751,6 @@ function toolchain(_buildDir, _libDir)
 			path.join(_libDir, "lib/win64_mingw-clang"),
 		}
 		buildoptions { "-m64" }
-
-	configuration { "linux-*" }
-		crtNone()
 
 	configuration { "linux-clang" }
 

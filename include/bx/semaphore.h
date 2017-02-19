@@ -8,8 +8,6 @@
 
 #include "bx.h"
 
-#if BX_CONFIG_SUPPORTS_THREADING
-
 namespace bx
 {
 	///
@@ -38,7 +36,5 @@ namespace bx
 	};
 
 } // namespace bx
-
-#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_SEM_H_HEADER_GUARD

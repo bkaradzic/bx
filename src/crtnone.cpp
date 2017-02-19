@@ -9,9 +9,6 @@
 
 #if BX_CRT_NONE
 
-typedef int64_t off64_t;
-typedef int32_t pid_t;
-
 extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
 {
 	bx::memCopy(_dst, _src, _numBytes);
@@ -29,6 +26,11 @@ extern "C" void* memset(void* _dst, int _ch, size_t _numBytes)
 	bx::memSet(_dst, uint8_t(_ch), _numBytes);
 	return _dst;
 }
+
+#if !BX_PLATFORM_NONE
+
+typedef int64_t off64_t;
+typedef int32_t pid_t;
 
 extern "C" int32_t memcmp(const void* _lhs, const void* _rhs, size_t _numBytes)
 {
@@ -488,6 +490,8 @@ extern "C" void free(void* _ptr)
 {
 	BX_UNUSED(_ptr);
 }
+
+#endif // BX_PLATFORM_*
 
 extern "C" void abort()
 {

@@ -268,9 +268,24 @@
 		|| BX_PLATFORM_RPI        \
 		)
 
-#ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
-#	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
-#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
+#define BX_PLATFORM_NONE !(0      \
+		|| BX_PLATFORM_ANDROID    \
+		|| BX_PLATFORM_EMSCRIPTEN \
+		|| BX_PLATFORM_BSD        \
+		|| BX_PLATFORM_HURD       \
+		|| BX_PLATFORM_IOS        \
+		|| BX_PLATFORM_LINUX      \
+		|| BX_PLATFORM_NACL       \
+		|| BX_PLATFORM_OSX        \
+		|| BX_PLATFORM_PS4        \
+		|| BX_PLATFORM_QNX        \
+		|| BX_PLATFORM_RPI        \
+		|| BX_PLATFORM_STEAMLINK  \
+		|| BX_PLATFORM_WINDOWS    \
+		|| BX_PLATFORM_WINRT      \
+		|| BX_PLATFORM_XBOX360    \
+		|| BX_PLATFORM_XBOXONE    \
+		)
 
 #if BX_COMPILER_GCC
 #	define BX_COMPILER_NAME "GCC " \
@@ -337,8 +352,10 @@
 #	define BX_PLATFORM_NAME "Xbox 360"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
-#else
+#elif BX_PLATFORM_NONE
 #	define BX_PLATFORM_NAME "None"
+#else
+#	error "Unknown BX_PLATFORM!"
 #endif // BX_PLATFORM_
 
 #if BX_CPU_ARM
@@ -363,12 +380,16 @@
 #	define BX_CRT_NAME "MSVC C Runtime"
 #elif BX_CRT_MINGW
 #	define BX_CRT_NAME "MinGW C Runtime"
+#elif BX_CRT_LIBCXX
+#	define BX_CRT_NAME "Clang C Library"
 #elif BX_CRT_NEWLIB
 #	define BX_CRT_NAME "Newlib"
 #elif BX_CRT_MUSL
 #	define BX_CRT_NAME "musl libc"
-#else
+#elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
+#else
+#	error "Unknown BX_CRT!"
 #endif // BX_CRT_
 
 #if BX_ARCH_32BIT
@@ -376,6 +397,10 @@
 #elif BX_ARCH_64BIT
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
+
+#ifndef  BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
+#	define BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS 0
+#endif // BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS
 
 #if BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS && BX_COMPILER_MSVC
 #	pragma warning(error:4062) // ENABLE warning C4062: enumerator'...' in switch of enum '...' is not handled

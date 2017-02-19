@@ -23,6 +23,13 @@
 #	endif // BX_PLATFORM_XBOXONE
 #endif // BX_PLATFORM_
 
+#ifndef BX_CONFIG_SEMAPHORE_PTHREAD
+#	define BX_CONFIG_SEMAPHORE_PTHREAD (0 \
+			|| BX_PLATFORM_OSX            \
+			|| BX_PLATFORM_IOS            \
+			)
+#endif // BX_CONFIG_SEMAPHORE_PTHREAD
+
 namespace bx
 {
 	struct SemaphoreInternal

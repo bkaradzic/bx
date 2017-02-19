@@ -9,8 +9,6 @@
 #include "bx.h"
 #include "semaphore.h"
 
-#if BX_CONFIG_SUPPORTS_THREADING
-
 namespace bx
 {
 	///
@@ -81,7 +79,5 @@ namespace bx
 	};
 
 } // namespace bx
-
-#endif // BX_CONFIG_SUPPORTS_THREADING
 
 #endif // BX_THREAD_H_HEADER_GUARD

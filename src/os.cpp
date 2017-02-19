@@ -7,6 +7,8 @@
 #include <bx/uint32_t.h>
 #include <bx/string.h>
 
+#if !BX_PLATFORM_NONE
+
 #include <stdio.h>
 #include <sys/stat.h>
 
@@ -453,3 +455,5 @@ namespace bx
 	}
 
 } // namespace bx
+
+#endif // !BX_PLATFORM_NONE
