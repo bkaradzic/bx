@@ -42,9 +42,9 @@ namespace bx
 	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
 	{
 		Ty str = _str;
-		int32_t startPos = 0;
-		const int32_t fromLen = strnlen(_from);
-		const int32_t toLen   = strnlen(_to);
+		typename Ty::size_type startPos = 0;
+		const typename Ty::size_type fromLen = strnlen(_from);
+		const typename Ty::size_type toLen   = strnlen(_to);
 		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
 		{
 			str.replace(startPos, fromLen, _to);
