@@ -581,9 +581,12 @@ namespace bx
 		while (_err->isOk() )
 		{
 			char ch = '\0';
-			read(&reader, ch, _err);
 
-			if (!_err->isOk() )
+			Error err;
+			read(&reader, ch, &err);
+
+			if (!_err->isOk()
+			||  !err.isOk() )
 			{
 				break;
 			}
