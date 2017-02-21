@@ -9,7 +9,8 @@
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_NACL    \
 	|| BX_PLATFORM_IOS     \
-	|| BX_PLATFORM_OSX
+	|| BX_PLATFORM_OSX     \
+	|| BX_PLATFORM_PS4
 #	include <pthread.h>
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>

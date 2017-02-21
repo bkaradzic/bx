@@ -143,7 +143,7 @@ namespace bx
 
 		const char* ptr = _str;
 		for (; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
-		return ptr - _str;
+		return int32_t(ptr - _str);
 	}
 
 	int32_t strlncpy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
