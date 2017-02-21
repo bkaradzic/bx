@@ -6,10 +6,9 @@
 #ifndef BX_STRING_H_HEADER_GUARD
 #define BX_STRING_H_HEADER_GUARD
 
-#include "bx.h"
-#include <wchar.h>  // wchar_t
-
 #include "allocator.h"
+
+#include <wchar.h> // wchar_t
 
 namespace bx
 {
@@ -179,7 +178,7 @@ namespace bx
 	// Finds identifier.
 	const char* findIdentifierMatch(const char* _str, const char* _word);
 
-	// Finds any identifier from NULL terminated array of identifiers.
+	/// Finds any identifier from NULL terminated array of identifiers.
 	const char* findIdentifierMatch(const char* _str, const char* _words[]);
 
 	/// Cross platform implementation of vsnprintf that returns number of

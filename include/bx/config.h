@@ -6,7 +6,7 @@
 #ifndef BX_CONFIG_H_HEADER_GUARD
 #define BX_CONFIG_H_HEADER_GUARD
 
-#include "platform.h"
+#include "bx.h"
 
 #ifndef BX_CONFIG_ALLOCATOR_DEBUG
 #	define BX_CONFIG_ALLOCATOR_DEBUG 0

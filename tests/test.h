@@ -7,6 +7,7 @@
 #define __TEST_H__
 
 #include <bx/bx.h>
+
 #include <catch/catch.hpp>
 #define TEST(_x) TEST_CASE(#_x, "")
 #define CHECK_EQUAL(_x, _y) REQUIRE(_x == _y)

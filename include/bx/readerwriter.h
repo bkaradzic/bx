@@ -6,7 +6,6 @@
 #ifndef BX_READERWRITER_H_HEADER_GUARD
 #define BX_READERWRITER_H_HEADER_GUARD
 
-#include "bx.h"
 #include "allocator.h"
 #include "error.h"
 #include "uint32_t.h"

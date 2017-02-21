@@ -6,7 +6,6 @@
 #ifndef BX_ERROR_H_HEADER_GUARD
 #define BX_ERROR_H_HEADER_GUARD
 
-#include "bx.h"
 #include "string.h"
 
 #define BX_ERROR_SET(_ptr, _result, _msg) \
