@@ -60,7 +60,7 @@ project "bx.test"
 
 	files {
 		path.join(BX_DIR, "tests/*_test.cpp"),
-		path.join(BX_DIR, "tests/*_test.H"),
+		path.join(BX_DIR, "tests/*.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
 	}
 
