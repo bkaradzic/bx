@@ -167,7 +167,7 @@ namespace bx
 		GetExitCodeThread(ti->m_handle, (DWORD*)&m_exitCode);
 		CloseHandle(ti->m_handle);
 		ti->m_handle = INVALID_HANDLE_VALUE;
-#elif BX_PLATFORM_WINRT
+#elif BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		WaitForSingleObjectEx(ti->m_handle, INFINITE, FALSE);
 		CloseHandle(ti->m_handle);
 		ti->m_handle = INVALID_HANDLE_VALUE;
