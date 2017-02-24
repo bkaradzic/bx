@@ -58,8 +58,13 @@ TEST_CASE("vsnprintf f", "")
 	REQUIRE(test("     nan", "%8f",   std::numeric_limits<double>::quiet_NaN() ) );
 
 #if !BX_CRT_MSVC
-	// BK - VS2015 CRT vsnprintf returns '-NAN(IND' for some reason?
+	// BK - VS2015 CRT vsnprintf returns '-NAN(IND'.
+#	if BX_CRT_LIBCXX
+	// BK - Clang LibC vsnprintf returns 'NAN     '.
+	REQUIRE(test("NAN     ", "%-8F", -std::numeric_limits<double>::quiet_NaN() ) );
+#	else
 	REQUIRE(test("-NAN    ", "%-8F", -std::numeric_limits<double>::quiet_NaN() ) );
+#	endif // BX_CRT_LIBCXX
 #endif // !BX_CRT_MSVC
 
 	REQUIRE(test("     inf", "%8f",   std::numeric_limits<double>::infinity() ) );
