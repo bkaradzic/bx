@@ -43,24 +43,8 @@ void simd_rsqrt_bench(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVer
 	}
 }
 
-void simd_bench()
+void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVertices)
 {
-	bx::CrtAllocator allocator;
-	bx::RngMwc rng;
-
-	const uint32_t numVertices = 1024*1024;
-
-	uint8_t* data = (uint8_t*)BX_ALIGNED_ALLOC(&allocator, 2*numVertices*sizeof(bx::simd128_t), 16);
-	bx::simd128_t* src = (bx::simd128_t*)data;
-	bx::simd128_t* dst = &src[numVertices];
-
-	for (uint32_t ii = 0; ii < numVertices; ++ii)
-	{
-		float* ptr = (float*)&src[ii];
-		randUnitSphere(ptr, &rng);
-		ptr[3] = 1.0f;
-	}
-
 	const uint32_t numIterations = 10;
 
 	{
@@ -69,7 +53,7 @@ void simd_bench()
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_est>(dst, src, numVertices);
+			simd_rsqrt_bench<bx::simd_rsqrt_est>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
 		printf("    simd_rsqrt_est: %15f\n", double(elapsed) );
@@ -81,7 +65,7 @@ void simd_bench()
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_nr>(dst, src, numVertices);
+			simd_rsqrt_bench<bx::simd_rsqrt_nr>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
 		printf("     simd_rsqrt_nr: %15f\n", double(elapsed) );
@@ -93,7 +77,7 @@ void simd_bench()
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_carmack>(dst, src, numVertices);
+			simd_rsqrt_bench<bx::simd_rsqrt_carmack>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
 		printf("simd_rsqrt_carmack: %15f\n", double(elapsed) );
@@ -105,11 +89,45 @@ void simd_bench()
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt>(dst, src, numVertices);
+			simd_rsqrt_bench<bx::simd_rsqrt>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
 		printf("        simd_rsqrt: %15f\n", double(elapsed) );
 	}
+}
+
+void simd_bench()
+{
+	bx::CrtAllocator allocator;
+	bx::RngMwc rng;
+
+	const uint32_t numVertices = 1024*1024;
+
+	uint8_t* data = (uint8_t*)BX_ALIGNED_ALLOC(&allocator, 2*numVertices*sizeof(bx::simd128_t), 16);
+	bx::simd128_t* src = (bx::simd128_t*)data;
+	bx::simd128_t* dst = &src[numVertices];
+
+	printf("\n -- positive & negative --\n");
+	for (uint32_t ii = 0; ii < numVertices; ++ii)
+	{
+		float* ptr = (float*)&src[ii];
+		randUnitSphere(ptr, &rng);
+		ptr[3] = 1.0f;
+	}
+
+	simd_bench_pass(dst, src, numVertices);
+
+	printf("\n -- positive only --\n");
+	for (uint32_t ii = 0; ii < numVertices; ++ii)
+	{
+		float* ptr = (float*)&src[ii];
+		ptr[0] = bx::fabsolute(ptr[0]);
+		ptr[1] = bx::fabsolute(ptr[1]);
+		ptr[2] = bx::fabsolute(ptr[2]);
+		ptr[3] = bx::fabsolute(ptr[3]);
+	}
+
+	simd_bench_pass(dst, src, numVertices);
 
 	BX_ALIGNED_FREE(&allocator, data, 16);
 }
