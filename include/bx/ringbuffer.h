@@ -34,7 +34,7 @@ namespace bx
 		uint32_t consume(uint32_t _size); // consumer only
 
 		///
-		uint32_t reserve(uint32_t _size); // producer only
+		uint32_t reserve(uint32_t _size, bool _mustSucceed = false); // producer only
 
 		///
 		uint32_t commit(uint32_t _size); // producer only
