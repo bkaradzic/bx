@@ -189,16 +189,16 @@ function toolchain(_buildDir, _libDir)
 		compiler32bit = true
 	end
 
+	flags {
+		"ExtraWarnings",
+	}
+
 	if _ACTION == "gmake" or _ACTION == "ninja" then
 
 		if nil == _OPTIONS["gcc"] then
 			print("GCC flavor must be specified!")
 			os.exit(1)
 		end
-
-		flags {
-			"ExtraWarnings",
-		}
 
 		if "android-arm" == _OPTIONS["gcc"] then
 
