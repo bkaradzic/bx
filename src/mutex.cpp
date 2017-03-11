@@ -12,7 +12,8 @@
 	|| BX_PLATFORM_NACL    \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
-	|| BX_PLATFORM_PS4
+	|| BX_PLATFORM_PS4     \
+	|| BX_PLATFORM_RPI
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
