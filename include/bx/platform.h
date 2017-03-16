@@ -34,7 +34,9 @@
 #define BX_CRT_LIBCXX 0
 #define BX_CRT_MINGW  0
 #define BX_CRT_MSVC   0
-#define BX_CRT_MUSL   0
+#ifndef BX_CRT_MUSL
+#	define BX_CRT_MUSL   0
+#endif
 #define BX_CRT_NEWLIB 0
 
 #ifndef BX_CRT_NONE
