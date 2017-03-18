@@ -743,7 +743,9 @@ namespace bx
 						};
 						break;
 
+					case 'e':
 					case 'f':
+					case 'g':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
