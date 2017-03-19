@@ -214,6 +214,7 @@ function toolchain(_buildDir, _libDir)
 			if os.is("macosx") then
 				if os.is64bit() then
 					premake.gcc.ar = "$(ANDROID_NDK_ROOT)/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64/bin/arm-linux-androideabi-ar"
+				end
 			end
 
 			premake.gcc.llvm = true
