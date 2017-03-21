@@ -31,10 +31,6 @@ BX_DIR = path.getabsolute("..")
 local BX_BUILD_DIR = path.join(BX_DIR, ".build")
 local BX_THIRD_PARTY_DIR = path.join(BX_DIR, "3rdparty")
 
-defines {
-	"BX_CONFIG_ENABLE_MSVC_LEVEL4_WARNINGS=1"
-}
-
 dofile "toolchain.lua"
 toolchain(BX_BUILD_DIR, BX_THIRD_PARTY_DIR)
 
