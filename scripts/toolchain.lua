@@ -1444,5 +1444,11 @@ function strip()
 --				.. "--preload-file ../../../examples/runtime@/"
 		}
 
+	configuration { "riscv" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(FREEDOM_E_SDK)/toolchain/bin/riscv32-unknown-elf-strip -s \"$(TARGET)\""
+		}
+
 	configuration {} -- reset configuration
 end
