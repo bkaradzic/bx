@@ -697,6 +697,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		buildoptions_cpp {
 			"-std=c++11",
@@ -779,6 +780,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		buildoptions_cpp {
 			"-std=c++11",
@@ -1044,6 +1046,7 @@ function toolchain(_buildDir, _libDir)
 			"-ffunction-sections",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		buildoptions_cpp {
 			"-std=c++11",
@@ -1168,6 +1171,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
@@ -1182,6 +1186,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
@@ -1338,6 +1343,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
+			"-g",
 		}
 		buildoptions_cpp {
 			"-std=c++11",
