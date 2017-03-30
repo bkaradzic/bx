@@ -1022,7 +1022,6 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
 			"-i\"system$(EMSCRIPTEN)/system/include\"",
-			"-i\"system$(EMSCRIPTEN)/system/include/libc\"",
 			"-Wunused-value",
 			"-Wundef",
 		}
