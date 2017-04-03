@@ -8,6 +8,7 @@
 
 #include "allocator.h"
 #include "error.h"
+#include "endian.h"
 #include "uint32_t.h"
 
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
