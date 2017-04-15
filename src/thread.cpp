@@ -11,8 +11,9 @@
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI
+	|| BX_PLATFORM_RPI	
 #	include <pthread.h>
+#   include <bx/string.h>
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>
 #	endif
@@ -154,7 +155,8 @@ namespace bx
 		}
 
 #   if BX_PLATFORM_IOS || BX_PLATFORM_OSX
-        bx::strlcpy(ti->m_name, _name, sizeof(ti->m_name));
+        if (NULL != _name)
+            bx::strlcpy(ti->m_name, _name, sizeof(ti->m_name));
 #   endif
 
 		result = pthread_create(&ti->m_handle, &attr, &ti->threadFunc, this);
@@ -220,6 +222,7 @@ namespace bx
 		BX_UNUSED(ti);
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		pthread_setname_np(_name);
+        bx::strlcpy(ti->m_name, _name, sizeof(ti->m_name));
 #elif (BX_CRT_GLIBC >= 21200) && ! BX_PLATFORM_HURD
 		pthread_setname_np(ti->m_handle, _name);
 #elif BX_PLATFORM_LINUX
@@ -268,7 +271,9 @@ namespace bx
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 		ti->m_threadId = ::GetCurrentThreadId();
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
-        setThreadName(m_name);  // Apple posix API only sets current thread's name, so we set it in the entry
+        ThreadInternal* ti = (ThreadInternal*)m_internal;
+        if (0 != ti->m_name[0])
+            setThreadName(ti->m_name);  // Apple posix API only sets current thread's name, so we set it in the entry
 #endif
 		m_sem.post();
 		return m_fn(m_userData);
