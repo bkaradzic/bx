@@ -135,7 +135,7 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger = "with-windows",
 		value = "#",
-		description = "Set the Windows target platform version (default: 10.0.10240.0).",
+		description = "Set the Windows target platform version (default: $WindowsSDKVersion or 8.1).",
 	}
 
 	newoption {
@@ -179,7 +179,7 @@ function toolchain(_buildDir, _libDir)
 		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
-	local windowsPlatform = "10.0.10240.0"
+	local windowsPlatform = os.getenv("WindowsSDKVersion") or "8.1"
 	if _OPTIONS["with-windows"] then
 		windowsPlatform = _OPTIONS["with-windows"]
 	end
@@ -458,6 +458,10 @@ function toolchain(_buildDir, _libDir)
 		or _ACTION == "vs2017"
 		then
 
+		local action = premake.action.current()
+		action.vstudio.windowsTargetPlatformVersion    = windowsPlatform
+		action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
+
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			if "vs2017-clang" == _OPTIONS["vs"] then
 				premake.vstudio.toolset = "v141_clang_c2"
@@ -487,10 +491,6 @@ function toolchain(_buildDir, _libDir)
 		elseif "winstore82" == _OPTIONS["vs"] then
 			premake.vstudio.toolset = "v140"
 			premake.vstudio.storeapp = "8.2"
-
-			local action = premake.action.current()
-			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
-			action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
 
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
