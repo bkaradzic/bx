@@ -50,6 +50,10 @@ namespace bx
 		static void* threadFunc(void* _arg);
 		pthread_t m_handle;
 #endif // BX_PLATFORM_
+
+#if BX_PLATFORM_IOS || BX_PLATFORM_OSX
+        char m_name[32];
+#endif
 	};
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360 || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
@@ -92,6 +96,10 @@ namespace bx
 #elif BX_PLATFORM_POSIX
 		ti->m_handle = 0;
 #endif // BX_PLATFORM_
+
+#if BX_PLATFORM_IOS || BX_PLATFORM_OSX
+        ti->m_name[0] = 0;
+#endif
 	}
 
 	Thread::~Thread()
@@ -145,6 +153,10 @@ namespace bx
 			BX_CHECK(0 == result, "pthread_attr_setstacksize failed! %d", result);
 		}
 
+#   if BX_PLATFORM_IOS || BX_PLATFORM_OSX
+        bx::strlcpy(ti->m_name, _name, sizeof(ti->m_name));
+#   endif
+
 		result = pthread_create(&ti->m_handle, &attr, &ti->threadFunc, this);
 		BX_CHECK(0 == result, "pthread_attr_setschedparam failed! %d", result);
 #else
@@ -153,10 +165,12 @@ namespace bx
 
 		m_sem.wait();
 
+#if !BX_PLATFORM_IOS && !BX_PLATFORM_OSX
 		if (NULL != _name)
 		{
 			setThreadName(_name);
 		}
+#endif
 	}
 
 	void Thread::shutdown()
@@ -182,6 +196,10 @@ namespace bx
 		m_exitCode = cast.i;
 		ti->m_handle = 0;
 #endif // BX_PLATFORM_
+
+#if BX_PLATFORM_IOS || BX_PLATFORM_OSX
+        ti->m_name[0] = 0;
+#endif
 
 		m_running = false;
 	}
@@ -249,8 +267,9 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 		ti->m_threadId = ::GetCurrentThreadId();
-#endif // BX_PLATFORM_WINDOWS
-
+#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+        setThreadName(m_name);  // Apple posix API only sets current thread's name, so we set it in the entry
+#endif
 		m_sem.post();
 		return m_fn(m_userData);
 	}
