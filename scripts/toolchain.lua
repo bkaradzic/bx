@@ -779,6 +779,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 			"-Wunused-value",
 			"-Wundef",
+			"-Wno-strict-overflow",
 		}
 		buildoptions_cpp {
 			"-std=c++11",

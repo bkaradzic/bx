@@ -39,29 +39,29 @@ extern "C" int32_t memcmp(const void* _lhs, const void* _rhs, size_t _numBytes)
 
 extern "C" size_t strlen(const char* _str)
 {
-	return bx::strnlen(_str);
+	return bx::strLen(_str);
 }
 
-extern "C" size_t strnlen(const char* _str, size_t _max)
+extern "C" size_t strLen(const char* _str, size_t _max)
 {
-	return bx::strnlen(_str, _max);
+	return bx::strLen(_str, _max);
 }
 
 extern "C" void* strcpy(char* _dst, const char* _src)
 {
-	bx::strlncpy(_dst, INT32_MAX, _src, INT32_MAX);
+	bx::strCopy(_dst, INT32_MAX, _src, INT32_MAX);
 	return _dst;
 }
 
 extern "C" void* strncpy(char* _dst, const char* _src, size_t _num)
 {
-	bx::strlncpy(_dst, INT32_MAX, _src, _num);
+	bx::strCopy(_dst, INT32_MAX, _src, _num);
 	return _dst;
 }
 
 extern "C" char* strcat(char* _dst, const char* _src)
 {
-	bx::strlncat(_dst, INT32_MAX, _src, INT32_MAX);
+	bx::strCat(_dst, INT32_MAX, _src, INT32_MAX);
 	return _dst;
 }
 

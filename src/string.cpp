@@ -70,7 +70,7 @@ namespace bx
 
 	void toLower(char* _inOutStr, int32_t _max)
 	{
-		const int32_t len = strnlen(_inOutStr, _max);
+		const int32_t len = strLen(_inOutStr, _max);
 		toLowerUnsafe(_inOutStr, len);
 	}
 
@@ -89,7 +89,7 @@ namespace bx
 
 	void toUpper(char* _inOutStr, int32_t _max)
 	{
-		const int32_t len = strnlen(_inOutStr, _max);
+		const int32_t len = strLen(_inOutStr, _max);
 		toUpperUnsafe(_inOutStr, len);
 	}
 
@@ -134,7 +134,7 @@ namespace bx
 		return strCmp<toLower>(_lhs, _rhs, _max);
 	}
 
-	int32_t strnlen(const char* _str, int32_t _max)
+	int32_t strLen(const char* _str, int32_t _max)
 	{
 		if (NULL == _str)
 		{
@@ -146,13 +146,13 @@ namespace bx
 		return int32_t(ptr - _str);
 	}
 
-	int32_t strlncpy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
 		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
 
-		const int32_t len = strnlen(_src, _num);
+		const int32_t len = strLen(_src, _num);
 		const int32_t max = _dstSize-1;
 		const int32_t num = (len < max ? len : max);
 		memCopy(_dst, _src, num);
@@ -161,20 +161,20 @@ namespace bx
 		return num;
 	}
 
-	int32_t strlncat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
 		BX_CHECK(0 < _dstSize, "_dstSize can't be 0!");
 
 		const int32_t max = _dstSize;
-		const int32_t len = strnlen(_dst, max);
-		return strlncpy(&_dst[len], max-len, _src, _num);
+		const int32_t len = strLen(_dst, max);
+		return strCopy(&_dst[len], max-len, _src, _num);
 	}
 
 	const char* strnchr(const char* _str, char _ch, int32_t _max)
 	{
-		for (int32_t ii = 0, len = strnlen(_str, _max); ii < len; ++ii)
+		for (int32_t ii = 0, len = strLen(_str, _max); ii < len; ++ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -187,7 +187,7 @@ namespace bx
 
 	const char* strnrchr(const char* _str, char _ch, int32_t _max)
 	{
-		for (int32_t ii = strnlen(_str, _max); 0 < ii; --ii)
+		for (int32_t ii = strLen(_str, _max); 0 < ii; --ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -203,8 +203,8 @@ namespace bx
 	{
 		const char* ptr = _str;
 
-		int32_t       stringLen = strnlen(_str,  _strMax);
-		const int32_t findLen   = strnlen(_find, _findMax);
+		int32_t       stringLen = strLen(_str,  _strMax);
+		const int32_t findLen   = strLen(_find, _findMax);
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
@@ -251,7 +251,7 @@ namespace bx
 
 	const char* strnl(const char* _str)
 	{
-		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
+		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
 			const char* eol = strnstr(_str, "\r\n", 1024);
 			if (NULL != eol)
@@ -271,7 +271,7 @@ namespace bx
 
 	const char* streol(const char* _str)
 	{
-		for (; '\0' != *_str; _str += strnlen(_str, 1024) )
+		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
 			const char* eol = strnstr(_str, "\r\n", 1024);
 			if (NULL != eol)
@@ -348,7 +348,7 @@ namespace bx
 
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
-		int32_t len = strnlen(_word);
+		int32_t len = strLen(_word);
 		const char* ptr = strnstr(_str, _word);
 		for (; NULL != ptr; ptr = strnstr(ptr + len, _word) )
 		{
@@ -418,7 +418,7 @@ namespace bx
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
 		{
 			int32_t size = 0;
-			int32_t len = (int32_t)strnlen(_str, _len);
+			int32_t len = (int32_t)strLen(_str, _len);
 			int32_t padding = _param.width > len ? _param.width - len : 0;
 			bool sign = _param.sign && len > 1 && _str[0] != '-';
 			padding = padding > 0 ? padding - sign : 0;
@@ -574,7 +574,7 @@ namespace bx
 
 	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err)
 	{
-		MemoryReader reader(_format, uint32_t(strnlen(_format) ) );
+		MemoryReader reader(_format, uint32_t(strLen(_format) ) );
 
 		int32_t size = 0;
 
@@ -914,16 +914,6 @@ namespace bx
 		}
 
 		snprintf(_out, _count, "%0.2f %c%c", size, "BkMGTPEZY"[idx], idx > 0 ? 'B' : '\0');
-	}
-
-	int32_t strlcpy(char* _dst, const char* _src, int32_t _max)
-	{
-		return strlncpy(_dst, _max, _src);
-	}
-
-	int32_t strlcat(char* _dst, const char* _src, int32_t _max)
-	{
-		return strlncat(_dst, _max, _src);
 	}
 
 } // namespace bx

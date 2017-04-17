@@ -23,48 +23,48 @@ TEST_CASE("chars", "")
 	}
 }
 
-TEST_CASE("strnlen", "")
+TEST_CASE("strLen", "")
 {
 	const char* test = "test";
 
-	REQUIRE(0 == bx::strnlen(test, 0) );
-	REQUIRE(2 == bx::strnlen(test, 2) );
-	REQUIRE(4 == bx::strnlen(test, INT32_MAX) );
+	REQUIRE(0 == bx::strLen(test, 0) );
+	REQUIRE(2 == bx::strLen(test, 2) );
+	REQUIRE(4 == bx::strLen(test, INT32_MAX) );
 }
 
-TEST_CASE("strlncpy", "")
+TEST_CASE("strCopy", "")
 {
 	char dst[128];
 	size_t num;
 
-	num = bx::strlncpy(dst, 1, "blah");
+	num = bx::strCopy(dst, 1, "blah");
 	REQUIRE(num == 0);
 
-	num = bx::strlncpy(dst, 3, "blah", 3);
+	num = bx::strCopy(dst, 3, "blah", 3);
 	REQUIRE(0 == bx::strncmp(dst, "bl") );
 	REQUIRE(num == 2);
 
-	num = bx::strlncpy(dst, sizeof(dst), "blah", 3);
+	num = bx::strCopy(dst, sizeof(dst), "blah", 3);
 	REQUIRE(0 == bx::strncmp(dst, "bla") );
 	REQUIRE(num == 3);
 
-	num = bx::strlncpy(dst, sizeof(dst), "blah");
+	num = bx::strCopy(dst, sizeof(dst), "blah");
 	REQUIRE(0 == bx::strncmp(dst, "blah") );
 	REQUIRE(num == 4);
 }
 
-TEST_CASE("strlncat", "")
+TEST_CASE("strCat", "")
 {
 	char dst[128] = { '\0' };
 
-	REQUIRE(0 == bx::strlncat(dst, 1, "cat") );
+	REQUIRE(0 == bx::strCat(dst, 1, "cat") );
 
-	REQUIRE(4 == bx::strlncpy(dst, 5, "copy") );
-	REQUIRE(3 == bx::strlncat(dst, 8, "cat") );
+	REQUIRE(4 == bx::strCopy(dst, 5, "copy") );
+	REQUIRE(3 == bx::strCat(dst, 8, "cat") );
 	REQUIRE(0 == bx::strncmp(dst, "copycat") );
 
-	REQUIRE(1 == bx::strlncat(dst, BX_COUNTOF(dst), "------", 1) );
-	REQUIRE(3 == bx::strlncat(dst, BX_COUNTOF(dst), "cat") );
+	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
+	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
 	REQUIRE(0 == bx::strncmp(dst, "copycat-cat") );
 }
 
@@ -134,7 +134,7 @@ static bool testToString(Ty _value, const char* _expected)
 {
 	char tmp[1024];
 	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
-	int32_t len = (int32_t)bx::strnlen(_expected);
+	int32_t len = (int32_t)bx::strLen(_expected);
 	if (0 == bx::strncmp(tmp, _expected)
 	&&  num == len)
 	{

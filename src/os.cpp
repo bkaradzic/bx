@@ -235,12 +235,12 @@ namespace bx
 		bool result = false;
 		if (NULL != ptr)
 		{
-			len = (uint32_t)strnlen(ptr);
+			len = (uint32_t)strLen(ptr);
 
 			result = len != 0 && len < *_inOutSize;
 			if (len < *_inOutSize)
 			{
-				strlncpy(_out, len, ptr);
+				strCopy(_out, len, ptr);
 			}
 		}
 
@@ -340,7 +340,7 @@ namespace bx
 		if (stat("/tmp", fi)
 		&&  FileInfo::Directory == fi.m_type)
 		{
-			strlncpy(_out, *_inOutSize, "/tmp");
+			strCopy(_out, *_inOutSize, "/tmp");
 			*_inOutSize = 4;
 			return true;
 		}
@@ -418,7 +418,7 @@ namespace bx
 		int32_t total = 0;
 		for (uint32_t ii = 0; NULL != _argv[ii]; ++ii)
 		{
-			total += (int32_t)strnlen(_argv[ii]) + 1;
+			total += (int32_t)strLen(_argv[ii]) + 1;
 		}
 
 		char* temp = (char*)alloca(total);

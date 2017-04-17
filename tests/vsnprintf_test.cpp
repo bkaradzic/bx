@@ -25,7 +25,7 @@ TEST_CASE("vsnprintf truncated", "Truncated output buffer.")
 
 static bool test(const char* _expected, const char* _format, ...)
 {
-	int32_t max = (int32_t)bx::strnlen(_expected) + 1;
+	int32_t max = (int32_t)bx::strLen(_expected) + 1;
 	char* temp = (char*)alloca(max);
 
 	va_list argList;

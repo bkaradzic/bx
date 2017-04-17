@@ -270,7 +270,7 @@ namespace bx
 				++arg;
 				if (_short == *arg)
 				{
-					if (1 == strnlen(arg) )
+					if (1 == strLen(arg) )
 					{
 						if (0 == _skip)
 						{
