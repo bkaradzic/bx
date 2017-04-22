@@ -127,10 +127,10 @@ namespace bx
 	bool toBool(const char* _str);
 
 	/// String compare.
-	int32_t strncmp(const char* _lhs, const char* _rhs, int32_t _max = INT32_MAX);
+	int32_t strCmp(const char* _lhs, const char* _rhs, int32_t _max = INT32_MAX);
 
 	/// Case insensitive string compare.
-	int32_t strincmp(const char* _lhs, const char* _rhs, int32_t _max = INT32_MAX);
+	int32_t strCmpI(const char* _lhs, const char* _rhs, int32_t _max = INT32_MAX);
 
 	///
 	int32_t strLen(const char* _str, int32_t _max = INT32_MAX);
@@ -143,16 +143,16 @@ namespace bx
 	int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num = INT32_MAX);
 
 	///
-	const char* strnchr(const char* _str, char _ch, int32_t _max = INT32_MAX);
+	const char* strFind(const char* _str, char _ch, int32_t _max = INT32_MAX);
 
 	///
-	const char* strnrchr(const char* _str, char _ch, int32_t _max = INT32_MAX);
+	const char* strRFind(const char* _str, char _ch, int32_t _max = INT32_MAX);
 
 	/// Find substring in string. Limit search to _size.
-	const char* strnstr(const char* _str, const char* _find, int32_t _max = INT32_MAX);
+	const char* strFind(const char* _str, const char* _find, int32_t _max = INT32_MAX);
 
 	/// Find substring in string. Case insensitive. Limit search to _max.
-	const char* stristr(const char* _str, const char* _find, int32_t _max = INT32_MAX);
+	const char* strFindI(const char* _str, const char* _find, int32_t _max = INT32_MAX);
 
 	/// Find new line. Returns pointer after new line terminator.
 	const char* strnl(const char* _str);

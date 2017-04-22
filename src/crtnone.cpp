@@ -67,22 +67,22 @@ extern "C" char* strcat(char* _dst, const char* _src)
 
 extern "C" const char* strchr(const char* _str, int _ch)
 {
-	return bx::strnchr(_str, _ch);
+	return bx::strFind(_str, _ch);
 }
 
 extern "C" int32_t strcmp(const char* _lhs, const char* _rhs)
 {
-	return bx::strncmp(_lhs, _rhs);
+	return bx::strCmp(_lhs, _rhs);
 }
 
 extern "C" int32_t strncmp(const char* _lhs, const char* _rhs, size_t _max)
 {
-	return bx::strncmp(_lhs, _rhs, _max);
+	return bx::strCmp(_lhs, _rhs, _max);
 }
 
 extern "C" const char* strstr(const char* _str, const char* _find)
 {
-	return bx::strnstr(_str, _find);
+	return bx::strFind(_str, _find);
 }
 
 extern "C" void qsort(void* _base, size_t _num, size_t _size, bx::ComparisonFn _fn)

@@ -124,12 +124,12 @@ namespace bx
 		return 0 == _max ? 0 : fn(*_lhs) - fn(*_rhs);
 	}
 
-	int32_t strncmp(const char* _lhs, const char* _rhs, int32_t _max)
+	int32_t strCmp(const char* _lhs, const char* _rhs, int32_t _max)
 	{
 		return strCmp<toNoop>(_lhs, _rhs, _max);
 	}
 
-	int32_t strincmp(const char* _lhs, const char* _rhs, int32_t _max)
+	int32_t strCmpI(const char* _lhs, const char* _rhs, int32_t _max)
 	{
 		return strCmp<toLower>(_lhs, _rhs, _max);
 	}
@@ -172,7 +172,7 @@ namespace bx
 		return strCopy(&_dst[len], max-len, _src, _num);
 	}
 
-	const char* strnchr(const char* _str, char _ch, int32_t _max)
+	const char* strFind(const char* _str, char _ch, int32_t _max)
 	{
 		for (int32_t ii = 0, len = strLen(_str, _max); ii < len; ++ii)
 		{
@@ -185,7 +185,7 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strnrchr(const char* _str, char _ch, int32_t _max)
+	const char* strRFind(const char* _str, char _ch, int32_t _max)
 	{
 		for (int32_t ii = strLen(_str, _max); 0 < ii; --ii)
 		{
@@ -239,12 +239,12 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strnstr(const char* _str, const char* _find, int32_t _max)
+	const char* strFind(const char* _str, const char* _find, int32_t _max)
 	{
 		return strStr<toNoop>(_str, _max, _find, INT32_MAX);
 	}
 
-	const char* stristr(const char* _str, const char* _find, int32_t _max)
+	const char* strFindI(const char* _str, const char* _find, int32_t _max)
 	{
 		return strStr<toLower>(_str, _max, _find, INT32_MAX);
 	}
@@ -253,13 +253,13 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
+			const char* eol = strFind(_str, "\r\n", 1024);
 			if (NULL != eol)
 			{
 				return eol + 2;
 			}
 
-			eol = strnstr(_str, "\n", 1024);
+			eol = strFind(_str, "\n", 1024);
 			if (NULL != eol)
 			{
 				return eol + 1;
@@ -273,13 +273,13 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strnstr(_str, "\r\n", 1024);
+			const char* eol = strFind(_str, "\r\n", 1024);
 			if (NULL != eol)
 			{
 				return eol;
 			}
 
-			eol = strnstr(_str, "\n", 1024);
+			eol = strFind(_str, "\n", 1024);
 			if (NULL != eol)
 			{
 				return eol;
@@ -349,8 +349,8 @@ namespace bx
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
 		int32_t len = strLen(_word);
-		const char* ptr = strnstr(_str, _word);
-		for (; NULL != ptr; ptr = strnstr(ptr + len, _word) )
+		const char* ptr = strFind(_str, _word);
+		for (; NULL != ptr; ptr = strFind(ptr + len, _word) )
 		{
 			if (ptr != _str)
 			{
@@ -534,7 +534,7 @@ namespace bx
 				toUpperUnsafe(str, len);
 			}
 
-			const char* dot = strnchr(str, '.');
+			const char* dot = strFind(str, '.');
 			if (NULL != dot)
 			{
 				const int32_t precLen = int32_t(
@@ -888,10 +888,10 @@ namespace bx
 
 	const char* baseName(const char* _filePath)
 	{
-		const char* bs       = strnrchr(_filePath, '\\');
-		const char* fs       = strnrchr(_filePath, '/');
+		const char* bs       = strRFind(_filePath, '\\');
+		const char* fs       = strRFind(_filePath, '/');
 		const char* slash    = (bs > fs ? bs : fs);
-		const char* colon    = strnrchr(_filePath, ':');
+		const char* colon    = strRFind(_filePath, ':');
 		const char* basename = slash > colon ? slash : colon;
 		if (NULL != basename)
 		{
