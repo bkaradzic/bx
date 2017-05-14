@@ -63,6 +63,11 @@ namespace bx
 		return ::logf(_a);
 	}
 
+	float flog2(float _a)
+	{
+		return ::logf(_a) * (1 / ::logf(2));
+	}
+
 	float fsqrt(float _a)
 	{
 		return ::sqrtf(_a);
