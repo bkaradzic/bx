@@ -16,6 +16,7 @@ namespace bx
 	extern const float invPi;
 	extern const float piHalf;
 	extern const float sqrt2;
+	extern const float invLogNat2;
 	extern const float huge;
 
 	///
