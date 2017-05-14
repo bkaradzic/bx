@@ -136,11 +136,6 @@ namespace bx
 		return fpow(2.0f, _a);
 	}
 
-	inline float flog2(float _a)
-	{
-		return flog(_a) * 1.442695041f;
-	}
-
 	inline float frsqrt(float _a)
 	{
 		return 1.0f/fsqrt(_a);
