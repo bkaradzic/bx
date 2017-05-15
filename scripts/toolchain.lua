@@ -1443,7 +1443,8 @@ function strip()
 --				.. "-s USE_WEBGL2=1 "
 				.. "--memory-init-file 1 "
 				.. "\"$(TARGET)\" -o \"$(TARGET)\".html "
---				.. "--preload-file ../../../examples/runtime@/"
+--				.. "--preload-file ../../../examples/runtime@/ "
+				.. "-s PRECISE_F32=1"
 		}
 
 	configuration { "riscv" }
