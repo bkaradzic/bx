@@ -52,6 +52,28 @@ namespace bx
 
 #if BX_PLATFORM_POSIX
 
+	uint64_t toNs(const timespec& _ts)
+	{
+		return _ts.tv_sec*UINT64_C(1000000000) + _ts.tv_nsec;
+	}
+
+	void toTimespecNs(timespec& _ts, uint64_t _nsecs)
+	{
+		_ts.tv_sec  = _nsecs/UINT64_C(1000000000);
+		_ts.tv_nsec = _nsecs%UINT64_C(1000000000);
+	}
+
+	void toTimespecMs(timespec& _ts, int32_t _msecs)
+	{
+		toTimespecNs(_ts, _msecs*1000000);
+	}
+
+	void add(timespec& _ts, int32_t _msecs)
+	{
+		uint64_t ns = toNs(_ts);
+		toTimespecNs(_ts, ns + _msecs*1000000);
+	}
+
 #	if BX_CONFIG_SEMAPHORE_PTHREAD
 	Semaphore::Semaphore()
 	{
@@ -133,8 +155,7 @@ namespace bx
 		else
 		{
 			timespec ts;
-			ts.tv_sec = _msecs/1000;
-			ts.tv_nsec = (_msecs%1000)*1000;
+			toTimespecMs(ts, _msecs);
 
 			while (0 == result
 			&&     0 >= si->m_count)
@@ -145,8 +166,7 @@ namespace bx
 #		else
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
-		ts.tv_sec += _msecs/1000;
-		ts.tv_nsec += (_msecs%1000)*1000;
+		add(ts, _msecs);
 
 		while (0 == result
 		&&     0 >= si->m_count)
@@ -226,8 +246,7 @@ namespace bx
 
 		timespec ts;
 		clock_gettime(CLOCK_REALTIME, &ts);
-		ts.tv_sec += _msecs/1000;
-		ts.tv_nsec += (_msecs%1000)*1000;
+		add(ts, _msecs);
 		return 0 == sem_timedwait(&si->m_handle, &ts);
 #		endif // BX_PLATFORM_
 	}
