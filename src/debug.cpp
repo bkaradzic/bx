@@ -125,7 +125,7 @@ namespace bx
 					ascii[asciiPos] = '\0';
 					debugPrintf("\t" DBG_ADDRESS "\t" HEX_DUMP_FORMAT "\t%s\n", data, hex, ascii);
 					data += asciiPos;
-					hexPos = 0;
+					hexPos   = 0;
 					asciiPos = 0;
 				}
 			}

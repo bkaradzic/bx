@@ -25,14 +25,19 @@ namespace bx
 			;
 	}
 
+	inline bool isInRange(char _ch, char _from, char _to)
+	{
+		return unsigned(_ch - _from) < unsigned(_to-_from);
+	}
+
 	bool isUpper(char _ch)
 	{
-		return _ch >= 'A' && _ch <= 'Z';
+		return isInRange(_ch, 'A', 'Z');
 	}
 
 	bool isLower(char _ch)
 	{
-		return _ch >= 'a' && _ch <= 'z';
+		return isInRange(_ch, 'a', 'z');
 	}
 
 	bool isAlpha(char _ch)
@@ -42,7 +47,7 @@ namespace bx
 
 	bool isNumeric(char _ch)
 	{
-		return _ch >= '0' && _ch <= '9';
+		return isInRange(_ch, '0', '9');
 	}
 
 	bool isAlphaNum(char _ch)
@@ -52,7 +57,7 @@ namespace bx
 
 	bool isPrint(char _ch)
 	{
-		return isAlphaNum(_ch) || isSpace(_ch);
+		return isInRange(_ch, ' ', '~');
 	}
 
 	char toLower(char _ch)
