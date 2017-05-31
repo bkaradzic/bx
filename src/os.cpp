@@ -21,7 +21,6 @@
 	|| BX_PLATFORM_HURD       \
 	|| BX_PLATFORM_IOS        \
 	|| BX_PLATFORM_LINUX      \
-	|| BX_PLATFORM_NACL       \
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_RPI        \
@@ -29,7 +28,6 @@
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD  \
 	|| BX_PLATFORM_IOS  \
-	|| BX_PLATFORM_NACL \
 	|| BX_PLATFORM_OSX  \
 	|| BX_PLATFORM_PS4  \
 	|| BX_PLATFORM_STEAMLINK
@@ -37,9 +35,9 @@
 #	endif // BX_PLATFORM_*
 
 #	include <time.h> // nanosleep
-#	if !BX_PLATFORM_PS4 && !BX_PLATFORM_NACL
+#	if !BX_PLATFORM_PS4
 #		include <dlfcn.h> // dlopen, dlclose, dlsym
-#	endif // !BX_PLATFORM_PS4 && !BX_PLATFORM_NACL
+#	endif // !BX_PLATFORM_PS4
 
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo
@@ -101,7 +99,7 @@ namespace bx
 		return (pid_t)::syscall(SYS_gettid);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
-#elif BX_PLATFORM_BSD || BX_PLATFORM_NACL
+#elif BX_PLATFORM_BSD
 		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
 #elif BX_PLATFORM_HURD
@@ -175,7 +173,6 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return (void*)::LoadLibraryA(_filePath);
 #elif  BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_NACL       \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT
@@ -191,7 +188,6 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
 #elif  BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_NACL       \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT
@@ -206,7 +202,6 @@ namespace bx
 #if BX_PLATFORM_WINDOWS
 		return (void*)::GetProcAddress( (HMODULE)_handle, _symbol);
 #elif  BX_PLATFORM_EMSCRIPTEN \
-	|| BX_PLATFORM_NACL       \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT

@@ -135,7 +135,7 @@ namespace bx
 		int result = pthread_mutex_lock(&si->m_mutex);
 		BX_CHECK(0 == result, "pthread_mutex_lock %d", result);
 
-#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
+#		if BX_PLATFORM_OSX
 		BX_UNUSED(_msecs);
 		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
 		while (0 == result
@@ -228,7 +228,7 @@ namespace bx
 	{
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 
-#		if BX_PLATFORM_NACL || BX_PLATFORM_OSX
+#		if BX_PLATFORM_OSX
 		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment."); BX_UNUSED(_msecs);
 		return 0 == sem_wait(&si->m_handle);
 #		else
