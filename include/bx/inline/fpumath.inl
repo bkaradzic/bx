@@ -121,17 +121,6 @@ namespace bx
 		return _a + (_b - _a) * _t;
 	}
 
-	inline float angleDiff(float _a, float _b)
-	{
-		const float dist = fwrap(_b - _a, pi*2.0f);
-		return fwrap(dist*2.0f, pi*2.0f) - dist;
-	}
-
-	inline float angleLerp(float _a, float _b, float _t)
-	{
-		return _a + angleDiff(_a, _b) * _t;
-	}
-
 	inline float fsign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
@@ -215,6 +204,17 @@ namespace bx
 		}
 
 		return fbias(_time * 2.0f - 1.0f, 1.0f - _gain) * 0.5f + 0.5f;
+	}
+
+	inline float angleDiff(float _a, float _b)
+	{
+		const float dist = fwrap(_b - _a, pi*2.0f);
+		return fwrap(dist*2.0f, pi*2.0f) - dist;
+	}
+
+	inline float angleLerp(float _a, float _b, float _t)
+	{
+		return _a + angleDiff(_a, _b) * _t;
 	}
 
 	inline void vec3Move(float* _result, const float* _a)
