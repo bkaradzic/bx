@@ -321,6 +321,10 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-steamlink"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
+			if not os.getenv("MINGW") then
+				print("Set MINGW enviroment variable.")
+			end
+
 			local mingwToolchain = "x86_64-w64-mingw32"
 			if compiler32bit then
 				if os.is("linux") then
