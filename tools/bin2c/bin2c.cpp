@@ -88,18 +88,20 @@ public:
 
 void help(const char* _error = NULL)
 {
+	bx::WriterI* stdOut = bx::getStdOut();
+
 	if (NULL != _error)
 	{
-		fprintf(stderr, "Error:\n%s\n\n", _error);
+		bx::writePrintf(stdOut, "Error:\n%s\n\n", _error);
 	}
 
-	fprintf(stderr
+	bx::writePrintf(stdOut
 		, "bin2c, binary to C\n"
 		  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 		  "License: https://github.com/bkaradzic/bx#license-bsd-2-clause\n\n"
 		);
 
-	fprintf(stderr
+	bx::writePrintf(stdOut
 		, "Usage: bin2c -f <in> -o <out> -n <name>\n"
 
 		  "\n"
@@ -151,7 +153,9 @@ int main(int _argc, const char* _argv[])
 	if (bx::open(&fr, filePath) )
 	{
 		size = uint32_t(bx::getSize(&fr) );
-		data = malloc(size);
+
+		bx::CrtAllocator allocator;
+		data = BX_ALLOC(&allocator, size);
 		bx::read(&fr, data, size);
 
 		bx::CrtFileWriter fw;
@@ -163,7 +167,7 @@ int main(int _argc, const char* _argv[])
 			bx::close(&fw);
 		}
 
-		free(data);
+		BX_FREE(&allocator, data);
 	}
 
 	return 0;
