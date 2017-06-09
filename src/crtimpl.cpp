@@ -99,8 +99,9 @@ namespace bx
 		{
 		}
 
-		~FileReaderImpl()
+		virtual ~FileReaderImpl()
 		{
+			close();
 		}
 
 		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
@@ -220,8 +221,9 @@ namespace bx
 		{
 		}
 
-		~FileWriterImpl()
+		virtual ~FileWriterImpl()
 		{
+			close();
 		}
 
 		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
