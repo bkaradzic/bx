@@ -36,6 +36,15 @@ namespace bx
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 	///
+	ReaderI* getStdIn();
+
+	///
+	WriterI* getStdOut();
+
+	///
+	WriterI* getStdErr();
+
+	///
 	class CrtFileReader : public FileReaderI
 	{
 	public:
@@ -58,7 +67,7 @@ namespace bx
 		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
 
 	private:
-		void* m_file;
+		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
 	///
@@ -84,7 +93,7 @@ namespace bx
 		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
 
 	private:
-		void* m_file;
+		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 

@@ -27,7 +27,7 @@ namespace bx
 
 	inline bool isInRange(char _ch, char _from, char _to)
 	{
-		return unsigned(_ch - _from) < unsigned(_to-_from);
+		return unsigned(_ch - _from) <= unsigned(_to-_from);
 	}
 
 	bool isUpper(char _ch)

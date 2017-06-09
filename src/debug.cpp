@@ -4,8 +4,9 @@
  */
 
 #include <bx/debug.h>
-#include <bx/string.h> // isPrint
-#include <inttypes.h>  // PRIx*
+#include <bx/string.h>       // isPrint
+#include <bx/readerwriter.h> // WriterI
+#include <inttypes.h>        // PRIx*
 
 #if BX_PLATFORM_ANDROID
 #	include <android/log.h>
@@ -140,6 +141,34 @@ namespace bx
 #undef HEX_DUMP_WIDTH
 #undef HEX_DUMP_SPACE_WIDTH
 #undef HEX_DUMP_FORMAT
+	}
+
+	class DebugWriter : public WriterI
+	{
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		{
+			BX_UNUSED(_err);
+
+			int32_t total = 0;
+
+			char temp[4096];
+			while (total != _size)
+			{
+				uint32_t len = bx::uint32_min(sizeof(temp)-1, _size-total);
+				memCopy(temp, _data, len);
+				temp[len] = '\0';
+				debugOutput(temp);
+				total += len;
+			}
+
+			return total;
+		}
+	};
+
+	WriterI* getDebugOut()
+	{
+		static DebugWriter s_debugOut;
+		return &s_debugOut;
 	}
 
 } // namespace bx
