@@ -13,12 +13,12 @@ namespace bx
 {
 	inline float toRad(float _deg)
 	{
-		return _deg * pi / 180.0f;
+		return _deg * kPi / 180.0f;
 	}
 
 	inline float toDeg(float _rad)
 	{
-		return _rad * 180.0f / pi;
+		return _rad * 180.0f / kPi;
 	}
 
 	inline uint32_t floatToBits(float _a)
@@ -138,7 +138,7 @@ namespace bx
 
 	inline float flog2(float _a)
 	{
-		return flog(_a) * invLogNat2;
+		return flog(_a) * kInvLogNat2;
 	}
 
 	inline float frsqrt(float _a)
@@ -208,8 +208,8 @@ namespace bx
 
 	inline float angleDiff(float _a, float _b)
 	{
-		const float dist = fwrap(_b - _a, pi*2.0f);
-		return fwrap(dist*2.0f, pi*2.0f) - dist;
+		const float dist = fwrap(_b - _a, kPi*2.0f);
+		return fwrap(dist*2.0f, kPi*2.0f) - dist;
 	}
 
 	inline float angleLerp(float _a, float _b, float _t)

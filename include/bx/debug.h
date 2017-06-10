@@ -26,7 +26,7 @@ namespace bx
 	void debugPrintfData(const void* _data, uint32_t _size, const char* _format, ...);
 
 	///
-	class WriterI* getDebugOut();
+	struct WriterI* getDebugOut();
 
 } // namespace bx
 

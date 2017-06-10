@@ -12,12 +12,13 @@
 
 namespace bx
 {
-	extern const float pi;
-	extern const float invPi;
-	extern const float piHalf;
-	extern const float sqrt2;
-	extern const float invLogNat2;
-	extern const float huge;
+	extern const float kPi;
+	extern const float kPi2;
+	extern const float kInvPi;
+	extern const float kPiHalf;
+	extern const float kSqrt2;
+	extern const float kInvLogNat2;
+	extern const float kHuge;
 
 	///
 	typedef float (*LerpFn)(float _a, float _b, float _t);
