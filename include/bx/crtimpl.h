@@ -6,33 +6,24 @@
 #ifndef BX_CRTIMPL_H_HEADER_GUARD
 #define BX_CRTIMPL_H_HEADER_GUARD
 
-#include "bx.h"
-
-#if BX_CONFIG_ALLOCATOR_CRT
-#	include "allocator.h"
-#endif // BX_CONFIG_ALLOCATOR_CRT
-
-#if BX_CONFIG_CRT_FILE_READER_WRITER
-#	include "readerwriter.h"
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
+#include "allocator.h"
+#include "readerwriter.h"
 
 namespace bx
 {
-#if BX_CONFIG_ALLOCATOR_CRT
 	///
-	class CrtAllocator : public AllocatorI
+	class DefaultAllocator : public AllocatorI
 	{
 	public:
 		///
-		CrtAllocator();
+		DefaultAllocator();
 
 		///
-		virtual ~CrtAllocator();
+		virtual ~DefaultAllocator();
 
 		///
 		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE;
 	};
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 	///

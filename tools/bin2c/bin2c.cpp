@@ -154,7 +154,7 @@ int main(int _argc, const char* _argv[])
 	{
 		size = uint32_t(bx::getSize(&fr) );
 
-		bx::CrtAllocator allocator;
+		bx::DefaultAllocator allocator;
 		data = BX_ALLOC(&allocator, size);
 		bx::read(&fr, data, size);
 

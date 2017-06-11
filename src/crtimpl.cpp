@@ -4,24 +4,21 @@
  */
 
 #include <bx/crtimpl.h>
-#include <stdio.h>
 
-#if BX_CONFIG_ALLOCATOR_CRT
-#	include <malloc.h>
-#endif // BX_CONFIG_ALLOCATOR_CRT
+#include <stdio.h>
+#include <malloc.h>
 
 namespace bx
 {
-#if BX_CONFIG_ALLOCATOR_CRT
-	CrtAllocator::CrtAllocator()
+	DefaultAllocator::DefaultAllocator()
 	{
 	}
 
-	CrtAllocator::~CrtAllocator()
+	DefaultAllocator::~DefaultAllocator()
 	{
 	}
 
-	void* CrtAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
+	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
 	{
 		if (0 == _size)
 		{
@@ -70,7 +67,6 @@ namespace bx
 		return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
 #	endif // BX_
 	}
-#endif // BX_CONFIG_ALLOCATOR_CRT
 
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 

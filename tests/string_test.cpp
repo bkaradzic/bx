@@ -187,7 +187,7 @@ TEST_CASE("StringView", "")
 	bx::StringView sv("test");
 	REQUIRE(4 == sv.getLength() );
 
-	bx::CrtAllocator crt;
+	bx::DefaultAllocator crt;
 	g_allocator = &crt;
 
 	typedef bx::StringT<&g_allocator> String;
