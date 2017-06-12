@@ -66,9 +66,10 @@ namespace bx
 
 	void sleep(uint32_t _ms)
 	{
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOX360
+#if BX_PLATFORM_WINDOWS
 		::Sleep(_ms);
-#elif BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#elif  BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 		BX_UNUSED(_ms);
 		debugOutput("sleep is not implemented"); debugBreak();
 #else
@@ -82,9 +83,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		::SwitchToThread();
-#elif BX_PLATFORM_XBOX360
-		::Sleep(0);
-#elif BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#elif  BX_PLATFORM_XBOXONE \
+	|| BX_PLATFORM_WINRT
 		debugOutput("yield is not implemented"); debugBreak();
 #else
 		::sched_yield();
