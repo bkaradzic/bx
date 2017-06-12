@@ -974,6 +974,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
+		buildoptions_cpp {
+			"-std=c++11",
+		}
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -1173,12 +1176,8 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include",
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
-		buildoptions {
-		}
 		buildoptions_cpp {
 			"-std=c++11",
-		}
-		linkoptions {
 		}
 
 	configuration { "qnx-arm" }

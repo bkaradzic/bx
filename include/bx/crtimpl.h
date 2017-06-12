@@ -25,7 +25,6 @@ namespace bx
 		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE;
 	};
 
-#if BX_CONFIG_CRT_FILE_READER_WRITER
 	///
 	ReaderI* getStdIn();
 
@@ -36,14 +35,14 @@ namespace bx
 	WriterI* getStdErr();
 
 	///
-	class CrtFileReader : public FileReaderI
+	class FileReader : public FileReaderI
 	{
 	public:
 		///
-		CrtFileReader();
+		FileReader();
 
 		///
-		virtual ~CrtFileReader();
+		virtual ~FileReader();
 
 		///
 		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE;
@@ -62,14 +61,14 @@ namespace bx
 	};
 
 	///
-	class CrtFileWriter : public FileWriterI
+	class FileWriter : public FileWriterI
 	{
 	public:
 		///
-		CrtFileWriter();
+		FileWriter();
 
 		///
-		virtual ~CrtFileWriter();
+		virtual ~FileWriter();
 
 		///
 		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE;
@@ -86,9 +85,7 @@ namespace bx
 	private:
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
-#endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
-#if BX_CONFIG_CRT_PROCESS
 	///
 	class ProcessReader : public ReaderOpenI, public CloserI, public ReaderI
 	{
@@ -142,7 +139,6 @@ namespace bx
 		void* m_file;
 		int32_t m_exitCode;
 	};
-#endif // BX_CONFIG_CRT_PROCESS
 
 } // namespace bx
 
