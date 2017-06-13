@@ -198,6 +198,7 @@ namespace bx
 				return false;
 			}
 
+			m_open = true;
 			return true;
 		}
 
