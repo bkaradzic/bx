@@ -239,6 +239,9 @@ namespace bx
 	///
 	int32_t toString(char* _out, int32_t _max, uint64_t _value, uint32_t _base = 10);
 
+	///
+	double fromString(const char* _str);
+
 } // namespace bx
 
 #include "inline/string.inl"
