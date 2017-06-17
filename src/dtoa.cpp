@@ -12,28 +12,31 @@
 
 namespace bx
 {
-	// https://github.com/miloyip/dtoa-benchmark
-	//
-	// Copyright (C) 2014 Milo Yip
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a copy
-	// of this software and associated documentation files (the "Software"), to deal
-	// in the Software without restriction, including without limitation the rights
-	// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	// copies of the Software, and to permit persons to whom the Software is
-	// furnished to do so, subject to the following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included in
-	// all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	// THE SOFTWARE.
-	//
+	/*
+	 * https://github.com/miloyip/dtoa-benchmark
+	 *
+	 * Copyright (C) 2014 Milo Yip
+	 *
+	 * Permission is hereby granted, free of charge, to any person obtaining a copy
+	 * of this software and associated documentation files (the "Software"), to deal
+	 * in the Software without restriction, including without limitation the rights
+	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	 * copies of the Software, and to permit persons to whom the Software is
+	 * furnished to do so, subject to the following conditions:
+	 *
+	 * The above copyright notice and this permission notice shall be included in
+	 * all copies or substantial portions of the Software.
+	 *
+	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+	 * THE SOFTWARE.
+	 *
+	 */
+
 	struct DiyFp
 	{
 		DiyFp()
@@ -558,6 +561,8 @@ namespace bx
 	}
 
 	/*
+	 * https://github.com/grzegorz-kraszewski/stringtofloat/
+	 *
 	 * MIT License
 	 *
 	 * Copyright (c) 2016 Grzegorz Kraszewski
@@ -593,10 +598,10 @@ namespace bx
 
 #define DIGITS 18
 
-#define DOUBLE_PLUS_ZERO      0x0000000000000000ull
-#define DOUBLE_MINUS_ZERO     0x8000000000000000ull
-#define DOUBLE_PLUS_INFINITY  0x7ff0000000000000ull
-#define DOUBLE_MINUS_INFINITY 0xfff0000000000000ull
+#define DOUBLE_PLUS_ZERO      UINT64_C(0x0000000000000000)
+#define DOUBLE_MINUS_ZERO     UINT64_C(0x8000000000000000)
+#define DOUBLE_PLUS_INFINITY  UINT64_C(0x7ff0000000000000)
+#define DOUBLE_MINUS_INFINITY UINT64_C(0xfff0000000000000)
 
 	union HexDouble
 	{
