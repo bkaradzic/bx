@@ -186,8 +186,12 @@ static bool testFromString(double _value, const char* _input)
 {
 	char tmp[1024];
 	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
-	const double lhs = bx::fromString(tmp);
-	const double rhs = bx::fromString(_input);
+
+	double lhs;
+	bx::fromString(&lhs, tmp);
+
+	double rhs;
+	bx::fromString(&rhs, _input);
 
 	if (lhs == rhs)
 	{

@@ -707,7 +707,7 @@ namespace bx
 
 #define GETC(s) *s++
 
-	static int parser(const char *s, struct PrepNumber *pn)
+	static int parser(const char *s, PrepNumber *pn)
 	{
 		int state = FSM_A;
 		int digx = 0, c = ' ';            /* initial value for kicking off the state machine */
@@ -921,10 +921,10 @@ namespace bx
 		return result;
 	}
 
-	static double converter(struct PrepNumber *pn)
+	static double converter(PrepNumber *pn)
 	{
 		int binexp = 92;
-		union HexDouble hd;
+		HexDouble hd;
 		uint32_t s2, s1, s0; /* 96-bit precision integer */
 		uint32_t q2, q1, q0; /* 96-bit precision integer */
 		uint32_t r2, r1, r0; /* 96-bit precision integer */
@@ -1037,47 +1037,43 @@ namespace bx
 		return hd.d;
 	}
 
-	double fromString(const char* _str)
+	bool fromString(double* _out, const char* _str)
 	{
-		struct PrepNumber pn;
-		union HexDouble hd;
-		int i;
-		double result;
-
+		PrepNumber pn;
 		pn.mantissa = 0;
 		pn.negative = 0;
 		pn.exponent = 0;
+
+		HexDouble hd;
 		hd.u = DOUBLE_PLUS_ZERO;
 
-		i = parser(_str, &pn);
-
-		switch (i)
+		switch (parser(_str, &pn) )
 		{
 		case PARSER_OK:
-			result = converter(&pn);
+			*_out = converter(&pn);
 			break;
 
 		case PARSER_PZERO:
-			result = hd.d;
+			*_out = hd.d;
 			break;
 
 		case PARSER_MZERO:
 			hd.u = DOUBLE_MINUS_ZERO;
-			result = hd.d;
+			*_out = hd.d;
 			break;
 
 		case PARSER_PINF:
 			hd.u = DOUBLE_PLUS_INFINITY;
-			result = hd.d;
+			*_out = hd.d;
 			break;
 
 		case PARSER_MINF:
 			hd.u = DOUBLE_MINUS_INFINITY;
-			result = hd.d;
+			*_out = hd.d;
 			break;
 		}
 
-		return result;
+		return true;
 	}
 
 } // namespace bx
