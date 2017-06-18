@@ -1042,6 +1042,14 @@ namespace bx
 		return hd.d;
 	}
 
+	bool fromString(float* _out, const char* _str)
+	{
+		double dbl;
+		bool result = fromString(&dbl, _str);
+		*_out = float(dbl);
+		return result;
+	}
+
 	bool fromString(double* _out, const char* _str)
 	{
 		PrepNumber pn;
