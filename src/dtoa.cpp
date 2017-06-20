@@ -628,7 +628,7 @@ namespace bx
 	 * more).
 	 */
 
-#define USE_64BIT_FOR_ADDSUB_MACROS 1
+#define USE_64BIT_FOR_ADDSUB_MACROS 0
 
 #if USE_64BIT_FOR_ADDSUB_MACROS
 
@@ -656,19 +656,19 @@ namespace bx
 
 #else
 
-#define add96(s2, s1, s0, d2, d1, d0) {                           \
-	uint32_t _x, _c;                                              \
-	_x = (s0); (s0) += (d0);                                      \
-	if ( (s0) < _x) _c = 1; else _c = 0;                           \
-	_x = (s1); (s1) += (d1) + _c;                                 \
+#define add96(s2, s1, s0, d2, d1, d0) {                                \
+	uint32_t _x, _c;                                                   \
+	_x = (s0); (s0) += (d0);                                           \
+	if ( (s0) < _x) _c = 1; else _c = 0;                               \
+	_x = (s1); (s1) += (d1) + _c;                                      \
 	if ( ( (s1) < _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
 	(s2) += (d2) + _c; }
 
-#define sub96(s2, s1, s0, d2, d1, d0) {                           \
-	uint32_t _x, _c;                                              \
-	_x = (s0); (s0) -= (d0);                                      \
-	if ( (s0) > _x) _c = 1; else _c = 0;                           \
-	_x = (s1); (s1) -= (d1) + _c;                                 \
+#define sub96(s2, s1, s0, d2, d1, d0) {                                \
+	uint32_t _x, _c;                                                   \
+	_x = (s0); (s0) -= (d0);                                           \
+	if ( (s0) > _x) _c = 1; else _c = 0;                               \
+	_x = (s1); (s1) -= (d1) + _c;                                      \
 	if ( ( (s1) > _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
 	(s2) -= (d2) + _c; }
 
@@ -676,21 +676,16 @@ namespace bx
 
 	/* parser state machine states */
 
-#define FSM_A     0
-#define FSM_B     1
-#define FSM_C     2
-#define FSM_D     3
-#define FSM_E     4
-#define FSM_F     5
-#define FSM_G     6
-#define FSM_H     7
-#define FSM_I     8
-#define FSM_STOP  9
-
-	/* Modify these if working with non-ASCII encoding */
-
-#define DPOINT '.'
-#define ISEXP(x) ( ( (x) == 'E') || ( (x) == 'e') )
+#define FSM_A    0
+#define FSM_B    1
+#define FSM_C    2
+#define FSM_D    3
+#define FSM_E    4
+#define FSM_F    5
+#define FSM_G    6
+#define FSM_H    7
+#define FSM_I    8
+#define FSM_STOP 9
 
 	/* The structure is filled by parser, then given to converter. */
 	struct PrepNumber
@@ -708,14 +703,11 @@ namespace bx
 #define PARSER_PINF   3  // number is higher than +HUGE_VAL
 #define PARSER_MINF   4  // number is lower than -HUGE_VAL
 
-	/* GETC() macro gets next character from processed string. */
-
-#define GETC(s) *s++
-
-	static int parser(const char *s, PrepNumber *pn)
+	static int parser(const char* _s, PrepNumber* _pn)
 	{
 		int state = FSM_A;
-		int digx = 0, c = ' ';            /* initial value for kicking off the state machine */
+		int digx = 0;
+		char c = ' ';            /* initial value for kicking off the state machine */
 		int result = PARSER_OK;
 		int expneg = 0;
 		int32_t expexp = 0;
@@ -727,7 +719,7 @@ namespace bx
 			case FSM_A:
 				if (isSpace(c) )
 				{
-					c = GETC(s);
+					c = *_s++;
 				}
 				else
 				{
@@ -740,17 +732,17 @@ namespace bx
 
 				if (c == '+')
 				{
-					c = GETC(s);
+					c = *_s++;
 				}
 				else if (c == '-')
 				{
-					pn->negative = 1;
-					c = GETC(s);
+					_pn->negative = 1;
+					c = *_s++;
 				}
 				else if (isNumeric(c) )
 				{
 				}
-				else if (c == DPOINT)
+				else if (c == '.')
 				{
 				}
 				else
@@ -762,11 +754,11 @@ namespace bx
 			case FSM_C:
 				if (c == '0')
 				{
-					c = GETC(s);
+					c = *_s++;
 				}
-				else if (c == DPOINT)
+				else if (c == '.')
 				{
-					c = GETC(s);
+					c = *_s++;
 					state = FSM_D;
 				}
 				else
@@ -778,8 +770,8 @@ namespace bx
 			case FSM_D:
 				if (c == '0')
 				{
-					c = GETC(s);
-					if (pn->exponent > -2147483647) pn->exponent--;
+					c = *_s++;
+					if (_pn->exponent > -2147483647) _pn->exponent--;
 				}
 				else
 				{
@@ -792,20 +784,20 @@ namespace bx
 				{
 					if (digx < DIGITS)
 					{
-						pn->mantissa *= 10;
-						pn->mantissa += c - '0';
+						_pn->mantissa *= 10;
+						_pn->mantissa += c - '0';
 						digx++;
 					}
-					else if (pn->exponent < 2147483647)
+					else if (_pn->exponent < 2147483647)
 					{
-						pn->exponent++;
+						_pn->exponent++;
 					}
 
-					c = GETC(s);
+					c = *_s++;
 				}
-				else if (c == DPOINT)
+				else if (c == '.')
 				{
-					c = GETC(s);
+					c = *_s++;
 					state = FSM_F;
 				}
 				else
@@ -819,17 +811,17 @@ namespace bx
 				{
 					if (digx < DIGITS)
 					{
-						pn->mantissa *= 10;
-						pn->mantissa += c - '0';
-						pn->exponent--;
+						_pn->mantissa *= 10;
+						_pn->mantissa += c - '0';
+						_pn->exponent--;
 						digx++;
 					}
 
-					c = GETC(s);
+					c = *_s++;
 				}
-				else if (ISEXP(c) )
+				else if ('e' == toLower(c) )
 				{
-					c = GETC(s);
+					c = *_s++;
 					state = FSM_G;
 				}
 				else
@@ -841,12 +833,12 @@ namespace bx
 			case FSM_G:
 				if (c == '+')
 				{
-					c = GETC(s);
+					c = *_s++;
 				}
 				else if (c == '-')
 				{
 					expneg = 1;
-					c = GETC(s);
+					c = *_s++;
 				}
 
 				state = FSM_H;
@@ -855,7 +847,7 @@ namespace bx
 			case FSM_H:
 				if (c == '0')
 				{
-					c = GETC(s);
+					c = *_s++;
 				}
 				else
 				{
@@ -872,7 +864,7 @@ namespace bx
 						expexp += c - '0';
 					}
 
-					c = GETC(s);
+					c = *_s++;
 				}
 				else
 				{
@@ -887,11 +879,11 @@ namespace bx
 			expexp = -expexp;
 		}
 
-		pn->exponent += expexp;
+		_pn->exponent += expexp;
 
-		if (pn->mantissa == 0)
+		if (_pn->mantissa == 0)
 		{
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				result = PARSER_MZERO;
 			}
@@ -900,9 +892,9 @@ namespace bx
 				result = PARSER_PZERO;
 			}
 		}
-		else if (pn->exponent > 309)
+		else if (_pn->exponent > 309)
 		{
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				result = PARSER_MINF;
 			}
@@ -911,9 +903,9 @@ namespace bx
 				result = PARSER_PINF;
 			}
 		}
-		else if (pn->exponent < -328)
+		else if (_pn->exponent < -328)
 		{
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				result = PARSER_MZERO;
 			}
@@ -926,7 +918,7 @@ namespace bx
 		return result;
 	}
 
-	static double converter(PrepNumber *pn)
+	static double converter(PrepNumber* _pn)
 	{
 		int binexp = 92;
 		HexDouble hd;
@@ -937,18 +929,18 @@ namespace bx
 
 		hd.u = 0;
 
-		s0 = (uint32_t)(pn->mantissa & 0xFFFFFFFF);
-		s1 = (uint32_t)(pn->mantissa >> 32);
+		s0 = (uint32_t)(_pn->mantissa & 0xFFFFFFFF);
+		s1 = (uint32_t)(_pn->mantissa >> 32);
 		s2 = 0;
 
-		while (pn->exponent > 0)
+		while (_pn->exponent > 0)
 		{
 			lsl96(s2, s1, s0, q2, q1, q0); // q = p << 1
 			lsl96(q2, q1, q0, r2, r1, r0); // r = p << 2
 			lsl96(r2, r1, r0, s2, s1, s0); // p = p << 3
 			add96(s2, s1, s0, q2, q1, q0); // p = (p << 3) + (p << 1)
 
-			pn->exponent--;
+			_pn->exponent--;
 
 			while (s2 & mask28)
 			{
@@ -960,7 +952,7 @@ namespace bx
 			}
 		}
 
-		while (pn->exponent < 0)
+		while (_pn->exponent < 0)
 		{
 			while (!(s2 & (1 << 31) ) )
 			{
@@ -987,7 +979,7 @@ namespace bx
 			s1 = q1;
 			s0 = q0;
 
-			pn->exponent++;
+			_pn->exponent++;
 		}
 
 		if (s2 || s1 || s0)
@@ -1006,7 +998,7 @@ namespace bx
 
 		if (binexp > 2046)
 		{
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				hd.u = DOUBLE_MINUS_INFINITY;
 			}
@@ -1017,7 +1009,7 @@ namespace bx
 		}
 		else if (binexp < 1)
 		{
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				hd.u = DOUBLE_MINUS_ZERO;
 			}
@@ -1031,7 +1023,7 @@ namespace bx
 			q =   ( (uint64_t)(s2 & ~mask28) << 24)
 			  | ( ( (uint64_t)s1 + 128) >> 8) | binexs2;
 
-			if (pn->negative)
+			if (_pn->negative)
 			{
 				q |= (1ULL << 63);
 			}
