@@ -80,7 +80,7 @@ namespace bx
 
 		DiyFp operator*(const DiyFp& rhs) const
 		{
-			const uint64_t M32 = 0xFFFFFFFF;
+			const uint64_t M32 = UINT32_MAX;
 			const uint64_t a = f >> 32;
 			const uint64_t b = f & M32;
 			const uint64_t c = rhs.f >> 32;
@@ -118,13 +118,13 @@ namespace bx
 
 #define UINT64_C2(h, l) ( (static_cast<uint64_t>(h) << 32) | static_cast<uint64_t>(l) )
 
-		static const int32_t kDiySignificandSize = 64;
-		static const int32_t kDpSignificandSize = 52;
-		static const int32_t kDpExponentBias = 0x3FF + kDpSignificandSize;
-		static const int32_t kDpMinExponent = -kDpExponentBias;
-		static const uint64_t kDpExponentMask = UINT64_C2(0x7FF00000, 0x00000000);
-		static const uint64_t kDpSignificandMask = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
-		static const uint64_t kDpHiddenBit = UINT64_C2(0x00100000, 0x00000000);
+		static const int32_t  kDiySignificandSize = 64;
+		static const int32_t  kDpSignificandSize  = 52;
+		static const int32_t  kDpExponentBias     = 0x3FF + kDpSignificandSize;
+		static const int32_t  kDpMinExponent      = -kDpExponentBias;
+		static const uint64_t kDpExponentMask     = UINT64_C2(0x7FF00000, 0x00000000);
+		static const uint64_t kDpSignificandMask  = UINT64_C2(0x000FFFFF, 0xFFFFFFFF);
+		static const uint64_t kDpHiddenBit        = UINT64_C2(0x00100000, 0x00000000);
 
 		uint64_t f;
 		int32_t e;
@@ -925,11 +925,11 @@ namespace bx
 		uint32_t s2, s1, s0; /* 96-bit precision integer */
 		uint32_t q2, q1, q0; /* 96-bit precision integer */
 		uint32_t r2, r1, r0; /* 96-bit precision integer */
-		uint32_t mask28 = 0xF << 28;
+		uint32_t mask28 = UINT32_C(0xf) << 28;
 
 		hd.u = 0;
 
-		s0 = (uint32_t)(_pn->mantissa & 0xFFFFFFFF);
+		s0 = (uint32_t)(_pn->mantissa & UINT32_MAX);
 		s1 = (uint32_t)(_pn->mantissa >> 32);
 		s2 = 0;
 
@@ -973,7 +973,7 @@ namespace bx
 			r1 = r2 % 10;
 			q1 = (q1 << 8) | ( (r0 & 0x00FF0000) >> 16);
 			q0 = r0 << 16;
-			r2 = (s0 & 0xFFFF) | (r1 << 16);
+			r2 = (s0 & UINT16_MAX) | (r1 << 16);
 			q0 |= r2 / 10;
 			s2 = q2;
 			s1 = q1;

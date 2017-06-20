@@ -185,7 +185,7 @@ TEST_CASE("toString double", "")
 static bool testFromString(double _value, const char* _input)
 {
 	char tmp[1024];
-	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
+	bx::toString(tmp, BX_COUNTOF(tmp), _value);
 
 	double lhs;
 	bx::fromString(&lhs, tmp);
