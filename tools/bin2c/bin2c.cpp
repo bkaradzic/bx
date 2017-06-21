@@ -123,21 +123,21 @@ int main(int _argc, const char* _argv[])
 	if (cmdLine.hasArg('h', "help") )
 	{
 		help();
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* filePath = cmdLine.findOption('f');
 	if (NULL == filePath)
 	{
 		help("Input file name must be specified.");
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* outFilePath = cmdLine.findOption('o');
 	if (NULL == outFilePath)
 	{
 		help("Output file name must be specified.");
-		return EXIT_FAILURE;
+		return bx::kExitFailure;
 	}
 
 	const char* name = cmdLine.findOption('n');

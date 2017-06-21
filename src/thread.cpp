@@ -76,7 +76,7 @@ namespace bx
 		: m_fn(NULL)
 		, m_userData(NULL)
 		, m_stackSize(0)
-		, m_exitCode(0 /*EXIT_SUCCESS*/)
+		, m_exitCode(kExitSuccess)
 		, m_running(false)
 	{
 		BX_STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal) );
