@@ -70,7 +70,11 @@
 #	define BX_UNLIKELY(_x) __builtin_expect(!!(_x), 0)
 #	define BX_NO_INLINE   __attribute__( (noinline) )
 #	define BX_NO_RETURN   __attribute__( (noreturn) )
-#	define BX_FALLTHROUGH __attribute__ ((fallthrough));
+#	if BX_COMPILER_GCC >= 70000
+#		define BX_FALLTHROUGH __attribute__( (fallthrough) )
+#	else
+#		define BX_FALLTHROUGH BX_NOOP()
+#	endif // BX_COMPILER_GCC >= 70000
 #	define BX_NO_VTABLE
 #	define BX_OVERRIDE
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
