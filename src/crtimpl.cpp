@@ -6,7 +6,9 @@
 #include <bx/crtimpl.h>
 
 #include <stdio.h>
+#ifndef BX_PLATFORM_BSD
 #include <malloc.h>
+#endif
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
 #	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \

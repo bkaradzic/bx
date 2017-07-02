@@ -10,9 +10,10 @@
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI
+	|| BX_PLATFORM_RPI     \
+  || BX_PLATFORM_BSD
 #	include <pthread.h>
-#	if defined(__FreeBSD__)
+#	if defined(__FreeBSD__) || defined(__OpenBSD__)
 #		include <pthread_np.h>
 #	endif
 #	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
