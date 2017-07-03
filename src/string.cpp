@@ -798,9 +798,9 @@ namespace bx
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t size = write(_writer, _format, argList, _err);
+		int32_t total = write(_writer, _format, argList, _err);
 		va_end(argList);
-		return size;
+		return total;
 	}
 
 	int32_t vsnprintfRef(char* _out, int32_t _max, const char* _format, va_list _argList)
@@ -834,8 +834,11 @@ namespace bx
 
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
+		va_list argList;
+		va_copy(argList, _argList);
+		int32_t total = 0;
 #if BX_CRT_NONE
-		return vsnprintfRef(_out, _max, _format, _argList);
+		total = vsnprintfRef(_out, _max, _format, argList);
 #elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
@@ -845,26 +848,30 @@ namespace bx
 			len = ::vsnprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
-		return -1 == len ? ::_vscprintf(_format, _argList) : len;
+		total = -1 == len ? ::_vscprintf(_format, argList) : len;
 #else
-		return ::vsnprintf(_out, _max, _format, _argList);
+		total = ::vsnprintf(_out, _max, _format, argList);
 #endif // BX_COMPILER_MSVC
+		va_end(argList);
+		return total;
 	}
 
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		int32_t len = vsnprintf(_out, _max, _format, argList);
+		int32_t total = vsnprintf(_out, _max, _format, argList);
 		va_end(argList);
-		return len;
+		return total;
 	}
 
 	int32_t vsnwprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, va_list _argList)
 	{
+		va_list argList;
+		va_copy(argList, _argList);
+		int32_t total = 0;
 #if BX_CRT_NONE
 		BX_UNUSED(_out, _max, _format, _argList);
-		return 0;
 #elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
@@ -874,12 +881,14 @@ namespace bx
 			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
 			va_end(argListCopy);
 		}
-		return -1 == len ? ::_vscwprintf(_format, _argList) : len;
+		total = -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif BX_CRT_MINGW
-		return ::vsnwprintf(_out, _max, _format, _argList);
+		total = ::vsnwprintf(_out, _max, _format, _argList);
 #else
-		return ::vswprintf(_out, _max, _format, _argList);
+		total = ::vswprintf(_out, _max, _format, _argList);
 #endif // BX_COMPILER_MSVC
+		va_end(argList);
+		return total;
 	}
 
 	int32_t swnprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, ...)
