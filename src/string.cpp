@@ -871,7 +871,7 @@ namespace bx
 		va_copy(argList, _argList);
 		int32_t total = 0;
 #if BX_CRT_NONE
-		BX_UNUSED(_out, _max, _format, _argList);
+		BX_UNUSED(_out, _max, _format, argList);
 #elif BX_CRT_MSVC
 		int32_t len = -1;
 		if (NULL != _out)
@@ -883,9 +883,9 @@ namespace bx
 		}
 		total = -1 == len ? ::_vscwprintf(_format, _argList) : len;
 #elif BX_CRT_MINGW
-		total = ::vsnwprintf(_out, _max, _format, _argList);
+		total = ::vsnwprintf(_out, _max, _format, argList);
 #else
-		total = ::vswprintf(_out, _max, _format, _argList);
+		total = ::vswprintf(_out, _max, _format, argList);
 #endif // BX_COMPILER_MSVC
 		va_end(argList);
 		return total;
