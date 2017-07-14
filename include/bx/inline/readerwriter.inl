@@ -293,6 +293,11 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write(_writer, _str, strLen(_str), _err);
+	}
+
 	inline int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);

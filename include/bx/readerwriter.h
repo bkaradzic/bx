@@ -247,6 +247,9 @@ namespace bx
 	/// Write data.
 	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err = NULL);
 
+	/// Writer string.
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
+
 	/// Write repeat the same value.
 	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err = NULL);
 
