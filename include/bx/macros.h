@@ -76,7 +76,7 @@
 #		define BX_FALLTHROUGH BX_NOOP()
 #	endif // BX_COMPILER_GCC >= 70000
 #	define BX_NO_VTABLE
-#	define BX_OVERRIDE
+#	define BX_OVERRIDE override
 #	define BX_PRINTF_ARGS(_format, _args) __attribute__( (format(__printf__, _format, _args) ) )
 #	if BX_CLANG_HAS_FEATURE(cxx_thread_local)
 #		define BX_THREAD_LOCAL __thread
