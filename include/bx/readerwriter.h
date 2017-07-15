@@ -121,7 +121,7 @@ namespace bx
 		virtual void* more(uint32_t _size = 0);
 
 		///
-		virtual uint32_t getSize() BX_OVERRIDE;
+		virtual uint32_t getSize() override;
 
 	private:
 		void* m_data;
@@ -139,10 +139,10 @@ namespace bx
 		virtual ~MemoryBlock();
 
 		///
-		virtual void* more(uint32_t _size = 0) BX_OVERRIDE;
+		virtual void* more(uint32_t _size = 0) override;
 
 		///
-		virtual uint32_t getSize() BX_OVERRIDE;
+		virtual uint32_t getSize() override;
 
 	private:
 		AllocatorI* m_allocator;
@@ -161,10 +161,10 @@ namespace bx
 		virtual ~SizerWriter();
 
 		///
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE;
+		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) override;
 
 		///
-		virtual int32_t write(const void* /*_data*/, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t write(const void* /*_data*/, int32_t _size, Error* _err) override;
 
 	private:
 		int64_t m_pos;
@@ -182,10 +182,10 @@ namespace bx
 		virtual ~MemoryReader();
 
 		///
-		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE;
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override;
 
 		///
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
 
 		///
 		const uint8_t* getDataPtr() const;
@@ -213,10 +213,10 @@ namespace bx
 		virtual ~MemoryWriter();
 
 		///
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE;
+		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) override;
 
 		///
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override;
 
 	private:
 		MemoryBlockI* m_memBlock;

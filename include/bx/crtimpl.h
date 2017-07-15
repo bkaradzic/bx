@@ -22,7 +22,7 @@ namespace bx
 		virtual ~DefaultAllocator();
 
 		///
-		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) BX_OVERRIDE;
+		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) override;
 	};
 
 	///
@@ -45,16 +45,16 @@ namespace bx
 		virtual ~FileReader();
 
 		///
-		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, Error* _err) override;
 
 		///
-		virtual void close() BX_OVERRIDE;
+		virtual void close() override;
 
 		///
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE;
+		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) override;
 
 		///
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
 
 	private:
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
@@ -71,16 +71,16 @@ namespace bx
 		virtual ~FileWriter();
 
 		///
-		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override;
 
 		///
-		virtual void close() BX_OVERRIDE;
+		virtual void close() override;
 
 		///
-		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) BX_OVERRIDE;
+		virtual int64_t seek(int64_t _offset = 0, Whence::Enum _whence = Whence::Current) override;
 
 		///
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override;
 
 	private:
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
@@ -100,13 +100,13 @@ namespace bx
 		~ProcessReader();
 
 		///
-		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) override;
 
 		///
-		virtual void close() BX_OVERRIDE;
+		virtual void close() override;
 
 		///
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
 
 		///
 		int32_t getExitCode() const;
@@ -130,13 +130,13 @@ namespace bx
 		~ProcessWriter();
 
 		///
-		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) override;
 
 		///
-		virtual void close() BX_OVERRIDE;
+		virtual void close() override;
 
 		///
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE;
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override;
 
 		///
 		int32_t getExitCode() const;

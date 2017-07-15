@@ -116,7 +116,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -137,7 +137,7 @@ namespace bx
 			return true;
 		}
 
-		virtual void close() BX_OVERRIDE
+		virtual void close() override
 		{
 			if (m_open
 			&&  NULL != m_file)
@@ -147,14 +147,14 @@ namespace bx
 			}
 		}
 
-		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
 			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
 			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
@@ -196,7 +196,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -218,7 +218,7 @@ namespace bx
 			return true;
 		}
 
-		virtual void close() BX_OVERRIDE
+		virtual void close() override
 		{
 			if (m_open
 			&&  NULL != m_file)
@@ -228,14 +228,14 @@ namespace bx
 			}
 		}
 
-		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
 			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			fseeko64(m_file, _offset, _whence);
 			return ftello64(m_file);
 		}
 
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
 			BX_CHECK(NULL != m_file, "Reader/Writer file is not open.");
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
@@ -269,23 +269,23 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, Error* _err) override
 		{
 			BX_UNUSED(_filePath, _err);
 			return false;
 		}
 
-		virtual void close() BX_OVERRIDE
+		virtual void close() override
 		{
 		}
 
-		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
 			BX_UNUSED(_offset, _whence);
 			return 0;
 		}
 
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
 		{
 			BX_UNUSED(_data, _size, _err);
 			return 0;
@@ -304,23 +304,23 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override
 		{
 			BX_UNUSED(_filePath, _append);
 			return false;
 		}
 
-		virtual void close() BX_OVERRIDE
+		virtual void close() override
 		{
 		}
 
-		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) BX_OVERRIDE
+		virtual int64_t seek(int64_t _offset, Whence::Enum _whence) override
 		{
 			BX_UNUSED(_offset, _whence);
 			return 0;
 		}
 
-		virtual int32_t write(const void* _data, int32_t _size, Error* _err) BX_OVERRIDE
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override
 		{
 			BX_UNUSED(_data, _size, _err);
 			return 0;
