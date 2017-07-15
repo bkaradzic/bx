@@ -8,8 +8,6 @@
 
 #include "bx.h"
 
-#include <new>
-
 #if BX_CONFIG_ALLOCATOR_DEBUG
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0, __FILE__, __LINE__)
 #	define BX_REALLOC(_allocator, _ptr, _size)                 bx::realloc(_allocator, _ptr, _size, 0, __FILE__, __LINE__)
@@ -17,9 +15,7 @@
 #	define BX_ALIGNED_ALLOC(_allocator, _size, _align)         bx::alloc(_allocator, _size, _align, __FILE__, __LINE__)
 #	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size, _align) bx::realloc(_allocator, _ptr, _size, _align, __FILE__, __LINE__)
 #	define BX_ALIGNED_FREE(_allocator, _ptr, _align)           bx::free(_allocator, _ptr, _align, __FILE__, __LINE__)
-#	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr, 0, __FILE__, __LINE__)
-#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
 #	define BX_ALIGNED_DELETE(_allocator, _ptr, _align)         bx::deleteObject(_allocator, _ptr, _align, __FILE__, __LINE__)
 #else
 #	define BX_ALLOC(_allocator, _size)                         bx::alloc(_allocator, _size, 0)
@@ -28,15 +24,18 @@
 #	define BX_ALIGNED_ALLOC(_allocator, _size, _align)         bx::alloc(_allocator, _size, _align)
 #	define BX_ALIGNED_REALLOC(_allocator, _ptr, _size, _align) bx::realloc(_allocator, _ptr, _size, _align)
 #	define BX_ALIGNED_FREE(_allocator, _ptr, _align)           bx::free(_allocator, _ptr, _align)
-#	define BX_NEW(_allocator, _type)                           ::new(BX_ALLOC(_allocator, sizeof(_type) ) ) _type
 #	define BX_DELETE(_allocator, _ptr)                         bx::deleteObject(_allocator, _ptr, 0)
-#	define BX_ALIGNED_NEW(_allocator, _type, _align)           ::new(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align) ) _type
 #	define BX_ALIGNED_DELETE(_allocator, _ptr, _align)         bx::deleteObject(_allocator, _ptr, _align)
 #endif // BX_CONFIG_DEBUG_ALLOC
 
-#ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
-#	define BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8
-#endif // BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+#define BX_NEW(_allocator, _type)                 BX_PLACEMENT_NEW(BX_ALLOC(_allocator, sizeof(_type) ), _type)
+#define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(BX_ALIGNED_ALLOC(_allocator, sizeof(_type), _align), _type)
+#define BX_PLACEMENT_NEW(_ptr, _type)             ::new(bx::PlacementNewTag(), _ptr) _type
+
+namespace bx { struct PlacementNewTag {}; }
+
+void* operator new(size_t, bx::PlacementNewTag, void* _ptr);
+void  operator delete(void*, bx::PlacementNewTag, void*) throw();
 
 namespace bx
 {
@@ -64,7 +63,7 @@ namespace bx
 	void* alignPtr(
 		  void* _ptr
 		, size_t _extra
-		, size_t _align = BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+		, size_t _align = 0
 		);
 
 	/// Allocate memory.

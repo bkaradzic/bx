@@ -24,6 +24,10 @@
 			)
 #endif // BX_CONFIG_CRT_PROCESS
 
+#ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+#	define BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8
+#endif // BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
+
 namespace bx
 {
 	DefaultAllocator::DefaultAllocator()
@@ -332,7 +336,7 @@ namespace bx
 	FileReader::FileReader()
 	{
 		BX_STATIC_ASSERT(sizeof(FileReaderImpl) <= sizeof(m_internal) );
-		new(m_internal) FileReaderImpl(NULL);
+		BX_PLACEMENT_NEW(m_internal, FileReaderImpl)(NULL);
 	}
 
 	FileReader::~FileReader()
@@ -368,7 +372,7 @@ namespace bx
 	FileWriter::FileWriter()
 	{
 		BX_STATIC_ASSERT(sizeof(FileWriterImpl) <= sizeof(m_internal) );
-		new(m_internal) FileWriterImpl(NULL);
+		BX_PLACEMENT_NEW(m_internal, FileWriterImpl)(NULL);
 	}
 
 	FileWriter::~FileWriter()
