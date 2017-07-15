@@ -32,6 +32,9 @@ namespace bx
 		StringView(const StringView& _rhs);
 
 		///
+		StringView& operator=(const char* _rhs);
+
+		///
 		StringView& operator=(const StringView& _rhs);
 
 		///

@@ -45,7 +45,7 @@ namespace bx
 		virtual ~FileReader();
 
 		///
-		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE;
 
 		///
 		virtual void close() BX_OVERRIDE;
@@ -71,7 +71,7 @@ namespace bx
 		virtual ~FileWriter();
 
 		///
-		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE;
 
 		///
 		virtual void close() BX_OVERRIDE;
@@ -87,7 +87,10 @@ namespace bx
 	};
 
 	///
-	class ProcessReader : public ReaderOpenI, public CloserI, public ReaderI
+	class ProcessReader
+		: public ProcessOpenI
+		, public CloserI
+		, public ReaderI
 	{
 	public:
 		///
@@ -97,7 +100,7 @@ namespace bx
 		~ProcessReader();
 
 		///
-		virtual bool open(const char* _command, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) BX_OVERRIDE;
 
 		///
 		virtual void close() BX_OVERRIDE;
@@ -114,7 +117,10 @@ namespace bx
 	};
 
 	///
-	class ProcessWriter : public WriterOpenI, public CloserI, public WriterI
+	class ProcessWriter
+		: public ProcessOpenI
+		, public CloserI
+		, public WriterI
 	{
 	public:
 		///
@@ -124,7 +130,7 @@ namespace bx
 		~ProcessWriter();
 
 		///
-		virtual bool open(const char* _command, bool, Error* _err) BX_OVERRIDE;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) BX_OVERRIDE;
 
 		///
 		virtual void close() BX_OVERRIDE;

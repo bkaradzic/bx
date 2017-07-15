@@ -28,13 +28,19 @@ namespace bx
 		FilePath();
 
 		///
+		FilePath(const char* _str);
+
+		///
 		FilePath(const StringView& _str);
+
+		///
+		FilePath& operator=(const StringView& _rhs);
 
 		///
 		void set(const StringView& _str);
 
 		///
-		const StringView get() const;
+		const char* get() const;
 
 		/// If path is `/abv/gd/555/333/pod.mac` returns `/abv/gd/555/333/`.
 		///

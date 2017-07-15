@@ -64,6 +64,12 @@ namespace bx
 		set(_rhs.m_ptr, _rhs.m_len);
 	}
 
+	inline StringView& StringView::operator=(const char* _rhs)
+	{
+		set(_rhs);
+		return *this;
+	}
+
 	inline StringView& StringView::operator=(const StringView& _rhs)
 	{
 		set(_rhs.m_ptr, _rhs.m_len);

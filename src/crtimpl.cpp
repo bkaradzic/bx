@@ -116,7 +116,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -126,7 +126,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath, "rb");
+			m_file = fopen(_filePath.get(), "rb");
 			if (NULL == m_file)
 			{
 				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
@@ -196,7 +196,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -206,7 +206,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath, _append ? "ab" : "wb");
+			m_file = fopen(_filePath.get(), _append ? "ab" : "wb");
 
 			if (NULL == m_file)
 			{
@@ -269,7 +269,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const char* _filePath, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, Error* _err) BX_OVERRIDE
 		{
 			BX_UNUSED(_filePath, _err);
 			return false;
@@ -304,7 +304,7 @@ namespace bx
 			close();
 		}
 
-		virtual bool open(const char* _filePath, bool _append, Error* _err) BX_OVERRIDE
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) BX_OVERRIDE
 		{
 			BX_UNUSED(_filePath, _append);
 			return false;
@@ -341,7 +341,7 @@ namespace bx
 		impl->~FileReaderImpl();
 	}
 
-	bool FileReader::open(const char* _filePath, Error* _err)
+	bool FileReader::open(const FilePath& _filePath, Error* _err)
 	{
 		FileReaderImpl* impl = reinterpret_cast<FileReaderImpl*>(m_internal);
 		return impl->open(_filePath, _err);
@@ -377,7 +377,7 @@ namespace bx
 		impl->~FileWriterImpl();
 	}
 
-	bool FileWriter::open(const char* _filePath, bool _append, Error* _err)
+	bool FileWriter::open(const FilePath& _filePath, bool _append, Error* _err)
 	{
 		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
 		return impl->open(_filePath, _append, _err);
@@ -436,7 +436,7 @@ namespace bx
 		BX_CHECK(NULL == m_file, "Process not closed!");
 	}
 
-	bool ProcessReader::open(const char* _command, Error* _err)
+	bool ProcessReader::open(const FilePath& _filePath, const StringView& _args, Error* _err)
 	{
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -446,7 +446,12 @@ namespace bx
 			return false;
 		}
 
-		m_file = popen(_command, "r");
+		char tmp[kMaxFilePath*2];
+		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), " ");
+		strCat(tmp, BX_COUNTOF(tmp), _args);
+
+		m_file = popen(tmp, "r");
 		if (NULL == m_file)
 		{
 			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessReader: Failed to open process.");
@@ -502,7 +507,7 @@ namespace bx
 		BX_CHECK(NULL == m_file, "Process not closed!");
 	}
 
-	bool ProcessWriter::open(const char* _command, bool, Error* _err)
+	bool ProcessWriter::open(const FilePath& _filePath, const StringView& _args, Error* _err)
 	{
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
@@ -512,7 +517,12 @@ namespace bx
 			return false;
 		}
 
-		m_file = popen(_command, "w");
+		char tmp[kMaxFilePath*2];
+		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
+		strCat(tmp, BX_COUNTOF(tmp), " ");
+		strCat(tmp, BX_COUNTOF(tmp), _args);
+
+		m_file = popen(tmp, "w");
 		if (NULL == m_file)
 		{
 			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessWriter: Failed to open process.");

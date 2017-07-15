@@ -9,6 +9,7 @@
 #include "allocator.h"
 #include "error.h"
 #include "endian.h"
+#include "filepath.h"
 #include "uint32_t.h"
 
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,         BX_MAKEFOURCC('R', 'W', 0, 1) );
@@ -65,14 +66,21 @@ namespace bx
 	struct BX_NO_VTABLE ReaderOpenI
 	{
 		virtual ~ReaderOpenI() = 0;
-		virtual bool open(const char* _filePath, Error* _err) = 0;
+		virtual bool open(const FilePath& _filePath, Error* _err) = 0;
 	};
 
 	///
 	struct BX_NO_VTABLE WriterOpenI
 	{
 		virtual ~WriterOpenI() = 0;
-		virtual bool open(const char* _filePath, bool _append, Error* _err) = 0;
+		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) = 0;
+	};
+
+	///
+	struct BX_NO_VTABLE ProcessOpenI
+	{
+		virtual ~ProcessOpenI() = 0;
+		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err) = 0;
 	};
 
 	///
@@ -248,7 +256,7 @@ namespace bx
 	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err = NULL);
 
 	/// Writer string.
-	inline int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
+	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
 
 	/// Write repeat the same value.
 	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err = NULL);
@@ -291,10 +299,13 @@ namespace bx
 	int32_t align(WriterSeekerI* _writer, uint32_t _alignment, Error* _err = NULL);
 
 	///
-	bool open(ReaderOpenI* _reader, const char* _filePath, Error* _err = NULL);
+	bool open(ReaderOpenI* _reader, const FilePath& _filePath, Error* _err = NULL);
 
 	///
-	bool open(WriterOpenI* _writer, const char* _filePath, bool _append = false, Error* _err = NULL);
+	bool open(WriterOpenI* _writer, const FilePath& _filePath, bool _append = false, Error* _err = NULL);
+
+	///
+	bool open(ProcessOpenI* _process, const FilePath& _filePath, const StringView& _args, Error* _err = NULL);
 
 	///
 	void close(CloserI* _reader);

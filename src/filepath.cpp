@@ -133,9 +133,20 @@ namespace bx
 		set("");
 	}
 
+	FilePath::FilePath(const char* _rhs)
+	{
+		set(_rhs);
+	}
+
 	FilePath::FilePath(const StringView& _filePath)
 	{
 		set(_filePath);
+	}
+
+	FilePath& FilePath::operator=(const StringView& _rhs)
+	{
+		set(_rhs);
+		return *this;
 	}
 
 	void FilePath::set(const StringView& _filePath)
@@ -148,9 +159,9 @@ namespace bx
 			);
 	}
 
-	const StringView FilePath::get() const
+	const char* FilePath::get() const
 	{
-		return StringView(m_filePath);
+		return m_filePath;
 	}
 
 	const StringView FilePath::getPath() const
