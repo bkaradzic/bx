@@ -118,7 +118,7 @@ namespace bx
 		virtual ~StaticMemoryBlock();
 
 		///
-		virtual void* more(uint32_t _size = 0);
+		virtual void* more(uint32_t _size = 0) override;
 
 		///
 		virtual uint32_t getSize() override;
