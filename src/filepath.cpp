@@ -223,6 +223,15 @@ namespace bx
 			);
 	}
 
+	void FilePath::join(const StringView& _str)
+	{
+		char tmp[kMaxFilePath];
+		strCopy(tmp, BX_COUNTOF(tmp), m_filePath);
+		strCat(tmp, BX_COUNTOF(tmp), "/");
+		strCat(tmp, BX_COUNTOF(tmp), _str);
+		set(tmp);
+	}
+
 	const char* FilePath::get() const
 	{
 		return m_filePath;

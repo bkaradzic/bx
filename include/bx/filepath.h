@@ -47,6 +47,9 @@ namespace bx
 		void set(const StringView& _str);
 
 		///
+		void join(const StringView& _str);
+
+		///
 		const char* get() const;
 
 		/// If path is `/abv/gd/555/333/pod.mac` returns `/abv/gd/555/333/`.
