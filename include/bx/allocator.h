@@ -53,7 +53,33 @@ namespace bx
 		/// @param[in] _align Alignment.
 		/// @param[in] _file Debug file path info.
 		/// @param[in] _line Debug file line info.
-		virtual void* realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line) = 0;
+		virtual void* realloc(
+			  void* _ptr
+			, size_t _size
+			, size_t _align
+			, const char* _file
+			, uint32_t _line
+			) = 0;
+	};
+
+	///
+	class DefaultAllocator : public AllocatorI
+	{
+	public:
+		///
+		DefaultAllocator();
+
+		///
+		virtual ~DefaultAllocator();
+
+		///
+		virtual void* realloc(
+			  void* _ptr
+			, size_t _size
+			, size_t _align
+			, const char* _file
+			, uint32_t _line
+			) override;
 	};
 
 	/// Check if pointer is aligned. _align must be power of two.

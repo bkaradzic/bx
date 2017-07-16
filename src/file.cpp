@@ -3,10 +3,10 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/crtimpl.h>
+#include <bx/file.h>
 
 #include <stdio.h>
-#include <malloc.h>
+#include <sys/stat.h>
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
 #	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \
@@ -14,80 +14,8 @@
 			)
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
-#ifndef BX_CONFIG_CRT_PROCESS
-#	define BX_CONFIG_CRT_PROCESS !(0  \
-			|| BX_CRT_NONE            \
-			|| BX_PLATFORM_EMSCRIPTEN \
-			|| BX_PLATFORM_PS4        \
-			|| BX_PLATFORM_WINRT      \
-			|| BX_PLATFORM_XBOXONE    \
-			)
-#endif // BX_CONFIG_CRT_PROCESS
-
-#ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
-#	define BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8
-#endif // BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
-
 namespace bx
 {
-	DefaultAllocator::DefaultAllocator()
-	{
-	}
-
-	DefaultAllocator::~DefaultAllocator()
-	{
-	}
-
-	void* DefaultAllocator::realloc(void* _ptr, size_t _size, size_t _align, const char* _file, uint32_t _line)
-	{
-		if (0 == _size)
-		{
-			if (NULL != _ptr)
-			{
-				if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-				{
-					::free(_ptr);
-					return NULL;
-				}
-
-#	if BX_COMPILER_MSVC
-				BX_UNUSED(_file, _line);
-				_aligned_free(_ptr);
-#	else
-				bx::alignedFree(this, _ptr, _align, _file, _line);
-#	endif // BX_
-			}
-
-			return NULL;
-		}
-		else if (NULL == _ptr)
-		{
-			if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-			{
-				return ::malloc(_size);
-			}
-
-#	if BX_COMPILER_MSVC
-			BX_UNUSED(_file, _line);
-			return _aligned_malloc(_size, _align);
-#	else
-			return bx::alignedAlloc(this, _size, _align, _file, _line);
-#	endif // BX_
-		}
-
-		if (BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT >= _align)
-		{
-			return ::realloc(_ptr, _size);
-		}
-
-#	if BX_COMPILER_MSVC
-		BX_UNUSED(_file, _line);
-		return _aligned_realloc(_ptr, _size, _align);
-#	else
-		return bx::alignedRealloc(this, _ptr, _size, _align, _file, _line);
-#	endif // BX_
-	}
-
 #if BX_CONFIG_CRT_FILE_READER_WRITER
 
 #	if BX_CRT_MSVC
@@ -423,150 +351,49 @@ namespace bx
 		return &s_stdOut;
 	}
 
-#if BX_CONFIG_CRT_PROCESS
-
-#if BX_CRT_MSVC
-#	define popen  _popen
-#	define pclose _pclose
-#endif // BX_CRT_MSVC
-
-	ProcessReader::ProcessReader()
-		: m_file(NULL)
+	bool stat(const char* _filePath, FileInfo& _fileInfo)
 	{
-	}
+		_fileInfo.m_size = 0;
+		_fileInfo.m_type = FileInfo::Count;
 
-	ProcessReader::~ProcessReader()
-	{
-		BX_CHECK(NULL == m_file, "Process not closed!");
-	}
+#if BX_COMPILER_MSVC
+		struct ::_stat64 st;
+		int32_t result = ::_stat64(_filePath, &st);
 
-	bool ProcessReader::open(const FilePath& _filePath, const StringView& _args, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		if (NULL != m_file)
+		if (0 != result)
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessReader: File is already open.");
 			return false;
 		}
 
-		char tmp[kMaxFilePath*2];
-		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
-		strCat(tmp, BX_COUNTOF(tmp), " ");
-		strCat(tmp, BX_COUNTOF(tmp), _args);
-
-		m_file = popen(tmp, "r");
-		if (NULL == m_file)
+		if (0 != (st.st_mode & _S_IFREG) )
 		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessReader: Failed to open process.");
+			_fileInfo.m_type = FileInfo::Regular;
+		}
+		else if (0 != (st.st_mode & _S_IFDIR) )
+		{
+			_fileInfo.m_type = FileInfo::Directory;
+		}
+#else
+		struct ::stat st;
+		int32_t result = ::stat(_filePath, &st);
+		if (0 != result)
+		{
 			return false;
 		}
+
+		if (0 != (st.st_mode & S_IFREG) )
+		{
+			_fileInfo.m_type = FileInfo::Regular;
+		}
+		else if (0 != (st.st_mode & S_IFDIR) )
+		{
+			_fileInfo.m_type = FileInfo::Directory;
+		}
+#endif // BX_COMPILER_MSVC
+
+		_fileInfo.m_size = st.st_size;
 
 		return true;
 	}
-
-	void ProcessReader::close()
-	{
-		BX_CHECK(NULL != m_file, "Process not open!");
-		FILE* file = (FILE*)m_file;
-		m_exitCode = pclose(file);
-		m_file = NULL;
-	}
-
-	int32_t ProcessReader::read(void* _data, int32_t _size, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
-
-		FILE* file = (FILE*)m_file;
-		int32_t size = (int32_t)fread(_data, 1, _size, file);
-		if (size != _size)
-		{
-			if (0 != feof(file) )
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "ProcessReader: EOF.");
-			}
-			else if (0 != ferror(file) )
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_READ, "ProcessReader: read error.");
-			}
-
-			return size >= 0 ? size : 0;
-		}
-
-		return size;
-	}
-
-	int32_t ProcessReader::getExitCode() const
-	{
-		return m_exitCode;
-	}
-
-	ProcessWriter::ProcessWriter()
-		: m_file(NULL)
-	{
-	}
-
-	ProcessWriter::~ProcessWriter()
-	{
-		BX_CHECK(NULL == m_file, "Process not closed!");
-	}
-
-	bool ProcessWriter::open(const FilePath& _filePath, const StringView& _args, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		if (NULL != m_file)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_ALREADY_OPEN, "ProcessWriter: File is already open.");
-			return false;
-		}
-
-		char tmp[kMaxFilePath*2];
-		strCopy(tmp, BX_COUNTOF(tmp), _filePath.get() );
-		strCat(tmp, BX_COUNTOF(tmp), " ");
-		strCat(tmp, BX_COUNTOF(tmp), _args);
-
-		m_file = popen(tmp, "w");
-		if (NULL == m_file)
-		{
-			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "ProcessWriter: Failed to open process.");
-			return false;
-		}
-
-		return true;
-	}
-
-	void ProcessWriter::close()
-	{
-		BX_CHECK(NULL != m_file, "Process not open!");
-		FILE* file = (FILE*)m_file;
-		m_exitCode = pclose(file);
-		m_file = NULL;
-	}
-
-	int32_t ProcessWriter::write(const void* _data, int32_t _size, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors."); BX_UNUSED(_err);
-
-		FILE* file = (FILE*)m_file;
-		int32_t size = (int32_t)fwrite(_data, 1, _size, file);
-		if (size != _size)
-		{
-			if (0 != ferror(file) )
-			{
-				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "ProcessWriter: write error.");
-			}
-
-			return size >= 0 ? size : 0;
-		}
-
-		return size;
-	}
-
-	int32_t ProcessWriter::getExitCode() const
-	{
-		return m_exitCode;
-	}
-#endif // BX_CONFIG_CRT_PROCESS
 
 } // namespace bx

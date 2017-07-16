@@ -9,7 +9,7 @@
 #include "crtnone.cpp"
 #include "debug.cpp"
 #include "dtoa.cpp"
-#include "fpumath.cpp"
+#include "math.cpp"
 #include "mutex.cpp"
 #include "os.cpp"
 #include "semaphore.cpp"

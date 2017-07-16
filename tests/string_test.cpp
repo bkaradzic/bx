@@ -5,7 +5,6 @@
 
 #include "test.h"
 #include <bx/string.h>
-#include <bx/crtimpl.h>
 #include <bx/handlealloc.h>
 
 bx::AllocatorI* g_allocator;

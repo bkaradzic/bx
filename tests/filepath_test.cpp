@@ -116,3 +116,9 @@ TEST_CASE("FilePath", "")
 		REQUIRE(test.absolute == fp.isAbsolute() );
 	};
 }
+
+TEST_CASE("FilePath temp", "")
+{
+	bx::FilePath tmp(bx::TempDir::Tag);
+	REQUIRE(0 != bx::strCmp(".", tmp.getPath() ) );
+}

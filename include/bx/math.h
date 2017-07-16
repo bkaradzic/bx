@@ -488,6 +488,6 @@ namespace bx
 
 } // namespace bx
 
-#include "inline/fpumath.inl"
+#include "inline/math.inl"
 
 #endif // BX_FPU_MATH_H_HEADER_GUARD

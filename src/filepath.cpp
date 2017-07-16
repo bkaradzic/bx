@@ -3,7 +3,8 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <bx/filepath.h>
+#include <bx/file.h>
+#include <bx/os.h>
 #include <bx/readerwriter.h>
 
 namespace bx
@@ -128,9 +129,60 @@ namespace bx
 		return size;
 	}
 
+	static bool getTempPath(char* _out, uint32_t* _inOutSize)
+	{
+#if BX_PLATFORM_WINDOWS
+		uint32_t len = ::GetTempPathA(*_inOutSize, _out);
+		bool result = len != 0 && len < *_inOutSize;
+		*_inOutSize = len;
+		return result;
+#else
+		static const char* s_tmp[] =
+		{
+			"TMPDIR",
+			"TMP",
+			"TEMP",
+			"TEMPDIR",
+
+			NULL
+		};
+
+		for (const char** tmp = s_tmp; *tmp != NULL; ++tmp)
+		{
+			uint32_t len = *_inOutSize;
+			*_out = '\0';
+			bool result = getenv(*tmp, _out, &len);
+
+			if (result
+			&&  len != 0
+			&&  len < *_inOutSize)
+			{
+				*_inOutSize = len;
+				return result;
+			}
+		}
+
+		FileInfo fi;
+		if (stat("/tmp", fi)
+		&&  FileInfo::Directory == fi.m_type)
+		{
+			strCopy(_out, *_inOutSize, "/tmp");
+			*_inOutSize = 4;
+			return true;
+		}
+
+		return false;
+#endif // BX_PLATFORM_*
+	}
+
 	FilePath::FilePath()
 	{
 		set("");
+	}
+
+	FilePath::FilePath(TempDir::Enum)
+	{
+		set(TempDir::Tag);
 	}
 
 	FilePath::FilePath(const char* _rhs)
@@ -147,6 +199,14 @@ namespace bx
 	{
 		set(_rhs);
 		return *this;
+	}
+
+	void FilePath::set(TempDir::Enum)
+	{
+		char tmp[kMaxFilePath];
+		uint32_t len = BX_COUNTOF(tmp);
+		getTempPath(tmp, &len);
+		set(StringView(tmp, len) );
 	}
 
 	void FilePath::set(const StringView& _filePath)
