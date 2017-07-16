@@ -297,6 +297,11 @@ namespace bx
 		return _writer->write(_data, _size, _err);
 	}
 
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err)
+	{
+		return write(_writer, _str, strLen(_str), _err);
+	}
+
 	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err)
 	{
 		return write(_writer, _str.getPtr(), _str.getLength(), _err);

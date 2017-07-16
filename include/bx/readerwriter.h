@@ -255,7 +255,10 @@ namespace bx
 	/// Write data.
 	int32_t write(WriterI* _writer, const void* _data, int32_t _size, Error* _err = NULL);
 
-	/// Writer string.
+	/// Write C string.
+	inline int32_t write(WriterI* _writer, const char* _str, Error* _err = NULL);
+
+	/// Write string view.
 	inline int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
 
 	/// Write repeat the same value.
