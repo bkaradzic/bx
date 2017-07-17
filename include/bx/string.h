@@ -156,6 +156,12 @@ namespace bx
 	/// Case insensitive string compare.
 	int32_t strCmpI(const char* _lhs, const StringView& _rhs);
 
+	// Compare as strings holding indices/version numbers.
+	int32_t strCmpV(const char* _lhs, const char* _rhs, int32_t _max = INT32_MAX);
+
+	// Compare as strings holding indices/version numbers.
+	int32_t strCmpV(const char* _lhs, const StringView& _rhs);
+
 	/// Get string length.
 	int32_t strLen(const char* _str, int32_t _max = INT32_MAX);
 
