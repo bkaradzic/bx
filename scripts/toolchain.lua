@@ -459,8 +459,6 @@ function toolchain(_buildDir, _libDir)
 			platforms { "Orbis" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-orbis"))
 
-		end
-
 		elseif ("vs2012-xp") == _OPTIONS["vs"] then
 			premake.vstudio.toolset = ("v110_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
@@ -477,6 +475,8 @@ function toolchain(_buildDir, _libDir)
 			premake.vstudio.toolset = ("v141_xp")
 			location (path.join(_buildDir, "projects", _ACTION .. "-xp"))
 
+		end
+			
 	elseif _ACTION == "xcode4" then
 
 		if "osx" == _OPTIONS["xcode"] then
