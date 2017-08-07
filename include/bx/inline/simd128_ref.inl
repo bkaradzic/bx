@@ -3,8 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD128_REF_H_HEADER_GUARD
-#define BX_SIMD128_REF_H_HEADER_GUARD
+#ifndef BX_SIMD_T_H_HEADER_GUARD
+#	error "Must be included from bx/simd_t.h!"
+#endif // BX_SIMD_T_H_HEADER_GUARD
 
 #define simd_shuf_xAzC simd_shuf_xAzC_ni
 #define simd_shuf_yBwD simd_shuf_yBwD_ni
@@ -34,8 +35,6 @@
 #define simd_dot simd_dot_ni
 #define simd_ceil simd_ceil_ni
 #define simd_floor simd_floor_ni
-
-#include "simd_ni.inl"
 
 namespace bx
 {
@@ -643,6 +642,39 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 		return result;
 	}
 
-} // namespace bx
+	BX_SIMD_FORCE_INLINE simd128_t simd_zero()
+	{
+		return simd_zero<simd128_t>();
+	}
 
-#endif // BX_SIMD128_REF_H_HEADER_GUARD
+	BX_SIMD_FORCE_INLINE simd128_t simd_ld(const void* _ptr)
+	{
+		return simd_ld<simd128_t>(_ptr);
+	}
+
+	BX_SIMD_FORCE_INLINE simd128_t simd_ld(float _x, float _y, float _z, float _w)
+	{
+		return simd_ld<simd128_t>(_x, _y, _z, _w);
+	}
+
+	BX_SIMD_FORCE_INLINE simd128_t simd_ild(uint32_t _x, uint32_t _y, uint32_t _z, uint32_t _w)
+	{
+		return simd_ild<simd128_t>(_x, _y, _z, _w);
+	}
+
+	BX_SIMD_FORCE_INLINE simd128_t simd_splat(const void* _ptr)
+	{
+		return simd_splat<simd128_t>(_ptr);
+	}
+
+	BX_SIMD_FORCE_INLINE simd128_t simd_splat(float _a)
+	{
+		return simd_splat<simd128_t>(_a);
+	}
+
+	BX_SIMD_FORCE_INLINE simd128_t simd_isplat(uint32_t _a)
+	{
+		return simd_isplat<simd128_t>(_a);
+	}
+
+} // namespace bx

@@ -3,8 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD128_LANGEXT_H_HEADER_GUARD
-#define BX_SIMD128_LANGEXT_H_HEADER_GUARD
+#ifndef BX_SIMD_T_H_HEADER_GUARD
+#	error "Must be included from bx/simd_t.h!"
+#endif // BX_SIMD_T_H_HEADER_GUARD
 
 #define simd_rcp           simd_rcp_ni
 #define simd_orx           simd_orx_ni
@@ -37,8 +38,6 @@
 #define simd_max           simd_max_ni
 #define simd_imin          simd_imin_ni
 #define simd_imax          simd_imax_ni
-
-#include "simd_ni.inl"
 
 namespace bx
 {
@@ -511,5 +510,3 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw , 0xf);
 	typedef simd128_langext_t simd128_t;
 
 } // namespace bx
-
-#endif // BX_SIMD128_LANGEXT_H_HEADER_GUARD

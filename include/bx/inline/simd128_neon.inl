@@ -3,8 +3,9 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#ifndef BX_SIMD128_NEON_H_HEADER_GUARD
-#define BX_SIMD128_NEON_H_HEADER_GUARD
+#ifndef BX_SIMD_T_H_HEADER_GUARD
+#	error "Must be included from bx/simd_t.h!"
+#endif // BX_SIMD_T_H_HEADER_GUARD
 
 #define simd_rcp           simd_rcp_ni
 #define simd_orx           simd_orx_ni
@@ -34,8 +35,6 @@
 #define simd_dot           simd_dot_ni
 #define simd_ceil          simd_ceil_ni
 #define simd_floor         simd_floor_ni
-
-#include "simd_ni.inl"
 
 namespace bx
 {
@@ -558,5 +557,3 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	typedef simd128_neon_t simd128_t;
 
 } // namespace bx
-
-#endif // BX_SIMD128_NEON_H_HEADER_GUARD
