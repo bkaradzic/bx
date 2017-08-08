@@ -405,7 +405,7 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 
 	template<typename Ty>
 	Ty simd_rsqrt_carmack_ni(Ty _a);
-	
+
 	template<typename Ty>
 	Ty simd_log2_ni(Ty _a);
 
@@ -440,8 +440,8 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 	bool simd_test_any_ni(Ty _a);
 
 	template<typename Ty>
-	bool simd_test_all_ni(Ty _a);	
-	
+	bool simd_test_all_ni(Ty _a);
+
 #if BX_SIMD_AVX
 	typedef __m256 simd256_avx_t;
 #endif // BX_SIMD_SSE
@@ -469,8 +469,6 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 
 } // namespace bx
 
-#include "inline/simd_ni.inl"
-
 #if BX_SIMD_AVX
 #	include "inline/simd256_avx.inl"
 #endif // BX_SIMD_AVX
@@ -486,6 +484,8 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 #if BX_SIMD_SSE
 #	include "inline/simd128_sse.inl"
 #endif // BX_SIMD_SSE
+
+#include "inline/simd_ni.inl"
 
 namespace bx
 {
@@ -532,7 +532,7 @@ namespace bx
 #endif // !BX_SIMD_AVX
 
 	simd128_t simd_zero();
-	
+
 	simd128_t simd_ld(const void* _ptr);
 
 	simd128_t simd_ld(float _x, float _y, float _z, float _w);
@@ -544,7 +544,7 @@ namespace bx
 	simd128_t simd_splat(float _a);
 
 	simd128_t simd_isplat(uint32_t _a);
-	
+
 } // namespace bx
 
 #include "inline/simd128_ref.inl"
