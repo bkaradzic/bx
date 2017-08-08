@@ -485,8 +485,6 @@ BX_SIMD128_IMPLEMENT_TEST(xyzw);
 #	include "inline/simd128_sse.inl"
 #endif // BX_SIMD_SSE
 
-#include "inline/simd_ni.inl"
-
 namespace bx
 {
 	union simd128_ref_t
@@ -549,5 +547,7 @@ namespace bx
 
 #include "inline/simd128_ref.inl"
 #include "inline/simd256_ref.inl"
+
+#include "inline/simd_ni.inl"
 
 #endif // BX_SIMD_T_H_HEADER_GUARD
