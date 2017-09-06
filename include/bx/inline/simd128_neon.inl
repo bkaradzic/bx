@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -13,10 +13,10 @@ namespace bx
 #define ELEMy 1
 #define ELEMz 2
 #define ELEMw 3
-#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w) \
-			template<> \
-			BX_SIMD_FORCE_INLINE simd128_neon_t simd_swiz_##_x##_y##_z##_w(simd128_neon_t _a) \
-			{ \
+#define BX_SIMD128_IMPLEMENT_SWIZZLE(_x, _y, _z, _w)                                                  \
+			template<>                                                                                \
+			BX_SIMD_FORCE_INLINE simd128_neon_t simd_swiz_##_x##_y##_z##_w(simd128_neon_t _a)         \
+			{                                                                                         \
 				return __builtin_shuffle(_a, (uint32x4_t){ ELEM##_x, ELEM##_y, ELEM##_z, ELEM##_w }); \
 			}
 
@@ -28,19 +28,19 @@ namespace bx
 #undef ELEMy
 #undef ELEMx
 
-#define BX_SIMD128_IMPLEMENT_TEST(_xyzw, _swizzle) \
-			template<> \
+#define BX_SIMD128_IMPLEMENT_TEST(_xyzw, _swizzle)                                \
+			template<>                                                            \
 			BX_SIMD_FORCE_INLINE bool simd_test_any_##_xyzw(simd128_neon_t _test) \
-			{ \
-				const simd128_neon_t tmp0 = simd_swiz_##_swizzle(_test); \
-				return simd_test_any_ni(tmp0); \
-			} \
-			\
-			template<> \
+			{                                                                     \
+				const simd128_neon_t tmp0 = simd_swiz_##_swizzle(_test);          \
+				return simd_test_any_ni(tmp0);                                    \
+			}                                                                     \
+			                                                                      \
+			template<>                                                            \
 			BX_SIMD_FORCE_INLINE bool simd_test_all_##_xyzw(simd128_neon_t _test) \
-			{ \
-				const simd128_neon_t tmp0 = simd_swiz_##_swizzle(_test); \
-				return simd_test_all_ni(tmp0); \
+			{                                                                     \
+				const simd128_neon_t tmp0 = simd_swiz_##_swizzle(_test);          \
+				return simd_test_all_ni(tmp0);                                    \
 			}
 
 BX_SIMD128_IMPLEMENT_TEST(x,   xxxx);
