@@ -134,12 +134,13 @@ namespace bx
 	}
 
 	static bool getTempPath(char* _out, uint32_t* _inOutSize)
-	{
+	{	
 #if BX_PLATFORM_WINDOWS
-		uint32_t len = ::GetTempPathA(*_inOutSize, _out);
+		/*uint32_t len = ::GetTempPathA(*_inOutSize, _out);
 		bool result = len != 0 && len < *_inOutSize;
 		*_inOutSize = len;
-		return result;
+		return result;*/
+		return false;
 #else
 		static const char* s_tmp[] =
 		{
@@ -174,7 +175,6 @@ namespace bx
 			*_inOutSize = 4;
 			return true;
 		}
-
 		return false;
 #endif // BX_PLATFORM_*
 	}
