@@ -262,7 +262,7 @@ namespace bx
 
 	const char* CommandLine::find(int32_t _skip, const char _short, const char* _long, int32_t _numParams) const
 	{
-		for (int32_t ii = 0; ii < m_argc; ++ii)
+		for (int32_t ii = 0; ii < m_argc && 0 != strCmp(m_argv[ii], "--"); ++ii)
 		{
 			const char* arg = m_argv[ii];
 			if ('-' == *arg)

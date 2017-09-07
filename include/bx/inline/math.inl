@@ -154,8 +154,8 @@ namespace bx
 	inline bool fequal(float _a, float _b, float _epsilon)
 	{
 		// http://realtimecollisiondetection.net/blog/?p=89
-		const float lhs = fabsolute(_a - _b);
-		const float rhs = _epsilon * fmax3(1.0f, fabsolute(_a), fabsolute(_b) );
+		const float lhs = fabs(_a - _b);
+		const float rhs = _epsilon * fmax3(1.0f, fabs(_a), fabs(_b) );
 		return lhs <= rhs;
 	}
 
@@ -226,9 +226,9 @@ namespace bx
 
 	inline void vec3Abs(float* _result, const float* _a)
 	{
-		_result[0] = fabsolute(_a[0]);
-		_result[1] = fabsolute(_a[1]);
-		_result[2] = fabsolute(_a[2]);
+		_result[0] = fabs(_a[0]);
+		_result[1] = fabs(_a[1]);
+		_result[2] = fabs(_a[2]);
 	}
 
 	inline void vec3Neg(float* _result, const float* _a)
@@ -348,7 +348,7 @@ namespace bx
 		const float ny = _n[1];
 		const float nz = _n[2];
 
-		if (bx::fabsolute(nx) > bx::fabsolute(nz) )
+		if (bx::fabs(nx) > bx::fabs(nz) )
 		{
 			float invLen = 1.0f / bx::fsqrt(nx*nx + nz*nz);
 			_t[0] = -nz * invLen;
