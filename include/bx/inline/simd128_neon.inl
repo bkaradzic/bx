@@ -514,6 +514,12 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rcp(simd128_neon_t _a)
+	{
+		return simd_rcp_ni(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_orx(simd128_neon_t _a)
 	{
 		return simd_orx_ni(_a);
