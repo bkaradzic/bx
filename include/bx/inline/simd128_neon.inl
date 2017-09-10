@@ -425,18 +425,6 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_madd(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
-	{
-		return vmlaq_f32(_c, _a, _b);
-	}
-
-	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_nmsub(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
-	{
-		return vmlsq_f32(_c, _a, _b);
-	}
-
-	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_icmpeq(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		const int32x4_t  tmp0   = vreinterpretq_s32_f32(_a);
@@ -526,6 +514,12 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rcp(simd128_neon_t _a)
+	{
+		return simd_rcp_ni(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd_orx(simd128_neon_t _a)
 	{
 		return simd_orx_ni(_a);
@@ -550,7 +544,7 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_nmsub(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _b)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_nmsub(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
 	{
 		return simd_nmsub_ni(_a, _b, _c);
 	}
@@ -610,19 +604,19 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt_n(simd128_neon_t _a)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt_nr(simd128_neon_t _a)
 	{
 		return simd_rsqrt_nr_ni(_a);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt_carma(simd128_neon_t _a)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_rsqrt_carmack(simd128_neon_t _a)
 	{
 		return simd_rsqrt_carmack_ni(_a);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt_n(simd128_neon_t _a)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_sqrt_nr(simd128_neon_t _a)
 	{
 		return simd_sqrt_nr_ni(_a);
 	}
@@ -658,9 +652,9 @@ BX_SIMD128_IMPLEMENT_TEST(yzw, yzww);
 	}
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd_normalize3(simd128_neon_t _a, simd128_neon_t _b)
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd_normalize3(simd128_neon_t _a)
 	{
-		return simd_normalize3_ni(_a, _b);
+		return simd_normalize3_ni(_a);
 	}
 
 	template<>

@@ -15,6 +15,7 @@ TEST_CASE("commandLine", "")
 		"--long",
 		"--platform",
 		"x",
+		"--num", "1389",
 		"--foo",
 		"--", // it should not parse arguments after argument terminator
 		"--bar",
@@ -24,6 +25,10 @@ TEST_CASE("commandLine", "")
 
 	REQUIRE( cmdLine.hasArg("long") );
 	REQUIRE( cmdLine.hasArg('s') );
+
+	int32_t num;
+	REQUIRE(cmdLine.hasArg(num, '\0', "num") );
+	REQUIRE(1389 == num);
 
 	// test argument terminator
 	REQUIRE( cmdLine.hasArg("foo") );
