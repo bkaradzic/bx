@@ -3,8 +3,6 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include <stdio.h>
-
 #include <bx/cpu.h>
 #include <bx/math.h>
 #include <bx/string.h>
