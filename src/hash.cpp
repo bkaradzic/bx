@@ -125,6 +125,7 @@ static const uint32_t* s_crcTable[] =
 	s_crcTableCastagnoli,
 	s_crcTableKoopman,
 };
+BX_STATIC_ASSERT(BX_COUNTOF(s_crcTable) == HashCrc32::Count);
 
 void HashCrc32::begin(Enum _type)
 {

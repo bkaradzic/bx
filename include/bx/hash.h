@@ -93,6 +93,8 @@ namespace bx
 			Ieee,       //!< 0xedb88320
 			Castagnoli, //!< 0x82f63b78
 			Koopman,    //!< 0xeb31d82e
+
+			Count
 		};
 
 		///
