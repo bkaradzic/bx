@@ -118,12 +118,12 @@
 #define BX_NOOP(...) BX_MACRO_BLOCK_BEGIN BX_MACRO_BLOCK_END
 
 ///
-#define BX_UNUSED_1(_a1)                                          \
-	BX_MACRO_BLOCK_BEGIN                                          \
-		BX_PRAGMA_DIAGNOSTIC_PUSH();                              \
-		BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wuseless-cast"); \
-		(void)(true ? (void)0 : ( (void)(_a1) ) );                \
-		BX_PRAGMA_DIAGNOSTIC_POP();                               \
+#define BX_UNUSED_1(_a1)                                              \
+	BX_MACRO_BLOCK_BEGIN                                              \
+		BX_PRAGMA_DIAGNOSTIC_PUSH();                                  \
+		/*BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wuseless-cast");*/ \
+		(void)(true ? (void)0 : ( (void)(_a1) ) );                    \
+		BX_PRAGMA_DIAGNOSTIC_POP();                                   \
 	BX_MACRO_BLOCK_END
 
 #define BX_UNUSED_2(_a1, _a2) BX_UNUSED_1(_a1); BX_UNUSED_1(_a2)
