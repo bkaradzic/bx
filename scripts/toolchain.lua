@@ -725,7 +725,7 @@ function toolchain(_buildDir, _libDir)
 			"-msse2",
 --			"-Wdouble-promotion",
 --			"-Wduplicated-branches",
-			"-Wduplicated-cond",
+--			"-Wduplicated-cond",
 --			"-Wjump-misses-init",
 			"-Wlogical-op",
 			"-Wshadow",
