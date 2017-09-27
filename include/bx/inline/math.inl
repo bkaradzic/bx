@@ -698,6 +698,13 @@ namespace bx
 		_result[2] = _vec[0] * _mat[ 2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] + _mat[14];
 	}
 
+	inline void vec3MulMtxXyz0(float* _result, const float* _vec, const float* _mat)
+	{
+		_result[0] = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8];
+		_result[1] = _vec[0] * _mat[ 1] + _vec[1] * _mat[5] + _vec[2] * _mat[ 9];
+		_result[2] = _vec[0] * _mat[ 2] + _vec[1] * _mat[6] + _vec[2] * _mat[10];
+	}
+
 	inline void vec3MulMtxH(float* _result, const float* _vec, const float* _mat)
 	{
 		float xx = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8] + _mat[12];
