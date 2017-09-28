@@ -319,4 +319,14 @@ namespace bx
 		return NULL;
 	}
 
+	int32_t CommandLine::getNum() const
+	{
+		return m_argc;
+	}
+
+	char const* CommandLine::get(int32_t _idx) const
+	{
+		return m_argv[_idx];
+	}
+
 } // namespace bx

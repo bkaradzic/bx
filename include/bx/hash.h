@@ -50,19 +50,6 @@ namespace bx
 	};
 
 	///
-	uint32_t hashMurmur2A(const void* _data, uint32_t _size);
-
-	///
-	template <typename Ty>
-	uint32_t hashMurmur2A(const Ty& _data);
-
-	///
-	uint32_t hashMurmur2A(const StringView& _data);
-
-	///
-	uint32_t hashMurmur2A(const char* _data);
-
-	///
 	class HashAdler32
 	{
 	public:
@@ -114,6 +101,22 @@ namespace bx
 		const uint32_t* m_table;
 		uint32_t m_hash;
 	};
+
+	///
+	template<typename HashT>
+	uint32_t hash(const void* _data, uint32_t _size);
+
+	///
+	template<typename HashT, typename Ty>
+	uint32_t hash(const Ty& _data);
+
+	///
+	template<typename HashT>
+	uint32_t hash(const StringView& _data);
+
+	///
+	template<typename HashT>
+	uint32_t hash(const char* _data);
 
 } // namespace bx
 

@@ -136,31 +136,6 @@ namespace bx
 #undef MURMUR_R
 #undef mmix
 
-	inline uint32_t hashMurmur2A(const void* _data, uint32_t _size)
-	{
-		HashMurmur2A murmur;
-		murmur.begin();
-		murmur.add(_data, (int)_size);
-		return murmur.end();
-	}
-
-	template <typename Ty>
-	inline uint32_t hashMurmur2A(const Ty& _data)
-	{
-		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
-		return hashMurmur2A(&_data, sizeof(Ty) );
-	}
-
-	inline uint32_t hashMurmur2A(const StringView& _data)
-	{
-		return hashMurmur2A(_data.getPtr(), _data.getLength() );
-	}
-
-	inline uint32_t hashMurmur2A(const char* _data)
-	{
-		return hashMurmur2A(StringView(_data) );
-	}
-
 	inline void HashAdler32::begin()
 	{
 		m_a = 1;
@@ -199,6 +174,34 @@ namespace bx
 	{
 		m_hash ^= UINT32_MAX;
 		return m_hash;
+	}
+
+	template<typename HashT>
+	inline uint32_t hash(const void* _data, uint32_t _size)
+	{
+		HashT hh;
+		hh.begin();
+		hh.add(_data, (int)_size);
+		return hh.end();
+	}
+
+	template<typename HashT, typename Ty>
+	inline uint32_t hash(const Ty& _data)
+	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
+		return hash<HashT>(&_data, sizeof(Ty) );
+	}
+
+	template<typename HashT>
+	inline uint32_t hash(const StringView& _data)
+	{
+		return hash<HashT>(_data.getPtr(), _data.getLength() );
+	}
+
+	template<typename HashT>
+	inline uint32_t hash(const char* _data)
+	{
+		return hash<HashT>(StringView(_data) );
 	}
 
 } // namespace bx
