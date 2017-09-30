@@ -179,16 +179,28 @@ namespace bx
 	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str);
 
 	/// Find character in string. Limit search to _max characters.
-	const char* strFind(const char* _str, char _ch, int32_t _max = INT32_MAX);
+	const char* strFind(const char* _str, int32_t _max, char _ch);
+
+	///
+	const char* strFind(const StringView& _str, char _ch);
 
 	/// Find character in string in reverse. Limit search to _max characters.
-	const char* strRFind(const char* _str, char _ch, int32_t _max = INT32_MAX);
+	const char* strRFind(const char* _str, int32_t _max, char _ch);
+
+	///
+	const char* strRFind(const StringView& _str, char _ch);
 
 	/// Find substring in string. Limit search to _max characters.
-	const char* strFind(const char* _str, const char* _find, int32_t _max = INT32_MAX);
+	const char* strFind(const char* _str, int32_t _max, const char* _find, int32_t _findMax = INT32_MAX);
+
+	///
+	const char* strFind(const StringView& _str, const StringView& _find);
 
 	/// Find substring in string. Case insensitive. Limit search to _max characters.
-	const char* strFindI(const char* _str, const char* _find, int32_t _max = INT32_MAX);
+	const char* strFindI(const char* _str, int32_t _max, const char* _find, int32_t _findMax = INT32_MAX);
+
+	///
+	const char* strFindI(const StringView& _str, const StringView& _find);
 
 	/// Find new line. Returns pointer after new line terminator.
 	const char* strnl(const char* _str);

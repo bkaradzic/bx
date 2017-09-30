@@ -239,7 +239,7 @@ namespace bx
 
 	const StringView FilePath::getPath() const
 	{
-		const char* end = strRFind(m_filePath, '/');
+		const char* end = strRFind(m_filePath, INT32_MAX, '/');
 		if (NULL != end)
 		{
 			return StringView(m_filePath, end+1);
@@ -250,7 +250,7 @@ namespace bx
 
 	const StringView FilePath::getFileName() const
 	{
-		const char* fileName = strRFind(m_filePath, '/');
+		const char* fileName = strRFind(m_filePath, INT32_MAX, '/');
 		if (NULL != fileName)
 		{
 			return StringView(fileName+1);

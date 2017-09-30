@@ -266,7 +266,7 @@ namespace bx
 		return strCat(_dst, _dstSize, _str.getPtr(), _str.getLength() );
 	}
 
-	const char* strFind(const char* _str, char _ch, int32_t _max)
+	const char* strFind(const char* _str, int32_t _max, char _ch)
 	{
 		for (int32_t ii = 0, len = strLen(_str, _max); ii < len; ++ii)
 		{
@@ -279,7 +279,12 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strRFind(const char* _str, char _ch, int32_t _max)
+	const char* strFind(const StringView& _str, char _ch)
+	{
+		return strFind(_str.getPtr(), _str.getLength(), _ch);
+	}
+
+	const char* strRFind(const char* _str, int32_t _max, char _ch)
 	{
 		for (int32_t ii = strLen(_str, _max); 0 <= ii; --ii)
 		{
@@ -292,8 +297,13 @@ namespace bx
 		return NULL;
 	}
 
+	const char* strRFind(const StringView& _str, char _ch)
+	{
+		return strRFind(_str.getPtr(), _str.getLength(), _ch);
+	}
+
 	template<CharFn fn>
-	static const char* strStr(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
+	static const char* strFind(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
 	{
 		const char* ptr = _str;
 
@@ -333,27 +343,37 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strFind(const char* _str, const char* _find, int32_t _max)
+	const char* strFind(const char* _str, int32_t _max, const char* _find, int32_t _findMax)
 	{
-		return strStr<toNoop>(_str, _max, _find, INT32_MAX);
+		return strFind<toNoop>(_str, _max, _find, _findMax);
 	}
 
-	const char* strFindI(const char* _str, const char* _find, int32_t _max)
+	const char* strFind(const StringView& _str, const StringView& _find)
 	{
-		return strStr<toLower>(_str, _max, _find, INT32_MAX);
+		return strFind(_str.getPtr(), _str.getLength(), _find.getPtr(), _find.getLength() );
+	}
+
+	const char* strFindI(const char* _str, int32_t _max, const char* _find, int32_t _findMax)
+	{
+		return strFind<toLower>(_str, _max, _find, _findMax);
+	}
+
+	const char* strFindI(const StringView& _str, const StringView& _find)
+	{
+		return strFindI(_str.getPtr(), _str.getLength(), _find.getPtr(), _find.getLength() );
 	}
 
 	const char* strnl(const char* _str)
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strFind(_str, "\r\n", 1024);
+			const char* eol = strFind(_str, 1024, "\r\n");
 			if (NULL != eol)
 			{
 				return eol + 2;
 			}
 
-			eol = strFind(_str, "\n", 1024);
+			eol = strFind(_str, 1024, "\n");
 			if (NULL != eol)
 			{
 				return eol + 1;
@@ -367,13 +387,13 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strFind(_str, "\r\n", 1024);
+			const char* eol = strFind(_str, 1024, "\r\n");
 			if (NULL != eol)
 			{
 				return eol;
 			}
 
-			eol = strFind(_str, "\n", 1024);
+			eol = strFind(_str, 1024, "\n");
 			if (NULL != eol)
 			{
 				return eol;
@@ -443,8 +463,8 @@ namespace bx
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
 		int32_t len = strLen(_word);
-		const char* ptr = strFind(_str, _word);
-		for (; NULL != ptr; ptr = strFind(ptr + len, _word) )
+		const char* ptr = strFind(_str, INT32_MAX, _word);
+		for (; NULL != ptr; ptr = strFind(ptr + len, INT32_MAX, _word) )
 		{
 			if (ptr != _str)
 			{
@@ -628,7 +648,7 @@ namespace bx
 				toUpperUnsafe(str, len);
 			}
 
-			const char* dot = strFind(str, '.');
+			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
 				const int32_t precLen = int32_t(

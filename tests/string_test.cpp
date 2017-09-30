@@ -153,19 +153,19 @@ TEST_CASE("strCmpV sort", "")
 TEST_CASE("strRFind", "")
 {
 	const char* test = "test";
-	REQUIRE(NULL == bx::strRFind(test, 's', 0) );
-	REQUIRE(NULL == bx::strRFind(test, 's', 1) );
-	REQUIRE(&test[2] == bx::strRFind(test, 's') );
+	REQUIRE(NULL == bx::strRFind(test, 0, 's') );
+	REQUIRE(NULL == bx::strRFind(test, 1, 's') );
+	REQUIRE(&test[2] == bx::strRFind(test, INT32_MAX, 's') );
 }
 
 TEST_CASE("strFindI", "")
 {
 	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-	REQUIRE(NULL == bx::strFindI(test, "quick", 8) );
-	REQUIRE(NULL == bx::strFindI(test, "quick1") );
-	REQUIRE(&test[4] == bx::strFindI(test, "quick", 9) );
-	REQUIRE(&test[4] == bx::strFindI(test, "quick") );
+	REQUIRE(NULL == bx::strFindI(test, 8, "quick") );
+	REQUIRE(NULL == bx::strFindI(test, INT32_MAX, "quick1") );
+	REQUIRE(&test[4] == bx::strFindI(test, 9, "quick") );
+	REQUIRE(&test[4] == bx::strFindI(test, INT32_MAX, "quick") );
 }
 
 TEST_CASE("strFind", "")
@@ -173,23 +173,23 @@ TEST_CASE("strFind", "")
 	{
 		const char* test = "test";
 
-		REQUIRE(NULL == bx::strFind(test, 's', 0) );
-		REQUIRE(NULL == bx::strFind(test, 's', 2) );
-		REQUIRE(&test[2] == bx::strFind(test, 's') );
+		REQUIRE(NULL == bx::strFind(test, 0, 's') );
+		REQUIRE(NULL == bx::strFind(test, 2, 's') );
+		REQUIRE(&test[2] == bx::strFind(test, INT32_MAX, 's') );
 	}
 
 	{
 		const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-		REQUIRE(NULL == bx::strFind(test, "quick", 8) );
-		REQUIRE(NULL == bx::strFind(test, "quick1") );
-		REQUIRE(NULL == bx::strFind(test, "quick", 9) );
-		REQUIRE(NULL == bx::strFind(test, "quick") );
+		REQUIRE(NULL == bx::strFind(test, 8, "quick") );
+		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "quick1") );
+		REQUIRE(NULL == bx::strFind(test, 9, "quick") );
+		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "quick") );
 
-		REQUIRE(NULL == bx::strFind(test, "Quick", 8) );
-		REQUIRE(NULL == bx::strFind(test, "Quick1") );
-		REQUIRE(&test[4] == bx::strFind(test, "Quick", 9) );
-		REQUIRE(&test[4] == bx::strFind(test, "Quick") );
+		REQUIRE(NULL == bx::strFind(test, 8, "Quick") );
+		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "Quick1") );
+		REQUIRE(&test[4] == bx::strFind(test, 9, "Quick") );
+		REQUIRE(&test[4] == bx::strFind(test, INT32_MAX, "Quick") );
 	}
 }
 
