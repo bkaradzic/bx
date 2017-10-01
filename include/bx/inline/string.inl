@@ -106,6 +106,11 @@ namespace bx
 		set(_ptr, int32_t(_term-_ptr) );
 	}
 
+	inline void StringView::set(const StringView& _str)
+	{
+		set(_str.m_ptr, _str.m_len);
+	}
+
 	inline void StringView::clear()
 	{
 		m_ptr = "";

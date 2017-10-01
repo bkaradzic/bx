@@ -14,6 +14,11 @@
 
 namespace bx
 {
+	inline bool isInRange(char _ch, char _from, char _to)
+	{
+		return unsigned(_ch - _from) <= unsigned(_to-_from);
+	}
+
 	bool isSpace(char _ch)
 	{
 		return ' '  == _ch
@@ -23,11 +28,6 @@ namespace bx
 			|| '\f' == _ch
 			|| '\r' == _ch
 			;
-	}
-
-	inline bool isInRange(char _ch, char _from, char _to)
-	{
-		return unsigned(_ch - _from) <= unsigned(_to-_from);
 	}
 
 	bool isUpper(char _ch)
@@ -58,6 +58,59 @@ namespace bx
 	bool isPrint(char _ch)
 	{
 		return isInRange(_ch, ' ', '~');
+	}
+
+	typedef bool (*CharTestFn)(char _ch);
+
+	template<CharTestFn fn>
+	static bool isCharTest(const StringView& _str)
+	{
+		bool result = true;
+
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm()
+			; ptr != term && result
+			; ++ptr
+			)
+		{
+			result &= fn(*ptr);
+		}
+
+		return result;
+	}
+
+	bool isSpace(const StringView& _str)
+	{
+		return isCharTest<isSpace>(_str);
+	}
+
+	bool isUpper(const StringView& _str)
+	{
+		return isCharTest<isUpper>(_str);
+	}
+
+	bool isLower(const StringView& _str)
+	{
+		return isCharTest<isLower>(_str);
+	}
+
+	bool isAlpha(const StringView& _str)
+	{
+		return isCharTest<isAlpha>(_str);
+	}
+
+	bool isNumeric(const StringView& _str)
+	{
+		return isCharTest<isNumeric>(_str);
+	}
+
+	bool isAlphaNum(const StringView& _str)
+	{
+		return isCharTest<isAlphaNum>(_str);
+	}
+
+	bool isPrint(const StringView& _str)
+	{
+		return isCharTest<isPrint>(_str);
 	}
 
 	char toLower(char _ch)

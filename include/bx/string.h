@@ -50,6 +50,9 @@ namespace bx
 		void set(const char* _ptr, const char* _term);
 
 		///
+		void set(const StringView& _str);
+
+		///
 		void clear();
 
 		///
@@ -106,22 +109,43 @@ namespace bx
 	bool isSpace(char _ch);
 
 	///
+	bool isSpace(const StringView& _str);
+
+	///
 	bool isUpper(char _ch);
+
+	///
+	bool isUpper(const StringView& _str);
 
 	///
 	bool isLower(char _ch);
 
 	///
+	bool isLower(const StringView& _str);
+
+	///
 	bool isAlpha(char _ch);
+
+	///
+	bool isAlpha(const StringView& _str);
 
 	///
 	bool isNumeric(char _ch);
 
 	///
+	bool isNumeric(const StringView& _str);
+
+	///
 	bool isAlphaNum(char _ch);
 
 	///
+	bool isAlphaNum(const StringView& _str);
+
+	///
 	bool isPrint(char _ch);
+
+	///
+	bool isPrint(const StringView& _str);
 
 	///
 	char toLower(char _ch);
