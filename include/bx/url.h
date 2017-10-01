@@ -11,8 +11,9 @@
 namespace bx
 {
 	///
-	struct UrlToken
+	class UrlView
 	{
+	public:
 		enum Enum
 		{
 			Scheme,
@@ -26,12 +27,7 @@ namespace bx
 
 			Count
 		};
-	};
 
-	///
-	class UrlView
-	{
-	public:
 		///
 		UrlView();
 
@@ -42,10 +38,10 @@ namespace bx
 		bool parse(const StringView& _url);
 
 		///
-		const StringView& get(UrlToken::Enum _token) const;
+		const StringView& get(Enum _token) const;
 
 	private:
-		StringView m_tokens[UrlToken::Count];
+		StringView m_tokens[Count];
 	};
 
 	///

@@ -13,7 +13,7 @@ namespace bx
 
 	void UrlView::clear()
 	{
-		for (uint32_t ii = 0; ii < UrlToken::Count; ++ii)
+		for (uint32_t ii = 0; ii < Count; ++ii)
 		{
 			m_tokens[ii].clear();
 		}
@@ -45,7 +45,7 @@ namespace bx
 				return false;
 			}
 
-			m_tokens[UrlToken::Scheme].set(scheme);
+			m_tokens[Scheme].set(scheme);
 		}
 
 		if (NULL != pathStart)
@@ -59,7 +59,7 @@ namespace bx
 				return false;
 			}
 
-			m_tokens[UrlToken::Path].set(pathStart
+			m_tokens[Path].set(pathStart
 				, NULL != queryStart    ? queryStart
 				: NULL != fragmentStart ? fragmentStart
 				: term
@@ -67,7 +67,7 @@ namespace bx
 
 			if (NULL != queryStart)
 			{
-				m_tokens[UrlToken::Query].set(queryStart+1
+				m_tokens[Query].set(queryStart+1
 					, NULL != fragmentStart ? fragmentStart
 					: term
 					);
@@ -75,7 +75,7 @@ namespace bx
 
 			if (NULL != fragmentStart)
 			{
-				m_tokens[UrlToken::Fragment].set(fragmentStart+1, term);
+				m_tokens[Fragment].set(fragmentStart+1, term);
 			}
 
 			term = pathStart;
@@ -86,32 +86,32 @@ namespace bx
 		hostStart = NULL != userPassEnd ? userPassEnd+1 : hostStart;
 		const char* portStart = strFind(StringView(hostStart, term), ':');
 
-		m_tokens[UrlToken::Host].set(hostStart, NULL != portStart ? portStart : term);
+		m_tokens[Host].set(hostStart, NULL != portStart ? portStart : term);
 
 		if (NULL != portStart)
 		{
-			m_tokens[UrlToken::Port].set(portStart+1, term);
+			m_tokens[Port].set(portStart+1, term);
 		}
 
 		if (NULL != userPassStart)
 		{
 			const char* passStart = strFind(StringView(userPassStart, userPassEnd), ':');
 
-			m_tokens[UrlToken::UserName].set(userPassStart
+			m_tokens[UserName].set(userPassStart
 				, NULL != passStart ? passStart
 				: userPassEnd
 				);
 
 			if (NULL != passStart)
 			{
-				m_tokens[UrlToken::Password].set(passStart+1, userPassEnd);
+				m_tokens[Password].set(passStart+1, userPassEnd);
 			}
 		}
 
 		return true;
 	}
 
-	const StringView& UrlView::get(UrlToken::Enum _token) const
+	const StringView& UrlView::get(Enum _token) const
 	{
 		return m_tokens[_token];
 	}

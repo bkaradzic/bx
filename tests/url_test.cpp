@@ -11,7 +11,7 @@ struct UrlTest
 {
 	bool result;
 	const char* url;
-	const char* tokens[bx::UrlToken::Count];
+	const char* tokens[bx::UrlView::Count];
 };
 
 static const UrlTest s_urlTest[] =
@@ -56,13 +56,13 @@ TEST_CASE("tokenizeUrl", "")
 
 		if (result)
 		{
-			for (uint32_t token = 0; token < bx::UrlToken::Count; ++token)
+			for (uint32_t token = 0; token < bx::UrlView::Count; ++token)
 			{
 //				char tmp[1024];
-//				strCopy(tmp, BX_COUNTOF(tmp), url.get(bx::UrlToken::Enum(token)) );
+//				strCopy(tmp, BX_COUNTOF(tmp), url.get(bx::UrlView::Enum(token)) );
 //				printf("`%s`, expected: `%s`\n", tmp, urlTest.tokens[token]);
 
-				REQUIRE(0 == bx::strCmp(urlTest.tokens[token], url.get(bx::UrlToken::Enum(token)) ) );
+				REQUIRE(0 == bx::strCmp(urlTest.tokens[token], url.get(bx::UrlView::Enum(token)) ) );
 			}
 		}
 	}
