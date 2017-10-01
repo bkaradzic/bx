@@ -703,7 +703,7 @@ namespace bx
 #define PARSER_PINF   3  // number is higher than +HUGE_VAL
 #define PARSER_MINF   4  // number is lower than -HUGE_VAL
 
-	static int parser(const char* _s, PrepNumber* _pn)
+	static int parser(const char* _s, const char* _term, PrepNumber* _pn)
 	{
 		int state = FSM_A;
 		int digx = 0;
@@ -712,7 +712,7 @@ namespace bx
 		int expneg = 0;
 		int32_t expexp = 0;
 
-		while (state != FSM_STOP)
+		while (state != FSM_STOP && _s != _term)
 		{
 			switch (state)
 			{
@@ -1034,7 +1034,7 @@ namespace bx
 		return hd.d;
 	}
 
-	bool fromString(float* _out, const char* _str)
+	bool fromString(float* _out, const StringView& _str)
 	{
 		double dbl;
 		bool result = fromString(&dbl, _str);
@@ -1042,7 +1042,7 @@ namespace bx
 		return result;
 	}
 
-	bool fromString(double* _out, const char* _str)
+	bool fromString(double* _out, const StringView& _str)
 	{
 		PrepNumber pn;
 		pn.mantissa = 0;
@@ -1052,7 +1052,7 @@ namespace bx
 		HexDouble hd;
 		hd.u = DOUBLE_PLUS_ZERO;
 
-		switch (parser(_str, &pn) )
+		switch (parser(_str.getPtr(), _str.getTerm(), &pn) )
 		{
 		case PARSER_OK:
 			*_out = converter(&pn);
@@ -1081,10 +1081,13 @@ namespace bx
 		return true;
 	}
 
-	bool fromString(int32_t* _out, const char* _str)
+	bool fromString(int32_t* _out, const StringView& _str)
 	{
-		_str = strws(_str);
-		char ch = *_str++;
+		const char* str  = _str.getPtr();
+		const char* term = _str.getTerm();
+
+		str = strws(str);
+		char ch = *str++;
 		bool neg = false;
 		switch (ch)
 		{
@@ -1093,13 +1096,13 @@ namespace bx
 			break;
 
 		default:
-			--_str;
+			--str;
 			break;
 		}
 
 		int32_t result = 0;
 
-		for (ch = *_str++; isNumeric(ch); ch = *_str++)
+		for (ch = *str++; isNumeric(ch) && str != term+1; ch = *str++)
 		{
 			result = 10*result - (ch - '0');
 		}
@@ -1109,7 +1112,7 @@ namespace bx
 		return true;
 	}
 
-	bool fromString(uint32_t* _out, const char* _str)
+	bool fromString(uint32_t* _out, const StringView& _str)
 	{
 		fromString( (int32_t*)_out, _str);
 		return true;

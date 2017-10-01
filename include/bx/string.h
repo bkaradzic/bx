@@ -300,16 +300,16 @@ namespace bx
 	int32_t toString(char* _out, int32_t _max, uint64_t _value, uint32_t _base = 10);
 
 	///
-	bool fromString(float* _out, const char* _str);
+	bool fromString(float* _out, const StringView& _str);
 
 	///
-	bool fromString(double* _out, const char* _str);
+	bool fromString(double* _out, const StringView& _str);
 
 	///
-	bool fromString(int32_t* _out, const char* _str);
+	bool fromString(int32_t* _out, const StringView& _str);
 
 	///
-	bool fromString(uint32_t* _out, const char* _str);
+	bool fromString(uint32_t* _out, const StringView& _str);
 
 } // namespace bx
 
