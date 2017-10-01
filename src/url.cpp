@@ -122,14 +122,17 @@ namespace bx
 	}
 
 	// https://secure.wikimedia.org/wikipedia/en/wiki/URL_encoding
-	void urlEncode(const char* _str, char* _buf, uint32_t _bufSize)
+	void urlEncode(char* _out, uint32_t _max, const StringView& _str)
 	{
-		_bufSize--; // need space for zero terminator
+		_max--; // need space for zero terminator
+
+		const char* str  = _str.getPtr();
+		const char* term = _str.getTerm();
 
 		uint32_t ii = 0;
-		for (char ch = *_str++
-			; '\0' != ch && ii < _bufSize
-			; ch = *_str++
+		for (char ch = *str++
+			; str <= term && ii < _max
+			; ch = *str++
 			)
 		{
 			if (isAlphaNum(ch)
@@ -138,17 +141,17 @@ namespace bx
 			||  ch == '.'
 			||  ch == '~')
 			{
-				_buf[ii++] = ch;
+				_out[ii++] = ch;
 			}
-			else if (ii+3 < _bufSize)
+			else if (ii+3 < _max)
 			{
-				_buf[ii++] = '%';
-				_buf[ii++] = toHex(ch>>4);
-				_buf[ii++] = toHex(ch);
+				_out[ii++] = '%';
+				_out[ii++] = toHex(ch>>4);
+				_out[ii++] = toHex(ch);
 			}
 		}
 
-		_buf[ii] = '\0';
+		_out[ii] = '\0';
 	}
 
 } // namespace bx

@@ -1102,7 +1102,7 @@ namespace bx
 
 		int32_t result = 0;
 
-		for (ch = *str++; isNumeric(ch) && str != term+1; ch = *str++)
+		for (ch = *str++; isNumeric(ch) && str <= term; ch = *str++)
 		{
 			result = 10*result - (ch - '0');
 		}

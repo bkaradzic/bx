@@ -45,7 +45,7 @@ namespace bx
 	};
 
 	///
-	void urlEncode(const char* _str, char* _buf, uint32_t _bufSize);
+	void urlEncode(char* _out, uint32_t _max, const StringView& _str);
 
 } // namespace bx
 
