@@ -8,6 +8,8 @@
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
 
+#include <string.h>
+
 bx::AllocatorI* g_allocator;
 
 TEST_CASE("chars", "")
@@ -82,6 +84,7 @@ TEST_CASE("strCmpI", "")
 	const char* empty = "";
 	REQUIRE(0 == bx::strCmpI(abvgd, abvgd) );
 	REQUIRE(0 == bx::strCmpI(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpI(empty, empty) );
 
 	REQUIRE(0 >  bx::strCmpI(abvgd, abvgx) );
 	REQUIRE(0 >  bx::strCmpI(empty, abvgd) );
@@ -102,6 +105,7 @@ TEST_CASE("strCmpV", "")
 	const char* empty = "";
 	REQUIRE(0 == bx::strCmpV(abvgd, abvgd) );
 	REQUIRE(0 == bx::strCmpV(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpV(empty, empty) );
 
 	REQUIRE(0 >  bx::strCmpV(abvgd, abvgx) );
 	REQUIRE(0 >  bx::strCmpV(empty, abvgd) );

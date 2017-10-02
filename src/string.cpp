@@ -242,7 +242,7 @@ namespace bx
 
 		if (0 == max)
 		{
-			return 0;
+			return _lhsMax == _rhsMax ? 0 : _lhs[ii] - _rhs[ii];
 		}
 
 		if ('0' != _lhs[idx]
