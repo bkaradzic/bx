@@ -164,10 +164,10 @@ TEST_CASE("strFindI", "")
 {
 	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-	REQUIRE(NULL == bx::strFindI(test, 8, "quick") );
-	REQUIRE(NULL == bx::strFindI(test, INT32_MAX, "quick1") );
-	REQUIRE(&test[4] == bx::strFindI(test, 9, "quick") );
-	REQUIRE(&test[4] == bx::strFindI(test, INT32_MAX, "quick") );
+	REQUIRE(NULL == bx::strFindI(bx::StringView(test, 8), "quick") );
+	REQUIRE(NULL == bx::strFindI(test, "quick1") );
+	REQUIRE(&test[4] == bx::strFindI(bx::StringView(test, 9), "quick") );
+	REQUIRE(&test[4] == bx::strFindI(test, "quick") );
 }
 
 TEST_CASE("strFind", "")
@@ -175,23 +175,23 @@ TEST_CASE("strFind", "")
 	{
 		const char* test = "test";
 
-		REQUIRE(NULL == bx::strFind(test, 0, 's') );
-		REQUIRE(NULL == bx::strFind(test, 2, 's') );
-		REQUIRE(&test[2] == bx::strFind(test, INT32_MAX, 's') );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 0), 's') );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 2), 's') );
+		REQUIRE(&test[2] == bx::strFind(test, 's') );
 	}
 
 	{
 		const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
 
-		REQUIRE(NULL == bx::strFind(test, 8, "quick") );
-		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "quick1") );
-		REQUIRE(NULL == bx::strFind(test, 9, "quick") );
-		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "quick") );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 8), "quick") );
+		REQUIRE(NULL == bx::strFind(test, "quick1") );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 9), "quick") );
+		REQUIRE(NULL == bx::strFind(test, "quick") );
 
-		REQUIRE(NULL == bx::strFind(test, 8, "Quick") );
-		REQUIRE(NULL == bx::strFind(test, INT32_MAX, "Quick1") );
-		REQUIRE(&test[4] == bx::strFind(test, 9, "Quick") );
-		REQUIRE(&test[4] == bx::strFind(test, INT32_MAX, "Quick") );
+		REQUIRE(NULL == bx::strFind(bx::StringView(test, 8), "Quick") );
+		REQUIRE(NULL == bx::strFind(test, "Quick1") );
+		REQUIRE(&test[4] == bx::strFind(bx::StringView(test, 9), "Quick") );
+		REQUIRE(&test[4] == bx::strFind(test, "Quick") );
 	}
 }
 

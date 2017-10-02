@@ -203,16 +203,10 @@ namespace bx
 	const char* strRFind(const StringView& _str, char _ch);
 
 	/// Find substring in string. Limit search to _max characters.
-	const char* strFind(const char* _str, int32_t _max, const char* _find, int32_t _findMax = INT32_MAX);
-
-	///
-	const char* strFind(const StringView& _str, const StringView& _find);
+	const char* strFind(const StringView& _str, const StringView& _find, int32_t _num = INT32_MAX);
 
 	/// Find substring in string. Case insensitive. Limit search to _max characters.
-	const char* strFindI(const char* _str, int32_t _max, const char* _find, int32_t _findMax = INT32_MAX);
-
-	///
-	const char* strFindI(const StringView& _str, const StringView& _find);
+	const char* strFindI(const StringView& _str, const StringView& _find, int32_t _num = INT32_MAX);
 
 	/// Find new line. Returns pointer after new line terminator.
 	const char* strnl(const char* _str);

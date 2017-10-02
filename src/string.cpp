@@ -428,37 +428,37 @@ namespace bx
 		return NULL;
 	}
 
-	const char* strFind(const char* _str, int32_t _max, const char* _find, int32_t _findMax)
+	const char* strFind(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strFind<toNoop>(_str, _max, _find, _findMax);
+		return strFind<toNoop>(
+			  _str.getPtr()
+			, _str.getLength()
+			, _find.getPtr()
+			, min(_find.getLength(), _num)
+			);
 	}
 
-	const char* strFind(const StringView& _str, const StringView& _find)
+	const char* strFindI(const StringView& _str, const StringView& _find, int32_t _num)
 	{
-		return strFind(_str.getPtr(), _str.getLength(), _find.getPtr(), _find.getLength() );
-	}
-
-	const char* strFindI(const char* _str, int32_t _max, const char* _find, int32_t _findMax)
-	{
-		return strFind<toLower>(_str, _max, _find, _findMax);
-	}
-
-	const char* strFindI(const StringView& _str, const StringView& _find)
-	{
-		return strFindI(_str.getPtr(), _str.getLength(), _find.getPtr(), _find.getLength() );
+		return strFind<toLower>(
+			  _str.getPtr()
+			, _str.getLength()
+			, _find.getPtr()
+			, min(_find.getLength(), _num)
+			);
 	}
 
 	const char* strnl(const char* _str)
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strFind(_str, 1024, "\r\n");
+			const char* eol = strFind(StringView(_str, 1024), "\r\n");
 			if (NULL != eol)
 			{
 				return eol + 2;
 			}
 
-			eol = strFind(_str, 1024, "\n");
+			eol = strFind(StringView(_str, 1024), "\n");
 			if (NULL != eol)
 			{
 				return eol + 1;
@@ -472,13 +472,13 @@ namespace bx
 	{
 		for (; '\0' != *_str; _str += strLen(_str, 1024) )
 		{
-			const char* eol = strFind(_str, 1024, "\r\n");
+			const char* eol = strFind(StringView(_str, 1024), "\r\n");
 			if (NULL != eol)
 			{
 				return eol;
 			}
 
-			eol = strFind(_str, 1024, "\n");
+			eol = strFind(StringView(_str, 1024), "\n");
 			if (NULL != eol)
 			{
 				return eol;
@@ -548,8 +548,8 @@ namespace bx
 	const char* findIdentifierMatch(const char* _str, const char* _word)
 	{
 		int32_t len = strLen(_word);
-		const char* ptr = strFind(_str, INT32_MAX, _word);
-		for (; NULL != ptr; ptr = strFind(ptr + len, INT32_MAX, _word) )
+		const char* ptr = strFind(_str, _word);
+		for (; NULL != ptr; ptr = strFind(ptr + len, _word) )
 		{
 			if (ptr != _str)
 			{
