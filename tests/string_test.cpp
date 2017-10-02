@@ -49,6 +49,7 @@ TEST_CASE("strCopy", "")
 	REQUIRE(num == 3);
 
 	num = bx::strCopy(dst, sizeof(dst), "blah");
+	REQUIRE(0 == bx::strCmp(dst, "bl", 2) );
 	REQUIRE(0 == bx::strCmp(dst, "blah") );
 	REQUIRE(num == 4);
 }
@@ -62,6 +63,7 @@ TEST_CASE("strCat", "")
 	REQUIRE(4 == bx::strCopy(dst, 5, "copy") );
 	REQUIRE(3 == bx::strCat(dst, 8, "cat") );
 	REQUIRE(0 == bx::strCmp(dst, "copycat") );
+	REQUIRE(0 == bx::strCmp(dst, "copy", 4) );
 
 	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
 	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
@@ -316,8 +318,8 @@ TEST_CASE("fromString int32_t", "")
 	REQUIRE(testFromString(1389,   "1389") );
 	REQUIRE(testFromString(1389,   "  1389") );
 	REQUIRE(testFromString(1389,   "+1389") );
-	REQUIRE(testFromString(-1389,   "-1389") );
-	REQUIRE(testFromString(-1389,   " -1389") );
+	REQUIRE(testFromString(-1389,  "-1389") );
+	REQUIRE(testFromString(-1389,  " -1389") );
 	REQUIRE(testFromString(555333, "555333") );
 	REQUIRE(testFromString(-21,    "-021") );
 }

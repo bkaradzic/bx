@@ -63,7 +63,7 @@ namespace bx
 	typedef bool (*CharTestFn)(char _ch);
 
 	template<CharTestFn fn>
-	static bool isCharTest(const StringView& _str)
+	inline bool isCharTest(const StringView& _str)
 	{
 		bool result = true;
 
@@ -165,11 +165,19 @@ namespace bx
 	}
 
 	template<CharFn fn>
-	int32_t strCmp(const char* _lhs, const char* _rhs, int32_t _max)
+	inline int32_t strCmp(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{
+		int32_t max = _lhsMax;
+
+		if (_lhsMax != _rhsMax)
+		{
+			max = _lhsMax < _rhsMax ? _lhsMax : _rhsMax;
+			return fn(_lhs[max]) - fn(_rhs[max]);
+		}
+
 		for (
-			; 0 < _max && fn(*_lhs) == fn(*_rhs)
-			; ++_lhs, ++_rhs, --_max
+			; 0 < max && fn(*_lhs) == fn(*_rhs)
+			; ++_lhs, ++_rhs, --max
 			)
 		{
 			if (*_lhs == '\0'
@@ -179,38 +187,52 @@ namespace bx
 			}
 		}
 
-		return 0 == _max ? 0 : fn(*_lhs) - fn(*_rhs);
+		return 0 == max ? 0 : fn(*_lhs) - fn(*_rhs);
 	}
 
-	int32_t strCmp(const char* _lhs, const char* _rhs, int32_t _max)
+	template<typename Ty>
+	inline Ty min(Ty _a, Ty _b)
 	{
-		return strCmp<toNoop>(_lhs, _rhs, _max);
+		return _a > _b ? _b : _a;
 	}
 
-	int32_t strCmp(const char* _lhs, const StringView& _rhs)
+	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max)
 	{
-		return strCmp(_lhs, _rhs.getPtr(), _rhs.getLength() );
+		return strCmp<toNoop>(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
 	}
 
-	int32_t strCmpI(const char* _lhs, const char* _rhs, int32_t _max)
+	int32_t strCmpI(const StringView& _lhs, const StringView& _rhs, int32_t _max)
 	{
-		return strCmp<toLower>(_lhs, _rhs, _max);
+		return strCmp<toLower>(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
 	}
 
-	int32_t strCmpI(const char* _lhs, const StringView& _rhs)
+	inline int32_t strCmpV(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{
-		return strCmpI(_lhs, _rhs.getPtr(), _rhs.getLength() );
-	}
+		int32_t max = _lhsMax;
 
-	int32_t strCmpV(const char* _lhs, const char* _rhs, int32_t _max)
-	{
+		if (_lhsMax != _rhsMax)
+		{
+			max = _lhsMax < _rhsMax ? _lhsMax : _rhsMax;
+			return _lhs[max] - _rhs[max];
+		}
+
 		int32_t ii   = 0;
 		int32_t idx  = 0;
 		bool    zero = true;
 
 		for (
-			; 0 < _max && _lhs[ii] == _rhs[ii]
-			; ++ii, --_max
+			; 0 < max && _lhs[ii] == _rhs[ii]
+			; ++ii, --max
 			)
 		{
 			const uint8_t ch = _lhs[ii];
@@ -231,7 +253,7 @@ namespace bx
 			}
 		}
 
-		if (0 == _max)
+		if (0 == max)
 		{
 			return 0;
 		}
@@ -241,8 +263,8 @@ namespace bx
 		{
 			int32_t jj = 0;
 			for (jj = ii
-				; 0 < _max && isNumeric(_lhs[jj])
-				; ++jj, --_max
+				; 0 < max && isNumeric(_lhs[jj])
+				; ++jj, --max
 				)
 			{
 				if (!isNumeric(_rhs[jj]) )
@@ -263,12 +285,17 @@ namespace bx
 			return (_lhs[ii] - '0') - (_rhs[ii] - '0');
 		}
 
-		return 0 == _max ? 0 : _lhs[ii] - _rhs[ii];
+		return 0 == max ? 0 : _lhs[ii] - _rhs[ii];
 	}
 
-	int32_t strCmpV(const char* _lhs, const StringView& _rhs)
+	int32_t strCmpV(const StringView& _lhs, const StringView& _rhs, int32_t _max)
 	{
-		return strCmpV(_lhs, _rhs.getPtr(), _rhs.getLength() );
+		return strCmpV(
+			  _lhs.getPtr()
+			, min(_lhs.getLength(), _max)
+			, _rhs.getPtr()
+			, min(_rhs.getLength(), _max)
+			);
 	}
 
 	int32_t strLen(const char* _str, int32_t _max)
@@ -283,7 +310,12 @@ namespace bx
 		return int32_t(ptr - _str);
 	}
 
-	int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	int32_t strLen(const StringView& _str, int32_t _max)
+	{
+		return strLen(_str.getPtr(), min(_str.getLength(), _max) );
+	}
+
+	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
@@ -298,12 +330,12 @@ namespace bx
 		return num;
 	}
 
-	int32_t strCopy(char* _dst, int32_t _dstSize, const StringView& _str)
+	int32_t strCopy(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num)
 	{
-		return strCopy(_dst, _dstSize, _str.getPtr(), _str.getLength() );
+		return strCopy(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
-	int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
+	inline int32_t strCat(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)
 	{
 		BX_CHECK(NULL != _dst, "_dst can't be NULL!");
 		BX_CHECK(NULL != _src, "_src can't be NULL!");
@@ -314,9 +346,9 @@ namespace bx
 		return strCopy(&_dst[len], max-len, _src, _num);
 	}
 
-	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str)
+	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num)
 	{
-		return strCat(_dst, _dstSize, _str.getPtr(), _str.getLength() );
+		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
 	const char* strFind(const char* _str, int32_t _max, char _ch)
@@ -356,7 +388,7 @@ namespace bx
 	}
 
 	template<CharFn fn>
-	static const char* strFind(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
+	inline const char* strFind(const char* _str, int32_t _strMax, const char* _find, int32_t _findMax)
 	{
 		const char* ptr = _str;
 
@@ -1065,33 +1097,33 @@ namespace bx
 	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
 
 	template<uint32_t Kilo, char KiloCh0, char KiloCh1>
-	static int32_t prettify(char* _out, int32_t _count, uint64_t _size)
+	inline int32_t prettify(char* _out, int32_t _count, uint64_t _value)
 	{
 		uint8_t idx = 0;
-		double size = double(_size);
-		while (_size != (_size&0x7ff)
+		double value = double(_value);
+		while (_value != (_value&0x7ff)
 		&&     idx < BX_COUNTOF(s_units) )
 		{
-			_size /= Kilo;
-			size  *= 1.0/double(Kilo);
+			_value /= Kilo;
+			value  *= 1.0/double(Kilo);
 			++idx;
 		}
 
-		return snprintf(_out, _count, "%0.2f %c%c%c", size
+		return snprintf(_out, _count, "%0.2f %c%c%c", value
 			, s_units[idx]
 			, idx > 0 ? KiloCh0 : '\0'
 			, KiloCh1
 			);
 	}
 
-	int32_t prettify(char* _out, int32_t _count, uint64_t _size, Units::Enum _units)
+	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units)
 	{
 		if (Units::Kilo == _units)
 		{
-			return prettify<1000, 'B', '\0'>(_out, _count, _size);
+			return prettify<1000, 'B', '\0'>(_out, _count, _value);
 		}
 
-		return prettify<1024, 'i', 'B'>(_out, _count, _size);
+		return prettify<1024, 'i', 'B'>(_out, _count, _value);
 	}
 
 } // namespace bx
