@@ -187,7 +187,7 @@ namespace bx
 			}
 		}
 
-		return 0 == max ? 0 : fn(*_lhs) - fn(*_rhs);
+		return 0 == max && _lhsMax == _rhsMax ? 0 : fn(*_lhs) - fn(*_rhs);
 	}
 
 	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max)
@@ -272,7 +272,7 @@ namespace bx
 			return (_lhs[ii] - '0') - (_rhs[ii] - '0');
 		}
 
-		return 0 == max ? 0 : _lhs[ii] - _rhs[ii];
+		return 0 == max && _lhsMax == _rhsMax ? 0 : _lhs[ii] - _rhs[ii];
 	}
 
 	int32_t strCmpV(const StringView& _lhs, const StringView& _rhs, int32_t _max)
