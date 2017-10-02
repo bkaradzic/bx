@@ -164,16 +164,16 @@ namespace bx
 		return _ch;
 	}
 
+	template<typename Ty>
+	inline Ty min(Ty _a, Ty _b)
+	{
+		return _a > _b ? _b : _a;
+	}
+
 	template<CharFn fn>
 	inline int32_t strCmp(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{
-		int32_t max = _lhsMax;
-
-		if (_lhsMax != _rhsMax)
-		{
-			max = _lhsMax < _rhsMax ? _lhsMax : _rhsMax;
-			return fn(_lhs[max]) - fn(_rhs[max]);
-		}
+		int32_t max = min(_lhsMax, _rhsMax);
 
 		for (
 			; 0 < max && fn(*_lhs) == fn(*_rhs)
@@ -188,12 +188,6 @@ namespace bx
 		}
 
 		return 0 == max ? 0 : fn(*_lhs) - fn(*_rhs);
-	}
-
-	template<typename Ty>
-	inline Ty min(Ty _a, Ty _b)
-	{
-		return _a > _b ? _b : _a;
 	}
 
 	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max)
@@ -218,14 +212,7 @@ namespace bx
 
 	inline int32_t strCmpV(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{
-		int32_t max = _lhsMax;
-
-		if (_lhsMax != _rhsMax)
-		{
-			max = _lhsMax < _rhsMax ? _lhsMax : _rhsMax;
-			return _lhs[max] - _rhs[max];
-		}
-
+		int32_t max  = min(_lhsMax, _rhsMax);
 		int32_t ii   = 0;
 		int32_t idx  = 0;
 		bool    zero = true;
