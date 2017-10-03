@@ -338,7 +338,7 @@ namespace bx
 		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
-	const char* strFind(const char* _str, int32_t _max, char _ch)
+	inline const char* strFind(const char* _str, int32_t _max, char _ch)
 	{
 		for (int32_t ii = 0, len = strLen(_str, _max); ii < len; ++ii)
 		{
@@ -356,7 +356,7 @@ namespace bx
 		return strFind(_str.getPtr(), _str.getLength(), _ch);
 	}
 
-	const char* strRFind(const char* _str, int32_t _max, char _ch)
+	inline const char* strRFind(const char* _str, int32_t _max, char _ch)
 	{
 		for (int32_t ii = strLen(_str, _max); 0 <= ii; --ii)
 		{

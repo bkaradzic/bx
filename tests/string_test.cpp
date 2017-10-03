@@ -159,9 +159,9 @@ TEST_CASE("strCmpV sort", "")
 TEST_CASE("strRFind", "")
 {
 	const char* test = "test";
-	REQUIRE(NULL == bx::strRFind(test, 0, 's') );
-	REQUIRE(NULL == bx::strRFind(test, 1, 's') );
-	REQUIRE(&test[2] == bx::strRFind(test, INT32_MAX, 's') );
+	REQUIRE(NULL == bx::strRFind(bx::StringView(test, 0), 's') );
+	REQUIRE(NULL == bx::strRFind(bx::StringView(test, 1), 's') );
+	REQUIRE(&test[2] == bx::strRFind(test, 's') );
 }
 
 TEST_CASE("strFindI", "")

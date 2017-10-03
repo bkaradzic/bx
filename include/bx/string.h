@@ -191,15 +191,9 @@ namespace bx
 	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
 	/// Find character in string. Limit search to _max characters.
-	const char* strFind(const char* _str, int32_t _max, char _ch);
-
-	///
 	const char* strFind(const StringView& _str, char _ch);
 
 	/// Find character in string in reverse. Limit search to _max characters.
-	const char* strRFind(const char* _str, int32_t _max, char _ch);
-
-	///
 	const char* strRFind(const StringView& _str, char _ch);
 
 	/// Find substring in string. Limit search to _max characters.
