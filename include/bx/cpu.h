@@ -8,25 +8,6 @@
 
 #include "bx.h"
 
-#if BX_COMPILER_MSVC
-#	include <math.h> // math.h is included because VS bitches:
-					 // warning C4985: 'ceil': attributes not present on previous declaration.
-					 // must be included before intrin.h.
-#	include <intrin.h>
-#	include <windows.h>
-#	if BX_PLATFORM_WINRT
-#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
-#	endif // BX_PLATFORM_WINRT
-extern "C" void _ReadBarrier();
-extern "C" void _WriteBarrier();
-extern "C" void _ReadWriteBarrier();
-#	pragma intrinsic(_ReadBarrier)
-#	pragma intrinsic(_WriteBarrier)
-#	pragma intrinsic(_ReadWriteBarrier)
-#	pragma intrinsic(_InterlockedExchangeAdd)
-#	pragma intrinsic(_InterlockedCompareExchange)
-#endif // BX_COMPILER_MSVC
-
 namespace bx
 {
 	///

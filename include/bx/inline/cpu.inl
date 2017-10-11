@@ -7,6 +7,30 @@
 #	error "Must be included from bx/cpu.h!"
 #endif // BX_CPU_H_HEADER_GUARD
 
+#if BX_COMPILER_MSVC
+#	if BX_PLATFORM_WINRT
+#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
+#	endif // BX_PLATFORM_WINRT
+
+extern "C" void _ReadBarrier();
+#	pragma intrinsic(_ReadBarrier)
+
+extern "C" void _WriteBarrier();
+#	pragma intrinsic(_WriteBarrier)
+
+extern "C" void _ReadWriteBarrier();
+#	pragma intrinsic(_ReadWriteBarrier)
+
+extern "C" long _InterlockedExchangeAdd(long volatile* _target, long _value);
+#	pragma intrinsic(_InterlockedExchangeAdd)
+
+extern "C" long _InterlockedCompareExchange(long volatile* _target, long _exchange, long _comparand);
+#	pragma intrinsic(_InterlockedCompareExchange)
+
+extern "C" void* InterlockedExchangePointer(void volatile* _target, void* _value);
+#	pragma intrinsic(InterlockedExchangePointer)
+#endif // BX_COMPILER_MSVC
+
 namespace bx
 {
 	inline void readBarrier()
@@ -44,7 +68,6 @@ namespace bx
 		_mm_mfence();
 #else
 		__sync_synchronize();
-//		asm volatile("mfence":::"memory");
 #endif // BX_COMPILER
 	}
 
