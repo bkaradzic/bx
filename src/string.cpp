@@ -10,6 +10,7 @@
 
 #if !BX_CRT_NONE
 #	include <stdio.h> // vsnprintf, vsnwprintf
+#	include <wchar.h> // vswprintf
 #endif // !BX_CRT_NONE
 
 namespace bx

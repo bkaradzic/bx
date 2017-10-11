@@ -8,8 +8,6 @@
 
 #include "allocator.h"
 
-#include <wchar.h> // wchar_t
-
 namespace bx
 {
 	struct Units
