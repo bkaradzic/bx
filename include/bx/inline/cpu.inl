@@ -23,7 +23,7 @@ extern "C" long _InterlockedExchangeAdd(long volatile* _ptr, long _value);
 #	pragma intrinsic(_InterlockedExchangeAdd)
 
 extern "C" int64_t __cdecl _InterlockedExchangeAdd64(int64_t volatile* _ptr, int64_t _value);
-#	pragma intrinsic(_InterlockedExchangeAdd64)
+//#	pragma intrinsic(_InterlockedExchangeAdd64)
 
 extern "C" long _InterlockedCompareExchange(long volatile* _ptr, long _exchange, long _comparand);
 #	pragma intrinsic(_InterlockedCompareExchange)
@@ -80,6 +80,46 @@ namespace bx
 	}
 
 	template<>
+	inline int32_t atomicCompareAndSwap<int32_t>(volatile int32_t* _ptr, int32_t _old, int32_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return int32_t(_InterlockedCompareExchange( (volatile long*)(_ptr), long(_new), long(_old) ) );
+#else
+		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
+#endif // BX_COMPILER
+	}
+
+	template<>
+	inline uint32_t atomicCompareAndSwap<uint32_t>(volatile uint32_t* _ptr, uint32_t _old, uint32_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return uint32_t(_InterlockedCompareExchange( (volatile long*)(_ptr), long(_new), long(_old) ) );
+#else
+		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
+#endif // BX_COMPILER
+	}
+
+	template<>
+	inline int64_t atomicCompareAndSwap<int64_t>(volatile int64_t* _ptr, int64_t _old, int64_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return _InterlockedCompareExchange64(_ptr, _new, _old);
+#else
+		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
+#endif // BX_COMPILER
+	}
+
+	template<>
+	inline uint64_t atomicCompareAndSwap<uint64_t>(volatile uint64_t* _ptr, uint64_t _old, uint64_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return uint64_t(_InterlockedCompareExchange64( (volatile int64_t*)(_ptr), int64_t(_new), int64_t(_old) ) );
+#else
+		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
+#endif // BX_COMPILER
+	}
+
+	template<>
 	inline int32_t atomicFetchAndAdd<int32_t>(volatile int32_t* _ptr, int32_t _add)
 	{
 #if BX_COMPILER_MSVC
@@ -87,6 +127,12 @@ namespace bx
 #else
 		return __sync_fetch_and_add(_ptr, _add);
 #endif // BX_COMPILER_
+	}
+
+	template<>
+	inline uint32_t atomicFetchAndAdd<uint32_t>(volatile uint32_t* _ptr, uint32_t _add)
+	{
+		return uint32_t(atomicFetchAndAdd<int32_t>( (volatile int32_t*)_ptr, int32_t(_add) ) );
 	}
 
 	template<>
@@ -101,7 +147,7 @@ namespace bx
 		do
 		{
 			oldVal = newVal;
-			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal + _add);
+			newVal = atomicCompareAndSwap<int64_t>(_ptr, oldVal, newVal + _add);
 
 		} while (oldVal != newVal);
 
@@ -110,12 +156,6 @@ namespace bx
 #else
 		return __sync_fetch_and_add(_ptr, _add);
 #endif // BX_COMPILER_
-	}
-
-	template<>
-	inline uint32_t atomicFetchAndAdd<uint32_t>(volatile uint32_t* _ptr, uint32_t _add)
-	{
-		return uint32_t(atomicFetchAndAdd<int32_t>( (volatile int32_t*)_ptr, int32_t(_add) ) );
 	}
 
 	template<>
@@ -220,46 +260,6 @@ namespace bx
 		return uint64_t(atomicSubAndFetch<int64_t>( (volatile int64_t*)_ptr, int64_t(_add) ) );
 	}
 
-	template<>
-	inline int32_t atomicCompareAndSwap(volatile int32_t* _ptr, int32_t _old, int32_t _new)
-	{
-#if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange( (volatile long*)(_ptr), _new, _old);
-#else
-		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
-	}
-
-	template<>
-	inline uint32_t atomicCompareAndSwap(volatile uint32_t* _ptr, uint32_t _old, uint32_t _new)
-	{
-#if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange( (volatile long*)(_ptr), _new, _old);
-#else
-		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
-	}
-
-	template<>
-	inline int64_t atomicCompareAndSwap(volatile int64_t* _ptr, int64_t _old, int64_t _new)
-	{
-#if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange64( (volatile int64_t*)(_ptr), _new, _old);
-#else
-		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
-	}
-
-	template<>
-	inline uint64_t atomicCompareAndSwap(volatile uint64_t* _ptr, uint64_t _old, uint64_t _new)
-	{
-#if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange64( (volatile int64_t*)(_ptr), _new, _old);
-#else
-		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
-#endif // BX_COMPILER
-	}
-
 	template<typename Ty>
 	inline Ty atomicFetchTestAndAdd(volatile Ty* _ptr, Ty _test, Ty _value)
 	{
@@ -268,7 +268,7 @@ namespace bx
 		do
 		{
 			oldVal = newVal;
-			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal >= _test ? _test : newVal+_value);
+			newVal = atomicCompareAndSwap<Ty>(_ptr, oldVal, newVal >= _test ? _test : newVal+_value);
 
 		} while (oldVal != newVal);
 
@@ -283,7 +283,7 @@ namespace bx
 		do
 		{
 			oldVal = newVal;
-			newVal = atomicCompareAndSwap(_ptr, oldVal, newVal <= _test ? _test : newVal-_value);
+			newVal = atomicCompareAndSwap<Ty>(_ptr, oldVal, newVal <= _test ? _test : newVal-_value);
 
 		} while (oldVal != newVal);
 
