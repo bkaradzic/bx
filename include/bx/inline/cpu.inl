@@ -8,9 +8,7 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINRT
-#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
-#	endif // BX_PLATFORM_WINRT
+#	include <emmintrin.h> // _mm_fence
 
 extern "C" void _ReadBarrier();
 #	pragma intrinsic(_ReadBarrier)
@@ -21,14 +19,24 @@ extern "C" void _WriteBarrier();
 extern "C" void _ReadWriteBarrier();
 #	pragma intrinsic(_ReadWriteBarrier)
 
-extern "C" long _InterlockedExchangeAdd(long volatile* _target, long _value);
+extern "C" long _InterlockedExchangeAdd(long volatile* _ptr, long _value);
 #	pragma intrinsic(_InterlockedExchangeAdd)
 
-extern "C" long _InterlockedCompareExchange(long volatile* _target, long _exchange, long _comparand);
+extern "C" int64_t __cdecl _InterlockedExchangeAdd64(int64_t volatile* _ptr, int64_t _value);
+#	pragma intrinsic(_InterlockedExchangeAdd64)
+
+extern "C" long _InterlockedCompareExchange(long volatile* _ptr, long _exchange, long _comparand);
 #	pragma intrinsic(_InterlockedCompareExchange)
 
-extern "C" void* InterlockedExchangePointer(void volatile* _target, void* _value);
-#	pragma intrinsic(InterlockedExchangePointer)
+extern "C" int64_t _InterlockedCompareExchange64(int64_t volatile* _ptr, int64_t _exchange, int64_t _comparand);
+#	pragma intrinsic(_InterlockedCompareExchange64)
+
+extern "C" void* _InterlockedExchangePointer(void* volatile* _ptr, void* _value);
+#	pragma intrinsic(_InterlockedExchangePointer)
+
+#	if BX_PLATFORM_WINRT
+#		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
+#	endif // BX_PLATFORM_WINRT
 #endif // BX_COMPILER_MSVC
 
 namespace bx
@@ -216,7 +224,7 @@ namespace bx
 	inline int32_t atomicCompareAndSwap(volatile int32_t* _ptr, int32_t _old, int32_t _new)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange( (volatile LONG*)(_ptr), _new, _old);
+		return _InterlockedCompareExchange( (volatile long*)(_ptr), _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
@@ -226,7 +234,7 @@ namespace bx
 	inline uint32_t atomicCompareAndSwap(volatile uint32_t* _ptr, uint32_t _old, uint32_t _new)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange( (volatile LONG*)(_ptr), _new, _old);
+		return _InterlockedCompareExchange( (volatile long*)(_ptr), _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int32_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
@@ -236,7 +244,7 @@ namespace bx
 	inline int64_t atomicCompareAndSwap(volatile int64_t* _ptr, int64_t _old, int64_t _new)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange64( (volatile LONG64*)(_ptr), _new, _old);
+		return _InterlockedCompareExchange64( (volatile int64_t*)(_ptr), _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
@@ -246,7 +254,7 @@ namespace bx
 	inline uint64_t atomicCompareAndSwap(volatile uint64_t* _ptr, uint64_t _old, uint64_t _new)
 	{
 #if BX_COMPILER_MSVC
-		return _InterlockedCompareExchange64( (volatile LONG64*)(_ptr), _new, _old);
+		return _InterlockedCompareExchange64( (volatile int64_t*)(_ptr), _new, _old);
 #else
 		return __sync_val_compare_and_swap( (volatile int64_t*)_ptr, _old, _new);
 #endif // BX_COMPILER
@@ -285,7 +293,7 @@ namespace bx
 	inline void* atomicExchangePtr(void** _ptr, void* _new)
 	{
 #if BX_COMPILER_MSVC
-		return InterlockedExchangePointer(_ptr, _new);
+		return _InterlockedExchangePointer(_ptr, _new);
 #else
 		return __sync_lock_test_and_set(_ptr, _new);
 #endif // BX_COMPILER
