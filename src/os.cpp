@@ -23,7 +23,8 @@
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_RPI        \
-	|| BX_PLATFORM_STEAMLINK
+	|| BX_PLATFORM_STEAMLINK  \
+	|| BX_PLATFORM_NX
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD  \
 	|| BX_PLATFORM_IOS  \
