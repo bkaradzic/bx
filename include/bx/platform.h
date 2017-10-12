@@ -59,6 +59,7 @@
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOXONE    0
+#define BX_PLATFORM_NX         0
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
 #if defined(__clang__)
@@ -213,6 +214,9 @@
 #elif defined(__GNU__)
 #	undef  BX_PLATFORM_HURD
 #	define BX_PLATFORM_HURD 1
+#elif defined(__NX__)
+# undef BX_PLATFORM_NX
+# define BX_PLATFORM_NX 1
 #endif //
 
 #if !BX_CRT_NONE
@@ -258,6 +262,7 @@
 		|| BX_PLATFORM_STEAMLINK  \
 		|| BX_PLATFORM_PS4        \
 		|| BX_PLATFORM_RPI        \
+		|| BX_PLATFORM_NX         \
 		)
 
 #define BX_PLATFORM_NONE !(0      \
