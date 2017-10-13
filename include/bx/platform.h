@@ -342,6 +342,8 @@
 #	define BX_PLATFORM_NAME "WinRT"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
+#elif BX_PLATFORM_NX
+#	define BX_PLATFORM_NAME "NX"
 #elif BX_PLATFORM_NONE
 #	define BX_PLATFORM_NAME "None"
 #else
