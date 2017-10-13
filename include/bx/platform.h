@@ -280,6 +280,7 @@
 		|| BX_PLATFORM_WINDOWS    \
 		|| BX_PLATFORM_WINRT      \
 		|| BX_PLATFORM_XBOXONE    \
+		|| BX_PLATFORM_NX         \
 		)
 
 #if BX_COMPILER_GCC
