@@ -10,6 +10,8 @@ namespace bx
 	static const EaseFn s_easeFunc[] =
 	{
 		easeLinear,
+		easeStep,
+		easeSmoothStep,
 		easeInQuad,
 		easeOutQuad,
 		easeInOutQuad,
