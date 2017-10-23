@@ -208,8 +208,8 @@ namespace bx
 
 	inline float angleDiff(float _a, float _b)
 	{
-		const float dist = fwrap(_b - _a, kPi*2.0f);
-		return fwrap(dist*2.0f, kPi*2.0f) - dist;
+		const float dist = fwrap(_b - _a, kPi2);
+		return fwrap(dist*2.0f, kPi2) - dist;
 	}
 
 	inline float angleLerp(float _a, float _b, float _t)
