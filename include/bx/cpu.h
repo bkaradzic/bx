@@ -51,6 +51,14 @@ namespace bx
 	Ty atomicFetchTestAndSub(volatile Ty* _ptr, Ty _test, Ty _value);
 
 	///
+	template<typename Ty>
+	Ty atomicFetchAndAddsat(volatile Ty* _ptr, Ty _value, Ty _max);
+
+	///
+	template<typename Ty>
+	Ty atomicFetchAndSubsat(volatile Ty* _ptr, Ty _value, Ty _min);
+
+	///
 	void* atomicExchangePtr(void** _ptr, void* _new);
 
 } // namespace bx

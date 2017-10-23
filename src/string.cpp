@@ -165,12 +165,6 @@ namespace bx
 		return _ch;
 	}
 
-	template<typename Ty>
-	inline Ty min(Ty _a, Ty _b)
-	{
-		return _a > _b ? _b : _a;
-	}
-
 	template<CharFn fn>
 	inline int32_t strCmp(const char* _lhs, int32_t _lhsMax, const char* _rhs, int32_t _rhsMax)
 	{

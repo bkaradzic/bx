@@ -290,6 +290,36 @@ namespace bx
 		return oldVal;
 	}
 
+	template<typename Ty>
+	Ty atomicFetchAndAddsat(volatile Ty* _ptr, Ty _value, Ty _max)
+	{
+		Ty oldVal;
+		Ty newVal = *_ptr;
+		do
+		{
+			oldVal = newVal;
+			newVal = atomicCompareAndSwap<Ty>(_ptr, oldVal, newVal >= _max ? _max : min(_max, newVal+_value) );
+
+		} while (oldVal != newVal && oldVal != _max);
+
+		return oldVal;
+	}
+
+	template<typename Ty>
+	Ty atomicFetchAndSubsat(volatile Ty* _ptr, Ty _value, Ty _min)
+	{
+		Ty oldVal;
+		Ty newVal = *_ptr;
+		do
+		{
+			oldVal = newVal;
+			newVal = atomicCompareAndSwap<Ty>(_ptr, oldVal, newVal <= _min ? _min : max(_min, newVal-_value) );
+
+		} while (oldVal != newVal && oldVal != _min);
+
+		return oldVal;
+	}
+
 	inline void* atomicExchangePtr(void** _ptr, void* _new)
 	{
 #if BX_COMPILER_MSVC
