@@ -703,6 +703,14 @@ namespace bx
 #define PARSER_PINF   3  // number is higher than +HUGE_VAL
 #define PARSER_MINF   4  // number is lower than -HUGE_VAL
 
+	inline char next(const char*& _s, const char* _term)
+	{
+		return _s != _term
+			? *_s++
+			: '\0'
+			;
+	}
+
 	static int parser(const char* _s, const char* _term, PrepNumber* _pn)
 	{
 		int state = FSM_A;
@@ -712,14 +720,14 @@ namespace bx
 		int expneg = 0;
 		int32_t expexp = 0;
 
-		while (state != FSM_STOP && _s != _term)
+		while (state != FSM_STOP) // && _s != _term)
 		{
 			switch (state)
 			{
 			case FSM_A:
 				if (isSpace(c) )
 				{
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else
 				{
@@ -732,12 +740,12 @@ namespace bx
 
 				if (c == '+')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if (c == '-')
 				{
 					_pn->negative = 1;
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if (isNumeric(c) )
 				{
@@ -754,11 +762,11 @@ namespace bx
 			case FSM_C:
 				if (c == '0')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if (c == '.')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 					state = FSM_D;
 				}
 				else
@@ -770,7 +778,7 @@ namespace bx
 			case FSM_D:
 				if (c == '0')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 					if (_pn->exponent > -2147483647) _pn->exponent--;
 				}
 				else
@@ -793,11 +801,11 @@ namespace bx
 						_pn->exponent++;
 					}
 
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if (c == '.')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 					state = FSM_F;
 				}
 				else
@@ -817,11 +825,11 @@ namespace bx
 						digx++;
 					}
 
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if ('e' == toLower(c) )
 				{
-					c = *_s++;
+					c = next(_s, _term);
 					state = FSM_G;
 				}
 				else
@@ -833,12 +841,12 @@ namespace bx
 			case FSM_G:
 				if (c == '+')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else if (c == '-')
 				{
 					expneg = 1;
-					c = *_s++;
+					c = next(_s, _term);
 				}
 
 				state = FSM_H;
@@ -847,7 +855,7 @@ namespace bx
 			case FSM_H:
 				if (c == '0')
 				{
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else
 				{
@@ -864,7 +872,7 @@ namespace bx
 						expexp += c - '0';
 					}
 
-					c = *_s++;
+					c = next(_s, _term);
 				}
 				else
 				{
