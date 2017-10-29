@@ -303,6 +303,10 @@ extern "C" int printf(const char* _format, ...)
 	return -1;
 }
 
+struct FILE
+{
+};
+
 extern "C" int fprintf(FILE* _stream, const char* _format, ...)
 {
 	BX_UNUSED(_stream, _format);
