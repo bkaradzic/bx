@@ -6,14 +6,18 @@
 #include "test.h"
 #include <bx/thread.h>
 
-int32_t threadExit0(void*)
+int32_t threadExit0(bx::Thread* _thread, void*)
 {
-	return 0;
+	BX_UNUSED(_thread);
+
+	return bx::kExitSuccess;
 }
 
-int32_t threadExit1(void*)
+int32_t threadExit1(bx::Thread* _thread, void*)
 {
-	return 1;
+	BX_UNUSED(_thread);
+
+	return bx::kExitFailure;
 }
 
 TEST_CASE("thread", "")
