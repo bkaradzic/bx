@@ -10,52 +10,49 @@
 
 TEST_CASE("easing", "")
 {
-	if (BX_ENABLED(false) )
+	bx::WriterI* writer = bx::getNullOut();
+
+	for (uint32_t ee = 0; ee < bx::Easing::Count; ++ee)
 	{
-		bx::WriterI* writer = bx::getStdOut();
+		bx::writePrintf(writer, "\n\n%d\n", ee);
 
-		for (uint32_t ee = 0; ee < bx::Easing::Count; ++ee)
+		const bx::EaseFn easing = bx::getEaseFunc(bx::Easing::Enum(ee) );
+
+		const int32_t nx = 64;
+		const int32_t ny = 10;
+
+		bx::writePrintf(writer, "\t///      ^\n");
+
+		for (int32_t yy = ny+4; yy >= -5; --yy)
 		{
-			bx::writePrintf(writer, "\n\n%d\n", ee);
+			const float ys = float(yy    )/float(ny);
+			const float ye = float(yy+1.0)/float(ny);
 
-			const bx::EaseFn easing = bx::getEaseFunc(bx::Easing::Enum(ee) );
+			bx::writePrintf(writer, "\t///      %c", yy != 0 ? '|' : '+');
 
-			const int32_t nx = 64;
-			const int32_t ny = 10;
-
-			bx::writePrintf(writer, "\t///      ^\n");
-
-			for (int32_t yy = ny+4; yy >= -5; --yy)
+			for (int32_t xx = 0; xx < nx; ++xx)
 			{
-				const float ys = float(yy    )/float(ny);
-				const float ye = float(yy+1.0)/float(ny);
-
-				bx::writePrintf(writer, "\t///      %c", yy != 0 ? '|' : '+');
-
-				for (int32_t xx = 0; xx < nx; ++xx)
+				int32_t jj = 0;
+				for (; jj < 10; ++jj)
 				{
-					int32_t jj = 0;
-					for (; jj < 10; ++jj)
-					{
-						const float tt = float(xx*10+jj)/10.0f/float(nx);
-						const float vv = easing(tt);
+					const float tt = float(xx*10+jj)/10.0f/float(nx);
+					const float vv = easing(tt);
 
-						if (vv >= ys
-						&&  vv <  ye)
-						{
-							bx::writePrintf(writer, "*");
-							break;
-						}
-					}
-
-					if (jj == 10)
+					if (vv >= ys
+					&&  vv <  ye)
 					{
-						bx::writePrintf(writer, "%c", yy != 0 ? ' ' : '-');
+						bx::writePrintf(writer, "*");
+						break;
 					}
 				}
 
-				bx::writePrintf(writer, "%s\n", yy != 0 ? "" : ">");
+				if (jj == 10)
+				{
+					bx::writePrintf(writer, "%c", yy != 0 ? ' ' : '-');
+				}
 			}
+
+			bx::writePrintf(writer, "%s\n", yy != 0 ? "" : ">");
 		}
 	}
 }

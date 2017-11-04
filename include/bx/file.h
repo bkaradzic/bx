@@ -21,6 +21,9 @@ namespace bx
 	WriterI* getStdErr();
 
 	///
+	WriterI* getNullOut();
+
+	///
 	class FileReader : public FileReaderI
 	{
 	public:
