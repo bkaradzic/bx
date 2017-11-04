@@ -150,7 +150,7 @@ namespace bx
 #	error "Not implemented!"
 #endif // BX_PLATFORM_
 
-		m_sem.wait();
+		m_queue.pop();
 
 		if (NULL != _name)
 		{
@@ -243,6 +243,16 @@ namespace bx
 #endif // BX_PLATFORM_
 	}
 
+	void Thread::push(void* _ptr)
+	{
+		m_queue.push(_ptr);
+	}
+
+	void* Thread::pop()
+	{
+		return m_queue.pop();
+	}
+
 	int32_t Thread::entry()
 	{
 #if BX_PLATFORM_WINDOWS
@@ -250,8 +260,8 @@ namespace bx
 		ti->m_threadId = ::GetCurrentThreadId();
 #endif // BX_PLATFORM_WINDOWS
 
-		m_sem.post();
-		return m_fn(m_userData);
+		m_queue.push(NULL);
+		return m_fn(this, m_userData);
 	}
 
 	struct TlsDataInternal
