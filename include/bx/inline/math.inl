@@ -45,6 +45,17 @@ namespace bx
 		return u.f;
 	}
 
+	inline uint32_t floatFlip(uint32_t _value)
+	{
+		// Reference:
+		// http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
+		const uint32_t tmp0   = uint32_sra(_value, 31);
+		const uint32_t tmp1   = uint32_neg(tmp0);
+		const uint32_t mask   = uint32_or(tmp1, 0x80000000);
+		const uint32_t result = uint32_xor(_value, mask);
+		return result;
+	}
+
 	inline bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
