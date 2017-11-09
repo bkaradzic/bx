@@ -59,6 +59,7 @@ namespace bx
 		ThreadFn  m_fn;
 		void*     m_userData;
 		MpScUnboundedBlockingQueue<void> m_queue;
+		Semaphore m_sem;
 		uint32_t  m_stackSize;
 		int32_t   m_exitCode;
 		bool      m_running;

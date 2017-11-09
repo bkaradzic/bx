@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
+#include "bx_p.h"
 #include <bx/semaphore.h>
 
 #if BX_CONFIG_SUPPORTS_THREADING
@@ -24,9 +25,10 @@
 
 #ifndef BX_CONFIG_SEMAPHORE_PTHREAD
 #	define BX_CONFIG_SEMAPHORE_PTHREAD (0 \
-			|| BX_PLATFORM_OSX            \
-			|| BX_PLATFORM_IOS            \
-			)
+		|| BX_PLATFORM_LINUX              \
+		|| BX_PLATFORM_OSX                \
+		|| BX_PLATFORM_IOS                \
+		)
 #endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
 namespace bx
@@ -135,13 +137,13 @@ namespace bx
 
 #		if BX_PLATFORM_OSX
 		BX_UNUSED(_msecs);
-		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support pthread_cond_timedwait at this moment.");
+		BX_CHECK(-1 == _msecs, "OSX doesn't support pthread_cond_timedwait at this moment.");
 		while (0 == result
 		&&     0 >= si->m_count)
 		{
 			result = pthread_cond_wait(&si->m_cond, &si->m_mutex);
 		}
-#		elif BX_PLATFORM_IOS
+#		else
 		if (-1 == _msecs)
 		{
 			while (0 == result
@@ -153,6 +155,7 @@ namespace bx
 		else
 		{
 			timespec ts;
+#			if BX_PLATFORM_IOS
 			toTimespecMs(ts, _msecs);
 
 			while (0 == result
@@ -160,16 +163,16 @@ namespace bx
 			{
 				result = pthread_cond_timedwait_relative_np(&si->m_cond, &si->m_mutex, &ts);
 			}
-		}
-#		else
-		timespec ts;
-		clock_gettime(CLOCK_REALTIME, &ts);
-		add(ts, _msecs);
+#			else
+			clock_gettime(CLOCK_REALTIME, &ts);
+			add(ts, _msecs);
 
-		while (0 == result
-		&&     0 >= si->m_count)
-		{
-			result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
+			while (0 == result
+			&&     0 >= si->m_count)
+			{
+				result = pthread_cond_timedwait(&si->m_cond, &si->m_mutex, &ts);
+			}
+#			endif // BX_PLATFORM_IOS
 		}
 #		endif // BX_PLATFORM_
 		bool ok = 0 == result;
@@ -226,10 +229,6 @@ namespace bx
 	{
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 
-#		if BX_PLATFORM_OSX
-		BX_CHECK(-1 == _msecs, "NaCl and OSX don't support sem_timedwait at this moment."); BX_UNUSED(_msecs);
-		return 0 == sem_wait(&si->m_handle);
-#		else
 		if (0 > _msecs)
 		{
 			int32_t result;
@@ -246,8 +245,8 @@ namespace bx
 		clock_gettime(CLOCK_REALTIME, &ts);
 		add(ts, _msecs);
 		return 0 == sem_timedwait(&si->m_handle, &ts);
-#		endif // BX_PLATFORM_
 	}
+
 #	endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
 #elif  BX_PLATFORM_WINDOWS \
