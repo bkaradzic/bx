@@ -80,10 +80,10 @@ static const FilePathSplit s_filePathSplit[] =
 {
 	{ "\\abc/def\\../..\\../test.txt", true, "/", "test.txt", "test", ".txt" },
 	{ "/abv/gd/555/333/pod.mac", true, "/abv/gd/555/333/", "pod.mac", "pod", ".mac" },
-	{ "archive.tar.gz", false, "", "archive.tar.gz", "archive",  ".tar.gz" },
-	{ "tmp/archive.tar.gz", false, "tmp/", "archive.tar.gz", "archive",  ".tar.gz" },
-	{ "/tmp/archive.tar.gz", true, "/tmp/", "archive.tar.gz", "archive",  ".tar.gz" },
-	{ "d:/tmp/archive.tar.gz", true, "D:/tmp/", "archive.tar.gz", "archive",  ".tar.gz" },
+	{ "archive.tar.gz", false, "", "archive.tar.gz", "archive", ".tar.gz" },
+	{ "tmp/archive.tar.gz", false, "tmp/", "archive.tar.gz", "archive", ".tar.gz" },
+	{ "/tmp/archive.tar.gz", true, "/tmp/", "archive.tar.gz", "archive", ".tar.gz" },
+	{ "d:/tmp/archive.tar.gz", true, "D:/tmp/", "archive.tar.gz", "archive", ".tar.gz" },
 };
 
 TEST_CASE("FilePath", "")

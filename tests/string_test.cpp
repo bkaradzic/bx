@@ -196,6 +196,8 @@ TEST_CASE("strFind", "")
 		REQUIRE(NULL == bx::strFind(test, "Quick1") );
 		REQUIRE(&test[4] == bx::strFind(bx::StringView(test, 9), "Quick") );
 		REQUIRE(&test[4] == bx::strFind(test, "Quick") );
+
+		REQUIRE(NULL == bx::strFind("vgd", 'a') );
 	}
 }
 
@@ -360,4 +362,20 @@ TEST_CASE("StringView", "")
 
 	sv.clear();
 	REQUIRE(0 == sv.getLength() );
+}
+
+TEST_CASE("Trim", "")
+{
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "ab"), "vgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vgd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("/555333/podmac/", "/"), "555333/podmac/") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "abv"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("/555333/podmac/", "/"), "/555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", "da"), "bvg") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("<1389>", "<>"), "1389") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("/555333/podmac/", "/"), "555333/podmac") );
 }

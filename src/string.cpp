@@ -333,9 +333,9 @@ namespace bx
 		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
-	inline const char* strFind(const char* _str, int32_t _max, char _ch)
+	inline const char* strFindUnsafe(const char* _str, int32_t _len, char _ch)
 	{
-		for (int32_t ii = 0, len = strLen(_str, _max); ii < len; ++ii)
+		for (int32_t ii = 0; ii < _len; ++ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -344,6 +344,11 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	inline const char* strFind(const char* _str, int32_t _max, char _ch)
+	{
+		return strFindUnsafe(_str, strLen(_str, _max), _ch);
 	}
 
 	const char* strFind(const StringView& _str, char _ch)
@@ -351,9 +356,9 @@ namespace bx
 		return strFind(_str.getPtr(), _str.getLength(), _ch);
 	}
 
-	inline const char* strRFind(const char* _str, int32_t _max, char _ch)
+	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
 	{
-		for (int32_t ii = strLen(_str, _max); 0 <= ii; --ii)
+		for (int32_t ii = _len; 0 <= ii; --ii)
 		{
 			if (_str[ii] == _ch)
 			{
@@ -362,6 +367,11 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	inline const char* strRFind(const char* _str, int32_t _max, char _ch)
+	{
+		return strRFindUnsafe(_str, strLen(_str, _max), _ch);
 	}
 
 	const char* strRFind(const StringView& _str, char _ch)
@@ -428,6 +438,44 @@ namespace bx
 			, _find.getPtr()
 			, min(_find.getLength(), _num)
 			);
+	}
+
+	StringView strLTrim(const StringView& _str, const StringView& _chars)
+	{
+		const char* ptr   = _str.getPtr();
+		const char* chars = _chars.getPtr();
+		const uint32_t charsLen = _chars.getLength();
+		for (uint32_t ii = 0, len = _str.getLength(); ii < len; ++ii)
+		{
+			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
+			{
+				return StringView(ptr + ii, len-ii);
+			}
+		}
+
+		return StringView();
+	}
+
+	StringView strRTrim(const StringView& _str, const StringView& _chars)
+	{
+		const char* ptr   = _str.getPtr();
+		const char* chars = _chars.getPtr();
+		const uint32_t charsLen = _chars.getLength();
+
+		for (int32_t len = _str.getLength(), ii = len-1; 0 <= ii; --ii)
+		{
+			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
+			{
+				return StringView(ptr, ii);
+			}
+		}
+
+		return StringView();
+	}
+
+	StringView strTrim(const StringView& _str, const StringView& _chars)
+	{
+		return strLTrim(strRTrim(_str, _chars), _chars);
 	}
 
 	const char* strnl(const char* _str)

@@ -200,6 +200,15 @@ namespace bx
 	/// Find substring in string. Case insensitive. Limit search to _max characters.
 	const char* strFindI(const StringView& _str, const StringView& _find, int32_t _num = INT32_MAX);
 
+	///
+	StringView strLTrim(const StringView& _str, const StringView& _chars);
+
+	///
+	StringView strRTrim(const StringView& _str, const StringView& _chars);
+
+	///
+	StringView strTrim(const StringView& _str, const StringView& _chars);
+
 	/// Find new line. Returns pointer after new line terminator.
 	const char* strnl(const char* _str);
 
