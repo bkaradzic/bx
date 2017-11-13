@@ -378,4 +378,7 @@ TEST_CASE("Trim", "")
 	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", "da"), "bvg") );
 	REQUIRE(0 == bx::strCmp(bx::strTrim("<1389>", "<>"), "1389") );
 	REQUIRE(0 == bx::strCmp(bx::strTrim("/555333/podmac/", "/"), "555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", ""), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim(" \t a b\tv g d \t ", " \t"), "a b\tv g d") );
 }
