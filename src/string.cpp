@@ -466,7 +466,7 @@ namespace bx
 		{
 			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
 			{
-				return StringView(ptr, ii);
+				return StringView(ptr, ii+1);
 			}
 		}
 

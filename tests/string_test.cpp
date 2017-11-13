@@ -4,11 +4,10 @@
  */
 
 #include "test.h"
+#include <bx/filepath.h>
 #include <bx/string.h>
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
-
-#include <string.h>
 
 bx::AllocatorI* g_allocator;
 
@@ -70,6 +69,11 @@ TEST_CASE("strCat", "")
 	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
 	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
 	REQUIRE(0 == bx::strCmp(dst, "copycat-cat") );
+}
+
+TEST_CASE("strCmp", "")
+{
+	REQUIRE(0 != bx::strCmp("meh", "meh/") );
 }
 
 TEST_CASE("strCmpI", "")
@@ -381,4 +385,7 @@ TEST_CASE("Trim", "")
 
 	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", ""), "abvgd") );
 	REQUIRE(0 == bx::strCmp(bx::strTrim(" \t a b\tv g d \t ", " \t"), "a b\tv g d") );
+
+	bx::FilePath uri("/555333/podmac/");
+	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
 }
