@@ -8,7 +8,10 @@
 
 #if BX_CONFIG_SUPPORTS_THREADING
 
-#if BX_PLATFORM_POSIX
+#if BX_PLATFORM_OSX \
+||  BX_PLATFORM_IOS
+#	include <dispatch/dispatch.h>
+#elif BX_PLATFORM_POSIX
 #	include <errno.h>
 #	include <pthread.h>
 #	include <semaphore.h>
@@ -26,8 +29,6 @@
 #ifndef BX_CONFIG_SEMAPHORE_PTHREAD
 #	define BX_CONFIG_SEMAPHORE_PTHREAD (0 \
 		|| BX_PLATFORM_LINUX              \
-		|| BX_PLATFORM_OSX                \
-		|| BX_PLATFORM_IOS                \
 		)
 #endif // BX_CONFIG_SEMAPHORE_PTHREAD
 
@@ -35,7 +36,10 @@ namespace bx
 {
 	struct SemaphoreInternal
 	{
-#if BX_PLATFORM_POSIX
+#if BX_PLATFORM_OSX \
+||  BX_PLATFORM_IOS
+		dispatch_semaphore_t m_handle;
+#elif BX_PLATFORM_POSIX
 #	if BX_CONFIG_SEMAPHORE_PTHREAD
 		pthread_mutex_t m_mutex;
 		pthread_cond_t m_cond;
@@ -137,7 +141,7 @@ namespace bx
 
 #		if BX_PLATFORM_OSX
 		BX_UNUSED(_msecs);
-		BX_CHECK(-1 == _msecs, "OSX doesn't support pthread_cond_timedwait at this moment.");
+//		BX_CHECK(-1 == _msecs, "OSX doesn't support pthread_cond_timedwait at this moment.");
 		while (0 == result
 		&&     0 >= si->m_count)
 		{
@@ -188,6 +192,45 @@ namespace bx
 		BX_UNUSED(result);
 
 		return ok;
+	}
+
+#	elif BX_PLATFORM_OSX \
+	||   BX_PLATFORM_IOS
+
+	Semaphore::Semaphore()
+	{
+		BX_STATIC_ASSERT(sizeof(SemaphoreInternal) <= sizeof(m_internal) );
+
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+		si->m_handle = dispatch_semaphore_create(0);
+		BX_CHECK(NULL != si->m_handle, "dispatch_semaphore_create failed.");
+	}
+
+	Semaphore::~Semaphore()
+	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+		dispatch_release(si->m_handle);
+	}
+
+	void Semaphore::post(uint32_t _count)
+	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		for (uint32_t ii = 0; ii < _count; ++ii)
+		{
+			dispatch_semaphore_signal(si->m_handle);
+		}
+	}
+
+	bool Semaphore::wait(int32_t _msecs)
+	{
+		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
+
+		dispatch_time_t dt = 0 > _msecs
+			? DISPATCH_TIME_FOREVER
+			: dispatch_time(DISPATCH_TIME_NOW, _msecs*1000000)
+			;
+		return !dispatch_semaphore_wait(si->m_handle, dt);
 	}
 
 #	else

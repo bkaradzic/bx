@@ -7,7 +7,7 @@
 #define BX_P_H_HEADER_GUARD
 
 #ifndef BX_CONFIG_DEBUG
-#	define BX_CONFIG_DEBUG 0
+#	define BX_CONFIG_DEBUG 1
 #endif // BX_CONFIG_DEBUG
 
 #if BX_CONFIG_DEBUG
