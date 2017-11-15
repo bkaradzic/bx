@@ -17,6 +17,11 @@ project "bx"
 		path.join(BX_DIR, "src/**.cpp"),
 	}
 
+	configuration { "Debug" }
+		defines {
+			"BX_CONFIG_DEBUG=1",
+		}
+
 	configuration { "linux-*" }
 		buildoptions {
 			"-fPIC",
