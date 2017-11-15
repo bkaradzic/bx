@@ -6,7 +6,8 @@
 #include "test.h"
 #include <bx/thread.h>
 
-bx::MpScUnboundedBlockingQueue<void> s_mpsc;
+bx::DefaultAllocator s_allocator;
+bx::MpScUnboundedBlockingQueue<void> s_mpsc(&s_allocator);
 
 int32_t threadExit0(bx::Thread* _thread, void*)
 {

@@ -36,6 +36,8 @@ using namespace Windows::System::Threading;
 
 namespace bx
 {
+	static DefaultAllocator s_allocator;
+
 	struct ThreadInternal
 	{
 #if    BX_PLATFORM_WINDOWS \
@@ -76,6 +78,7 @@ namespace bx
 	Thread::Thread()
 		: m_fn(NULL)
 		, m_userData(NULL)
+		, m_queue(&s_allocator)
 		, m_stackSize(0)
 		, m_exitCode(kExitSuccess)
 		, m_running(false)

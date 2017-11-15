@@ -6,7 +6,7 @@
 #ifndef BX_THREAD_H_HEADER_GUARD
 #define BX_THREAD_H_HEADER_GUARD
 
-#include "bx.h"
+#include "allocator.h"
 #include "mpscqueue.h"
 
 namespace bx
