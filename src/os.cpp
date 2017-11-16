@@ -96,12 +96,12 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif BX_PLATFORM_LINUX \
-   || BX_PLATFORM_RPI   \
-   || BX_PLATFORM_STEAMLINK
+#elif  BX_PLATFORM_LINUX \
+	|| BX_PLATFORM_RPI   \
+	|| BX_PLATFORM_STEAMLINK
 		return (pid_t)::syscall(SYS_gettid);
-#elif BX_PLATFORM_IOS \
-   || BX_PLATFORM_OSX
+#elif  BX_PLATFORM_IOS \
+	|| BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
 #elif BX_PLATFORM_BSD
 		return *(uint32_t*)::pthread_self();
@@ -118,8 +118,8 @@ namespace bx
 #if BX_PLATFORM_ANDROID
 		struct mallinfo mi = mallinfo();
 		return mi.uordblks;
-#elif BX_PLATFORM_LINUX \
-   || BX_PLATFORM_HURD
+#elif  BX_PLATFORM_LINUX \
+	|| BX_PLATFORM_HURD
 		FILE* file = fopen("/proc/self/statm", "r");
 		if (NULL == file)
 		{
