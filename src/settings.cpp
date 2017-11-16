@@ -12,7 +12,7 @@ namespace
 #define INI_FREE(_ctx, _ptr)           (BX_FREE(reinterpret_cast<bx::AllocatorI*>(_ctx), _ptr) )
 #define INI_MEMCPY(_dst, _src, _count) (bx::memCopy(_dst, _src, _count) )
 #define INI_STRLEN(_str)               (bx::strLen(_str) )
-#define INI_STRICMP(_s1, _s2, _len)    (bx::strCmpI(_s1, _s2, _len) )
+#define INI_STRNICMP(_s1, _s2, _len)   (bx::strCmpI(_s1, _s2, _len) )
 
 #define INI_IMPLEMENTATION
 
