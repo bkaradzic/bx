@@ -96,20 +96,21 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif BX_PLATFORM_LINUX || BX_PLATFORM_RPI || BX_PLATFORM_STEAMLINK
+#elif BX_PLATFORM_LINUX \
+   || BX_PLATFORM_RPI   \
+   || BX_PLATFORM_STEAMLINK
 		return (pid_t)::syscall(SYS_gettid);
-#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
+#elif BX_PLATFORM_IOS \
+   || BX_PLATFORM_OSX
 		return (mach_port_t)::pthread_mach_thread_np(pthread_self() );
 #elif BX_PLATFORM_BSD
-		// Casting __nc_basic_thread_data*... need better way to do this.
 		return *(uint32_t*)::pthread_self();
 #elif BX_PLATFORM_HURD
 		return (pthread_t)::pthread_self();
 #else
-//#	pragma message "not implemented."
 		debugOutput("getTid is not implemented"); debugBreak();
 		return 0;
-#endif //
+#endif // BX_PLATFORM_
 	}
 
 	size_t getProcessMemoryUsed()
@@ -117,7 +118,8 @@ namespace bx
 #if BX_PLATFORM_ANDROID
 		struct mallinfo mi = mallinfo();
 		return mi.uordblks;
-#elif BX_PLATFORM_LINUX || BX_PLATFORM_HURD
+#elif BX_PLATFORM_LINUX \
+   || BX_PLATFORM_HURD
 		FILE* file = fopen("/proc/self/statm", "r");
 		if (NULL == file)
 		{
@@ -141,7 +143,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#	else // MACH_TASK_BASIC_INFO
+#	else
 		task_basic_info info;
 		mach_msg_type_number_t infoCount = TASK_BASIC_INFO_COUNT;
 
@@ -150,7 +152,7 @@ namespace bx
 				, (task_info_t)&info
 				, &infoCount
 				);
-#	endif // MACH_TASK_BASIC_INFO
+#	endif // defined(MACH_TASK_BASIC_INFO)
 		if (KERN_SUCCESS != result)
 		{
 			return 0;
@@ -301,7 +303,8 @@ namespace bx
 
 	void* exec(const char* const* _argv)
 	{
-#if BX_PLATFORM_LINUX || BX_PLATFORM_HURD
+#if BX_PLATFORM_LINUX \
+ || BX_PLATFORM_HURD
 		pid_t pid = fork();
 
 		if (0 == pid)
@@ -331,9 +334,9 @@ namespace bx
 		for(uint32_t ii = 0; NULL != _argv[ii]; ++ii)
 		{
 			len += snprintf(&temp[len], bx::uint32_imax(0, total-len)
-						, "%s "
-						, _argv[ii]
-						);
+				, "%s "
+				, _argv[ii]
+				);
 		}
 
 		bool ok = !!CreateProcessA(_argv[0]
