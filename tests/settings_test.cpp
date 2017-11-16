@@ -10,7 +10,7 @@
 TEST_CASE("Settings", "")
 {
 	bx::FilePath filePath;
-	filePath.set(bx::TempDir::Tag);
+	filePath.set(bx::Dir::Temp);
 	filePath.join("settings.ini");
 
 	bx::DefaultAllocator allocator;

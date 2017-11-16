@@ -119,6 +119,6 @@ TEST_CASE("FilePath", "")
 
 TEST_CASE("FilePath temp", "")
 {
-	bx::FilePath tmp(bx::TempDir::Tag);
+	bx::FilePath tmp(bx::Dir::Temp);
 	REQUIRE(0 != bx::strCmp(".", tmp.getPath().getPtr() ) );
 }

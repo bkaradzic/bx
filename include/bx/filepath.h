@@ -11,7 +11,18 @@
 namespace bx
 {
 	const int32_t kMaxFilePath = 1024;
-	struct TempDir { enum Enum { Tag }; };
+
+	///
+	struct Dir
+	{
+		enum Enum ///
+		{
+			Temp,
+			Home,
+
+			Count
+		};
+	};
 
 	/// FilePath parser and helper.
 	///
@@ -29,7 +40,7 @@ namespace bx
 		FilePath();
 
 		///
-		FilePath(TempDir::Enum);
+		FilePath(Dir::Enum _dir);
 
 		///
 		FilePath(const char* _str);
@@ -41,7 +52,7 @@ namespace bx
 		FilePath& operator=(const StringView& _rhs);
 
 		///
-		void set(TempDir::Enum);
+		void set(Dir::Enum _dir);
 
 		///
 		void set(const StringView& _str);

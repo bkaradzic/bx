@@ -134,6 +134,35 @@ namespace bx
 		return size;
 	}
 
+	static bool getEnv(const char* _name, FileInfo::Enum _type, char* _out, uint32_t* _inOutSize)
+	{
+		uint32_t len = *_inOutSize;
+		*_out = '\0';
+
+		if (getenv(_name, _out, &len) )
+		{
+			FileInfo fi;
+			if (stat(_out, fi)
+			&&  _type == fi.m_type)
+			{
+				*_inOutSize = len;
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	static bool getHomePath(char* _out, uint32_t* _inOutSize)
+	{
+		return false
+#if BX_PLATFORM_WINDOWS
+			|| getEnv("USERPROFILE", FileInfo::Directory, _out, _inOutSize)
+#endif // BX_PLATFORM_WINDOWS
+			|| getEnv("HOME", FileInfo::Directory, _out, _inOutSize)
+			;
+	}
+
 	static bool getTempPath(char* _out, uint32_t* _inOutSize)
 	{
 #if BX_PLATFORM_WINDOWS
@@ -156,14 +185,14 @@ namespace bx
 		{
 			uint32_t len = *_inOutSize;
 			*_out = '\0';
-			bool result = getenv(*tmp, _out, &len);
+			bool ok = getEnv(*tmp, FileInfo::Directory, _out, &len);
 
-			if (result
+			if (ok
 			&&  len != 0
 			&&  len < *_inOutSize)
 			{
 				*_inOutSize = len;
-				return result;
+				return ok;
 			}
 		}
 
@@ -185,9 +214,9 @@ namespace bx
 		set("");
 	}
 
-	FilePath::FilePath(TempDir::Enum)
+	FilePath::FilePath(Dir::Enum _dir)
 	{
-		set(TempDir::Tag);
+		set(_dir);
 	}
 
 	FilePath::FilePath(const char* _rhs)
@@ -206,11 +235,27 @@ namespace bx
 		return *this;
 	}
 
-	void FilePath::set(TempDir::Enum)
+	void FilePath::set(Dir::Enum _dir)
 	{
 		char tmp[kMaxFilePath];
 		uint32_t len = BX_COUNTOF(tmp);
-		getTempPath(tmp, &len);
+
+		switch (_dir)
+		{
+		case Dir::Temp:
+			getTempPath(tmp, &len);
+			break;
+
+		case Dir::Home:
+			getHomePath(tmp, &len);
+bx::debugPrintf("%s", tmp);
+			break;
+
+		default:
+			len = 0;
+			break;
+		}
+
 		set(StringView(tmp, len) );
 	}
 
