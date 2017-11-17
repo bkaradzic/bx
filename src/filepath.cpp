@@ -248,7 +248,6 @@ namespace bx
 
 		case Dir::Home:
 			getHomePath(tmp, &len);
-bx::debugPrintf("%s", tmp);
 			break;
 
 		default:
