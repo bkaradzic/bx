@@ -8,6 +8,12 @@
 #include <bx/os.h>
 #include <bx/readerwriter.h>
 
+#if BX_CRT_MSVC
+#	include <direct.h> // _getcwd
+#else
+#	include <unistd.h> // getcwd
+#endif // BX_CRT_MSVC
+
 #if BX_PLATFORM_WINDOWS
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _ptr);
 #endif // BX_PLATFORM_WINDOWS
@@ -159,6 +165,20 @@ namespace bx
 		}
 
 		return false;
+	}
+
+	static char* pwd(char* _buffer, uint32_t _size)
+	{
+#if BX_PLATFORM_PS4     \
+ || BX_PLATFORM_XBOXONE \
+ || BX_PLATFORM_WINRT
+		BX_UNUSED(_buffer, _size);
+		return NULL;
+#elif BX_CRT_MSVC
+		return ::_getcwd(_buffer, (int)_size);
+#else
+		return ::getcwd(_buffer, _size);
+#endif // BX_COMPILER_
 	}
 
 	static bool getCurrentPath(char* _out, uint32_t* _inOutSize)

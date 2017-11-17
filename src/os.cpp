@@ -56,12 +56,6 @@
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
-#if BX_CRT_MSVC
-#	include <direct.h> // _getcwd
-#else
-#	include <unistd.h> // getcwd
-#endif // BX_CRT_MSVC
-
 namespace bx
 {
 
@@ -284,20 +278,6 @@ namespace bx
 		return ::_chdir(_path);
 #else
 		return ::chdir(_path);
-#endif // BX_COMPILER_
-	}
-
-	char* pwd(char* _buffer, uint32_t _size)
-	{
-#if BX_PLATFORM_PS4     \
- || BX_PLATFORM_XBOXONE \
- || BX_PLATFORM_WINRT
-		BX_UNUSED(_buffer, _size);
-		return NULL;
-#elif BX_CRT_MSVC
-		return ::_getcwd(_buffer, (int)_size);
-#else
-		return ::getcwd(_buffer, _size);
 #endif // BX_COMPILER_
 	}
 
