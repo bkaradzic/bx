@@ -153,6 +153,14 @@ namespace bx
 		return false;
 	}
 
+	static bool getCurrentPath(char* _out, uint32_t* _inOutSize)
+	{
+		uint32_t len = *_inOutSize;
+		pwd(_out, len);
+		*_inOutSize = strLen(_out);
+		return true;
+	}
+
 	static bool getHomePath(char* _out, uint32_t* _inOutSize)
 	{
 		return false
@@ -242,6 +250,10 @@ namespace bx
 
 		switch (_dir)
 		{
+		case Dir::Current:
+			getCurrentPath(tmp, &len);
+			break;
+
 		case Dir::Temp:
 			getTempPath(tmp, &len);
 			break;

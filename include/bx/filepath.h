@@ -17,6 +17,7 @@ namespace bx
 	{
 		enum Enum ///
 		{
+			Current,
 			Temp,
 			Home,
 
