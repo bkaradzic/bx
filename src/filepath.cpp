@@ -61,6 +61,8 @@ namespace bx
 			dotdot = size;
 		}
 
+		bool trailingSlash = false;
+
 		while (idx < num && err.isOk() )
 		{
 			switch (_src[idx])
@@ -68,6 +70,7 @@ namespace bx
 			case '/':
 			case '\\':
 				++idx;
+				trailingSlash = idx == num;
 				break;
 
 			case '.':
@@ -127,6 +130,11 @@ namespace bx
 		if (0 == size)
 		{
 			size += write(&writer, '.', &err);
+		}
+
+		if (trailingSlash)
+		{
+			size += write(&writer, '/', &err);
 		}
 
 		write(&writer, '\0', &err);
@@ -326,6 +334,8 @@ namespace bx
 			{
 				return StringView(fileName.getPtr(), ext);
 			}
+
+			return fileName;
 		}
 
 		return StringView();

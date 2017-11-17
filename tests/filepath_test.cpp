@@ -26,21 +26,21 @@ FilePathTest s_filePathTest[] =
 	{"/abc", "/abc"},
 	{"/", "/"},
 
-	// Remove trailing slash
-	{"abc/", "abc"},
-	{"abc/def/", "abc/def"},
-	{"a/b/c/", "a/b/c"},
-	{"./", "."},
-	{"../", ".."},
-	{"../../", "../.."},
-	{"/abc/", "/abc"},
+	// Do not remove trailing slash
+	{"abc/", "abc/"},
+	{"abc/def/", "abc/def/"},
+	{"a/b/c/", "a/b/c/"},
+	{"./", "./"},
+	{"../", "../"},
+	{"../../", "../../"},
+	{"/abc/", "/abc/"},
 
 	// Remove doubled slash
 	{"abc//def//ghi", "abc/def/ghi"},
 	{"//abc", "/abc"},
 	{"///abc", "/abc"},
-	{"//abc//", "/abc"},
-	{"abc//", "abc"},
+	{"//abc//", "/abc/"},
+	{"abc//", "abc/"},
 
 	// Remove . elements
 	{"abc/./def", "abc/def"},
@@ -84,6 +84,8 @@ static const FilePathSplit s_filePathSplit[] =
 	{ "tmp/archive.tar.gz", false, "tmp/", "archive.tar.gz", "archive", ".tar.gz" },
 	{ "/tmp/archive.tar.gz", true, "/tmp/", "archive.tar.gz", "archive", ".tar.gz" },
 	{ "d:/tmp/archive.tar.gz", true, "D:/tmp/", "archive.tar.gz", "archive", ".tar.gz" },
+	{ "/tmp/abv/gd", true, "/tmp/abv/", "gd", "gd", "" },
+	{ "/tmp/abv/gd/", true, "/tmp/abv/gd/", "", "", "" },
 };
 
 TEST_CASE("FilePath", "")
