@@ -360,14 +360,14 @@ namespace bx
 		return &s_nullOut;
 	}
 
-	bool stat(const char* _filePath, FileInfo& _fileInfo)
+	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo)
 	{
-		_fileInfo.m_size = 0;
-		_fileInfo.m_type = FileInfo::Count;
+		_outFileInfo.m_size = 0;
+		_outFileInfo.m_type = FileInfo::Count;
 
 #if BX_COMPILER_MSVC
 		struct ::_stat64 st;
-		int32_t result = ::_stat64(_filePath, &st);
+		int32_t result = ::_stat64(_filePath.get(), &st);
 
 		if (0 != result)
 		{
@@ -376,15 +376,15 @@ namespace bx
 
 		if (0 != (st.st_mode & _S_IFREG) )
 		{
-			_fileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.m_type = FileInfo::Regular;
 		}
 		else if (0 != (st.st_mode & _S_IFDIR) )
 		{
-			_fileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.m_type = FileInfo::Directory;
 		}
 #else
 		struct ::stat st;
-		int32_t result = ::stat(_filePath, &st);
+		int32_t result = ::stat(_filePath.get(), &st);
 		if (0 != result)
 		{
 			return false;
@@ -392,15 +392,15 @@ namespace bx
 
 		if (0 != (st.st_mode & S_IFREG) )
 		{
-			_fileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.m_type = FileInfo::Regular;
 		}
 		else if (0 != (st.st_mode & S_IFDIR) )
 		{
-			_fileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.m_type = FileInfo::Directory;
 		}
 #endif // BX_COMPILER_MSVC
 
-		_fileInfo.m_size = st.st_size;
+		_outFileInfo.m_size = st.st_size;
 
 		return true;
 	}
