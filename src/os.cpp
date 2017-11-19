@@ -12,6 +12,12 @@
 
 #include <stdio.h>
 
+#if BX_CRT_MSVC
+#	include <direct.h>
+#else
+#	include <unistd.h>
+#endif // BX_CRT_MSVC
+
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	include <windows.h>
 #	include <psapi.h>
