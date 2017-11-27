@@ -458,7 +458,7 @@ namespace bx
 		}
 
 #if BX_CRT_MSVC
-		int32_t result;
+		int32_t result = -1;
 		FileInfo fi;
 		if (stat(_filePath, fi) )
 		{
@@ -509,6 +509,7 @@ namespace bx
 			return false;
 		}
 
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		DIR* dir = opendir(_filePath.get() );
 		if (NULL == dir)
 		{
@@ -534,6 +535,7 @@ namespace bx
 		}
 
 		closedir(dir);
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 
 		return remove(_filePath, _err);
 	}
