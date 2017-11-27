@@ -395,7 +395,7 @@ namespace bx
 
 #if BX_CRT_MSVC
 		int32_t result = ::_mkdir(_filePath.get() );
-#elif BX_PLATFORM_WINDOWS
+#elif BX_CRT_MINGW
 		int32_t result = ::mkdir(_filePath.get());
 #else
 		int32_t result = ::mkdir(_filePath.get(), 0700);
