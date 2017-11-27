@@ -69,8 +69,8 @@ const char* Settings::get(const StringView& _name) const
 	ini_t* ini = INI_T(m_ini);
 
 	FilePath uri(_name);
-	const StringView  path     = strTrim(uri.getPath(), "/");
-	const StringView& fileName = uri.getFileName();
+	const StringView  path(strTrim(uri.getPath(), "/") );
+	const StringView& fileName(uri.getFileName() );
 	int32_t section = INI_GLOBAL_SECTION;
 
 	if (!path.isEmpty() )
@@ -96,8 +96,8 @@ void Settings::set(const StringView& _name, const StringView& _value)
 	ini_t* ini = INI_T(m_ini);
 
 	FilePath uri(_name);
-	const StringView  path     = strTrim(uri.getPath(), "/");
-	const StringView& fileName = uri.getFileName();
+	const StringView  path(strTrim(uri.getPath(), "/") );
+	const StringView& fileName(uri.getFileName() );
 
 	int32_t section = INI_GLOBAL_SECTION;
 

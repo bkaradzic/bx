@@ -6,7 +6,11 @@
 #ifndef BX_FILEPATH_H_HEADER_GUARD
 #define BX_FILEPATH_H_HEADER_GUARD
 
+#include "error.h"
 #include "string.h"
+
+BX_ERROR_RESULT(BX_ERROR_ACCESS,        BX_MAKEFOURCC('b', 'x', 0, 0) );
+BX_ERROR_RESULT(BX_ERROR_NOT_DIRECTORY, BX_MAKEFOURCC('b', 'x', 0, 1) );
 
 namespace bx
 {
@@ -86,6 +90,18 @@ namespace bx
 	private:
 		char m_filePath[kMaxFilePath];
 	};
+
+	/// Creates a directory named `_filePath`.
+	bool make(const FilePath& _filePath, Error* _err);
+
+	/// Creates a directory named `_filePath` along with all necessary parents.
+	bool makeAll(const FilePath& _filePath, Error* _err);
+
+	/// Removes file or directory.
+	bool remove(const FilePath& _filePath, Error* _err);
+
+	/// Removes file or directory recursivelly.
+	bool removeAll(const FilePath& _filePath, Error* _err);
 
 } // namespace bx
 

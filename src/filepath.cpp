@@ -8,10 +8,14 @@
 #include <bx/os.h>
 #include <bx/readerwriter.h>
 
+#include <stdio.h>  // remove
+#include <dirent.h> // opendir
+
 #if BX_CRT_MSVC
-#	include <direct.h> // _getcwd
+#	include <direct.h>   // _getcwd
 #else
-#	include <unistd.h> // getcwd
+#	include <sys/stat.h> // mkdir
+#	include <unistd.h>   // getcwd
 #endif // BX_CRT_MSVC
 
 #if BX_PLATFORM_WINDOWS
@@ -175,7 +179,7 @@ namespace bx
 		BX_UNUSED(_buffer, _size);
 		return NULL;
 #elif BX_CRT_MSVC
-		return ::_getcwd(_buffer, (int)_size);
+		return ::_getcwd(_buffer, (int32_t)_size);
 #else
 		return ::getcwd(_buffer, _size);
 #endif // BX_COMPILER_
@@ -378,6 +382,142 @@ namespace bx
 		return  '/' == m_filePath[0] // no drive letter
 			|| (':' == m_filePath[1] && '/' == m_filePath[2]) // with drive letter
 			;
+	}
+
+	bool make(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+#if BX_CRT_MSVC
+		int32_t result = ::_mkdir(_filePath.get() );
+#else
+		int32_t result = ::mkdir(_filePath.get(), 0700);
+#endif // BX_CRT_MSVC
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool makeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+		FileInfo fi;
+
+		if (stat(_filePath, fi) )
+		{
+			if (FileInfo::Directory == fi.m_type)
+			{
+				return true;
+			}
+
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		const StringView dir = strRTrim(_filePath.get(), "/");
+		const char* slash = strRFind(dir, '/');
+
+		if (NULL != slash
+		&&  slash - dir.getPtr() > 1)
+		{
+			if (!makeAll(StringView(dir.getPtr(), slash), _err) )
+			{
+				return false;
+			}
+		}
+
+		FilePath path(dir);
+		return make(path, _err);
+	}
+
+	bool remove(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+		int32_t result = ::remove(_filePath.get() );
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool removeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (remove(_filePath, _err) )
+		{
+			return true;
+		}
+
+		_err->reset();
+
+		FileInfo fi;
+
+		if (!stat(_filePath, fi) )
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		if (FileInfo::Directory != fi.m_type)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		DIR* dir = opendir(_filePath.get() );
+		if (NULL == dir)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		for (dirent* item = readdir(dir); NULL != item; item = readdir(dir) )
+		{
+			if (0 == strCmp(item->d_name, ".")
+			||  0 == strCmp(item->d_name, "..") )
+			{
+				continue;
+			}
+
+			FilePath path(_filePath);
+			path.join(item->d_name);
+			if (!removeAll(path, _err) )
+			{
+				_err->reset();
+				break;
+			}
+		}
+
+		closedir(dir);
+
+		return remove(_filePath, _err);
 	}
 
 } // namespace bx

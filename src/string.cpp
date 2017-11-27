@@ -446,6 +446,7 @@ namespace bx
 		const char* ptr   = _str.getPtr();
 		const char* chars = _chars.getPtr();
 		const uint32_t charsLen = _chars.getLength();
+
 		for (uint32_t ii = 0, len = _str.getLength(); ii < len; ++ii)
 		{
 			if (NULL == strFindUnsafe(chars, charsLen, ptr[ii]) )
@@ -459,6 +460,11 @@ namespace bx
 
 	StringView strRTrim(const StringView& _str, const StringView& _chars)
 	{
+		if (_str.isEmpty() )
+		{
+			return StringView();
+		}
+
 		const char* ptr   = _str.getPtr();
 		const char* chars = _chars.getPtr();
 		const uint32_t charsLen = _chars.getLength();
