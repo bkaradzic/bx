@@ -455,7 +455,23 @@ namespace bx
 			return false;
 		}
 
+#if BX_CRT_MSVC
+		int32_t result;
+		FileInfo fi;
+		if (stat(_filePath, fi) )
+		{
+			if (FileInfo::Directory == fi.m_type)
+			{
+				result = ::_rmdir(_filePath.get() );
+			}
+			else
+			{
+				result = ::remove(_filePath.get() );
+			}
+		}
+#else
 		int32_t result = ::remove(_filePath.get() );
+#endif // BX_CRT_MSVC
 
 		if (0 != result)
 		{
