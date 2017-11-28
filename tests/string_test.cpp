@@ -352,7 +352,7 @@ TEST_CASE("StringView", "")
 	st.append("test");
 	REQUIRE(8 == st.getLength() );
 
-	st.append("test", 2);
+	st.append(bx::StringView("test", 2) );
 	REQUIRE(10 == st.getLength() );
 
 	REQUIRE(0 == bx::strCmp(st.getPtr(), "testtestte") );

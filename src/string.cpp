@@ -153,12 +153,6 @@ namespace bx
 		toUpperUnsafe(_inOutStr, len);
 	}
 
-	bool toBool(const char* _str)
-	{
-		char ch = toLower(_str[0]);
-		return ch == 't' ||  ch == '1';
-	}
-
 	typedef char (*CharFn)(char _ch);
 
 	inline char toNoop(char _ch)

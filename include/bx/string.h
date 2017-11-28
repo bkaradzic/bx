@@ -85,19 +85,16 @@ namespace bx
 		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
 
 		///
-		StringT(const char* _ptr, int32_t _len = INT32_MAX);
-
-		///
 		StringT(const StringView& _rhs);
 
 		///
 		~StringT();
 
 		///
-		void set(const char* _ptr, int32_t _len = INT32_MAX);
+		void set(const StringView& _str);
 
 		///
-		void append(const char* _ptr, int32_t _len = INT32_MAX);
+		void append(const StringView& _str);
 
 		///
 		void clear();
@@ -162,9 +159,6 @@ namespace bx
 
 	///
 	void toUpper(char* _inOutStr, int32_t _max = INT32_MAX);
-
-	///
-	bool toBool(const char* _str);
 
 	/// String compare.
 	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
@@ -268,6 +262,9 @@ namespace bx
 	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units = Units::Kibi);
 
 	///
+	int32_t toString(char* _out, int32_t _max, bool _value);
+
+	///
 	int32_t toString(char* _out, int32_t _max, double _value);
 
 	///
@@ -281,6 +278,9 @@ namespace bx
 
 	///
 	int32_t toString(char* _out, int32_t _max, uint64_t _value, uint32_t _base = 10);
+
+	///
+	bool fromString(bool* _out, const StringView& _str);
 
 	///
 	bool fromString(float* _out, const StringView& _str);
