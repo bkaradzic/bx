@@ -29,7 +29,7 @@
 
 #if defined(__clang__)
 #	pragma clang diagnostic ignored "-Wunused-function"
-#if defined(_MSC_VER)
+#elif defined(_MSC_VER)
 #	pragma warning(disable:4505) // error C4505: '_wreaddir': unreferenced local function has been removed
 #else
 #	pragma GCC diagnostic ignored "-Wunused-function"
