@@ -40,7 +40,7 @@ TEST_CASE("Settings", "")
 	if (bx::open(&reader, filePath) )
 	{
 		bx::read(&reader, settings);
-		bx::close(&writer);
+		bx::close(&reader);
 	}
 
 	REQUIRE(NULL == settings.get("meh") );
