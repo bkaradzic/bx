@@ -718,7 +718,7 @@ namespace bx
 		const float qz = flerp(pw, pz, s1);
 		const float qw = flerp(rr, px, s1);
 
-		const float dd = qx - fmin(qw, qy);
+		const float dd = qx - min(qw, qy);
 		const float ee = 1.0e-10f;
 
 		_hsv[0] = fabs(qz + (qw - qy) / (6.0f * dd + ee) );
