@@ -736,9 +736,9 @@ namespace bx
 		const float py = fabs(ffract(hh + 2.0f/3.0f) * 6.0f - 3.0f);
 		const float pz = fabs(ffract(hh + 1.0f/3.0f) * 6.0f - 3.0f);
 
-		_rgb[0] = vv * flerp(1.0f, fsaturate(px - 1.0f), ss);
-		_rgb[1] = vv * flerp(1.0f, fsaturate(py - 1.0f), ss);
-		_rgb[2] = vv * flerp(1.0f, fsaturate(pz - 1.0f), ss);
+		_rgb[0] = vv * flerp(1.0f, clamp(px - 1.0f, 0.0f, 1.0f), ss);
+		_rgb[1] = vv * flerp(1.0f, clamp(py - 1.0f, 0.0f, 1.0f), ss);
+		_rgb[2] = vv * flerp(1.0f, clamp(pz - 1.0f, 0.0f, 1.0f), ss);
 	}
 
 } // namespace bx
