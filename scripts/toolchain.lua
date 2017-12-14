@@ -93,7 +93,8 @@ function toolchain(_buildDir, _libDir)
 			{ "winphone8",     "Windows Phone 8.0"               },
 			{ "winphone81",    "Windows Phone 8.1"               },
 			{ "winstore81",    "Windows Store 8.1"               },
-			{ "winstore82",    "Universal Windows App"           },
+			{ "winstore82",    "Universal Windows App 8.2"       },
+			{ "winstore100",   "Universal Windows App 10.0"      },
 			{ "durango",       "Durango"                         },
 			{ "orbis",         "Orbis"                           },
 		},
@@ -452,6 +453,13 @@ function toolchain(_buildDir, _libDir)
 			platforms { "ARM" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-winstore82"))
 
+		elseif "winstore100" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v141"
+			premake.vstudio.storeapp = "10.0"
+
+			platforms { "ARM" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-winstore100"))
+
 		elseif "durango" == _OPTIONS["vs"] then
 			if not os.getenv("DurangoXDK") then
 				print("DurangoXDK not found.")
@@ -637,7 +645,7 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/bin"))
 		objdir (path.join(_buildDir, "win64_" .. _ACTION .. "-clang/obj"))
 
-	configuration { "winphone8* or winstore8*" }
+	configuration { "winphone* or winstore*" }
 		removeflags {
 			"StaticRuntime",
 			"NoExceptions",
