@@ -609,7 +609,10 @@ function toolchain(_buildDir, _libDir)
 	configuration { "winstore*" }
 		removeflags {
 			"StaticRuntime",
-			"NoExceptions",
+			"NoBufferSecurityCheck",
+		}
+		buildoptions {
+			"/wd4530", -- vccorlib.h(1345): warning C4530: C++ exception handler used, but unwind semantics are not enabled. Specify /EHsc
 		}
 		linkoptions {
 			"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
