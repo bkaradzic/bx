@@ -8,6 +8,10 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
+#	if BX_PLATFORM_WINRT
+#		include <windows.h>
+#	endif // BX_PLATFORM_WINRT
+
 #	include <emmintrin.h> // _mm_fence
 
 extern "C" void _ReadBarrier();
