@@ -61,8 +61,7 @@ namespace bx
 	  || BX_PLATFORM_ANDROID \
 	  || BX_PLATFORM_BSD     \
 	  || BX_PLATFORM_IOS     \
-	  || BX_PLATFORM_OSX     \
-	  || BX_PLATFORM_QNX
+	  || BX_PLATFORM_OSX
 #		define fseeko64 fseeko
 #		define ftello64 ftello
 #	elif BX_PLATFORM_PS4
