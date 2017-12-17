@@ -64,6 +64,7 @@ function toolchain(_buildDir, _libDir)
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
+			{ "ios-simulator64", "iOS - Simulator 64"         },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
 			{ "tvos-simulator",  "tvOS - Simulator"           },
 			{ "mingw-gcc",       "MinGW"                      },
@@ -271,6 +272,12 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator"))
+
+		elseif "ios-simulator64" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
+			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
+			premake.gcc.ar  = "ar"
+			location (path.join(_buildDir, "projects", _ACTION .. "-ios-simulator64"))
 
 		elseif "tvos-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
@@ -1119,6 +1126,24 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-mios-simulator-version-min=7.0",
 			"-arch i386",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+		}
+
+	configuration { "ios-simulator64" }
+		targetdir (path.join(_buildDir, "ios-simulator64/bin"))
+		objdir (path.join(_buildDir, "ios-simulator64/obj"))
+		libdirs { path.join(_libDir, "lib/ios-simulator64") }
+		linkoptions {
+			"-mios-simulator-version-min=7.0",
+			"-arch x86_64",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+		}
+		buildoptions {
+			"-mios-simulator-version-min=7.0",
+			"-arch x86_64",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
 		}
 
