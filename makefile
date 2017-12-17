@@ -16,6 +16,7 @@ all:
 	$(GENIE) --gcc=osx gmake
 	$(GENIE) --gcc=ios-arm gmake
 	$(GENIE) --gcc=ios-simulator gmake
+	$(GENIE) --gcc=ios-simulator64 gmake
 	$(GENIE) xcode4
 
 .build/projects/gmake-android-arm:
@@ -111,6 +112,14 @@ ios-simulator-debug: .build/projects/gmake-ios-simulator
 ios-simulator-release: .build/projects/gmake-ios-simulator
 	make -R -C .build/projects/gmake-ios-simulator config=release
 ios-simulator: ios-simulator-debug ios-simulator-release
+
+.build/projects/gmake-ios-simulator64:
+	$(GENIE) --gcc=ios-simulator64 gmake
+ios-simulator64-debug: .build/projects/gmake-ios-simulator64
+	make -R -C .build/projects/gmake-ios-simulator64 config=debug
+ios-simulator64-release: .build/projects/gmake-ios-simulator64
+	make -R -C .build/projects/gmake-ios-simulator64 config=release
+ios-simulator64: ios-simulator64-debug ios-simulator64-release
 
 rebuild-shaders:
 	make -R -C examples rebuild
