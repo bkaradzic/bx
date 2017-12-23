@@ -160,10 +160,11 @@ else
 OS=windows
 BUILD_PROJECT_DIR=gmake-mingw-gcc
 BUILD_OUTPUT_DIR=win32_mingw-gcc
-BUILD_TOOLS_CONFIG=release32
+BUILD_TOOLS_CONFIG=release64
 EXE=.exe
 endif
 
+# bin2c
 .build/osx64_clang/bin/bin2cRelease: .build/projects/gmake-osx
 	$(SILENT) make -C .build/projects/gmake-osx bin2c config=$(BUILD_TOOLS_CONFIG)
 
@@ -179,10 +180,36 @@ tools/bin/linux/bin2c: .build/linux64_gcc/bin/bin2cRelease
 .build/win64_mingw-gcc/bin/bin2cRelease.exe: .build/projects/gmake-mingw-gcc
 	$(SILENT) make -C .build/projects/gmake-mingw-gcc bin2c config=$(BUILD_TOOLS_CONFIG)
 
-tools/bin/windows/bin2c.exe: .build/win64_mingw-gcc/bin/bin2cRelease
+tools/bin/windows/bin2c.exe: .build/win64_mingw-gcc/bin/bin2cRelease.exe
 	$(SILENT) cp $(<) $(@)
 
-tools: tools/bin/$(OS)/bin2c$(EXE)
+bin2c: tools/bin/$(OS)/bin2c$(EXE)
+
+# lemon
+.build/osx64_clang/bin/lemonRelease: .build/projects/gmake-osx
+	$(SILENT) make -C .build/projects/gmake-osx lemon config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/darwin/lemon: .build/osx64_clang/bin/lemonRelease
+	$(SILENT) cp $(<) $(@)
+
+.build/linux64_gcc/bin/lemonRelease: .build/projects/gmake-linux
+	$(SILENT) make -C .build/projects/gmake-linux lemon config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/linux/lemon: .build/linux64_gcc/bin/lemonRelease
+	$(SILENT) cp $(<) $(@)
+
+.build/win64_mingw-gcc/bin/lemonRelease.exe: .build/projects/gmake-mingw-gcc
+	$(SILENT) make -C .build/projects/gmake-mingw-gcc lemon config=$(BUILD_TOOLS_CONFIG)
+
+tools/bin/windows/lemon.exe: .build/win64_mingw-gcc/bin/lemonRelease.exe
+	$(SILENT) cp $(<) $(@)
+
+tools/bin/$(OS)/lempar.c: tools/lemon/lempar.c
+	$(SILENT) cp $(<) $(@)
+
+lemon: tools/bin/$(OS)/lemon$(EXE) tools/bin/$(OS)/lempar.c
+
+tools: bin2c lemon
 
 dist: tools/bin/darwin/bin2c tools/bin/linux/bin2c tools/bin/windows/bin2c.exe
 

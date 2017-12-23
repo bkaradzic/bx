@@ -39,6 +39,7 @@ end
 
 dofile "bx.lua"
 dofile "bin2c.lua"
+dofile "lemon.lua"
 
 project "bx.test"
 	kind "ConsoleApp"
