@@ -54,7 +54,18 @@ namespace bx
 
 	bool isAlphaNum(char _ch)
 	{
-		return isAlpha(_ch) || isNumeric(_ch);
+		return false
+			|| isAlpha(_ch)
+			|| isNumeric(_ch)
+			;
+	}
+
+	bool isHexNum(char _ch)
+	{
+		return false
+			|| isInRange(toLower(_ch), 'a', 'f')
+			|| isNumeric(_ch)
+			;
 	}
 
 	bool isPrint(char _ch)
@@ -108,6 +119,11 @@ namespace bx
 	bool isAlphaNum(const StringView& _str)
 	{
 		return isCharTest<isAlphaNum>(_str);
+	}
+
+	bool isHexNum(const StringView& _str)
+	{
+		return isCharTest<isHexNum>(_str);
 	}
 
 	bool isPrint(const StringView& _str)

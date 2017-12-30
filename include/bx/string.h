@@ -100,46 +100,52 @@ namespace bx
 		void clear();
 	};
 
-	///
+	/// Retruns true if character is part of space set.
 	bool isSpace(char _ch);
 
-	///
+	/// Returns true if string view contains only space characters.
 	bool isSpace(const StringView& _str);
 
-	///
+	/// Retruns true if character is uppercase.
 	bool isUpper(char _ch);
 
-	///
+	/// Returns true if string view contains only uppercase characters.
 	bool isUpper(const StringView& _str);
 
-	///
+	/// Retruns true if character is lowercase.
 	bool isLower(char _ch);
 
-	///
+	/// Returns true if string view contains only lowercase characters.
 	bool isLower(const StringView& _str);
 
-	///
+	/// Returns true if character is part of alphabet set.
 	bool isAlpha(char _ch);
 
-	///
+	/// Retruns true if string view contains only alphabet characters.
 	bool isAlpha(const StringView& _str);
 
-	///
+	/// Returns true if character is part of numeric set.
 	bool isNumeric(char _ch);
 
-	///
+	/// Retruns true if string view contains only numeric characters.
 	bool isNumeric(const StringView& _str);
 
-	///
+	/// Returns true if character is part of alpha numeric set.
 	bool isAlphaNum(char _ch);
 
-	///
+	/// Returns true if string view contains only alpha-numeric characters.
 	bool isAlphaNum(const StringView& _str);
 
-	///
+	/// Returns true if character is part of hexadecimal set.
+	bool isHexNum(char _ch);
+
+	/// Returns true if string view contains only hexadecimal characters.
+	bool isHexNum(const StringView& _str);
+
+	/// Returns true if character is printable.
 	bool isPrint(char _ch);
 
-	///
+	/// Returns true if string vieww contains only printable characters.
 	bool isPrint(const StringView& _str);
 
 	///
