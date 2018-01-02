@@ -262,6 +262,9 @@ namespace bx
 	/// Write string view.
 	int32_t write(WriterI* _writer, const StringView& _str, Error* _err = NULL);
 
+	///
+	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...);
+
 	/// Write repeat the same value.
 	int32_t writeRep(WriterI* _writer, uint8_t _byte, int32_t _size, Error* _err = NULL);
 
