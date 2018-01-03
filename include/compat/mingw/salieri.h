@@ -61,6 +61,14 @@
 #  define SALIERI_DEFINED_In
 #endif
 
+#if defined(__in_bcount) && defined(SALIERI_DEFINED__in_bcount)
+#  undef __in_bcount
+#endif
+#if !defined(__in_bcount)
+#  define __in_bcount(s)
+#  define SALIERI_DEFINED__in_bcount(s)
+#endif
+
 #if defined(__in_ecount) && defined(SALIERI_DEFINED__in_ecount)
 #  undef __in_ecount
 #endif
