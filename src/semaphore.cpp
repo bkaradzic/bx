@@ -104,7 +104,7 @@ namespace bx
 	void add(timespec& _ts, int32_t _msecs)
 	{
 		uint64_t ns = toNs(_ts);
-		toTimespecNs(_ts, ns + _msecs*1000000);
+		toTimespecNs(_ts, ns + uint64_t(_msecs)*1000000);
 	}
 
 	Semaphore::Semaphore()
