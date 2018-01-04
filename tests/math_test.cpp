@@ -32,6 +32,20 @@ TEST_CASE("flog2", "")
 	flog2_test(256.0f);
 }
 
+TEST_CASE("fmod", "")
+{
+	REQUIRE(389.0f == bx::fmod(1389.0f, 1000.0f) );
+	REQUIRE(bx::isNan(bx::fmod(0.0f, 0.0f) ) );
+}
+
+TEST_CASE("fabs", "")
+{
+	REQUIRE(1389.0f == bx::fabs(-1389.0f) );
+	REQUIRE(1389.0f == bx::fabs( 1389.0f) );
+	REQUIRE(   0.0f == bx::fabs(-0.0f) );
+	REQUIRE(   0.0f == bx::fabs( 0.0f) );
+}
+
 TEST_CASE("ToBits", "")
 {
 	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );

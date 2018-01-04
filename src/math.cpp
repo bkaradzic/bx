@@ -22,11 +22,6 @@ namespace bx
 	const float kHuge = HUGE_VALF;
 #endif // BX_COMPILER_MSVC
 
-	float fabs(float _a)
-	{
-		return ::fabsf(_a);
-	}
-
 	float fsin(float _a)
 	{
 		return ::sinf(_a);
@@ -80,11 +75,6 @@ namespace bx
 	float fceil(float _f)
 	{
 		return ::ceilf(_f);
-	}
-
-	float fmod(float _a, float _b)
-	{
-		return ::fmodf(_a, _b);
 	}
 
 	void mtxLookAtImpl(float* _result, const float* _eye, const float* _view, const float* _up)

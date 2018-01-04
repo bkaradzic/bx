@@ -102,6 +102,11 @@ namespace bx
 		return _a + (_b - _a) * _t;
 	}
 
+	inline float fabs(float _a)
+	{
+		return _a < 0.0f ? -_a : _a;
+	}
+
 	inline float fsign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
@@ -130,6 +135,11 @@ namespace bx
 	inline float ffract(float _a)
 	{
 		return _a - ffloor(_a);
+	}
+
+	inline float fmod(float _a, float _b)
+	{
+		return _a - _b * ffloor(_a / _b);
 	}
 
 	inline bool fequal(float _a, float _b, float _epsilon)
