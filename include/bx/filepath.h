@@ -57,6 +57,9 @@ namespace bx
 		FilePath& operator=(const StringView& _rhs);
 
 		///
+		void clear();
+
+		///
 		void set(Dir::Enum _dir);
 
 		///
@@ -86,6 +89,9 @@ namespace bx
 
 		///
 		bool isAbsolute() const;
+
+		///
+		bool isEmpty() const;
 
 	private:
 		char m_filePath[kMaxFilePath];

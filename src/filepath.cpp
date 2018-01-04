@@ -275,6 +275,14 @@ namespace bx
 		return *this;
 	}
 
+	void FilePath::clear()
+	{
+		if (!isEmpty() )
+		{
+			set("");
+		}
+	}
+
 	void FilePath::set(Dir::Enum _dir)
 	{
 		char tmp[kMaxFilePath];
@@ -382,6 +390,11 @@ namespace bx
 		return  '/' == m_filePath[0] // no drive letter
 			|| (':' == m_filePath[1] && '/' == m_filePath[2]) // with drive letter
 			;
+	}
+
+	bool FilePath::isEmpty() const
+	{
+		return 0 == strCmp(m_filePath, ".");
 	}
 
 	bool make(const FilePath& _filePath, Error* _err)
