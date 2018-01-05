@@ -718,6 +718,22 @@ namespace bx
 		_result[2] = zz*invW;
 	}
 
+	inline void vec4Mul(float* _result, const float* _a, const float* _b)
+	{
+		_result[0] = _a[0] * _b[0];
+		_result[1] = _a[1] * _b[1];
+		_result[2] = _a[2] * _b[2];
+		_result[3] = _a[3] * _b[3];
+	}
+
+	inline void vec4Mul(float* _result, const float* _a, float _b)
+	{
+		_result[0] = _a[0] * _b;
+		_result[1] = _a[1] * _b;
+		_result[2] = _a[2] * _b;
+		_result[3] = _a[3] * _b;
+	}
+
 	inline void vec4MulMtx(float* _result, const float* _vec, const float* _mat)
 	{
 		_result[0] = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8] + _vec[3] * _mat[12];
