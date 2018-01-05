@@ -5,9 +5,9 @@
 
 // FPU math lib
 
-#ifndef BX_FPU_MATH_H_HEADER_GUARD
-#	error "Must be included from bx/fpumath.h!"
-#endif // BX_FPU_MATH_H_HEADER_GUARD
+#ifndef BX_MATH_H_HEADER_GUARD
+#	error "Must be included from bx/math.h!"
+#endif // BX_MATH_H_HEADER_GUARD
 
 namespace bx
 {

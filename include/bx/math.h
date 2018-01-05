@@ -5,8 +5,8 @@
 
 // FPU math lib
 
-#ifndef BX_FPU_MATH_H_HEADER_GUARD
-#define BX_FPU_MATH_H_HEADER_GUARD
+#ifndef BX_MATH_H_HEADER_GUARD
+#define BX_MATH_H_HEADER_GUARD
 
 #include "bx.h"
 #include "uint32_t.h"
@@ -482,4 +482,4 @@ namespace bx
 
 #include "inline/math.inl"
 
-#endif // BX_FPU_MATH_H_HEADER_GUARD
+#endif // BX_MATH_H_HEADER_GUARD
