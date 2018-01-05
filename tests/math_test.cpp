@@ -32,18 +32,26 @@ TEST_CASE("flog2", "")
 	flog2_test(256.0f);
 }
 
-TEST_CASE("fmod", "")
-{
-	REQUIRE(389.0f == bx::fmod(1389.0f, 1000.0f) );
-	REQUIRE(bx::isNan(bx::fmod(0.0f, 0.0f) ) );
-}
 
-TEST_CASE("fabs", "")
+TEST_CASE("libm", "")
 {
 	REQUIRE(1389.0f == bx::fabs(-1389.0f) );
 	REQUIRE(1389.0f == bx::fabs( 1389.0f) );
 	REQUIRE(   0.0f == bx::fabs(-0.0f) );
 	REQUIRE(   0.0f == bx::fabs( 0.0f) );
+
+	REQUIRE(389.0f == bx::fmod(1389.0f, 1000.0f) );
+	REQUIRE(bx::isNan(bx::fmod(0.0f, 0.0f) ) );
+
+	REQUIRE( 13.0f == bx::ffloor( 13.89f) );
+	REQUIRE(-14.0f == bx::ffloor(-13.89f) );
+	REQUIRE( 14.0f == bx::fceil(  13.89f) );
+	REQUIRE(-13.0f == bx::fceil( -13.89f) );
+
+	REQUIRE( 13.0f == bx::ftrunc( 13.89f) );
+	REQUIRE(-13.0f == bx::ftrunc(-13.89f) );
+	REQUIRE(bx::fequal( 0.89f, bx::ffract( 13.89f), 0.000001f) );
+	REQUIRE(bx::fequal(-0.89f, bx::ffract(-13.89f), 0.000001f) );
 }
 
 TEST_CASE("ToBits", "")

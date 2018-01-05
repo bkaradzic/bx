@@ -141,6 +141,9 @@ namespace bx
 	float frsqrt(float _a);
 
 	///
+	float ftrunc(float _a);
+
+	///
 	float ffract(float _a);
 
 	///

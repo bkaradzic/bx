@@ -97,6 +97,11 @@ namespace bx
 		return ffloor(_f + 0.5f);
 	}
 
+	inline float fceil(float _a)
+	{
+		return -ffloor(-_a);
+	}
+
 	inline float flerp(float _a, float _b, float _t)
 	{
 		return _a + (_b - _a) * _t;
@@ -132,9 +137,14 @@ namespace bx
 		return 1.0f/fsqrt(_a);
 	}
 
+	inline float ftrunc(float _a)
+	{
+		return float(int(_a) );
+	}
+
 	inline float ffract(float _a)
 	{
-		return _a - ffloor(_a);
+		return _a - ftrunc(_a);
 	}
 
 	inline float fmod(float _a, float _b)

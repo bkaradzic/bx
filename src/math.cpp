@@ -67,14 +67,20 @@ namespace bx
 		return ::sqrtf(_a);
 	}
 
-	float ffloor(float _f)
+	float ffloor(float _a)
 	{
-		return ::floorf(_f);
-	}
+		if (_a < 0.0f)
+		{
+			const float fr = ffract(-_a);
+			float result = -_a - fr;
 
-	float fceil(float _f)
-	{
-		return ::ceilf(_f);
+			return -(0.0f != fr
+				? result + 1.0f
+				: result)
+				;
+		}
+
+		return _a - ffract(_a);
 	}
 
 	void mtxLookAtImpl(float* _result, const float* _eye, const float* _view, const float* _up)
