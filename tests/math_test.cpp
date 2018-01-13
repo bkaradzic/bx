@@ -23,7 +23,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 
 bool flog2_test(float _a)
 {
-	return bx::flog2(_a) == bx::flog(_a) * (1.0f / bx::flog(2.0f) );
+	return bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) );
 }
 
 TEST_CASE("flog2", "")
@@ -35,23 +35,23 @@ TEST_CASE("flog2", "")
 
 TEST_CASE("libm", "")
 {
-	REQUIRE(1389.0f == bx::fabs(-1389.0f) );
-	REQUIRE(1389.0f == bx::fabs( 1389.0f) );
-	REQUIRE(   0.0f == bx::fabs(-0.0f) );
-	REQUIRE(   0.0f == bx::fabs( 0.0f) );
+	REQUIRE(1389.0f == bx::abs(-1389.0f) );
+	REQUIRE(1389.0f == bx::abs( 1389.0f) );
+	REQUIRE(   0.0f == bx::abs(-0.0f) );
+	REQUIRE(   0.0f == bx::abs( 0.0f) );
 
-	REQUIRE(389.0f == bx::fmod(1389.0f, 1000.0f) );
-	REQUIRE(bx::isNan(bx::fmod(0.0f, 0.0f) ) );
+	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
+	REQUIRE(bx::isNan(bx::mod(0.0f, 0.0f) ) );
 
-	REQUIRE( 13.0f == bx::ffloor( 13.89f) );
-	REQUIRE(-14.0f == bx::ffloor(-13.89f) );
-	REQUIRE( 14.0f == bx::fceil(  13.89f) );
-	REQUIRE(-13.0f == bx::fceil( -13.89f) );
+	REQUIRE( 13.0f == bx::floor( 13.89f) );
+	REQUIRE(-14.0f == bx::floor(-13.89f) );
+	REQUIRE( 14.0f == bx::ceil(  13.89f) );
+	REQUIRE(-13.0f == bx::ceil( -13.89f) );
 
-	REQUIRE( 13.0f == bx::ftrunc( 13.89f) );
-	REQUIRE(-13.0f == bx::ftrunc(-13.89f) );
-	REQUIRE(bx::fequal( 0.89f, bx::ffract( 13.89f), 0.000001f) );
-	REQUIRE(bx::fequal(-0.89f, bx::ffract(-13.89f), 0.000001f) );
+	REQUIRE( 13.0f == bx::trunc( 13.89f) );
+	REQUIRE(-13.0f == bx::trunc(-13.89f) );
+	REQUIRE(bx::equal( 0.89f, bx::fract( 13.89f), 0.000001f) );
+	REQUIRE(bx::equal(-0.89f, bx::fract(-13.89f), 0.000001f) );
 }
 
 TEST_CASE("ToBits", "")
@@ -62,7 +62,7 @@ TEST_CASE("ToBits", "")
 
 void mtxCheck(const float* _a, const float* _b)
 {
-	if (!bx::fequal(_a, _b, 16, 0.01f) )
+	if (!bx::equal(_a, _b, 16, 0.01f) )
 	{
 		DBG("\n"
 			"A:\n"
@@ -110,7 +110,7 @@ TEST_CASE("quaternion", "")
 
 	float euler[3];
 	bx::quatToEuler(euler, quat);
-	CHECK(bx::fequal(euler[0], ax, 0.001f) );
+	CHECK(bx::equal(euler[0], ax, 0.001f) );
 
 	bx::quatRotateY(quat, ay);
 	bx::mtxQuat(mtxQ, quat);
@@ -118,7 +118,7 @@ TEST_CASE("quaternion", "")
 	mtxCheck(mtxQ, mtx);
 
 	bx::quatToEuler(euler, quat);
-	CHECK(bx::fequal(euler[1], ay, 0.001f) );
+	CHECK(bx::equal(euler[1], ay, 0.001f) );
 
 	bx::quatRotateZ(quat, az);
 	bx::mtxQuat(mtxQ, quat);
@@ -126,5 +126,5 @@ TEST_CASE("quaternion", "")
 	mtxCheck(mtxQ, mtx);
 
 	bx::quatToEuler(euler, quat);
-	CHECK(bx::fequal(euler[2], az, 0.001f) );
+	CHECK(bx::equal(euler[2], az, 0.001f) );
 }

@@ -84,98 +84,98 @@ namespace bx
 	bool isInfinite(double _f);
 
 	///
-	float ffloor(float _f);
+	float floor(float _f);
 
 	///
-	float fceil(float _f);
+	float ceil(float _f);
 
 	///
-	float fround(float _f);
+	float round(float _f);
 
 	///
-	float flerp(float _a, float _b, float _t);
+	float lerp(float _a, float _b, float _t);
 
 	///
-	float fsign(float _a);
+	float sign(float _a);
 
 	///
-	float fabs(float _a);
+	float abs(float _a);
 
 	///
-	float fsq(float _a);
+	float square(float _a);
 
 	///
-	float fsin(float _a);
+	float sin(float _a);
 
 	///
-	float fasin(float _a);
+	float asin(float _a);
 
 	///
-	float fcos(float _a);
+	float cos(float _a);
 
 	///
-	float ftan(float _a);
+	float tan(float _a);
 
 	///
-	float facos(float _a);
+	float acos(float _a);
 
 	///
-	float fatan2(float _y, float _x);
+	float atan2(float _y, float _x);
 
 	///
-	float fpow(float _a, float _b);
+	float pow(float _a, float _b);
 
 	///
-	float fexp2(float _a);
+	float exp2(float _a);
 
 	///
-	float flog(float _a);
+	float log(float _a);
 
 	///
-	float flog2(float _a);
+	float log2(float _a);
 
 	///
-	float fsqrt(float _a);
+	float sqrt(float _a);
 
 	///
-	float frsqrt(float _a);
+	float rsqrt(float _a);
 
 	///
-	float ftrunc(float _a);
+	float trunc(float _a);
 
 	///
-	float ffract(float _a);
+	float fract(float _a);
 
 	///
-	float fmod(float _a, float _b);
+	float mod(float _a, float _b);
 
 	///
-	bool fequal(float _a, float _b, float _epsilon);
+	bool equal(float _a, float _b, float _epsilon);
 
 	///
-	bool fequal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
+	bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
-	float fwrap(float _a, float _wrap);
+	float wrap(float _a, float _wrap);
 
 	///
-	float fstep(float _edge, float _a);
+	float step(float _edge, float _a);
 
 	///
-	float fpulse(float _a, float _start, float _end);
+	float pulse(float _a, float _start, float _end);
 
 	///
-	float fsmoothstep(float _a);
+	float smoothStep(float _a);
 
 	// References:
 	//  - Bias And Gain Are Your Friend
 	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
 	//  - http://demofox.org/biasgain.html
 	///
-	float fbias(float _time, float _bias);
+	float bias(float _time, float _bias);
 
 	///
-	float fgain(float _time, float _gain);
+	float gain(float _time, float _gain);
 
 	///
 	float angleDiff(float _a, float _b);
