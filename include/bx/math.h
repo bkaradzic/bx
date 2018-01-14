@@ -248,8 +248,13 @@ namespace bx
 	///
 	void vec3FromLatLong(float* _vec, float _u, float _v);
 
+	/// Convert direction to 2D latitude and longitude.
 	///
-	void vec3ToLatLong(float* _u, float* _v, const float* _vec);
+	/// @param[out] _outU U-coordinate.
+	/// @param[out] _outV V-coordinate.
+	/// @param[in]  _dir Normalized direction vector.
+	///
+	void vec3ToLatLong(float* _outU, float* _outV, const float* _dir)
 
 	///
 	void quatIdentity(float* _result);

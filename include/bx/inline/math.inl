@@ -396,13 +396,13 @@ namespace bx
 		_vec[2] = -st*cp;
 	}
 
-	inline void vec3ToLatLong(float* _u, float* _v, const float* _vec)
+	inline void vec3ToLatLong(float* _outU, float* _outV, const float* _dir)
 	{
-		const float phi   = atan2(_vec[0], _vec[2]);
-		const float theta = acos(_vec[1]);
+		const float phi   = atan2(_dir[0], _dir[2]);
+		const float theta = acos(_dir[1]);
 
-		*_u = (kPi + phi)*kInvPi*0.5f;
-		*_v = theta*kInvPi;
+		*_outU = (bx::kPi + phi)/bx::kPi2;
+		*_outV = theta*bx::kInvPi;
 	}
 
 	inline void quatIdentity(float* _result)
