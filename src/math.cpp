@@ -54,7 +54,7 @@ namespace bx
 
 	float pow(float _a, float _b)
 	{
-		return ::powf(_a, _b);
+		return exp(_b * log(_a) );
 	}
 
 	float log(float _a)

@@ -6,8 +6,9 @@
 #include "test.h"
 #include <bx/math.h>
 
-#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 #include <cmath>
+
+#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 TEST_CASE("isFinite, isInfinite, isNan", "")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
@@ -20,18 +21,16 @@ TEST_CASE("isFinite, isInfinite, isNan", "")
 }
 #endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 
-
-bool flog2_test(float _a)
+bool log2_test(float _a)
 {
 	return bx::log2(_a) == bx::log(_a) * (1.0f / bx::log(2.0f) );
 }
 
-TEST_CASE("flog2", "")
+TEST_CASE("log2", "")
 {
-	flog2_test(0.0f);
-	flog2_test(256.0f);
+	log2_test(0.0f);
+	log2_test(256.0f);
 }
-
 
 TEST_CASE("libm", "")
 {
@@ -52,6 +51,11 @@ TEST_CASE("libm", "")
 	REQUIRE(-13.0f == bx::trunc(-13.89f) );
 	REQUIRE(bx::equal( 0.89f, bx::fract( 13.89f), 0.000001f) );
 	REQUIRE(bx::equal(-0.89f, bx::fract(-13.89f), 0.000001f) );
+
+	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
+	{
+		REQUIRE(bx::equal(bx::pow(1.389f, xx), ::pow(1.389f, xx), 0.00001f) );
+	}
 }
 
 TEST_CASE("ToBits", "")
