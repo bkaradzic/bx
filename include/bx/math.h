@@ -254,7 +254,7 @@ namespace bx
 	/// @param[out] _outV V-coordinate.
 	/// @param[in]  _dir Normalized direction vector.
 	///
-	void vec3ToLatLong(float* _outU, float* _outV, const float* _dir)
+	void vec3ToLatLong(float* _outU, float* _outV, const float* _dir);
 
 	///
 	void quatIdentity(float* _result);
