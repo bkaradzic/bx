@@ -126,6 +126,9 @@ namespace bx
 	float pow(float _a, float _b);
 
 	///
+	float exp(float _a);
+
+	///
 	float exp2(float _a);
 
 	///

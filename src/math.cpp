@@ -22,24 +22,78 @@ namespace bx
 	const float kHuge = HUGE_VALF;
 #endif // BX_COMPILER_MSVC
 
-	float sin(float _a)
-	{
-		return ::sinf(_a);
-	}
-
 	float asin(float _a)
 	{
 		return ::asinf(_a);
 	}
 
+	namespace
+	{
+		static const float kSinC2  = -0.16666667163372039794921875f;
+		static const float kSinC4  =  8.333347737789154052734375e-3f;
+		static const float kSinC6  = -1.9842604524455964565277099609375e-4f;
+		static const float kSinC8  =  2.760012648650445044040679931640625e-6f;
+		static const float kSinC10 = -2.50293279435709337121807038784027099609375e-8f;
+
+		static const float kCosC2  = -0.5f;
+		static const float kCosC4  =  4.166664183139801025390625e-2f;
+		static const float kCosC6  = -1.388833043165504932403564453125e-3f;
+		static const float kCosC8  =  2.47562347794882953166961669921875e-5f;
+		static const float kCosC10 = -2.59630184018533327616751194000244140625e-7f;
+
+	} // namespace
+
 	float cos(float _a)
 	{
-		return ::cosf(_a);
+		const float scaled = _a * 2.0f*kInvPi;
+		const float real   = floor(scaled);
+		const float xx     = _a - real * kPiHalf;
+		const int32_t bits = int32_t(real) & 3;
+
+		float c0, c2, c4, c6, c8, c10;
+
+		if (bits == 0
+		||  bits == 2)
+		{
+			c0  = 1.0f;
+			c2  = kCosC2;
+			c4  = kCosC4;
+			c6  = kCosC6;
+			c8  = kCosC8;
+			c10 = kCosC10;
+		}
+		else
+		{
+			c0  = xx;
+			c2  = kSinC2;
+			c4  = kSinC4;
+			c6  = kSinC6;
+			c8  = kSinC8;
+			c10 = kSinC10;
+		}
+
+		const float xsq = square(xx);
+		float result;
+		result = xsq * c10    + c8;
+		result = xsq * result + c6;
+		result = xsq * result + c4;
+		result = xsq * result + c2;
+		result = xsq * result + 1.0f;
+		result *= c0;
+
+		return bits == 1 || bits == 2
+			? -result
+			:  result
+			;
 	}
 
 	float tan(float _a)
 	{
+#if 0
+		return sin(_a) / cos(_a);
+#else
 		return ::tanf(_a);
+#endif
 	}
 
 	float acos(float _a)
@@ -52,9 +106,9 @@ namespace bx
 		return ::atan2f(_y, _x);
 	}
 
-	float pow(float _a, float _b)
+	float exp(float _a)
 	{
-		return exp(_b * log(_a) );
+		return ::expf(_a);
 	}
 
 	float log(float _a)

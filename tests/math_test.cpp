@@ -52,9 +52,24 @@ TEST_CASE("libm", "")
 	REQUIRE(bx::equal( 0.89f, bx::fract( 13.89f), 0.000001f) );
 	REQUIRE(bx::equal(-0.89f, bx::fract(-13.89f), 0.000001f) );
 
-	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
 		REQUIRE(bx::equal(bx::pow(1.389f, xx), ::pow(1.389f, xx), 0.00001f) );
+	}
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		REQUIRE(bx::equal(bx::sin(xx), ::sin(xx), 0.00001f) );
+	}
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		REQUIRE(bx::equal(bx::cos(xx), ::cos(xx), 0.00001f) );
+	}
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		REQUIRE(bx::equal(bx::tan(xx), ::tan(xx), 0.00001f) );
 	}
 }
 

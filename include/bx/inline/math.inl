@@ -122,6 +122,16 @@ namespace bx
 		return _a * _a;
 	}
 
+	inline float sin(float _a)
+	{
+		return cos(_a - kPiHalf);
+	}
+
+	inline float pow(float _a, float _b)
+	{
+		return exp(_b * log(_a) );
+	}
+
 	inline float exp2(float _a)
 	{
 		return pow(2.0f, _a);
