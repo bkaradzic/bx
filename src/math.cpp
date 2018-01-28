@@ -99,7 +99,7 @@ namespace bx
 		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
 		const float tmp1   = mad(tmp0,    absa, kAcosC1);
 		const float tmp2   = mad(tmp1,    absa, kAcosC0);
-		const float tmp3   = tmp2 * sqrt(1.0 - absa);
+		const float tmp3   = tmp2 * sqrt(1.0f - absa);
 		const float negate = float(_a < 0.0f);
 		const float tmp4   = tmp3 - 2.0f*negate*tmp3;
 		const float result = negate*kPi + tmp4;
@@ -242,7 +242,7 @@ namespace bx
 		const float t2     = s4*tmp4;
 
 		const float t12    = t1 + t2;
-		const float hfsq   = 0.5*square(ff);
+		const float hfsq   = 0.5f*square(ff);
 		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
 
 		return result;
