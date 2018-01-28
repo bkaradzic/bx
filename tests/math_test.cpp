@@ -5,8 +5,9 @@
 
 #include "test.h"
 #include <bx/math.h>
+#include <bx/file.h>
 
-#include <cmath>
+#include <math.h>
 
 #if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 TEST_CASE("isFinite, isInfinite, isNan", "")
@@ -34,6 +35,8 @@ TEST_CASE("log2", "")
 
 TEST_CASE("libm", "")
 {
+	bx::WriterI* writer = bx::getNullOut();
+
 	REQUIRE(1389.0f == bx::abs(-1389.0f) );
 	REQUIRE(1389.0f == bx::abs( 1389.0f) );
 	REQUIRE(   0.0f == bx::abs(-0.0f) );
@@ -52,24 +55,88 @@ TEST_CASE("libm", "")
 	REQUIRE(bx::equal( 0.89f, bx::fract( 13.89f), 0.000001f) );
 	REQUIRE(bx::equal(-0.89f, bx::fract(-13.89f), 0.000001f) );
 
-	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	for (int32_t yy = -10; yy < 10; ++yy)
 	{
-		REQUIRE(bx::equal(bx::pow(1.389f, xx), ::pow(1.389f, xx), 0.00001f) );
+		for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+		{
+			bx::writePrintf(writer, "ldexp(%f, %d) == %f (expected: %f)\n", xx, yy, bx::ldexp(xx, yy), ::ldexpf(xx, yy) );
+			REQUIRE(bx::equal(bx::ldexp(xx, yy), ::ldexpf(xx, yy), 0.00001f) );
+		}
+	}
+
+	for (float xx = -80.0f; xx < 80.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "exp(%f) == %f (expected: %f)\n", xx, bx::exp(xx), ::expf(xx) );
+		REQUIRE(bx::equal(bx::exp(xx), ::expf(xx), 0.00001f) );
+	}
+
+	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(bx::equal(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
-		REQUIRE(bx::equal(bx::sin(xx), ::sin(xx), 0.00001f) );
+		bx::writePrintf(writer, "pow(1.389f, %f) == %f (expected: %f)\n", xx, bx::pow(1.389f, xx), ::powf(1.389f, xx) );
+		REQUIRE(bx::equal(bx::pow(1.389f, xx), ::powf(1.389f, xx), 0.00001f) );
+	}
+
+	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
+	{
+		bx::writePrintf(writer, "asin(%f) == %f (expected: %f)\n", xx, bx::asin(xx), ::asinf(xx) );
+		REQUIRE(bx::equal(bx::asin(xx), ::asinf(xx), 0.0001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
-		REQUIRE(bx::equal(bx::cos(xx), ::cos(xx), 0.00001f) );
+		bx::writePrintf(writer, "sin(%f) == %f (expected: %f)\n", xx, bx::sin(xx), ::sinf(xx) );
+		REQUIRE(bx::equal(bx::sin(xx), ::sinf(xx), 0.00001f) );
+	}
+
+	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "sinh(%f) == %f (expected: %f)\n", xx, bx::sinh(xx), ::sinhf(xx) );
+		REQUIRE(bx::equal(bx::sinh(xx), ::sinhf(xx), 0.00001f) );
+	}
+
+	for (float xx = -1.0f; xx < 1.0f; xx += 0.001f)
+	{
+		bx::writePrintf(writer, "acos(%f) == %f (expected: %f\n)", xx, bx::acos(xx), ::acosf(xx) );
+		REQUIRE(bx::equal(bx::acos(xx), ::acosf(xx), 0.0001f) );
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
 	{
-		REQUIRE(bx::equal(bx::tan(xx), ::tan(xx), 0.00001f) );
+		bx::writePrintf(writer, "cos(%f) == %f (expected: %f)\n", xx, bx::cos(xx), ::cosf(xx) );
+		REQUIRE(bx::equal(bx::cos(xx), ::cosf(xx), 0.00001f) );
+	}
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "tan(%f) == %f (expected: %f)\n", xx, bx::tan(xx), ::tanf(xx) );
+		REQUIRE(bx::equal(bx::tan(xx), ::tanf(xx), 0.001f) );
+	}
+
+	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "tanh(%f) == %f (expected: %f\n", xx, bx::tanh(xx), ::tanhf(xx) );
+		REQUIRE(bx::equal(bx::tanh(xx), ::tanhf(xx), 0.00001f) );
+	}
+
+	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		bx::writePrintf(writer, "atan(%f) == %f (expected: %f)\n", xx, bx::atan(xx), ::atanf(xx) );
+		REQUIRE(bx::equal(bx::atan(xx), ::atanf(xx), 0.00001f) );
+	}
+
+	for (float yy = -100.0f; yy < 100.0f; yy += 0.1f)
+	{
+		for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+		{
+			bx::writePrintf(writer, "atan2(%f, %f) == %f (expected: %f)\n", yy, xx, bx::atan2(yy, xx), ::atan2f(yy, xx) );
+			REQUIRE(bx::equal(bx::atan2(yy, xx), ::atan2f(yy, xx), 0.00001f) );
+		}
 	}
 }
 

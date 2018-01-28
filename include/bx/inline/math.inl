@@ -127,6 +127,41 @@ namespace bx
 		return cos(_a - kPiHalf);
 	}
 
+	inline float sinh(float _a)
+	{
+		return 0.5f*(exp(_a) - exp(-_a) );
+	}
+
+	inline float asin(float _a)
+	{
+		return kPiHalf - acos(_a);
+	}
+
+	inline float cosh(float _a)
+	{
+		return 0.5f*(exp(_a) + exp(-_a) );
+	}
+
+	inline float tan(float _a)
+	{
+		return sin(_a) / cos(_a);
+	}
+
+	inline float tanh(float _a)
+	{
+		const float tmp0   = exp(2.0f*_a);
+		const float tmp1   = tmp0 - 1.0f;
+		const float tmp2   = tmp0 + 1.0f;
+		const float result = tmp1 / tmp2;
+
+		return result;
+	}
+
+	inline float atan(float _a)
+	{
+		return atan2(_a, 1.0f);
+	}
+
 	inline float pow(float _a, float _b)
 	{
 		return exp(_b * log(_a) );
@@ -142,9 +177,19 @@ namespace bx
 		return log(_a) * kInvLogNat2;
 	}
 
+	inline float sqrt(float _a)
+	{
+		if (_a < kNearZero)
+		{
+			return 0.0f;
+		}
+
+		return 1.0f/rsqrt(_a);
+	}
+
 	inline float rsqrt(float _a)
 	{
-		return 1.0f/sqrt(_a);
+		return pow(_a, -0.5f);
 	}
 
 	inline float trunc(float _a)
@@ -155,6 +200,11 @@ namespace bx
 	inline float fract(float _a)
 	{
 		return _a - trunc(_a);
+	}
+
+	inline float mad(float _a, float _b, float _c)
+	{
+		return _a * _b + _c;
 	}
 
 	inline float mod(float _a, float _b)

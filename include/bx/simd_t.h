@@ -39,7 +39,6 @@
 	&& !BX_PLATFORM_EMSCRIPTEN \
 	&& !BX_PLATFORM_IOS \
 	&&  BX_CLANG_HAS_EXTENSION(attribute_ext_vector_type)
-#	include <math.h>
 #	undef  BX_SIMD_LANGEXT
 #	define BX_SIMD_LANGEXT 1
 #endif //

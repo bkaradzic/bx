@@ -119,9 +119,19 @@ namespace bx
 		return _a + _b;
 	}
 
+	inline uint32_t uint32_iadd(uint32_t _a, uint32_t _b)
+	{
+		return int32_t(_a) + int32_t(_b);
+	}
+
 	inline uint32_t uint32_sub(uint32_t _a, uint32_t _b)
 	{
 		return _a - _b;
+	}
+
+	inline uint32_t uint32_isub(uint32_t _a, uint32_t _b)
+	{
+		return int32_t(_a) - int32_t(_b);
 	}
 
 	inline uint32_t uint32_mul(uint32_t _a, uint32_t _b)

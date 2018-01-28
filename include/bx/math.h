@@ -17,9 +17,15 @@ namespace bx
 	extern const float kPi2;
 	extern const float kInvPi;
 	extern const float kPiHalf;
+	extern const float kPiQuarter;
 	extern const float kSqrt2;
+	extern const float kLogNat10;
 	extern const float kInvLogNat2;
-	extern const float kHuge;
+	extern const float kLogNat2Hi;
+	extern const float kLogNat2Lo;
+	extern const float kE;
+	extern const float kNearZero;
+	extern const float kInfinity;
 
 	///
 	typedef float (*LerpFn)(float _a, float _b, float _t);
@@ -65,22 +71,22 @@ namespace bx
 	///
 	uint32_t floatFlip(uint32_t _value);
 
-	///
+	/// Returns true if _f is a number that is NaN.
 	bool isNan(float _f);
 
-	///
+	/// Returns true if _f is a number that is NaN.
 	bool isNan(double _f);
 
-	///
+	/// Returns true if _f is not infinite and is not a NaN.
 	bool isFinite(float _f);
 
-	///
+	/// Returns true if _f is not infinite and is not a NaN.
 	bool isFinite(double _f);
 
-	///
+	/// Returns true if _f is infinite and is not a NaN.
 	bool isInfinite(float _f);
 
-	///
+	/// Returns true if _f is infinite and is not a NaN.
 	bool isInfinite(double _f);
 
 	///
@@ -98,49 +104,64 @@ namespace bx
 	///
 	float sign(float _a);
 
-	///
+	/// Returns the absolute of _a.
 	float abs(float _a);
 
-	///
+	/// Returns the square of _a.
 	float square(float _a);
 
-	///
+	/// Returns the cosine of the argument _a.
 	float sin(float _a);
 
-	///
+	/// Returns hyperbolic sine of the argument _a.
+	float sinh(float _a);
+
+	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
 	float asin(float _a);
 
-	///
+	/// Returns the cosine of the argument _a.
 	float cos(float _a);
 
-	///
-	float tan(float _a);
+	/// Returns hyperbolic cosine of the argument _a.
+	float cosh(float _a);
 
-	///
+	/// Returns radian angle between 0 and pi whose cosine is _a.
 	float acos(float _a);
 
-	///
+	/// Returns the circular tangent of the radian argument _a.
+	float tan(float _a);
+
+	/// Returns hyperbolic tangent of the argument _a.
+	float tanh(float _a);
+
+	/// Returns radian angle between -pi/2 and +pi/2 whose tangent is _a.
+	float atan(float _a);
+
+	/// Retruns the inverse tangent of _y/_x.
 	float atan2(float _y, float _x);
 
-	///
+	/// Computes _a raised to the _b power.
 	float pow(float _a, float _b);
 
 	///
+	float ldexp(float _a, int32_t _b);
+
+	/// Returns e (2.71828...) raised to the _a power.
 	float exp(float _a);
 
-	///
+	/// Returns 2 raised to the _a power.
 	float exp2(float _a);
 
-	///
+	/// Returns the base e (2.71828...) logarithm of _a.
 	float log(float _a);
 
-	///
+	/// Returns the base 2 logarithm of _a.
 	float log2(float _a);
 
-	///
+	/// Returns the square root of _a.
 	float sqrt(float _a);
 
-	///
+	/// Returns reciprocal square root of _a.
 	float rsqrt(float _a);
 
 	///
@@ -148,6 +169,9 @@ namespace bx
 
 	///
 	float fract(float _a);
+
+	/// Returns result of multipla and add (_a * _b + _c).
+	float mad(float _a, float _b, float _c);
 
 	///
 	float mod(float _a, float _b);

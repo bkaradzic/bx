@@ -5,8 +5,7 @@
 
 #include "bx_p.h"
 #include <bx/math.h>
-
-#include <math.h>
+#include <bx/uint32_t.h>
 
 namespace bx
 {
@@ -14,18 +13,17 @@ namespace bx
 	const float kPi2        = 6.2831853071795864769252867665590f;
 	const float kInvPi      = 1.0f/kPi;
 	const float kPiHalf     = 1.5707963267948966192313216916398f;
+	const float kPiQuarter  = 0.7853981633974483096156608458199f;
 	const float kSqrt2      = 1.4142135623730950488016887242097f;
+	const float kLogNat10   = 2.3025850929940456840179914546844f;
 	const float kInvLogNat2 = 1.4426950408889634073599246810019f;
-#if BX_COMPILER_MSVC
-	const float kHuge = float(HUGE_VAL);
-#else
-	const float kHuge = HUGE_VALF;
-#endif // BX_COMPILER_MSVC
-
-	float asin(float _a)
-	{
-		return ::asinf(_a);
-	}
+	const float kLogNat2Hi  = 0.6931471805599453094172321214582f;
+	const float kLogNat2Lo  = 1.90821492927058770002e-10f;
+	const float kE          = 2.7182818284590452353602874713527f;
+	const float kNearZero   = 1.0f/float(1 << 28);
+	const float kFloatMin   = 1.175494e-38f;
+	const float kFloatMax   = 3.402823e+38f;
+	const float kInfinity   = bitsToFloat(UINT32_C(0x7f800000) );
 
 	namespace
 	{
@@ -72,14 +70,13 @@ namespace bx
 			c10 = kSinC10;
 		}
 
-		const float xsq = square(xx);
-		float result;
-		result = xsq * c10    + c8;
-		result = xsq * result + c6;
-		result = xsq * result + c4;
-		result = xsq * result + c2;
-		result = xsq * result + 1.0f;
-		result *= c0;
+		const float xsq    = square(xx);
+		const float tmp0   = mad(c10,  xsq, c8 );
+		const float tmp1   = mad(tmp0, xsq, c6 );
+		const float tmp2   = mad(tmp1, xsq, c4 );
+		const float tmp3   = mad(tmp2, xsq, c2 );
+		const float tmp4   = mad(tmp3, xsq, 1.0);
+		const float result = tmp4 * c0;
 
 		return bits == 1 || bits == 2
 			? -result
@@ -87,38 +84,168 @@ namespace bx
 			;
 	}
 
-	float tan(float _a)
+	namespace
 	{
-#if 0
-		return sin(_a) / cos(_a);
-#else
-		return ::tanf(_a);
-#endif
-	}
+		static const float kAcosC0 =  1.5707288f;
+		static const float kAcosC1 = -0.2121144f;
+		static const float kAcosC2 =  0.0742610f;
+		static const float kAcosC3 = -0.0187293f;
+
+	} // namespace
 
 	float acos(float _a)
 	{
-		return ::acosf(_a);
+		const float absa   = abs(_a);
+		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
+		const float tmp1   = mad(tmp0,    absa, kAcosC1);
+		const float tmp2   = mad(tmp1,    absa, kAcosC0);
+		const float tmp3   = tmp2 * sqrt(1.0 - absa);
+		const float negate = float(_a < 0.0f);
+		const float tmp4   = tmp3 - 2.0f*negate*tmp3;
+		const float result = negate*kPi + tmp4;
+
+		return result;
 	}
+
+	namespace
+	{
+		static const float kAtan2C0 = -0.013480470f;
+		static const float kAtan2C1 =  0.057477314f;
+		static const float kAtan2C2 = -0.121239071f;
+		static const float kAtan2C3 =  0.195635925f;
+		static const float kAtan2C4 = -0.332994597f;
+		static const float kAtan2C5 =  0.999995630f;
+
+	} // namespace
 
 	float atan2(float _y, float _x)
 	{
-		return ::atan2f(_y, _x);
+		const float ax     = abs(_x);
+		const float ay     = abs(_y);
+		const float maxaxy = max(ax, ay);
+		const float minaxy = min(ax, ay);
+		const float mxy    = minaxy / maxaxy;
+		const float mxysq  = square(mxy);
+		const float tmp0   = mad(kAtan2C0, mxysq, kAtan2C1);
+		const float tmp1   = mad(tmp0,     mxysq, kAtan2C2);
+		const float tmp2   = mad(tmp1,     mxysq, kAtan2C3);
+		const float tmp3   = mad(tmp2,     mxysq, kAtan2C4);
+		const float tmp4   = mad(tmp3,     mxysq, kAtan2C5);
+		const float tmp5   = tmp4 * mxy;
+		const float tmp6   = ay > ax   ? kPiHalf - tmp5 : tmp5;
+		const float tmp7   = _x < 0.0f ? kPi     - tmp6 : tmp6;
+		const float result = sign(_y)*tmp7;
+
+		return result;
 	}
+
+	float ldexp(float _a, int32_t _b)
+	{
+		const uint32_t ftob     = floatToBits(_a);
+		const uint32_t masked   = uint32_and(ftob, UINT32_C(0xff800000) );
+		const uint32_t expsign0 = uint32_sra(masked, 23);
+		const uint32_t tmp      = uint32_iadd(expsign0, _b);
+		const uint32_t expsign1 = uint32_sll(tmp, 23);
+		const uint32_t mantissa = uint32_and(ftob, UINT32_C(0x007fffff) );
+		const uint32_t bits     = uint32_or(mantissa, expsign1);
+		const float    result   = bitsToFloat(bits);
+
+		return result;
+	}
+
+	float frexp(float _a, int32_t* _exp)
+	{
+		const uint32_t ftob     = floatToBits(_a);
+		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
+		const uint32_t exp0     = uint32_srl(masked0, 23);
+		const uint32_t masked1  = uint32_and(ftob,   UINT32_C(0x807fffff) );
+		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
+		const float    result   = bitsToFloat(bits);
+
+		*_exp = int32_t(exp0 - 0x7e);
+
+		return result;
+	}
+
+	namespace
+	{
+		static const float kExpC0  =  1.66666666666666019037e-01f;
+		static const float kExpC1  = -2.77777777770155933842e-03f;
+		static const float kExpC2  =  6.61375632143793436117e-05f;
+		static const float kExpC3  = -1.65339022054652515390e-06f;
+		static const float kExpC4  =  4.13813679705723846039e-08f;
+		static const float kExpMax =  7.09782712893383973096e+02f;
+
+	} // namespace
 
 	float exp(float _a)
 	{
-		return ::expf(_a);
+		if (abs(_a) <= kNearZero)
+		{
+			return _a + 1.0f;
+		}
+
+		const float kk     = round(_a*kInvLogNat2);
+		const float hi     = _a - kk*kLogNat2Hi;
+		const float lo     =      kk*kLogNat2Lo;
+		const float hml    = hi - lo;
+		const float hmlsq  = square(hml);
+		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
+		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
+		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
+		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
+		const float tmp4   = hml - hmlsq * tmp3;
+		const float tmp5   = hml*tmp4/(2.0f-tmp4);
+		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
+		const float result = ldexp(tmp6, int32_t(kk) );
+
+		return result;
 	}
+
+	namespace
+	{
+		static const float kLogC0 = 6.666666666666735130e-01f;
+		static const float kLogC1 = 3.999999999940941908e-01f;
+		static const float kLogC2 = 2.857142874366239149e-01f;
+		static const float kLogC3 = 2.222219843214978396e-01f;
+		static const float kLogC4 = 1.818357216161805012e-01f;
+		static const float kLogC5 = 1.531383769920937332e-01f;
+		static const float kLogC6 = 1.479819860511658591e-01f;
+
+	} // namespace
 
 	float log(float _a)
 	{
-		return ::logf(_a);
-	}
+		int32_t exp;
+		float ff = frexp(_a, &exp);
+		if (ff < kSqrt2*0.5f)
+		{
+			ff *= 2.0f;
+			--exp;
+		}
 
-	float sqrt(float _a)
-	{
-		return ::sqrtf(_a);
+		ff -= 1.0f;
+		const float kk     = float(exp);
+		const float hi     = kk*kLogNat2Hi;
+		const float lo     = kk*kLogNat2Lo;
+		const float ss     = ff / (2.0f + ff);
+		const float s2     = square(ss);
+		const float s4     = square(s2);
+
+		const float tmp0   = mad(kLogC6, s4, kLogC4);
+		const float tmp1   = mad(tmp0,   s4, kLogC2);
+		const float tmp2   = mad(tmp1,   s4, kLogC0);
+		const float t1     = s2*tmp2;
+
+		const float tmp3   = mad(kLogC5, s4, kLogC3);
+		const float tmp4   = mad(tmp3,   s4, kLogC1);
+		const float t2     = s4*tmp4;
+
+		const float t12    = t1 + t2;
+		const float hfsq   = 0.5*square(ff);
+		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
+
+		return result;
 	}
 
 	float floor(float _a)
@@ -126,7 +253,7 @@ namespace bx
 		if (_a < 0.0f)
 		{
 			const float fr = fract(-_a);
-			float result = -_a - fr;
+			const float result = -_a - fr;
 
 			return -(0.0f != fr
 				? result + 1.0f
