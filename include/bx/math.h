@@ -50,24 +50,31 @@ namespace bx
 		};
 	};
 
+	/// Returns converted the argument _deg to radians.
 	///
 	float toRad(float _deg);
 
+	/// Returns converted the argument _rad to degrees.
 	///
 	float toDeg(float _rad);
 
+	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
 	uint32_t floatToBits(float _a);
 
+	/// Reinterprets the bit pattern of _a as float.
 	///
 	float bitsToFloat(uint32_t _a);
 
+	/// Reinterprets the bit pattern of _a as uint64_t.
 	///
 	uint64_t doubleToBits(double _a);
 
+	/// Reinterprets the bit pattern of _a as double.
 	///
 	double bitsToDouble(uint64_t _a);
 
+	/// Returns sortable floating point value.
 	///
 	uint32_t floatFlip(uint32_t _value);
 
