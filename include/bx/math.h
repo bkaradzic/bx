@@ -72,110 +72,148 @@ namespace bx
 	uint32_t floatFlip(uint32_t _value);
 
 	/// Returns true if _f is a number that is NaN.
+	///
 	bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
+	///
 	bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
+	///
 	bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
+	///
 	bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
+	///
 	bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
+	///
 	bool isInfinite(double _f);
 
+	/// Returns the largest integer value not greater than _f.
 	///
 	float floor(float _f);
 
+	/// Returns the smallest integer value not less than _f.
 	///
 	float ceil(float _f);
 
+	/// Returns the nearest integer value to _f, rounding halfway cases away from zero,
 	///
 	float round(float _f);
 
+	/// Returns linear interpolation between two values _a and _b.
 	///
 	float lerp(float _a, float _b, float _t);
 
+	/// Returns the sign of _a.
 	///
 	float sign(float _a);
 
 	/// Returns the absolute of _a.
+	///
 	float abs(float _a);
 
 	/// Returns the square of _a.
+	///
 	float square(float _a);
 
 	/// Returns the cosine of the argument _a.
+	///
 	float sin(float _a);
 
 	/// Returns hyperbolic sine of the argument _a.
+	///
 	float sinh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
+	///
 	float asin(float _a);
 
 	/// Returns the cosine of the argument _a.
+	///
 	float cos(float _a);
 
 	/// Returns hyperbolic cosine of the argument _a.
+	///
 	float cosh(float _a);
 
 	/// Returns radian angle between 0 and pi whose cosine is _a.
+	///
 	float acos(float _a);
 
 	/// Returns the circular tangent of the radian argument _a.
+	///
 	float tan(float _a);
 
 	/// Returns hyperbolic tangent of the argument _a.
+	///
 	float tanh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose tangent is _a.
+	///
 	float atan(float _a);
 
 	/// Retruns the inverse tangent of _y/_x.
+	///
 	float atan2(float _y, float _x);
 
 	/// Computes _a raised to the _b power.
+	///
 	float pow(float _a, float _b);
 
+	/// Returns the result of multiplying _a by 2 raised to the power of the exponent.
 	///
 	float ldexp(float _a, int32_t _b);
 
+	/// Returns decomposed given floating point value _a into a normalized fraction and
+	/// an integral power of two.
 	///
 	float frexp(float _a, int32_t* _outExp);
 
 	/// Returns e (2.71828...) raised to the _a power.
+	///
 	float exp(float _a);
 
 	/// Returns 2 raised to the _a power.
+	///
 	float exp2(float _a);
 
 	/// Returns the base e (2.71828...) logarithm of _a.
+	///
 	float log(float _a);
 
 	/// Returns the base 2 logarithm of _a.
+	///
 	float log2(float _a);
 
 	/// Returns the square root of _a.
+	///
 	float sqrt(float _a);
 
 	/// Returns reciprocal square root of _a.
+	///
 	float rsqrt(float _a);
 
+	/// Returns the nearest integer not greater in magnitude than _a.
 	///
 	float trunc(float _a);
 
+	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
+	/// and less than 1.
 	///
 	float fract(float _a);
 
 	/// Returns result of multipla and add (_a * _b + _c).
+	///
 	float mad(float _a, float _b, float _c);
 
+	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	float mod(float _a, float _b);
 
@@ -210,7 +248,8 @@ namespace bx
 	///
 	float angleDiff(float _a, float _b);
 
-	/// Shortest distance linear interpolation between two angles.
+	/// Returns shortest distance linear interpolation between two angles.
+	///
 	float angleLerp(float _a, float _b, float _t);
 
 	///
