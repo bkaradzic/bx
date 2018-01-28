@@ -146,6 +146,9 @@ namespace bx
 	///
 	float ldexp(float _a, int32_t _b);
 
+	///
+	float frexp(float _a, int32_t* _outExp);
+
 	/// Returns e (2.71828...) raised to the _a power.
 	float exp(float _a);
 

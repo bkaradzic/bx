@@ -153,7 +153,7 @@ namespace bx
 		return result;
 	}
 
-	float frexp(float _a, int32_t* _exp)
+	float frexp(float _a, int32_t* _outExp)
 	{
 		const uint32_t ftob     = floatToBits(_a);
 		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
@@ -162,7 +162,7 @@ namespace bx
 		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
 		const float    result   = bitsToFloat(bits);
 
-		*_exp = int32_t(exp0 - 0x7e);
+		*_outExp = int32_t(exp0 - 0x7e);
 
 		return result;
 	}
