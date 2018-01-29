@@ -49,7 +49,7 @@ void math_bench()
 		result = 0.0f;
 		for (float xx = 0.0f; xx < max; xx += 0.1f)
 		{
-			result += bx::sqrtRef(xx);
+			result += bx::sqrtSimd(xx);
 		}
 
 		elapsed += bx::getHPCounter();
