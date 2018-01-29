@@ -9,63 +9,60 @@
 
 #include <math.h>
 
+typedef float (*MathFn)(float);
+
+
+template<MathFn mfn>
+float mathTest(const char* _name)
+{
+	bx::WriterI* writer = bx::getStdOut();
+	int64_t elapsed = -bx::getHPCounter();
+
+	float result = 0.0f;
+	const float max = 1389.0f;
+
+	for (float xx = 0.0f; xx < max; xx += 0.1f)
+	{
+		result += mfn(xx);
+	}
+
+	elapsed += bx::getHPCounter();
+	bx::writePrintf(writer, "%-20s: %15f\n", _name, double(elapsed) );
+
+	return result;
+}
+
 void math_bench()
 {
 	bx::WriterI* writer = bx::getStdOut();
 	bx::writePrintf(writer, "Math bench\n\n");
 
-	float result = 0.0f;
-	float max = 1389.0f;
+	mathTest<  ::sqrtf   >("::sqrtf");
+	mathTest<bx::sqrtRef >("bx::sqrtRef");
+	mathTest<bx::sqrtSimd>("bx::sqrtSimd");
+	mathTest<bx::sqrt    >("bx::sqrt");
 
-	{
-		int64_t elapsed = -bx::getHPCounter();
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::sinf   >("::sinf");
+	mathTest<bx::sin    >("bx::sin");
 
-		result = 0.0f;
-		for (float xx = 0.0f; xx < max; xx += 0.1f)
-		{
-			result += ::sqrtf(xx);
-		}
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::asinf  >("::asinf");
+	mathTest<bx::asin   >("bx::asin");
 
-		elapsed += bx::getHPCounter();
-		bx::writePrintf(writer, "     ::sqrtf: %15f, %f\n", double(elapsed), result);
-	}
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::cosf   >("::cosf");
+	mathTest<bx::cos    >("bx::cos");
 
-	{
-		int64_t elapsed = -bx::getHPCounter();
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::acosf  >("::acosf");
+	mathTest<bx::acos   >("bx::acos");
 
-		result = 0.0f;
-		for (float xx = 0.0f; xx < max; xx += 0.1f)
-		{
-			result += bx::sqrtRef(xx);
-		}
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::tanf   >("::tanf");
+	mathTest<bx::tan    >("bx::tan");
 
-		elapsed += bx::getHPCounter();
-		bx::writePrintf(writer, " bx::sqrtRef: %15f, %f\n", double(elapsed), result);
-	}
-
-	{
-		int64_t elapsed = -bx::getHPCounter();
-
-		result = 0.0f;
-		for (float xx = 0.0f; xx < max; xx += 0.1f)
-		{
-			result += bx::sqrtSimd(xx);
-		}
-
-		elapsed += bx::getHPCounter();
-		bx::writePrintf(writer, "bx::sqrtSimd: %15f, %f\n", double(elapsed), result);
-	}
-
-	{
-		int64_t elapsed = -bx::getHPCounter();
-
-		result = 0.0f;
-		for (float xx = 0.0f; xx < max; xx += 0.1f)
-		{
-			result += bx::sqrt(xx);
-		}
-
-		elapsed += bx::getHPCounter();
-		bx::writePrintf(writer, "    bx::sqrt: %15f, %f\n", double(elapsed), result);
-	}
+	bx::writePrintf(writer, "\n");
+	mathTest<  ::atanf  >("::atanf");
+	mathTest<bx::atan   >("bx::atan");
 }
