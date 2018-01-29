@@ -7,6 +7,8 @@
 #	error "Must be included from bx/simd_t.h!"
 #endif // BX_SIMD_T_H_HEADER_GUARD
 
+#include <bx/math.h>
+
 namespace bx
 {
 #define ELEMx 0

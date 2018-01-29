@@ -9,6 +9,8 @@
 #	error "Must be included from bx/math.h!"
 #endif // BX_MATH_H_HEADER_GUARD
 
+#include <bx/simd_t.h>
+
 namespace bx
 {
 	inline float toRad(float _deg)
@@ -177,7 +179,7 @@ namespace bx
 		return log(_a) * kInvLogNat2;
 	}
 
-	inline float sqrt(float _a)
+	inline float sqrtRef(float _a)
 	{
 		if (_a < kNearZero)
 		{
@@ -185,6 +187,25 @@ namespace bx
 		}
 
 		return 1.0f/rsqrt(_a);
+	}
+
+	inline float sqrtSimd(float _a)
+	{
+		const simd128_t aa    = simd_splat(_a);
+		const simd128_t sqrta = simd_sqrt(aa);
+		float result;
+		simd_stx(&result, sqrta);
+
+		return result;
+	}
+
+	inline float sqrt(float _a)
+	{
+#if BX_CONFIG_SUPPORTS_SIMD
+		return sqrtSimd(_a);
+#else
+		return sqrtRef(_a);
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	inline float rsqrt(float _a)
