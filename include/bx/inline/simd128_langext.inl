@@ -9,6 +9,8 @@
 
 namespace bx
 {
+	float sqrt(float);
+
 #define ELEMx 0
 #define ELEMy 1
 #define ELEMz 2

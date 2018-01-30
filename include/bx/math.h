@@ -26,6 +26,8 @@ namespace bx
 	extern const float kE;
 	extern const float kNearZero;
 	extern const float kInfinity;
+	extern const float kFloatMin;
+	extern const float kFloatMax;
 
 	///
 	typedef float (*LerpFn)(float _a, float _b, float _t);

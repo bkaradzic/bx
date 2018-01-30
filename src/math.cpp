@@ -174,7 +174,6 @@ namespace bx
 		static const float kExpC2  =  6.61375632143793436117e-05f;
 		static const float kExpC3  = -1.65339022054652515390e-06f;
 		static const float kExpC4  =  4.13813679705723846039e-08f;
-		static const float kExpMax =  7.09782712893383973096e+02f;
 
 	} // namespace
 

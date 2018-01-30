@@ -7,10 +7,11 @@
 #	error "Must be included from bx/simd_t.h!"
 #endif // BX_SIMD_T_H_HEADER_GUARD
 
-#include <bx/math.h>
-
 namespace bx
 {
+	float sqrt(float);
+	float rsqrt(float);
+
 #define ELEMx 0
 #define ELEMy 1
 #define ELEMz 2
