@@ -215,8 +215,13 @@ namespace bx
 
 	inline float rsqrtSimd(float _a)
 	{
+		if (_a < kNearZero)
+		{
+			return 0.0f;
+		}
+
 		const simd128_t aa     = simd_splat(_a);
-		const simd128_t rsqrta = simd_rsqrt(aa);
+		const simd128_t rsqrta = simd_rsqrt_nr(aa);
 		float result;
 		simd_stx(&result, rsqrta);
 

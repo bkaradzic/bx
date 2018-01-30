@@ -41,38 +41,38 @@ void math_bench()
 	bx::WriterI* writer = bx::getStdOut();
 	bx::writePrintf(writer, "Math bench\n\n");
 
-	mathTest<  ::sqrtf    >("::sqrtf");
+	mathTest<  ::sqrtf    >("  ::sqrtf");
 	mathTest<bx::sqrtRef  >("bx::sqrtRef");
 	mathTest<bx::sqrtSimd >("bx::sqrtSimd");
 	mathTest<bx::sqrt     >("bx::sqrt");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::rsqrt    >("::rsqrtf");
-	mathTest<bx::rsqrtRef >("bx::sqrtRef");
-	mathTest<bx::rsqrtSimd>("bx::sqrtSimd");
+	mathTest<  ::rsqrt    >("  ::rsqrtf");
+	mathTest<bx::rsqrtRef >("bx::rsqrtRef");
+	mathTest<bx::rsqrtSimd>("bx::rsqrtSimd");
 	mathTest<bx::rsqrt    >("bx::rsqrt");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::sinf >("::sinf");
+	mathTest<  ::sinf >("  ::sinf");
 	mathTest<bx::sin  >("bx::sin");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::asinf>("::asinf");
+	mathTest<  ::asinf>("  ::asinf");
 	mathTest<bx::asin >("bx::asin");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::cosf >("::cosf");
+	mathTest<  ::cosf >("  ::cosf");
 	mathTest<bx::cos  >("bx::cos");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::acosf>("::acosf");
+	mathTest<  ::acosf>("  ::acosf");
 	mathTest<bx::acos >("bx::acos");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::tanf >("::tanf");
+	mathTest<  ::tanf >("  ::tanf");
 	mathTest<bx::tan  >("bx::tan");
 
 	bx::writePrintf(writer, "\n");
-	mathTest<  ::atanf>("::atanf");
+	mathTest<  ::atanf>("  ::atanf");
 	mathTest<bx::atan >("bx::atan");
 }
