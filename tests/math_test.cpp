@@ -72,6 +72,12 @@ TEST_CASE("libm", "")
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
+		bx::writePrintf(writer, "rsqrt(%f) == %f (expected: %f)\n", xx, bx::rsqrt(xx), 1.0f/::sqrtf(xx) );
+		REQUIRE(bx::equal(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
+	}
+
+	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
+	{
 		bx::writePrintf(writer, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
 		REQUIRE(bx::equal(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
 	}

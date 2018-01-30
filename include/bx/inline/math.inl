@@ -208,9 +208,28 @@ namespace bx
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
-	inline float rsqrt(float _a)
+	inline float rsqrtRef(float _a)
 	{
 		return pow(_a, -0.5f);
+	}
+
+	inline float rsqrtSimd(float _a)
+	{
+		const simd128_t aa     = simd_splat(_a);
+		const simd128_t rsqrta = simd_rsqrt(aa);
+		float result;
+		simd_stx(&result, rsqrta);
+
+		return result;
+	}
+
+	inline float rsqrt(float _a)
+	{
+#if BX_CONFIG_SUPPORTS_SIMD
+		return rsqrtSimd(_a);
+#else
+		return rsqrtRef(_a);
+#endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
 	inline float trunc(float _a)
