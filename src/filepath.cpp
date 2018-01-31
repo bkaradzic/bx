@@ -118,7 +118,6 @@ namespace bx
 
 					break;
 				}
-
 				BX_FALLTHROUGH;
 
 			default:

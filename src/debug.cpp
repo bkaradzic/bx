@@ -155,15 +155,17 @@ namespace bx
 			BX_UNUSED(_err);
 
 			int32_t total = 0;
+			const char* data = (const char*)_data;
 
 			char temp[4096];
 			while (total != _size)
 			{
 				uint32_t len = bx::uint32_min(sizeof(temp)-1, _size-total);
-				memCopy(temp, _data, len);
+				memCopy(temp, data, len);
 				temp[len] = '\0';
-				debugOutput(temp);
+				data  += len;
 				total += len;
+				debugOutput(temp);
 			}
 
 			return total;
