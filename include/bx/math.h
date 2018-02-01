@@ -54,212 +54,212 @@ namespace bx
 
 	/// Returns converted the argument _deg to radians.
 	///
-	float toRad(float _deg);
+	BX_CONST_FUNC float toRad(float _deg);
 
 	/// Returns converted the argument _rad to degrees.
 	///
-	float toDeg(float _rad);
+	BX_CONST_FUNC float toDeg(float _rad);
 
 	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
-	uint32_t floatToBits(float _a);
+	BX_CONST_FUNC uint32_t floatToBits(float _a);
 
 	/// Reinterprets the bit pattern of _a as float.
 	///
-	float bitsToFloat(uint32_t _a);
+	BX_CONST_FUNC float bitsToFloat(uint32_t _a);
 
 	/// Reinterprets the bit pattern of _a as uint64_t.
 	///
-	uint64_t doubleToBits(double _a);
+	BX_CONST_FUNC uint64_t doubleToBits(double _a);
 
 	/// Reinterprets the bit pattern of _a as double.
 	///
-	double bitsToDouble(uint64_t _a);
+	BX_CONST_FUNC double bitsToDouble(uint64_t _a);
 
 	/// Returns sortable floating point value.
 	///
-	uint32_t floatFlip(uint32_t _value);
+	BX_CONST_FUNC uint32_t floatFlip(uint32_t _value);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	bool isNan(float _f);
+	BX_CONST_FUNC bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	bool isNan(double _f);
+	BX_CONST_FUNC bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	bool isFinite(float _f);
+	BX_CONST_FUNC bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	bool isFinite(double _f);
+	BX_CONST_FUNC bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	bool isInfinite(float _f);
+	BX_CONST_FUNC bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	bool isInfinite(double _f);
+	BX_CONST_FUNC bool isInfinite(double _f);
 
 	/// Returns the largest integer value not greater than _f.
 	///
-	float floor(float _f);
+	BX_CONST_FUNC float floor(float _f);
 
 	/// Returns the smallest integer value not less than _f.
 	///
-	float ceil(float _f);
+	BX_CONST_FUNC float ceil(float _f);
 
 	/// Returns the nearest integer value to _f, rounding halfway cases away from zero,
 	///
-	float round(float _f);
+	BX_CONST_FUNC float round(float _f);
 
 	/// Returns linear interpolation between two values _a and _b.
 	///
-	float lerp(float _a, float _b, float _t);
+	BX_CONST_FUNC float lerp(float _a, float _b, float _t);
 
 	/// Returns the sign of _a.
 	///
-	float sign(float _a);
+	BX_CONST_FUNC float sign(float _a);
 
 	/// Returns the absolute of _a.
 	///
-	float abs(float _a);
+	BX_CONST_FUNC float abs(float _a);
 
 	/// Returns the square of _a.
 	///
-	float square(float _a);
+	BX_CONST_FUNC float square(float _a);
 
 	/// Returns the cosine of the argument _a.
 	///
-	float sin(float _a);
+	BX_CONST_FUNC float sin(float _a);
 
 	/// Returns hyperbolic sine of the argument _a.
 	///
-	float sinh(float _a);
+	BX_CONST_FUNC float sinh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
 	///
-	float asin(float _a);
+	BX_CONST_FUNC float asin(float _a);
 
 	/// Returns the cosine of the argument _a.
 	///
-	float cos(float _a);
+	BX_CONST_FUNC float cos(float _a);
 
 	/// Returns hyperbolic cosine of the argument _a.
 	///
-	float cosh(float _a);
+	BX_CONST_FUNC float cosh(float _a);
 
 	/// Returns radian angle between 0 and pi whose cosine is _a.
 	///
-	float acos(float _a);
+	BX_CONST_FUNC float acos(float _a);
 
 	/// Returns the circular tangent of the radian argument _a.
 	///
-	float tan(float _a);
+	BX_CONST_FUNC float tan(float _a);
 
 	/// Returns hyperbolic tangent of the argument _a.
 	///
-	float tanh(float _a);
+	BX_CONST_FUNC float tanh(float _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose tangent is _a.
 	///
-	float atan(float _a);
+	BX_CONST_FUNC float atan(float _a);
 
 	/// Retruns the inverse tangent of _y/_x.
 	///
-	float atan2(float _y, float _x);
+	BX_CONST_FUNC float atan2(float _y, float _x);
 
 	/// Computes _a raised to the _b power.
 	///
-	float pow(float _a, float _b);
+	BX_CONST_FUNC float pow(float _a, float _b);
 
 	/// Returns the result of multiplying _a by 2 raised to the power of the exponent.
 	///
-	float ldexp(float _a, int32_t _b);
+	BX_CONST_FUNC float ldexp(float _a, int32_t _b);
 
 	/// Returns decomposed given floating point value _a into a normalized fraction and
 	/// an integral power of two.
 	///
-	float frexp(float _a, int32_t* _outExp);
+	BX_CONST_FUNC float frexp(float _a, int32_t* _outExp);
 
 	/// Returns e (2.71828...) raised to the _a power.
 	///
-	float exp(float _a);
+	BX_CONST_FUNC float exp(float _a);
 
 	/// Returns 2 raised to the _a power.
 	///
-	float exp2(float _a);
+	BX_CONST_FUNC float exp2(float _a);
 
 	/// Returns the base e (2.71828...) logarithm of _a.
 	///
-	float log(float _a);
+	BX_CONST_FUNC float log(float _a);
 
 	/// Returns the base 2 logarithm of _a.
 	///
-	float log2(float _a);
+	BX_CONST_FUNC float log2(float _a);
 
 	/// Returns the square root of _a.
 	///
-	float sqrt(float _a);
+	BX_CONST_FUNC float sqrt(float _a);
 
 	/// Returns reciprocal square root of _a.
 	///
-	float rsqrt(float _a);
+	BX_CONST_FUNC float rsqrt(float _a);
 
 	/// Returns the nearest integer not greater in magnitude than _a.
 	///
-	float trunc(float _a);
+	BX_CONST_FUNC float trunc(float _a);
 
 	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
 	/// and less than 1.
 	///
-	float fract(float _a);
+	BX_CONST_FUNC float fract(float _a);
 
 	/// Returns result of multipla and add (_a * _b + _c).
 	///
-	float mad(float _a, float _b, float _c);
+	BX_CONST_FUNC float mad(float _a, float _b, float _c);
 
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
-	float mod(float _a, float _b);
+	BX_CONST_FUNC float mod(float _a, float _b);
 
 	///
-	bool equal(float _a, float _b, float _epsilon);
+	BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon);
 
 	///
-	bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
+	BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
-	float wrap(float _a, float _wrap);
+	BX_CONST_FUNC float wrap(float _a, float _wrap);
 
 	///
-	float step(float _edge, float _a);
+	BX_CONST_FUNC float step(float _edge, float _a);
 
 	///
-	float pulse(float _a, float _start, float _end);
+	BX_CONST_FUNC float pulse(float _a, float _start, float _end);
 
 	///
-	float smoothStep(float _a);
+	BX_CONST_FUNC float smoothStep(float _a);
 
 	// References:
 	//  - Bias And Gain Are Your Friend
 	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
 	//  - http://demofox.org/biasgain.html
 	///
-	float bias(float _time, float _bias);
+	BX_CONST_FUNC float bias(float _time, float _bias);
 
 	///
-	float gain(float _time, float _gain);
+	BX_CONST_FUNC float gain(float _time, float _gain);
 
 	///
-	float angleDiff(float _a, float _b);
+	BX_CONST_FUNC float angleDiff(float _a, float _b);
 
 	/// Returns shortest distance linear interpolation between two angles.
 	///
-	float angleLerp(float _a, float _b, float _t);
+	BX_CONST_FUNC float angleLerp(float _a, float _b, float _t);
 
 	///
 	void vec3Move(float* _result, const float* _a);

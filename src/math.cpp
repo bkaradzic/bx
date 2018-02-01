@@ -41,7 +41,7 @@ namespace bx
 
 	} // namespace
 
-	float cos(float _a)
+	BX_CONST_FUNC float cos(float _a)
 	{
 		const float scaled = _a * 2.0f*kInvPi;
 		const float real   = floor(scaled);
@@ -93,7 +93,7 @@ namespace bx
 
 	} // namespace
 
-	float acos(float _a)
+	BX_CONST_FUNC float acos(float _a)
 	{
 		const float absa   = abs(_a);
 		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
@@ -118,7 +118,7 @@ namespace bx
 
 	} // namespace
 
-	float atan2(float _y, float _x)
+	BX_CONST_FUNC float atan2(float _y, float _x)
 	{
 		const float ax     = abs(_x);
 		const float ay     = abs(_y);
@@ -139,7 +139,7 @@ namespace bx
 		return result;
 	}
 
-	float ldexp(float _a, int32_t _b)
+	BX_CONST_FUNC float ldexp(float _a, int32_t _b)
 	{
 		const uint32_t ftob     = floatToBits(_a);
 		const uint32_t masked   = uint32_and(ftob, UINT32_C(0xff800000) );
@@ -153,7 +153,7 @@ namespace bx
 		return result;
 	}
 
-	float frexp(float _a, int32_t* _outExp)
+	BX_CONST_FUNC float frexp(float _a, int32_t* _outExp)
 	{
 		const uint32_t ftob     = floatToBits(_a);
 		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
@@ -177,7 +177,7 @@ namespace bx
 
 	} // namespace
 
-	float exp(float _a)
+	BX_CONST_FUNC float exp(float _a)
 	{
 		if (abs(_a) <= kNearZero)
 		{
@@ -213,7 +213,7 @@ namespace bx
 
 	} // namespace
 
-	float log(float _a)
+	BX_CONST_FUNC float log(float _a)
 	{
 		int32_t exp;
 		float ff = frexp(_a, &exp);
@@ -247,7 +247,7 @@ namespace bx
 		return result;
 	}
 
-	float floor(float _a)
+	BX_CONST_FUNC float floor(float _a)
 	{
 		if (_a < 0.0f)
 		{

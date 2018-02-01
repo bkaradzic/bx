@@ -13,41 +13,41 @@
 
 namespace bx
 {
-	inline float toRad(float _deg)
+	inline BX_CONST_FUNC float toRad(float _deg)
 	{
 		return _deg * kPi / 180.0f;
 	}
 
-	inline float toDeg(float _rad)
+	inline BX_CONST_FUNC float toDeg(float _rad)
 	{
 		return _rad * 180.0f / kPi;
 	}
 
-	inline uint32_t floatToBits(float _a)
+	inline BX_CONST_FUNC uint32_t floatToBits(float _a)
 	{
 		union { float f; uint32_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline float bitsToFloat(uint32_t _a)
+	inline BX_CONST_FUNC float bitsToFloat(uint32_t _a)
 	{
 		union { uint32_t ui; float f; } u = { _a };
 		return u.f;
 	}
 
-	inline uint64_t doubleToBits(double _a)
+	inline BX_CONST_FUNC uint64_t doubleToBits(double _a)
 	{
 		union { double f; uint64_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline double bitsToDouble(uint64_t _a)
+	inline BX_CONST_FUNC double bitsToDouble(uint64_t _a)
 	{
 		union { uint64_t ui; double f; } u = { _a };
 		return u.f;
 	}
 
-	inline uint32_t floatFlip(uint32_t _value)
+	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)
 	{
 		// Reference:
 		// http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
@@ -58,98 +58,98 @@ namespace bx
 		return result;
 	}
 
-	inline bool isNan(float _f)
+	inline BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp > UINT32_C(0x7f800000);
 	}
 
-	inline bool isNan(double _f)
+	inline BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp > UINT64_C(0x7ff0000000000000);
 	}
 
-	inline bool isFinite(float _f)
+	inline BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp < UINT32_C(0x7f800000);
 	}
 
-	inline bool isFinite(double _f)
+	inline BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp < UINT64_C(0x7ff0000000000000);
 	}
 
-	inline bool isInfinite(float _f)
+	inline BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp == UINT32_C(0x7f800000);
 	}
 
-	inline bool isInfinite(double _f)
+	inline BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp == UINT64_C(0x7ff0000000000000);
 	}
 
-	inline float round(float _f)
+	inline BX_CONST_FUNC float round(float _f)
 	{
 		return floor(_f + 0.5f);
 	}
 
-	inline float ceil(float _a)
+	inline BX_CONST_FUNC float ceil(float _a)
 	{
 		return -floor(-_a);
 	}
 
-	inline float lerp(float _a, float _b, float _t)
+	inline BX_CONST_FUNC float lerp(float _a, float _b, float _t)
 	{
 		return _a + (_b - _a) * _t;
 	}
 
-	inline float abs(float _a)
+	inline BX_CONST_FUNC float abs(float _a)
 	{
 		return _a < 0.0f ? -_a : _a;
 	}
 
-	inline float sign(float _a)
+	inline BX_CONST_FUNC float sign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline float square(float _a)
+	inline BX_CONST_FUNC float square(float _a)
 	{
 		return _a * _a;
 	}
 
-	inline float sin(float _a)
+	inline BX_CONST_FUNC float sin(float _a)
 	{
 		return cos(_a - kPiHalf);
 	}
 
-	inline float sinh(float _a)
+	inline BX_CONST_FUNC float sinh(float _a)
 	{
 		return 0.5f*(exp(_a) - exp(-_a) );
 	}
 
-	inline float asin(float _a)
+	inline BX_CONST_FUNC float asin(float _a)
 	{
 		return kPiHalf - acos(_a);
 	}
 
-	inline float cosh(float _a)
+	inline BX_CONST_FUNC float cosh(float _a)
 	{
 		return 0.5f*(exp(_a) + exp(-_a) );
 	}
 
-	inline float tan(float _a)
+	inline BX_CONST_FUNC float tan(float _a)
 	{
 		return sin(_a) / cos(_a);
 	}
 
-	inline float tanh(float _a)
+	inline BX_CONST_FUNC float tanh(float _a)
 	{
 		const float tmp0   = exp(2.0f*_a);
 		const float tmp1   = tmp0 - 1.0f;
@@ -159,27 +159,27 @@ namespace bx
 		return result;
 	}
 
-	inline float atan(float _a)
+	inline BX_CONST_FUNC float atan(float _a)
 	{
 		return atan2(_a, 1.0f);
 	}
 
-	inline float pow(float _a, float _b)
+	inline BX_CONST_FUNC float pow(float _a, float _b)
 	{
 		return exp(_b * log(_a) );
 	}
 
-	inline float exp2(float _a)
+	inline BX_CONST_FUNC float exp2(float _a)
 	{
 		return pow(2.0f, _a);
 	}
 
-	inline float log2(float _a)
+	inline BX_CONST_FUNC float log2(float _a)
 	{
 		return log(_a) * kInvLogNat2;
 	}
 
-	inline float sqrtRef(float _a)
+	inline BX_CONST_FUNC float sqrtRef(float _a)
 	{
 		if (_a < kNearZero)
 		{
@@ -189,7 +189,7 @@ namespace bx
 		return 1.0f/rsqrt(_a);
 	}
 
-	inline float sqrtSimd(float _a)
+	inline BX_CONST_FUNC float sqrtSimd(float _a)
 	{
 		const simd128_t aa    = simd_splat(_a);
 		const simd128_t sqrta = simd_sqrt(aa);
@@ -199,7 +199,7 @@ namespace bx
 		return result;
 	}
 
-	inline float sqrt(float _a)
+	inline BX_CONST_FUNC float sqrt(float _a)
 	{
 #if BX_CONFIG_SUPPORTS_SIMD
 		return sqrtSimd(_a);
@@ -208,12 +208,12 @@ namespace bx
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
-	inline float rsqrtRef(float _a)
+	inline BX_CONST_FUNC float rsqrtRef(float _a)
 	{
 		return pow(_a, -0.5f);
 	}
 
-	inline float rsqrtSimd(float _a)
+	inline BX_CONST_FUNC float rsqrtSimd(float _a)
 	{
 		if (_a < kNearZero)
 		{
@@ -228,7 +228,7 @@ namespace bx
 		return result;
 	}
 
-	inline float rsqrt(float _a)
+	inline BX_CONST_FUNC float rsqrt(float _a)
 	{
 #if BX_CONFIG_SUPPORTS_SIMD
 		return rsqrtSimd(_a);
@@ -237,27 +237,27 @@ namespace bx
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
-	inline float trunc(float _a)
+	inline BX_CONST_FUNC float trunc(float _a)
 	{
 		return float(int(_a) );
 	}
 
-	inline float fract(float _a)
+	inline BX_CONST_FUNC float fract(float _a)
 	{
 		return _a - trunc(_a);
 	}
 
-	inline float mad(float _a, float _b, float _c)
+	inline BX_CONST_FUNC float mad(float _a, float _b, float _c)
 	{
 		return _a * _b + _c;
 	}
 
-	inline float mod(float _a, float _b)
+	inline BX_CONST_FUNC float mod(float _a, float _b)
 	{
 		return _a - _b * floor(_a / _b);
 	}
 
-	inline bool equal(float _a, float _b, float _epsilon)
+	inline BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon)
 	{
 		// http://realtimecollisiondetection.net/blog/?p=89
 		const float lhs = abs(_a - _b);
@@ -265,7 +265,7 @@ namespace bx
 		return lhs <= rhs;
 	}
 
-	inline bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon)
+	inline BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon)
 	{
 		bool result = equal(_a[0], _b[0], _epsilon);
 		for (uint32_t ii = 1; result && ii < _num; ++ii)
@@ -275,34 +275,34 @@ namespace bx
 		return result;
 	}
 
-	inline float wrap(float _a, float _wrap)
+	inline BX_CONST_FUNC float wrap(float _a, float _wrap)
 	{
 		const float tmp0   = mod(_a, _wrap);
 		const float result = tmp0 < 0.0f ? _wrap + tmp0 : tmp0;
 		return result;
 	}
 
-	inline float step(float _edge, float _a)
+	inline BX_CONST_FUNC float step(float _edge, float _a)
 	{
 		return _a < _edge ? 0.0f : 1.0f;
 	}
 
-	inline float pulse(float _a, float _start, float _end)
+	inline BX_CONST_FUNC float pulse(float _a, float _start, float _end)
 	{
 		return step(_a, _start) - step(_a, _end);
 	}
 
-	inline float smoothStep(float _a)
+	inline BX_CONST_FUNC float smoothStep(float _a)
 	{
 		return square(_a)*(3.0f - 2.0f*_a);
 	}
 
-	inline float bias(float _time, float _bias)
+	inline BX_CONST_FUNC float bias(float _time, float _bias)
 	{
 		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
 	}
 
-	inline float gain(float _time, float _gain)
+	inline BX_CONST_FUNC float gain(float _time, float _gain)
 	{
 		if (_time < 0.5f)
 		{
@@ -312,13 +312,13 @@ namespace bx
 		return bias(_time * 2.0f - 1.0f, 1.0f - _gain) * 0.5f + 0.5f;
 	}
 
-	inline float angleDiff(float _a, float _b)
+	inline BX_CONST_FUNC float angleDiff(float _a, float _b)
 	{
 		const float dist = wrap(_b - _a, kPi2);
 		return wrap(dist*2.0f, kPi2) - dist;
 	}
 
-	inline float angleLerp(float _a, float _b, float _t)
+	inline BX_CONST_FUNC float angleLerp(float _a, float _b, float _t)
 	{
 		return _a + angleDiff(_a, _b) * _t;
 	}
