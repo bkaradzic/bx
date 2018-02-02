@@ -153,7 +153,7 @@ namespace bx
 		return result;
 	}
 
-	BX_CONST_FUNC float frexp(float _a, int32_t* _outExp)
+	float frexp(float _a, int32_t* _outExp)
 	{
 		const uint32_t ftob     = floatToBits(_a);
 		const uint32_t masked0  = uint32_and(ftob, UINT32_C(0x7f800000) );
