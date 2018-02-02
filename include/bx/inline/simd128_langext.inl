@@ -9,7 +9,7 @@
 
 namespace bx
 {
-	float sqrt(float);
+	BX_CONST_FUNC float sqrt(float);
 
 #define ELEMx 0
 #define ELEMy 1
