@@ -10,8 +10,7 @@
 #include <bx/string.h>
 
 #if !BX_CRT_NONE
-#	include <stdio.h> // vsnprintf, vsnwprintf
-#	include <wchar.h> // vswprintf
+#	include <stdio.h> // vsnprintf
 #endif // !BX_CRT_NONE
 
 namespace bx
@@ -1111,41 +1110,6 @@ namespace bx
 		int32_t total = vsnprintf(_out, _max, _format, argList);
 		va_end(argList);
 		return total;
-	}
-
-	int32_t vsnwprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, va_list _argList)
-	{
-		va_list argList;
-		va_copy(argList, _argList);
-		int32_t total = 0;
-#if BX_CRT_NONE
-		BX_UNUSED(_out, _max, _format, argList);
-#elif BX_CRT_MSVC
-		int32_t len = -1;
-		if (NULL != _out)
-		{
-			va_list argListCopy;
-			va_copy(argListCopy, _argList);
-			len = ::_vsnwprintf_s(_out, _max, size_t(-1), _format, argListCopy);
-			va_end(argListCopy);
-		}
-		total = -1 == len ? ::_vscwprintf(_format, _argList) : len;
-#elif BX_CRT_MINGW
-		total = ::vsnwprintf(_out, _max, _format, argList);
-#else
-		total = ::vswprintf(_out, _max, _format, argList);
-#endif // BX_COMPILER_MSVC
-		va_end(argList);
-		return total;
-	}
-
-	int32_t swnprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, ...)
-	{
-		va_list argList;
-		va_start(argList, _format);
-		int32_t len = vsnwprintf(_out, _max, _format, argList);
-		va_end(argList);
-		return len;
 	}
 
 	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };

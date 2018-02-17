@@ -244,16 +244,8 @@ namespace bx
 	/// enough space had been available.
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList);
 
-	/// Cross platform implementation of vsnwprintf that returns number of
-	/// characters which would have been written to the final string if
-	/// enough space had been available.
-	int32_t vsnwprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, va_list _argList);
-
 	///
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...);
-
-	///
-	int32_t swnprintf(wchar_t* _out, int32_t _max, const wchar_t* _format, ...);
 
 	///
 	template <typename Ty>
