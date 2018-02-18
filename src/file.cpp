@@ -361,10 +361,14 @@ namespace bx
 
 	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo)
 	{
+#if BX_CRT_NONE
+		BX_UNUSED(_filePath, _outFileInfo);
+		return false;
+#else
 		_outFileInfo.m_size = 0;
 		_outFileInfo.m_type = FileInfo::Count;
 
-#if BX_COMPILER_MSVC
+#	if BX_COMPILER_MSVC
 		struct ::_stat64 st;
 		int32_t result = ::_stat64(_filePath.get(), &st);
 
@@ -381,7 +385,7 @@ namespace bx
 		{
 			_outFileInfo.m_type = FileInfo::Directory;
 		}
-#else
+#	else
 		struct ::stat st;
 		int32_t result = ::stat(_filePath.get(), &st);
 		if (0 != result)
@@ -397,11 +401,12 @@ namespace bx
 		{
 			_outFileInfo.m_type = FileInfo::Directory;
 		}
-#endif // BX_COMPILER_MSVC
+#	endif // BX_COMPILER_MSVC
 
 		_outFileInfo.m_size = st.st_size;
 
 		return true;
+#endif // BX_CRT_NONE
 	}
 
 } // namespace bx
