@@ -6,8 +6,10 @@
 #include "bx_p.h"
 #include <bx/file.h>
 
-#include <stdio.h>
-#include <sys/stat.h>
+#if !BX_CRT_NONE
+#	include <stdio.h>
+#	include <sys/stat.h>
+#endif // !BX_CRT_NONE
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
 #	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \
@@ -222,6 +224,24 @@ namespace bx
 		bool  m_open;
 	};
 
+	ReaderI* getStdIn()
+	{
+		static FileReaderImpl s_stdIn(stdout);
+		return &s_stdIn;
+	}
+
+	WriterI* getStdOut()
+	{
+		static FileWriterImpl s_stdOut(stdout);
+		return &s_stdOut;
+	}
+
+	WriterI* getStdErr()
+	{
+		static FileWriterImpl s_stdOut(stderr);
+		return &s_stdOut;
+	}
+
 #else
 
 	class FileReaderImpl : public FileReaderI
@@ -261,7 +281,31 @@ namespace bx
 
 	typedef NoopWriterImpl FileWriterImpl;
 
+	ReaderI* getStdIn()
+	{
+		static FileReaderImpl s_stdIn(NULL);
+		return &s_stdIn;
+	}
+
+	WriterI* getStdOut()
+	{
+		static FileWriterImpl s_stdOut(NULL);
+		return &s_stdOut;
+	}
+
+	WriterI* getStdErr()
+	{
+		static FileWriterImpl s_stdOut(NULL);
+		return &s_stdOut;
+	}
+
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+	WriterI* getNullOut()
+	{
+		static NoopWriterImpl s_nullOut(NULL);
+		return &s_nullOut;
+	}
 
 	FileReader::FileReader()
 	{
@@ -333,30 +377,6 @@ namespace bx
 	{
 		FileWriterImpl* impl = reinterpret_cast<FileWriterImpl*>(m_internal);
 		return impl->write(_data, _size, _err);
-	}
-
-	ReaderI* getStdIn()
-	{
-		static FileReaderImpl s_stdIn(stdout);
-		return &s_stdIn;
-	}
-
-	WriterI* getStdOut()
-	{
-		static FileWriterImpl s_stdOut(stdout);
-		return &s_stdOut;
-	}
-
-	WriterI* getStdErr()
-	{
-		static FileWriterImpl s_stdOut(stderr);
-		return &s_stdOut;
-	}
-
-	WriterI* getNullOut()
-	{
-		static NoopWriterImpl s_nullOut(NULL);
-		return &s_nullOut;
 	}
 
 	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo)
