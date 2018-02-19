@@ -40,5 +40,6 @@
 				BX_MACRO_BLOCK_END
 
 #include <bx/bx.h>
+#include <bx/debug.h>
 
 #endif // BX_P_H_HEADER_GUARD

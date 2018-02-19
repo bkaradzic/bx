@@ -15,7 +15,6 @@
 #include "platform.h"
 #include "config.h"
 #include "macros.h"
-#include "debug.h"
 
 ///
 #define BX_COUNTOF(_x) sizeof(bx::COUNTOF_REQUIRES_ARRAY_ARGUMENT(_x) )
