@@ -138,7 +138,7 @@ extern "C" double fabs(double _x)
 
 extern "C" double ldexp(double _x, int _exp)
 {
-	return ldexp(float(_x), _exp);
+	return bx::ldexp(float(_x), _exp);
 }
 
 extern "C" float expf(float _x)
@@ -453,6 +453,8 @@ extern "C" int unsetenv(const char* _name)
 	BX_UNUSED(_name);
 	return -1;
 }
+
+typedef int64_t time_t;
 
 extern "C" time_t time(time_t* _arg)
 {
