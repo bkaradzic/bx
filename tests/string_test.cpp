@@ -8,8 +8,16 @@
 #include <bx/string.h>
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
+#include <string>
 
 bx::AllocatorI* g_allocator;
+
+TEST_CASE("stringPrintfTy", "")
+{
+	std::string test;
+	bx::stringPrintf(test, "printf into std::string.");
+	REQUIRE(0 == bx::strCmp(bx::StringView(test), "printf into std::string.") );
+}
 
 TEST_CASE("chars", "")
 {

@@ -42,6 +42,10 @@ namespace bx
 		StringView(const char* _ptr, const char* _term);
 
 		///
+		template<typename Ty>
+		explicit StringView(const Ty& _container);
+
+		///
 		void set(const char* _ptr, int32_t _len = INT32_MAX);
 
 		///
@@ -49,6 +53,10 @@ namespace bx
 
 		///
 		void set(const StringView& _str);
+
+		///
+		template<typename Ty>
+		void set(const Ty& _container);
 
 		///
 		void clear();
