@@ -241,21 +241,21 @@ extern "C" double atof(const char* _str)
 	return result;
 }
 
-extern "C" struct DIR* opendir(const char* dirname)
+extern "C" struct DIR* opendir(const char* _dirname)
 {
-	BX_UNUSED(dirname);
+	BX_UNUSED(_dirname);
 	return NULL;
 }
 
-extern "C" struct dirent* readdir(struct DIR* dirp)
+extern "C" struct dirent* readdir(struct DIR* _dirp)
 {
-	BX_UNUSED(dirp);
+	BX_UNUSED(_dirp);
 	return NULL;
 }
 
-extern "C" int closedir (struct DIR* dirp)
+extern "C" int closedir(struct DIR* _dirp)
 {
-	BX_UNUSED(dirp);
+	BX_UNUSED(_dirp);
 	return 0;
 }
 
