@@ -16,14 +16,16 @@ namespace bx
 {
 	const int32_t kMaxFilePath = 1024;
 
+	/// Special predefined OS directories.
 	///
 	struct Dir
 	{
-		enum Enum ///
+		/// Special OS directories:
+		enum Enum
 		{
-			Current,
-			Temp,
-			Home,
+			Current, //!< Current directory.
+			Temp,    //!< Temporary directory.
+			Home,    //!< User's home directory.
 
 			Count
 		};
@@ -41,33 +43,43 @@ namespace bx
 	class FilePath
 	{
 	public:
+		/// Default constructor, creates empty file path.
 		///
 		FilePath();
 
+		/// Construct file path from special OS directory.
 		///
 		FilePath(Dir::Enum _dir);
 
+		/// Construct file path from C string.
 		///
 		FilePath(const char* _str);
 
+		/// Construct file path from string.
 		///
 		FilePath(const StringView& _str);
 
+		/// Assign file path from string.
 		///
 		FilePath& operator=(const StringView& _rhs);
 
+		/// Clear file path.
 		///
 		void clear();
 
+		/// Set file path from special OS directory.
 		///
 		void set(Dir::Enum _dir);
 
+		/// Set file path.
 		///
 		void set(const StringView& _str);
 
+		/// Join directory to file path.
 		///
 		void join(const StringView& _str);
 
+		/// Returns C string to file path.
 		///
 		const char* get() const;
 
@@ -87,9 +99,11 @@ namespace bx
 		///
 		const StringView getExt() const;
 
+		/// Returns true if file path is absolute.
 		///
 		bool isAbsolute() const;
 
+		/// Returns true if file path is empty.
 		///
 		bool isEmpty() const;
 
