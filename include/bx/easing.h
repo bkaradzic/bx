@@ -1190,8 +1190,6 @@ namespace bx
 	///
 	float easeOutInBounce(float _t);
 
-	float easeInOutLinear(float _t);
-
 } // namespace bx
 
 #include "inline/easing.inl"
