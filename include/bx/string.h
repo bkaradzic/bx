@@ -10,12 +10,13 @@
 
 namespace bx
 {
+	/// Units
 	struct Units
 	{
-		enum Enum
+		enum Enum //!< Units:
 		{
-			Kilo,
-			Kibi,
+			Kilo, //!< SI units
+			Kibi, //!< IEC prefix
 		};
 	};
 
@@ -257,11 +258,11 @@ namespace bx
 	/// enough space had been available.
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...);
 
-	/// Templatized snprintf
+	/// Templatized snprintf.
 	template <typename Ty>
 	void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList);
 
-	///
+	/// Templatized snprintf.
 	template <typename Ty>
 	void stringPrintf(Ty& _out, const char* _format, ...);
 

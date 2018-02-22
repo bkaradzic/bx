@@ -1112,9 +1112,9 @@ namespace bx
 		return total;
 	}
 
-	static const char s_units[] = { 'B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
+	static const char s_units[] = { 'B', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
 
-	template<uint32_t Kilo, char KiloCh0, char KiloCh1>
+	template<uint32_t Kilo, char KiloCh0, char KiloCh1, CharFn fn>
 	inline int32_t prettify(char* _out, int32_t _count, uint64_t _value)
 	{
 		uint8_t idx = 0;
@@ -1128,7 +1128,7 @@ namespace bx
 		}
 
 		return snprintf(_out, _count, "%0.2f %c%c%c", value
-			, s_units[idx]
+			, fn(s_units[idx])
 			, idx > 0 ? KiloCh0 : '\0'
 			, KiloCh1
 			);
@@ -1138,10 +1138,10 @@ namespace bx
 	{
 		if (Units::Kilo == _units)
 		{
-			return prettify<1000, 'B', '\0'>(_out, _count, _value);
+			return prettify<1000, 'B', '\0', toNoop>(_out, _count, _value);
 		}
 
-		return prettify<1024, 'i', 'B'>(_out, _count, _value);
+		return prettify<1024, 'i', 'B', toUpper>(_out, _count, _value);
 	}
 
 } // namespace bx
