@@ -274,6 +274,7 @@ TEST_CASE("toString double", "")
 	REQUIRE(testToString(0.0000000001,            "1e-10") );
 	REQUIRE(testToString(-270.000000,             "-270.0") );
 	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
 }
 
 static bool testFromString(double _value, const char* _input)
