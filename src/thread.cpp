@@ -9,6 +9,7 @@
 #if BX_CONFIG_SUPPORTS_THREADING
 
 #if BX_CRT_NONE
+#	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
@@ -46,7 +47,8 @@ namespace bx
 	struct ThreadInternal
 	{
 #if BX_CRT_NONE
-		static void* threadFunc(void* _arg);
+		static int32_t threadFunc(void* _arg);
+		int32_t m_handle;
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
@@ -59,7 +61,14 @@ namespace bx
 #endif // BX_PLATFORM_
 	};
 
-#if    BX_PLATFORM_WINDOWS \
+#if BX_CRT_NONE
+	int32_t ThreadInternal::threadFunc(void* _arg)
+	{
+		Thread* thread = (Thread*)_arg;
+		int32_t result = thread->entry();
+		return result;
+	}
+#elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
 	DWORD WINAPI ThreadInternal::threadFunc(LPVOID _arg)
@@ -94,7 +103,7 @@ namespace bx
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
-		BX_UNUSED(ti);
+		ti->m_handle = INT32_MIN;
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
@@ -124,7 +133,7 @@ namespace bx
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
-		BX_UNUSED(ti);
+		ti->m_handle = crt0::threadCreate(&ti->threadFunc, _userData, m_stackSize, _name);
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_XBOXONE
 		ti->m_handle = ::CreateThread(NULL
@@ -178,7 +187,7 @@ namespace bx
 		BX_CHECK(m_running, "Not running!");
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
-		BX_UNUSED(ti);
+		crt0::threadJoin(ti->m_handle, NULL);
 #elif BX_PLATFORM_WINDOWS
 		WaitForSingleObject(ti->m_handle, INFINITE);
 		GetExitCodeThread(ti->m_handle, (DWORD*)&m_exitCode);
