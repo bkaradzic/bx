@@ -9,6 +9,8 @@
 #if BX_CONFIG_SUPPORTS_THREADING
 
 #if BX_CRT_NONE
+#	include <bx/cpu.h>
+#	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
@@ -26,9 +28,22 @@
 namespace bx
 {
 #if BX_CRT_NONE
+	struct State
+	{
+		enum Enum
+		{
+			Unlocked,
+			Locked,
+			Contested,
+		};
+	};
+
 	Mutex::Mutex()
 	{
-		BX_STATIC_ASSERT(sizeof(pthread_mutex_t) <= sizeof(m_internal) );
+		BX_STATIC_ASSERT(sizeof(int32_t) <= sizeof(m_internal) );
+
+		uint32_t* futex = (uint32_t*)m_internal;
+		*futex = State::Unlocked;
 	}
 
 	Mutex::~Mutex()
@@ -37,10 +52,27 @@ namespace bx
 
 	void Mutex::lock()
 	{
+		uint32_t* futex = (uint32_t*)m_internal;
+
+		if (State::Unlocked == bx::atomicCompareAndSwap<uint32_t>(futex, State::Unlocked, State::Locked) )
+		{
+			return;
+		}
+
+		while (State::Unlocked != bx::atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Contested) )
+		{
+			crt0::futexWait(futex, State::Contested);
+		}
 	}
 
 	void Mutex::unlock()
 	{
+		uint32_t* futex = (uint32_t*)m_internal;
+
+		if (State::Contested == bx::atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Unlocked) )
+		{
+			crt0::futexWake(futex, State::Locked);
+		}
 	}
 
 #else
