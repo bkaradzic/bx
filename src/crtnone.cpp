@@ -11,6 +11,8 @@
 
 #if BX_CRT_NONE
 
+#include "crt0.h"
+
 extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
 {
 	bx::memCopy(_dst, _src, _numBytes);
@@ -408,12 +410,12 @@ extern "C" long sysconf(int name)
 	return -1;
 }
 
-extern "C" pid_t fork()
+extern "C" pid_t fork(void)
 {
 	return -1;
 }
 
-extern "C" int sched_yield()
+extern "C" int sched_yield(void)
 {
 	return -1;
 }
@@ -471,6 +473,7 @@ extern "C" int gettimeofday(struct timeval* _tv, struct timezone* _tz)
 extern "C" void* realloc(void* _ptr, size_t _size)
 {
 	BX_UNUSED(_ptr, _size);
+	abort();
 	return NULL;
 }
 
@@ -486,9 +489,10 @@ extern "C" void free(void* _ptr)
 
 #endif // BX_PLATFORM_*
 
-extern "C" void abort()
+extern "C" void abort(void)
 {
-	while (true) {};
+	bx::debugPrintf("crtnone: abort called!\n");
+	crt0::exit(bx::kExitFailure);
 }
 
 extern "C" void __assert_fail(const char* _assertion, const char* _file, uint32_t _line, const char* _function)
@@ -503,7 +507,7 @@ void operator delete(void*)
 {
 }
 
-extern "C" void __cxa_pure_virtual()
+extern "C" void __cxa_pure_virtual(void)
 {
 }
 
@@ -513,7 +517,7 @@ extern "C" int __cxa_atexit(void (*_dtorFn)(void*), void* _arg, void* _dsoHandle
 	return 0;
 }
 
-extern "C" void __gxx_personality_v0()
+extern "C" void __gxx_personality_v0(void)
 {
 }
 
