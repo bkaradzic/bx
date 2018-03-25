@@ -472,19 +472,17 @@ extern "C" int gettimeofday(struct timeval* _tv, struct timezone* _tz)
 
 extern "C" void* realloc(void* _ptr, size_t _size)
 {
-	BX_UNUSED(_ptr, _size);
-	abort();
-	return NULL;
+	return crt0::realloc(_ptr, _size);
 }
 
 extern "C" void* malloc(size_t _size)
 {
-	return ::realloc(NULL, _size);
+	return crt0::realloc(NULL, _size);
 }
 
 extern "C" void free(void* _ptr)
 {
-	BX_UNUSED(_ptr);
+	crt0::realloc(_ptr, 0);
 }
 
 #endif // BX_PLATFORM_*
