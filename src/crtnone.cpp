@@ -5,9 +5,9 @@
 
 #include "bx_p.h"
 #include <bx/debug.h>
+#include <bx/file.h>
 #include <bx/math.h>
 #include <bx/sort.h>
-#include <bx/readerwriter.h>
 
 #if BX_CRT_NONE
 
@@ -286,8 +286,12 @@ extern "C" int snprintf(char* _out, size_t _max, const char* _format, ...)
 
 extern "C" int printf(const char* _format, ...)
 {
-	BX_UNUSED(_format);
-	return -1;
+	va_list argList;
+	va_start(argList, _format);
+	bx::WriterI* writer = bx::getStdOut();
+	int32_t len = bx::writePrintfVargs(writer, _format, argList);
+	va_end(argList);
+	return len;
 }
 
 struct FILE
@@ -429,6 +433,7 @@ extern "C" int prctl(int _option, unsigned long _arg2, unsigned long _arg3, unsi
 extern "C" int chdir(const char* _path)
 {
 	BX_UNUSED(_path);
+	bx::debugPrintf("chdir(%s) not implemented!\n", _path);
 	return -1;
 }
 
@@ -441,18 +446,21 @@ extern "C" char* getcwd(char* _buf, size_t _size)
 extern "C" char* getenv(const char* _name)
 {
 	BX_UNUSED(_name);
-	return NULL;
+	bx::debugPrintf("getenv(%s) not implemented!\n", _name);
+	return (char*)"";
 }
 
 extern "C" int setenv(const char* _name, const char* _value, int _overwrite)
 {
 	BX_UNUSED(_name, _value, _overwrite);
+	bx::debugPrintf("setenv(%s, %s, %d) not implemented!\n", _name, _value, _overwrite);
 	return -1;
 }
 
 extern "C" int unsetenv(const char* _name)
 {
 	BX_UNUSED(_name);
+	bx::debugPrintf("unsetenv(%s) not implemented!\n", _name);
 	return -1;
 }
 
@@ -565,17 +573,17 @@ namespace __cxxabiv1
 
 	__extension__ typedef int __guard __attribute__( (mode(__DI__) ) );
 
-	extern "C" int __cxa_guard_acquire (__guard* _g)
+	extern "C" int __cxa_guard_acquire(__guard* _g)
 	{
 		return !*(char*)(_g);
 	}
 
-	extern "C" void __cxa_guard_release (__guard* _g)
+	extern "C" void __cxa_guard_release(__guard* _g)
 	{
 		*(char*)_g = 1;
 	}
 
-	extern "C" void __cxa_guard_abort (__guard* _g)
+	extern "C" void __cxa_guard_abort(__guard* _g)
 	{
 		BX_UNUSED(_g);
 	}

@@ -305,6 +305,7 @@ namespace bx
 			int32_t size = crt0::read(m_fd, _data, _size);
 			if (size != _size)
 			{
+				BX_UNUSED(_err);
 //				if (0 != feof(m_file) )
 //				{
 //					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "FileReader: EOF.");
