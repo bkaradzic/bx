@@ -13,6 +13,9 @@
 
 #include "crt0.h"
 
+#define NOT_IMPLEMENTED() \
+	{ bx::debugPrintf("crtnone: %s not implemented\n", BX_FUNCTION); abort(); }
+
 extern "C" void* memcpy(void* _dst, const void* _src, size_t _numBytes)
 {
 	bx::memCopy(_dst, _src, _numBytes);
@@ -113,13 +116,14 @@ extern "C" size_t mbstowcs(wchar_t* _dst, const char* _src, size_t _max)
 
 extern "C" char* strdup(const char* _src)
 {
-	BX_UNUSED(_src);
-	return NULL;
+	uint32_t size = bx::strLen(_src);
+	return (char*)malloc(size);
 }
 
 extern "C" long int strtol(const char* _str, char** _end, int _base)
 {
 	BX_UNUSED(_str, _end, _base);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
@@ -246,18 +250,21 @@ extern "C" double atof(const char* _str)
 extern "C" struct DIR* opendir(const char* _dirname)
 {
 	BX_UNUSED(_dirname);
+	NOT_IMPLEMENTED();
 	return NULL;
 }
 
 extern "C" struct dirent* readdir(struct DIR* _dirp)
 {
 	BX_UNUSED(_dirp);
+	NOT_IMPLEMENTED();
 	return NULL;
 }
 
 extern "C" int closedir(struct DIR* _dirp)
 {
 	BX_UNUSED(_dirp);
+	NOT_IMPLEMENTED();
 	return 0;
 }
 
@@ -327,106 +334,126 @@ FILE * stdout;
 extern "C" FILE* fopen(const char* _filename, const char* _mode)
 {
 	BX_UNUSED(_filename, _mode);
+	bx::debugPrintf("fopen(\"%s\", \"%s\");\n", _filename, _mode);
+	NOT_IMPLEMENTED();
 	return NULL;
 }
 
 extern "C" int fclose(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" size_t fread(void* _ptr, size_t _size, size_t _count, FILE* _stream)
 {
 	BX_UNUSED(_ptr, _size, _count, _stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" size_t fwrite(const void* _ptr, size_t _size, size_t _count, FILE* _stream)
 {
 	BX_UNUSED(_ptr, _size, _count, _stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int fseek(FILE* _stream, long int _offset, int _origin)
 {
 	BX_UNUSED(_stream, _offset, _origin);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int fseeko64(FILE* _stream, off64_t _offset, int _whence)
 {
 	BX_UNUSED(_stream, _offset, _whence);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" long int ftell(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" off64_t ftello64(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int feof(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int ferror(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" FILE* popen(const char* _command, const char* _type)
 {
 	BX_UNUSED(_command, _type);
+	NOT_IMPLEMENTED();
 	return NULL;
 }
 
 extern "C" int pclose(FILE* _stream)
 {
 	BX_UNUSED(_stream);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int execvp(const char* _file, char* const _argv[])
 {
 	BX_UNUSED(_file, _argv);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" long syscall(long _num, ...)
 {
 	BX_UNUSED(_num);
+	bx::debugPrintf("syscall %d\n", _num);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" long sysconf(int name)
 {
 	BX_UNUSED(name);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" pid_t fork(void)
 {
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int sched_yield(void)
 {
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int prctl(int _option, unsigned long _arg2, unsigned long _arg3, unsigned long _arg4, unsigned long _arg5)
 {
 	BX_UNUSED(_option, _arg2, _arg3, _arg4, _arg5);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
@@ -440,6 +467,7 @@ extern "C" int chdir(const char* _path)
 extern "C" char* getcwd(char* _buf, size_t _size)
 {
 	BX_UNUSED(_buf, _size);
+	NOT_IMPLEMENTED();
 	return NULL;
 }
 
@@ -469,12 +497,14 @@ typedef int64_t time_t;
 extern "C" time_t time(time_t* _arg)
 {
 	BX_UNUSED(_arg);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
 extern "C" int gettimeofday(struct timeval* _tv, struct timezone* _tz)
 {
 	BX_UNUSED(_tv, _tz);
+	NOT_IMPLEMENTED();
 	return -1;
 }
 
