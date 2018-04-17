@@ -49,7 +49,7 @@ linux-debug64: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=debug64
 linux-release64: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=release64
-linux: linux-debug32 linux-release32 linux-debug64 linux-release64
+linux: linux-debug64 linux-release64
 
 .build/projects/gmake-mingw-gcc:
 	$(GENIE) --gcc=mingw-gcc gmake
@@ -87,7 +87,7 @@ osx-debug64: .build/projects/gmake-osx
 	make -C .build/projects/gmake-osx config=debug64
 osx-release64: .build/projects/gmake-osx
 	make -C .build/projects/gmake-osx config=release64
-osx: osx-debug32 osx-release32 osx-debug64 osx-release64
+osx: osx-debug64 osx-release64
 
 .build/projects/gmake-ios-arm:
 	$(GENIE) --gcc=ios-arm gmake
