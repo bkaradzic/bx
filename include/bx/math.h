@@ -567,6 +567,12 @@ namespace bx
 	///
 	void hsvToRgb(float _rgb[3], const float _hsv[3]);
 
+	///
+	float toLinear(float _a);
+
+	///
+	float toGamma(float _a);
+
 } // namespace bx
 
 #include "inline/math.inl"
