@@ -6,10 +6,12 @@
 #ifndef BX_H_HEADER_GUARD
 #define BX_H_HEADER_GUARD
 
+#ifdef BX_PLATFORM_WINDOWS
 #include <alloca.h> // alloca
+#endif
 #include <stdarg.h> // va_list
 #include <stdint.h> // uint32_t
-#include <stdlib.h> // size_t
+#include <stdlib.h> // size_t, alloca
 #include <stddef.h> // ptrdiff_t
 
 #include "platform.h"
