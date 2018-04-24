@@ -6,7 +6,7 @@
 #include "bx_p.h"
 #include <bx/allocator.h>
 
-#include <malloc.h>
+#include <stdlib.h>
 
 #ifndef BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT
 #	define BX_CONFIG_ALLOCATOR_NATURAL_ALIGNMENT 8
