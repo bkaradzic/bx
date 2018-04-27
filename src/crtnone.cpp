@@ -8,6 +8,7 @@
 #include <bx/file.h>
 #include <bx/math.h>
 #include <bx/sort.h>
+#include <bx/timer.h>
 
 #if BX_CRT_NONE
 
@@ -85,6 +86,11 @@ extern "C" int32_t strcmp(const char* _lhs, const char* _rhs)
 extern "C" int32_t strncmp(const char* _lhs, const char* _rhs, size_t _max)
 {
 	return bx::strCmp(_lhs, _rhs, _max);
+}
+
+extern "C" int32_t strcasecmp(const char* _lhs, const char* _rhs)
+{
+	return bx::strCmpI(_lhs, _rhs);
 }
 
 extern "C" const char* strstr(const char* _str, const char* _find)
@@ -335,7 +341,7 @@ extern "C" FILE* fopen(const char* _filename, const char* _mode)
 {
 	BX_UNUSED(_filename, _mode);
 	bx::debugPrintf("fopen(\"%s\", \"%s\");\n", _filename, _mode);
-	NOT_IMPLEMENTED();
+//	NOT_IMPLEMENTED();
 	return NULL;
 }
 
@@ -427,7 +433,7 @@ extern "C" long syscall(long _num, ...)
 {
 	BX_UNUSED(_num);
 	bx::debugPrintf("syscall %d\n", _num);
-	NOT_IMPLEMENTED();
+//	NOT_IMPLEMENTED();
 	return -1;
 }
 
@@ -475,7 +481,7 @@ extern "C" char* getenv(const char* _name)
 {
 	BX_UNUSED(_name);
 	bx::debugPrintf("getenv(%s) not implemented!\n", _name);
-	return (char*)"";
+	return NULL;
 }
 
 extern "C" int setenv(const char* _name, const char* _value, int _overwrite)
@@ -501,11 +507,51 @@ extern "C" time_t time(time_t* _arg)
 	return -1;
 }
 
+#if 0
+struct timeval
+{
+	time_t tv_sec;
+	suseconds_t tv_usec;
+};
+
+struct timespec
+{
+	time_t tv_sec;
+	long tv_nsec;
+};
+#endif //
+
+typedef int32_t clockid_t;
+
+inline void toTimespecNs(timespec& _ts, int64_t _nsecs)
+{
+	_ts.tv_sec  = _nsecs/INT64_C(1000000000);
+	_ts.tv_nsec = _nsecs%INT64_C(1000000000);
+}
+
+extern "C" int clock_gettime(clockid_t _clock, struct timespec* _ts)
+{
+	BX_UNUSED(_clock);
+	int64_t now = bx::getHPCounter();
+	toTimespecNs(*_ts, now);
+	return 0;
+}
+
 extern "C" int gettimeofday(struct timeval* _tv, struct timezone* _tz)
 {
-	BX_UNUSED(_tv, _tz);
-	NOT_IMPLEMENTED();
-	return -1;
+	BX_UNUSED(_tz);
+
+	timespec ts;
+
+	if (NULL == _tv)
+	{
+		return 0;
+	}
+
+	clock_gettime(0 /*CLOCK_REALTIME*/, &ts);
+	_tv->tv_sec = ts.tv_sec;
+	_tv->tv_usec = (int)ts.tv_nsec / 1000;
+	return 0;
 }
 
 extern "C" void* realloc(void* _ptr, size_t _size)
