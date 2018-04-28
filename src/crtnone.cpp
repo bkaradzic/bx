@@ -256,7 +256,7 @@ extern "C" double atof(const char* _str)
 extern "C" struct DIR* opendir(const char* _dirname)
 {
 	BX_UNUSED(_dirname);
-	NOT_IMPLEMENTED();
+//	NOT_IMPLEMENTED();
 	return NULL;
 }
 
@@ -348,8 +348,9 @@ extern "C" FILE* fopen(const char* _filename, const char* _mode)
 extern "C" int fclose(FILE* _stream)
 {
 	BX_UNUSED(_stream);
-	NOT_IMPLEMENTED();
-	return -1;
+	bx::debugPrintf("fclose(%p);\n", _stream);
+//	NOT_IMPLEMENTED();
+	return 0;
 }
 
 extern "C" size_t fread(void* _ptr, size_t _size, size_t _count, FILE* _stream)
@@ -498,15 +499,6 @@ extern "C" int unsetenv(const char* _name)
 	return -1;
 }
 
-typedef int64_t time_t;
-
-extern "C" time_t time(time_t* _arg)
-{
-	BX_UNUSED(_arg);
-	NOT_IMPLEMENTED();
-	return -1;
-}
-
 #if 0
 struct timeval
 {
@@ -532,7 +524,7 @@ inline void toTimespecNs(timespec& _ts, int64_t _nsecs)
 extern "C" int clock_gettime(clockid_t _clock, struct timespec* _ts)
 {
 	BX_UNUSED(_clock);
-	int64_t now = bx::getHPCounter();
+	int64_t now = crt0::getHPCounter();
 	toTimespecNs(*_ts, now);
 	return 0;
 }
@@ -552,6 +544,22 @@ extern "C" int gettimeofday(struct timeval* _tv, struct timezone* _tz)
 	_tv->tv_sec = ts.tv_sec;
 	_tv->tv_usec = (int)ts.tv_nsec / 1000;
 	return 0;
+}
+
+typedef int64_t time_t;
+
+extern "C" time_t time(time_t* _arg)
+{
+	timespec ts;
+	clock_gettime(0 /*CLOCK_REALTIME*/, &ts);
+	time_t result = ts.tv_sec;
+
+	if (NULL != _arg)
+	{
+		*_arg = result;
+	}
+
+	return result;
 }
 
 extern "C" void* realloc(void* _ptr, size_t _size)
