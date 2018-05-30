@@ -453,12 +453,10 @@ namespace bx
 
 	inline uint32_t uint32_testpow2(uint32_t _a)
 	{
-		const uint32_t tmp0   = uint32_not(_a);
-		const uint32_t tmp1   = uint32_inc(tmp0);
-		const uint32_t tmp2   = uint32_and(_a, tmp1);
-		const uint32_t tmp3   = uint32_cmpeq(tmp2, _a);
-		const uint32_t tmp4   = uint32_cmpneq(_a, 0);
-		const uint32_t result = uint32_and(tmp3, tmp4);
+		const uint32_t tmp0   = uint32_dec(_a);
+		const uint32_t tmp1   = uint32_xor(_a, tmp0);
+		const uint32_t tmp2   = uint32_srl(tmp1, 1);
+		const uint32_t result = uint32_cmpeq(tmp2, tmp0);
 
 		return result;
 	}
