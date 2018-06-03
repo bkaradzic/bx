@@ -194,6 +194,7 @@ function toolchain(_buildDir, _libDir)
 	end
 
 	flags {
+		"Cpp11",
 		"ExtraWarnings",
 	}
 
@@ -644,9 +645,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 		linkoptions {
 			"-Wl,--gc-sections",
 			"-static",
@@ -734,9 +732,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 --			"-Wuseless-cast",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 		links {
 			"rt",
 			"dl",
@@ -786,9 +781,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 		links {
 			"rt",
 			"dl",
@@ -804,9 +796,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
 		}
 		links {
 			"rt",
@@ -846,9 +835,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 		linkoptions {
 			"-no-canonical-prefixes",
 			"-Wl,--no-undefined",
@@ -866,7 +852,6 @@ function toolchain(_buildDir, _libDir)
 			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
 		}
 		buildoptions {
-			"-std=c++11",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -981,9 +966,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 
 	configuration { "freebsd" }
 		targetdir (path.join(_buildDir, "freebsd/bin"))
@@ -1041,12 +1023,6 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "osx_universal/bin"))
 
 	configuration { "osx" }
-		buildoptions_cpp {
-			"-std=c++11",
-		}
-		buildoptions_objcpp {
-			"-std=c++11",
-		}
 		buildoptions {
 			"-Wfatal-errors",
 			"-msse2",
@@ -1058,12 +1034,6 @@ function toolchain(_buildDir, _libDir)
 	configuration { "ios*" }
 		linkoptions {
 			"-lc++",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
-		buildoptions_objcpp {
-			"-std=c++11",
 		}
 		buildoptions {
 			"-Wfatal-errors",
@@ -1207,9 +1177,6 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include",
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
-		buildoptions_cpp {
-			"-std=c++11",
-		}
 
 	configuration { "rpi" }
 		targetdir (path.join(_buildDir, "rpi/bin"))
@@ -1225,9 +1192,6 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-Wunused-value",
 			"-Wundef",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
 		}
 		includedirs {
 			"/opt/vc/include",
@@ -1257,9 +1221,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-Wundef",
 			"--sysroot=$(FREEDOM_E_SDK)/toolchain/riscv32-unknown-elf",
-		}
-		buildoptions_cpp {
-			"-std=c++11",
 		}
 
 	configuration {} -- reset configuration
