@@ -101,15 +101,15 @@ namespace bx
 		switch (_whence)
 		{
 			case Whence::Begin:
-				m_pos = int64_clamp(_offset, 0, m_top);
+				m_pos = clamp<int64_t>(_offset, 0, m_top);
 				break;
 
 			case Whence::Current:
-				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_pos + _offset, 0, m_top);
 				break;
 
 			case Whence::End:
-				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_top - _offset, 0, m_top);
 				break;
 		}
 
@@ -128,7 +128,7 @@ namespace bx
 		}
 
 		int64_t remainder = m_top-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
 		m_pos += size;
 		if (size != _size)
 		{
@@ -153,15 +153,15 @@ namespace bx
 		switch (_whence)
 		{
 			case Whence::Begin:
-				m_pos = int64_clamp(_offset, 0, m_top);
+				m_pos = clamp<int64_t>(_offset, 0, m_top);
 				break;
 
 			case Whence::Current:
-				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_pos + _offset, 0, m_top);
 				break;
 
 			case Whence::End:
-				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_top - _offset, 0, m_top);
 				break;
 		}
 
@@ -173,7 +173,7 @@ namespace bx
 		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int64_t remainder = m_top-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
 		memCopy(_data, &m_data[m_pos], size);
 		m_pos += size;
 		if (size != _size)
@@ -216,15 +216,15 @@ namespace bx
 		switch (_whence)
 		{
 			case Whence::Begin:
-				m_pos = int64_clamp(_offset, 0, m_top);
+				m_pos = clamp<int64_t>(_offset, 0, m_top);
 				break;
 
 			case Whence::Current:
-				m_pos = int64_clamp(m_pos + _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_pos + _offset, 0, m_top);
 				break;
 
 			case Whence::End:
-				m_pos = int64_clamp(m_top - _offset, 0, m_top);
+				m_pos = clamp<int64_t>(m_top - _offset, 0, m_top);
 				break;
 		}
 
@@ -245,10 +245,10 @@ namespace bx
 		}
 
 		int64_t remainder = m_size-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
+		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
 		memCopy(&m_data[m_pos], _data, size);
 		m_pos += size;
-		m_top = int64_max(m_top, m_pos);
+		m_top = max(m_top, m_pos);
 		if (size != _size)
 		{
 			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_WRITE, "MemoryWriter: write truncated.");

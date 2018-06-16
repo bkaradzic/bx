@@ -595,34 +595,6 @@ namespace bx
 		return utof.flt;
 	}
 
-	inline uint16_t uint16_min(uint16_t _a, uint16_t _b)
-	{
-		return _a > _b ? _b : _a;
-	}
-
-	inline uint16_t uint16_max(uint16_t _a, uint16_t _b)
-	{
-		return _a < _b ? _b : _a;
-	}
-
-	inline int64_t int64_min(int64_t _a, int64_t _b)
-	{
-		return _a < _b ? _a : _b;
-	}
-
-	inline int64_t int64_max(int64_t _a, int64_t _b)
-	{
-		return _a > _b ? _a : _b;
-	}
-
-	inline int64_t int64_clamp(int64_t _a, int64_t _min, int64_t _max)
-	{
-		const int64_t min    = int64_min(_a, _max);
-		const int64_t result = int64_max(_min, min);
-
-		return result;
-	}
-
 	inline uint32_t uint64_cntbits_ref(uint64_t _val)
 	{
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
