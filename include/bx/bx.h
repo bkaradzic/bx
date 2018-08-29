@@ -11,6 +11,7 @@
 #include <stdint.h> // uint32_t
 #include <stdlib.h> // size_t
 #include <stddef.h> // ptrdiff_t
+#include <time.h>   // time_t
 
 #include "platform.h"
 #include "config.h"
