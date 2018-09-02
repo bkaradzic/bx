@@ -519,9 +519,7 @@ extern "C" char* getcwd(char* _buf, size_t _size)
 
 extern "C" char* getenv(const char* _name)
 {
-	BX_UNUSED(_name);
-	bx::debugPrintf("getenv(%s) not implemented!\n", _name);
-	return NULL;
+	return const_cast<char*>(crt0::getEnv(_name) );
 }
 
 extern "C" int setenv(const char* _name, const char* _value, int _overwrite)
