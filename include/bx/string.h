@@ -225,7 +225,7 @@ namespace bx
 	const char* streol(const char* _str);
 
 	/// Find end of line. Retuns pointer to new line terminator.
-	const StringView strFindEol(const StringView& _str)
+	const StringView strFindEol(const StringView& _str);
 
 	/// Skip whitespace.
 	const char* strws(const char* _str);
