@@ -224,11 +224,20 @@ namespace bx
 	/// Find end of line. Retuns pointer to new line terminator.
 	const char* streol(const char* _str);
 
+	/// Find end of line. Retuns pointer to new line terminator.
+	const StringView strFindEol(const StringView& _str)
+
 	/// Skip whitespace.
 	const char* strws(const char* _str);
 
+	/// Skip whitespace.
+	const StringView strSkipSpace(const StringView& _str);
+
 	/// Skip non-whitespace.
 	const char* strnws(const char* _str);
+
+	/// Skip non-whitespace.
+	const StringView strSkipNonSpace(const StringView& _str);
 
 	/// Returns pointer to first character after word.
 	const char* strSkipWord(const char* _str, int32_t _max = INT32_MAX);

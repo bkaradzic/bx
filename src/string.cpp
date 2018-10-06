@@ -534,16 +534,66 @@ namespace bx
 		return _str;
 	}
 
+	const StringView strFindEol(const StringView& _str)
+	{
+		StringView str(_str);
+
+		for (; str.getPtr() != _str.getTerm()
+			 ; str = StringView(str.getPtr()+1024, min(str.getPtr()+1024, _str.getTerm() ) )
+			)
+		{
+			const char* eol = strFind(str, "\r\n");
+			if (NULL != eol)
+			{
+				return StringView(eol, _str.getTerm() );
+			}
+
+			eol = strFind(str, "\n");
+			if (NULL != eol)
+			{
+				return StringView(eol, _str.getTerm() );
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
+	}
+
 	const char* strws(const char* _str)
 	{
 		for (; isSpace(*_str); ++_str) {};
 		return _str;
 	}
 
+	const StringView strSkipSpace(const StringView& _str)
+	{
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
+		{
+			if (!isSpace(*ptr) )
+			{
+				return StringView(ptr, term);
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
+	}
+
 	const char* strnws(const char* _str)
 	{
 		for (; !isSpace(*_str); ++_str) {};
 		return _str;
+	}
+
+	const StringView strSkipNonSpace(const StringView& _str)
+	{
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
+		{
+			if (isSpace(*ptr) )
+			{
+				return StringView(ptr, term);
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	const char* strSkipWord(const char* _str, int32_t _max)
