@@ -223,6 +223,22 @@ TEST_CASE("strFind", "")
 	}
 }
 
+TEST_CASE("strSkip", "")
+{
+	const bx::StringView t0("   test X");
+
+	const bx::StringView t1 = bx::strSkipSpace(t0);
+	REQUIRE(0 == bx::strCmp(t1, "test", 4) );
+
+	const bx::StringView t2 = bx::strSkipNonSpace(t1);
+	REQUIRE(0 == bx::strCmp(t2, " X", 2) );
+
+	const bx::StringView t3("test");
+
+	const bx::StringView t4 = bx::strSkipNonSpace(t3);
+	REQUIRE(t4.getTerm() == t4.getPtr() );
+}
+
 template<typename Ty>
 static bool testToStringS(Ty _value, const char* _expected, char _separator = '\0')
 {
