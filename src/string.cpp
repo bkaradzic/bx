@@ -559,7 +559,7 @@ namespace bx
 				return StringView(eol.getTerm(), _str.getTerm() );
 			}
 
-			eol = strFind(str, "\n");
+			eol = strFind(str, '\n');
 			if (!eol.isEmpty() )
 			{
 				return StringView(eol.getTerm(), _str.getTerm() );
@@ -583,7 +583,7 @@ namespace bx
 				return StringView(eol.getPtr(), _str.getTerm() );
 			}
 
-			eol = strFind(str, "\n");
+			eol = strFind(str, '\n');
 			if (!eol.isEmpty() )
 			{
 				return StringView(eol.getPtr(), _str.getTerm() );
