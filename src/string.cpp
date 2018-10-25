@@ -401,8 +401,8 @@ namespace bx
 	{
 		const char* ptr = _str;
 
-		int32_t       stringLen = strLen(_str,  _strMax);
-		const int32_t findLen   = strLen(_find, _findMax);
+		int32_t       stringLen = _strMax;
+		const int32_t findLen   = _findMax;
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
@@ -543,12 +543,14 @@ namespace bx
 		return strLTrim(strRTrim(_str, _chars), _chars);
 	}
 
+	constexpr uint32_t kFindStep = 1024;
+
 	StringView strFindNl(const StringView& _str)
 	{
 		StringView str(_str);
 
 		for (; str.getPtr() != _str.getTerm()
-			; str = StringView(str.getPtr() + 1024, min(str.getPtr() + 1024, _str.getTerm()))
+			; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
 			)
 		{
 			StringView eol = strFind(str, "\r\n");
@@ -572,7 +574,7 @@ namespace bx
 		StringView str(_str);
 
 		for (; str.getPtr() != _str.getTerm()
-			 ; str = StringView(str.getPtr()+1024, min(str.getPtr()+1024, _str.getTerm() ) )
+			 ; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
 			)
 		{
 			StringView eol = strFind(str, "\r\n");
