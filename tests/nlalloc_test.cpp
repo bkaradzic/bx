@@ -141,10 +141,10 @@ namespace bx
 			bx::quickSort(
 				  m_free.begin()
 				, uint32_t(m_free.end() - m_free.begin() )
-				, sizeof(T)
+				, sizeof(Blk)
 				, [](const void* _a, const void* _b) -> int32_t {
-					const T& lhs = *(const T*)(_a);
-					const T& rhs = *(const T*)(_b);
+					const Blk& lhs = *(const Blk*)(_a);
+					const Blk& rhs = *(const Blk*)(_b);
 					return lhs < rhs ? -1 : 1;
 				});
 
