@@ -236,4 +236,9 @@ namespace bx
 		}
 	}
 
+	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)
+	{
+		return StringView(_str, _start, _len);
+	}
+
 } // namespace bx

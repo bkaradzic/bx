@@ -245,11 +245,11 @@ namespace bx
 	/// Find end of line. Retuns pointer to new line terminator.
 	StringView strFindEol(const StringView& _str);
 
-	/// Returns pointer to first character after word.
-	const char* strSkipWord(const char* _str, int32_t _max = INT32_MAX);
-
 	/// Returns StringView of word or empty.
 	StringView strWord(const StringView& _str);
+
+	///
+	StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len);
 
 	/// Find matching block.
 	const char* strmb(const char* _str, char _open, char _close);

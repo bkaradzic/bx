@@ -593,7 +593,7 @@ namespace bx
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	const char* strSkipWord(const char* _str, int32_t _max)
+	static const char* strSkipWord(const char* _str, int32_t _max)
 	{
 		for (char ch = *_str++; 0 < _max && (isAlphaNum(ch) || '_' == ch); ch = *_str++, --_max) {};
 		return _str-1;
