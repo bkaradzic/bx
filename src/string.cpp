@@ -690,7 +690,7 @@ namespace bx
 			Param()
 				: width(0)
 				, base(10)
-				, prec(6)
+				, prec(INT32_MAX)
 				, fill(' ')
 				, bits(0)
 				, left(false)
@@ -701,8 +701,8 @@ namespace bx
 			}
 
 			int32_t width;
-			uint32_t base;
-			uint32_t prec;
+			int32_t base;
+			int32_t prec;
 			char fill;
 			uint8_t bits;
 			bool left;
@@ -760,7 +760,7 @@ namespace bx
 
 		static int32_t write(WriterI* _writer, const char* _str, const Param& _param, Error* _err)
 		{
-			return write(_writer, _str, INT32_MAX, _param, _err);
+			return write(_writer, _str, _param.prec, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
@@ -833,10 +833,11 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
+				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
 				const int32_t precLen = int32_t(
 						dot
-						+ uint32_min(_param.prec + _param.spec, 1)
-						+ _param.prec
+						+ uint32_min(prec + _param.spec, 1)
+						+ prec
 						- str
 						);
 				if (precLen > len)

@@ -28,7 +28,7 @@ namespace bx
 		StringView();
 
 		///
-		StringView(const StringView& _rhs);
+		StringView(const StringView& _rhs, int32_t _start = 0, int32_t _len = INT32_MAX);
 
 		///
 		StringView& operator=(const char* _rhs);
@@ -68,7 +68,7 @@ namespace bx
 		void set(const char* _ptr, const char* _term);
 
 		///
-		void set(const StringView& _str);
+		void set(const StringView& _str, int32_t _start = 0, int32_t _len = INT32_MAX);
 
 		///
 		template<typename Ty>
