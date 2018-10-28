@@ -248,11 +248,11 @@ namespace bx
 	/// Returns StringView of word or empty.
 	StringView strWord(const StringView& _str);
 
-	///
-	StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len);
+	/// Returns substring in string.
+	StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len = INT32_MAX);
 
 	/// Find matching block.
-	const char* strmb(const char* _str, char _open, char _close);
+	StringView strFindBlock(const StringView& _str, char _open, char _close);
 
 	// Normalize string to sane line endings.
 	void eolLF(char* _out, int32_t _size, const char* _str);

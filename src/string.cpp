@@ -606,26 +606,41 @@ namespace bx
 		return StringView(ptr, term);
 	}
 
-	const char* strmb(const char* _str, char _open, char _close)
+	StringView strFindBlock(const StringView& _str, char _open, char _close)
 	{
-		int count = 0;
-		for (char ch = *_str++; ch != '\0' && count >= 0; ch = *_str++)
+		const char* curr  = _str.getPtr();
+		const char* term  = _str.getTerm();
+		const char* start = NULL;
+
+		int32_t count = 0;
+		for (char ch = *curr; curr != term && count >= 0; ch = *(++curr) )
 		{
 			if (ch == _open)
 			{
-				count++;
+				if (0 == count)
+				{
+					start = curr;
+				}
+
+				++count;
 			}
 			else if (ch == _close)
 			{
-				count--;
+				--count;
+
+				if (NULL == start)
+				{
+					break;
+				}
+
 				if (0 == count)
 				{
-					return _str-1;
+					return StringView(start, curr+1);
 				}
 			}
 		}
 
-		return NULL;
+		return StringView(term, term);
 	}
 
 	void eolLF(char* _out, int32_t _size, const char* _str)
