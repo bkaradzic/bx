@@ -255,7 +255,7 @@ namespace bx
 	StringView strFindBlock(const StringView& _str, char _open, char _close);
 
 	// Normalize string to sane line endings.
-	void eolLF(char* _out, int32_t _size, const char* _str);
+	StringView normalizeEolLf(char* _out, int32_t _size, const StringView& _str);
 
 	// Finds identifier.
 	StringView findIdentifierMatch(const StringView& _str, const StringView& _word);

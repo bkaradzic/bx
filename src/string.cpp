@@ -643,12 +643,17 @@ namespace bx
 		return StringView(term, term);
 	}
 
-	void eolLF(char* _out, int32_t _size, const char* _str)
+	StringView normalizeEolLf(char* _out, int32_t _size, const StringView& _str)
 	{
+		const char* start = _out;
+		const char* end   = _out;
+
 		if (0 < _size)
 		{
-			char* end = _out + _size - 1;
-			for (char ch = *_str++; ch != '\0' && _out < end; ch = *_str++)
+			const char* curr = _str.getPtr();
+			const char* term = _str.getTerm();
+			end  = _out + _size;
+			for (char ch = *curr; curr != term && _out < end; ch = *(++curr) )
 			{
 				if ('\r' != ch)
 				{
@@ -656,8 +661,10 @@ namespace bx
 				}
 			}
 
-			*_out = '\0';
+			end = _out;
 		}
+
+		return StringView(start, end);
 	}
 
 	StringView findIdentifierMatch(const StringView& _str, const StringView& _word)
