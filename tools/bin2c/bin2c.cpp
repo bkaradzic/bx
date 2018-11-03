@@ -8,33 +8,12 @@
 #include <bx/file.h>
 #include <bx/string.h>
 
-bx::DefaultAllocator g_allocator;
-
-struct TinyStlAllocator
-{
-	static void* static_allocate(size_t _bytes)
-	{
-		return BX_ALLOC(&g_allocator, _bytes);
-	}
-
-	static void static_deallocate(void* _ptr, size_t /*_bytes*/)
-	{
-		if (NULL != _ptr)
-		{
-			BX_FREE(&g_allocator, _ptr);
-		}
-	}
-};
-
-#define TINYSTL_ALLOCATOR TinyStlAllocator
-#include <tinystl/vector.h>
-namespace stl = tinystl;
-
 class Bin2cWriter : public bx::WriterI
 {
 public:
-	Bin2cWriter(bx::WriterI* _writer, const bx::StringView& _name)
-		: m_writer(_writer)
+	Bin2cWriter(bx::AllocatorI* _allocator, const bx::StringView& _name)
+		: m_mb(_allocator)
+		, m_mw(&m_mb)
 		, m_name(_name)
 	{
 	}
@@ -43,20 +22,18 @@ public:
 	{
 	}
 
-	virtual int32_t write(const void* _data, int32_t _size, bx::Error* /*_err*/ = NULL) override
+	virtual int32_t write(const void* _data, int32_t _size, bx::Error* _err) override
 	{
-		const char* data = (const char*)_data;
-		m_buffer.insert(m_buffer.end(), data, data+_size);
-		return _size;
+		return bx::write(&m_mw, _data, _size, _err);
 	}
 
-	void finish()
+	void output(bx::WriterI* m_writer)
 	{
 #define HEX_DUMP_WIDTH 16
 #define HEX_DUMP_SPACE_WIDTH 96
 #define HEX_DUMP_FORMAT "%-" BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "." BX_STRINGIZE(HEX_DUMP_SPACE_WIDTH) "s"
-		const char* data = &m_buffer[0];
-		uint32_t size = (uint32_t)m_buffer.size();
+		const char* data = (const char*)m_mb.more(0);
+		uint32_t size = uint32_t(bx::seek(&m_mw) );
 
 		bx::writePrintf(
 			  m_writer
@@ -101,14 +78,11 @@ public:
 #undef HEX_DUMP_WIDTH
 #undef HEX_DUMP_SPACE_WIDTH
 #undef HEX_DUMP_FORMAT
-
-		m_buffer.clear();
 	}
 
-	bx::WriterI* m_writer;
-	bx::StringView m_name;
-	typedef stl::vector<char> Buffer;
-	Buffer m_buffer;
+	bx::MemoryBlock  m_mb;
+	bx::MemoryWriter m_mw;
+	bx::StringView   m_name;
 };
 
 void help(const char* _error = NULL)
@@ -179,13 +153,15 @@ int main(int _argc, const char* _argv[])
 		bx::DefaultAllocator allocator;
 		data = BX_ALLOC(&allocator, size);
 		bx::read(&fr, data, size);
+		bx::close(&fr);
 
 		bx::FileWriter fw;
 		if (bx::open(&fw, outFilePath) )
 		{
-			Bin2cWriter writer(&fw, name);
+			Bin2cWriter writer(&allocator, name);
 			bx::write(&writer, data, size);
-			writer.finish();
+
+			writer.output(&fw);
 			bx::close(&fw);
 		}
 
