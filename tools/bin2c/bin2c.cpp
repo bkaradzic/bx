@@ -27,14 +27,13 @@ struct TinyStlAllocator
 };
 
 #define TINYSTL_ALLOCATOR TinyStlAllocator
-#include <tinystl/string.h>
 #include <tinystl/vector.h>
 namespace stl = tinystl;
 
 class Bin2cWriter : public bx::WriterI
 {
 public:
-	Bin2cWriter(bx::WriterI* _writer, const char* _name)
+	Bin2cWriter(bx::WriterI* _writer, const bx::StringView& _name)
 		: m_writer(_writer)
 		, m_name(_name)
 	{
@@ -59,7 +58,13 @@ public:
 		const char* data = &m_buffer[0];
 		uint32_t size = (uint32_t)m_buffer.size();
 
-		bx::writePrintf(m_writer, "static const uint8_t %s[%d] =\n{\n", m_name.c_str(), size);
+		bx::writePrintf(
+			  m_writer
+			, "static const uint8_t %.*s[%d] =\n{\n"
+			, m_name.getLength()
+			, m_name.getPtr()
+			, size
+			);
 
 		if (NULL != data)
 		{
@@ -101,7 +106,7 @@ public:
 	}
 
 	bx::WriterI* m_writer;
-	stl::string m_name;
+	bx::StringView m_name;
 	typedef stl::vector<char> Buffer;
 	Buffer m_buffer;
 };
@@ -123,18 +128,15 @@ void help(const char* _error = NULL)
 
 	bx::writePrintf(stdOut
 		, "Usage: bin2c -f <in> -o <out> -n <name>\n"
-
 		  "\n"
 		  "Options:\n"
 		  "  -f <file path>    Input file path.\n"
 		  "  -o <file path>    Output file path.\n"
 		  "  -n <name>         Array name.\n"
-
 		  "\n"
 		  "For additional information, see https://github.com/bkaradzic/bx\n"
 		);
 }
-
 
 int main(int _argc, const char* _argv[])
 {
@@ -146,24 +148,24 @@ int main(int _argc, const char* _argv[])
 		return bx::kExitFailure;
 	}
 
-	const char* filePath = cmdLine.findOption('f');
-	if (NULL == filePath)
+	bx::FilePath filePath = cmdLine.findOption('f');
+	if (filePath.isEmpty() )
 	{
 		help("Input file name must be specified.");
 		return bx::kExitFailure;
 	}
 
-	const char* outFilePath = cmdLine.findOption('o');
-	if (NULL == outFilePath)
+	bx::FilePath outFilePath = cmdLine.findOption('o');
+	if (outFilePath.isEmpty() )
 	{
 		help("Output file name must be specified.");
 		return bx::kExitFailure;
 	}
 
-	const char* name = cmdLine.findOption('n');
-	if (NULL == name)
+	bx::StringView name = cmdLine.findOption('n');
+	if (name.isEmpty() )
 	{
-		name = "data";
+		name.set("data");
 	}
 
 	void* data = NULL;
