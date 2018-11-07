@@ -936,11 +936,15 @@ namespace bx
 	{
 		float normal[3];
 		calcNormal(normal, _va, _vb, _vc);
+		calcPlane(_result, normal, _va);
+	}
 
-		_result[0] = normal[0];
-		_result[1] = normal[1];
-		_result[2] = normal[2];
-		_result[3] = -vec3Dot(normal, _va);
+	inline void calcPlane(float _result[4], const float _normal[3], const float _pos[3])
+	{
+		_result[0] = _normal[0];
+		_result[1] = _normal[1];
+		_result[2] = _normal[2];
+		_result[3] = -vec3Dot(_normal, _pos);
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)

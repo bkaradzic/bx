@@ -556,6 +556,9 @@ namespace bx
 	void calcPlane(float _result[4], const float _va[3], const float _vb[3], const float _vc[3]);
 
 	///
+	void calcPlane(float _result[4], const float _normal[3], const float _pos[3]);
+
+	///
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints);
 
 	///
