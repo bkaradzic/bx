@@ -891,9 +891,9 @@ namespace bx
 		}
 	} // anonymous namespace
 
-	int32_t write(WriterI* _writer, const char* _format, va_list _argList, Error* _err)
+	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err)
 	{
-		MemoryReader reader(_format, uint32_t(strLen(_format) ) );
+		MemoryReader reader(_format.getPtr(), _format.getLength() );
 
 		int32_t size = 0;
 
@@ -1103,15 +1103,13 @@ namespace bx
 			}
 		}
 
-		size += write(_writer, '\0', _err);
-
 		return size;
 	}
 
-	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...)
+	int32_t write(WriterI* _writer, Error* _err, const StringView& _format, ...)
 	{
 		va_list argList;
-		va_start(argList, _format);
+		va_start(argList, &_format);
 		int32_t total = write(_writer, _format, argList, _err);
 		va_end(argList);
 		return total;
@@ -1132,6 +1130,7 @@ namespace bx
 
 			if (err.isOk() )
 			{
+				size += write(&writer, '\0', &err);
 				return size - 1 /* size without '\0' terminator */;
 			}
 		}
@@ -1143,7 +1142,7 @@ namespace bx
 		int32_t size = write(&sizer, _format, argListCopy, &err);
 		va_end(argListCopy);
 
-		return size - 1 /* size without '\0' terminator */;
+		return size;
 	}
 
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
