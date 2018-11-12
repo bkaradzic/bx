@@ -188,5 +188,5 @@ TEST_CASE("vsnprintf write")
 	REQUIRE(len == 4);
 
 	bx::StringView str(tmp, len);
-	REQUIRE(0 == bx::strCmp(str, "1389"));
+	REQUIRE(0 == bx::strCmp(str, "1389") );
 }

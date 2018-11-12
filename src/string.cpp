@@ -1106,10 +1106,19 @@ namespace bx
 		return size;
 	}
 
-	int32_t write(WriterI* _writer, Error* _err, const StringView& _format, ...)
+	int32_t write(WriterI* _writer, Error* _err, const StringView* _format, ...)
 	{
 		va_list argList;
-		va_start(argList, &_format);
+		va_start(argList, _format);
+		int32_t total = write(_writer, *_format, argList, _err);
+		va_end(argList);
+		return total;
+	}
+
+	int32_t write(WriterI* _writer, Error* _err, const char* _format, ...)
+	{
+		va_list argList;
+		va_start(argList, _format);
 		int32_t total = write(_writer, _format, argList, _err);
 		va_end(argList);
 		return total;
