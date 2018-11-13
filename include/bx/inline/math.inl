@@ -324,6 +324,213 @@ namespace bx
 		return _a + angleDiff(_a, _b) * _t;
 	}
 
+	inline BX_CONST_FUNC Vec3 abs(const Vec3&  _a)
+	{
+		Vec3 result;
+		result.x = abs(_a.x);
+		result.y = abs(_a.y);
+		result.z = abs(_a.z);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 neg(const Vec3&  _a)
+	{
+		Vec3 result;
+		result.x = -_a.x;
+		result.y = -_a.y;
+		result.z = -_a.z;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = _a.x + _b.x;
+		result.y = _a.y + _b.y;
+		result.z = _a.z + _b.z;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b)
+	{
+		Vec3 result;
+		result.x = _a.x + _b;
+		result.y = _a.y + _b;
+		result.z = _a.z + _b;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = _a.x - _b.x;
+		result.y = _a.y - _b.y;
+		result.z = _a.z - _b.z;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b)
+	{
+		Vec3 result;
+		result.x = _a.x - _b;
+		result.y = _a.y - _b;
+		result.z = _a.z - _b;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = _a.x * _b.x;
+		result.y = _a.y * _b.y;
+		result.z = _a.z * _b.z;
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b)
+	{
+		Vec3 result;
+		result.x = _a.x * _b;
+		result.y = _a.y * _b;
+		result.z = _a.z * _b;
+		return result;
+	}
+
+	inline BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
+	{
+		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
+	}
+
+	inline BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = _a.y*_b.z - _a.z*_b.y;
+		result.y = _a.z*_b.x - _a.x*_b.z;
+		result.z = _a.x*_b.y - _a.y*_b.x;
+		return result;
+	}
+
+	inline BX_CONST_FUNC float length(const Vec3&  _a)
+	{
+		return sqrt(dot(_a, _a) );
+	}
+
+	inline BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t)
+	{
+		Vec3 result;
+		result.x = lerp(_a.x, _b.x, _t);
+		result.y = lerp(_a.y, _b.y, _t);
+		result.z = lerp(_a.z, _b.z, _t);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t)
+	{
+		Vec3 result;
+		result.x = lerp(_a.x, _b.x, _t.x);
+		result.y = lerp(_a.y, _b.y, _t.y);
+		result.z = lerp(_a.z, _b.z, _t.z);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 normalize(const Vec3&  _a)
+	{
+		const float invLen = 1.0f/length(_a);
+		const Vec3  result = mul(_a, invLen);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = min(_a.x, _b.x);
+		result.y = min(_a.y, _b.y);
+		result.z = min(_a.z, _b.z);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b)
+	{
+		Vec3 result;
+		result.x = max(_a.x, _b.x);
+		result.y = max(_a.y, _b.y);
+		result.z = max(_a.z, _b.z);
+		return result;
+	}
+
+	inline BX_CONST_FUNC Vec3 rcp(const Vec3&  _a)
+	{
+		Vec3 result;
+		result.x = 1.0f / _a.x;
+		result.y = 1.0f / _a.y;
+		result.z = 1.0f / _a.z;
+		return result;
+	}
+
+	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n)
+	{
+		const float nx = _n.x;
+		const float ny = _n.y;
+		const float nz = _n.z;
+
+		if (abs(nx) > abs(nz) )
+		{
+			float invLen = 1.0f / sqrt(nx*nx + nz*nz);
+			_outT.x = -nz * invLen;
+			_outT.y =  0.0f;
+			_outT.z =  nx * invLen;
+		}
+		else
+		{
+			float invLen = 1.0f / sqrt(ny*ny + nz*nz);
+			_outT.x =  0.0f;
+			_outT.y =  nz * invLen;
+			_outT.z = -ny * invLen;
+		}
+
+		_outB = cross(_n, _outT);
+	}
+
+	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n, float _angle)
+	{
+		calcTangentFrame(_outT, _outB, _n);
+
+		const float sa = sin(_angle);
+		const float ca = cos(_angle);
+
+		_outT.x = -sa * _outB.x + ca * _outT.x;
+		_outT.y = -sa * _outB.y + ca * _outT.y;
+		_outT.z = -sa * _outB.z + ca * _outT.z;
+
+		_outB = cross(_n, _outT);
+	}
+
+	inline BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v)
+	{
+		Vec3 result;
+		const float phi   = _u * kPi2;
+		const float theta = _v * kPi;
+
+		const float st = sin(theta);
+		const float sp = sin(phi);
+		const float ct = cos(theta);
+		const float cp = cos(phi);
+
+		result.x = -st*sp;
+		result.y =  ct;
+		result.z = -st*cp;
+		return result;
+	}
+
+	inline void toLatLong(float* _outU, float* _outV, const Vec3&  _dir)
+	{
+		const float phi   = atan2(_dir.x, _dir.z);
+		const float theta = acos(_dir.y);
+
+		*_outU = (bx::kPi + phi)/bx::kPi2;
+		*_outV = theta*bx::kInvPi;
+	}
+
 	inline void vec3Move(float* _result, const float* _a)
 	{
 		_result[0] = _a[0];

@@ -52,6 +52,12 @@ namespace bx
 		};
 	};
 
+	///
+	struct Vec3
+	{
+		float x, y, z;
+	};
+
 	/// Returns converted the argument _deg to radians.
 	///
 	BX_CONST_FUNC float toRad(float _deg);
@@ -260,6 +266,69 @@ namespace bx
 	/// Returns shortest distance linear interpolation between two angles.
 	///
 	BX_CONST_FUNC float angleLerp(float _a, float _b, float _t);
+
+	///
+	BX_CONST_FUNC Vec3 abs(const Vec3&  _a);
+
+	///
+	BX_CONST_FUNC Vec3 neg(const Vec3&  _a);
+
+	///
+	BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b);
+
+	///
+	BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b);
+
+	///
+	BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b);
+
+	///
+	BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC float length(const Vec3&  _a);
+
+	///
+	BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t);
+
+	///
+	BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t);
+
+	///
+	BX_CONST_FUNC Vec3 normalize(const Vec3&  _a);
+
+	///
+	BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b);
+
+	///
+	BX_CONST_FUNC Vec3 rcp(const Vec3&  _a);
+
+	///
+	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n);
+
+	///
+	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n, float _angle);
+
+	///
+	BX_CONST_FUNC Vec3 fromLatLong(float _u, float _v);
+
+	///
+	void toLatLong(float* _outU, float* _outV, const Vec3&  _dir);
 
 	///
 	void vec3Move(float* _result, const float* _a);
