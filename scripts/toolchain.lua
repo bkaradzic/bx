@@ -223,7 +223,7 @@ function toolchain(_buildDir, _libDir)
 			if not os.getenv("ANDROID_NDK_X86")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_X86, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
@@ -815,6 +815,7 @@ function toolchain(_buildDir, _libDir)
 			"NoImportLib",
 		}
 		includedirs {
+			"${ANDROID_NDK_ROOT}/sysroot/usr/include",
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
@@ -878,12 +879,10 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "android-arm/bin"))
 		objdir (path.join(_buildDir, "android-arm/obj"))
 		libdirs {
-			path.join(_libDir, "lib/android-arm"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/armeabi-v7a/include",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/arm-linux-androideabi",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_ARM)",
@@ -906,42 +905,14 @@ function toolchain(_buildDir, _libDir)
 			"-Wl,--fix-cortex-a8",
 		}
 
-	configuration { "android-mips" }
-		targetdir (path.join(_buildDir, "android-mips/bin"))
-		objdir (path.join(_buildDir, "android-mips/obj"))
-		libdirs {
-			path.join(_libDir, "lib/android-mips"),
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips",
-		}
-		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/mips/include",
-		}
-		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips"),
-			"-target mipsel-none-linux-android",
-			"-mips32",
-			"-Wunused-value",
-			"-Wundef",
-		}
-		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_MIPS)",
-			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips"),
-			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips/usr/lib/crtbegin_so.o"),
-			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-mips/usr/lib/crtend_so.o"),
-			"-target mipsel-none-linux-android",
-			"-mips32",
-		}
-
 	configuration { "android-x86" }
 		targetdir (path.join(_buildDir, "android-x86/bin"))
 		objdir (path.join(_buildDir, "android-x86/obj"))
 		libdirs {
-			path.join(_libDir, "lib/android-x86"),
 			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86",
 		}
 		includedirs {
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86/include",
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
 		}
 		buildoptions {
 			"-gcc-toolchain $(ANDROID_NDK_X86)",
