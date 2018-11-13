@@ -9,10 +9,6 @@
 #include <bx/readerwriter.h>
 #include <bx/string.h>
 
-#if !BX_CRT_NONE
-#	include <stdio.h> // vsnprintf
-#endif // !BX_CRT_NONE
-
 namespace bx
 {
 	inline bool isInRange(char _ch, char _from, char _to)
@@ -1124,7 +1120,7 @@ namespace bx
 		return total;
 	}
 
-	int32_t vsnprintfRef(char* _out, int32_t _max, const char* _format, va_list _argList)
+	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
 		if (1 < _max)
 		{
@@ -1154,6 +1150,12 @@ namespace bx
 		return size;
 	}
 
+#if 0
+
+#if !BX_CRT_NONE
+#	include <stdio.h> // vsnprintf
+#endif // !BX_CRT_NONE
+
 	int32_t vsnprintf(char* _out, int32_t _max, const char* _format, va_list _argList)
 	{
 		va_list argList;
@@ -1177,6 +1179,8 @@ namespace bx
 		va_end(argList);
 		return total;
 	}
+
+#endif // 0
 
 	int32_t snprintf(char* _out, int32_t _max, const char* _format, ...)
 	{
