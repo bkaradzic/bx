@@ -828,7 +828,7 @@ function toolchain(_buildDir, _libDir)
 			"m",
 			"android",
 			"log",
-			"c++",
+			"c++_shared",
 			"gcc",
 		}
 		buildoptions {
