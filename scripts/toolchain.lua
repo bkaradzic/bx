@@ -648,7 +648,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		linkoptions {
 			"-Wl,--gc-sections",
@@ -737,7 +737,7 @@ function toolchain(_buildDir, _libDir)
 --			"-Wuseless-cast",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -794,7 +794,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -813,7 +813,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		links {
 			"rt",
@@ -854,7 +854,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		linkoptions {
 			"-no-canonical-prefixes",
@@ -873,7 +873,7 @@ function toolchain(_buildDir, _libDir)
 			"__STEAMLINK__=1", -- There is no special prefedined compiler symbol to detect SteamLink, faking it.
 		}
 		buildoptions {
-			"-std=c++11",
+			"-std=c++14",
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
@@ -989,7 +989,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration { "freebsd" }
@@ -1049,10 +1049,10 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "osx" }
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions_objcpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions {
 			"-Wfatal-errors",
@@ -1067,10 +1067,10 @@ function toolchain(_buildDir, _libDir)
 			"-lc++",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions_objcpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		buildoptions {
 			"-Wfatal-errors",
@@ -1215,7 +1215,7 @@ function toolchain(_buildDir, _libDir)
 			"$(SCE_ORBIS_SDK_DIR)/target/include_common",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration { "rpi" }
@@ -1234,7 +1234,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 		includedirs {
 			"/opt/vc/include",
@@ -1266,7 +1266,7 @@ function toolchain(_buildDir, _libDir)
 			"--sysroot=$(FREEDOM_E_SDK)/work/build/riscv-gnu-toolchain/riscv64-unknown-elf/prefix/riscv64-unknown-elf",
 		}
 		buildoptions_cpp {
-			"-std=c++11",
+			"-std=c++14",
 		}
 
 	configuration {} -- reset configuration

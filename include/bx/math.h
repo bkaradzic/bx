@@ -13,21 +13,21 @@
 
 namespace bx
 {
-	extern const float kPi;
-	extern const float kPi2;
-	extern const float kInvPi;
-	extern const float kPiHalf;
-	extern const float kPiQuarter;
-	extern const float kSqrt2;
-	extern const float kLogNat10;
-	extern const float kInvLogNat2;
-	extern const float kLogNat2Hi;
-	extern const float kLogNat2Lo;
-	extern const float kE;
-	extern const float kNearZero;
+	constexpr float kPi         = 3.1415926535897932384626433832795f;
+	constexpr float kPi2        = 6.2831853071795864769252867665590f;
+	constexpr float kInvPi      = 1.0f/kPi;
+	constexpr float kPiHalf     = 1.5707963267948966192313216916398f;
+	constexpr float kPiQuarter  = 0.7853981633974483096156608458199f;
+	constexpr float kSqrt2      = 1.4142135623730950488016887242097f;
+	constexpr float kLogNat10   = 2.3025850929940456840179914546844f;
+	constexpr float kInvLogNat2 = 1.4426950408889634073599246810019f;
+	constexpr float kLogNat2Hi  = 0.6931471805599453094172321214582f;
+	constexpr float kLogNat2Lo  = 1.90821492927058770002e-10f;
+	constexpr float kE          = 2.7182818284590452353602874713527f;
+	constexpr float kNearZero   = 1.0f/float(1 << 28);
+	constexpr float kFloatMin   = 1.175494e-38f;
+	constexpr float kFloatMax   = 3.402823e+38f;
 	extern const float kInfinity;
-	extern const float kFloatMin;
-	extern const float kFloatMax;
 
 	///
 	typedef float (*LerpFn)(float _a, float _b, float _t);
@@ -62,19 +62,19 @@ namespace bx
 
 	/// Reinterprets the bit pattern of _a as uint32_t.
 	///
-	BX_CONST_FUNC uint32_t floatToBits(float _a);
+	constexpr BX_CONST_FUNC uint32_t floatToBits(float _a);
 
 	/// Reinterprets the bit pattern of _a as float.
 	///
-	BX_CONST_FUNC float bitsToFloat(uint32_t _a);
+	constexpr BX_CONST_FUNC float bitsToFloat(uint32_t _a);
 
 	/// Reinterprets the bit pattern of _a as uint64_t.
 	///
-	BX_CONST_FUNC uint64_t doubleToBits(double _a);
+	constexpr BX_CONST_FUNC uint64_t doubleToBits(double _a);
 
 	/// Reinterprets the bit pattern of _a as double.
 	///
-	BX_CONST_FUNC double bitsToDouble(uint64_t _a);
+	constexpr BX_CONST_FUNC double bitsToDouble(uint64_t _a);
 
 	/// Returns sortable floating point value.
 	///
@@ -82,27 +82,27 @@ namespace bx
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	BX_CONST_FUNC bool isNan(float _f);
+	constexpr BX_CONST_FUNC bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	BX_CONST_FUNC bool isNan(double _f);
+	constexpr BX_CONST_FUNC bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isFinite(float _f);
+	constexpr BX_CONST_FUNC bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isFinite(double _f);
+	constexpr BX_CONST_FUNC bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isInfinite(float _f);
+	constexpr BX_CONST_FUNC bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	BX_CONST_FUNC bool isInfinite(double _f);
+	constexpr BX_CONST_FUNC bool isInfinite(double _f);
 
 	/// Returns the largest integer value not greater than _f.
 	///
@@ -118,19 +118,19 @@ namespace bx
 
 	/// Returns linear interpolation between two values _a and _b.
 	///
-	BX_CONST_FUNC float lerp(float _a, float _b, float _t);
+	constexpr BX_CONST_FUNC float lerp(float _a, float _b, float _t);
 
 	/// Returns the sign of _a.
 	///
-	BX_CONST_FUNC float sign(float _a);
+	constexpr BX_CONST_FUNC float sign(float _a);
 
 	/// Returns the absolute of _a.
 	///
-	BX_CONST_FUNC float abs(float _a);
+	constexpr BX_CONST_FUNC float abs(float _a);
 
 	/// Returns the square of _a.
 	///
-	BX_CONST_FUNC float square(float _a);
+	constexpr BX_CONST_FUNC float square(float _a);
 
 	/// Returns the cosine of the argument _a.
 	///
@@ -211,23 +211,23 @@ namespace bx
 
 	/// Returns the nearest integer not greater in magnitude than _a.
 	///
-	BX_CONST_FUNC float trunc(float _a);
+	constexpr BX_CONST_FUNC float trunc(float _a);
 
 	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
 	/// and less than 1.
 	///
-	BX_CONST_FUNC float fract(float _a);
+	constexpr BX_CONST_FUNC float fract(float _a);
 
 	/// Returns result of multipla and add (_a * _b + _c).
 	///
-	BX_CONST_FUNC float mad(float _a, float _b, float _c);
+	constexpr BX_CONST_FUNC float mad(float _a, float _b, float _c);
 
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	BX_CONST_FUNC float mod(float _a, float _b);
 
 	///
-	BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon);
+	constexpr BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon);
 
 	///
 	BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
@@ -236,23 +236,23 @@ namespace bx
 	BX_CONST_FUNC float wrap(float _a, float _wrap);
 
 	///
-	BX_CONST_FUNC float step(float _edge, float _a);
+	constexpr BX_CONST_FUNC float step(float _edge, float _a);
 
 	///
-	BX_CONST_FUNC float pulse(float _a, float _start, float _end);
+	constexpr BX_CONST_FUNC float pulse(float _a, float _start, float _end);
 
 	///
-	BX_CONST_FUNC float smoothStep(float _a);
+	constexpr BX_CONST_FUNC float smoothStep(float _a);
 
 	// References:
 	//  - Bias And Gain Are Your Friend
 	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
 	//  - http://demofox.org/biasgain.html
 	///
-	BX_CONST_FUNC float bias(float _time, float _bias);
+	constexpr BX_CONST_FUNC float bias(float _time, float _bias);
 
 	///
-	BX_CONST_FUNC float gain(float _time, float _gain);
+	constexpr BX_CONST_FUNC float gain(float _time, float _gain);
 
 	///
 	BX_CONST_FUNC float angleDiff(float _a, float _b);

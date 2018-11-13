@@ -23,25 +23,25 @@ namespace bx
 		return _rad * 180.0f / kPi;
 	}
 
-	inline BX_CONST_FUNC uint32_t floatToBits(float _a)
+	inline constexpr BX_CONST_FUNC uint32_t floatToBits(float _a)
 	{
 		union { float f; uint32_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline BX_CONST_FUNC float bitsToFloat(uint32_t _a)
+	inline constexpr BX_CONST_FUNC float bitsToFloat(uint32_t _a)
 	{
 		union { uint32_t ui; float f; } u = { _a };
 		return u.f;
 	}
 
-	inline BX_CONST_FUNC uint64_t doubleToBits(double _a)
+	inline constexpr BX_CONST_FUNC uint64_t doubleToBits(double _a)
 	{
 		union { double f; uint64_t ui; } u = { _a };
 		return u.ui;
 	}
 
-	inline BX_CONST_FUNC double bitsToDouble(uint64_t _a)
+	inline constexpr BX_CONST_FUNC double bitsToDouble(uint64_t _a)
 	{
 		union { uint64_t ui; double f; } u = { _a };
 		return u.f;
@@ -58,37 +58,37 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC bool isNan(float _f)
+	inline constexpr BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp > UINT32_C(0x7f800000);
 	}
 
-	inline BX_CONST_FUNC bool isNan(double _f)
+	inline constexpr BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp > UINT64_C(0x7ff0000000000000);
 	}
 
-	inline BX_CONST_FUNC bool isFinite(float _f)
+	inline constexpr BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp < UINT32_C(0x7f800000);
 	}
 
-	inline BX_CONST_FUNC bool isFinite(double _f)
+	inline constexpr BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp < UINT64_C(0x7ff0000000000000);
 	}
 
-	inline BX_CONST_FUNC bool isInfinite(float _f)
+	inline constexpr BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp == UINT32_C(0x7f800000);
 	}
 
-	inline BX_CONST_FUNC bool isInfinite(double _f)
+	inline constexpr BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp == UINT64_C(0x7ff0000000000000);
@@ -104,22 +104,22 @@ namespace bx
 		return -floor(-_a);
 	}
 
-	inline BX_CONST_FUNC float lerp(float _a, float _b, float _t)
+	inline constexpr BX_CONST_FUNC float lerp(float _a, float _b, float _t)
 	{
 		return _a + (_b - _a) * _t;
 	}
 
-	inline BX_CONST_FUNC float abs(float _a)
-	{
-		return _a < 0.0f ? -_a : _a;
-	}
-
-	inline BX_CONST_FUNC float sign(float _a)
+	inline constexpr BX_CONST_FUNC float sign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline BX_CONST_FUNC float square(float _a)
+	inline constexpr BX_CONST_FUNC float abs(float _a)
+	{
+		return _a < 0.0f ? -_a : _a;
+	}
+
+	inline constexpr BX_CONST_FUNC float square(float _a)
 	{
 		return _a * _a;
 	}
@@ -237,17 +237,17 @@ namespace bx
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
-	inline BX_CONST_FUNC float trunc(float _a)
+	inline constexpr BX_CONST_FUNC float trunc(float _a)
 	{
 		return float(int(_a) );
 	}
 
-	inline BX_CONST_FUNC float fract(float _a)
+	inline constexpr BX_CONST_FUNC float fract(float _a)
 	{
 		return _a - trunc(_a);
 	}
 
-	inline BX_CONST_FUNC float mad(float _a, float _b, float _c)
+	inline constexpr BX_CONST_FUNC float mad(float _a, float _b, float _c)
 	{
 		return _a * _b + _c;
 	}
@@ -257,7 +257,7 @@ namespace bx
 		return _a - _b * floor(_a / _b);
 	}
 
-	inline BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon)
+	inline constexpr BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon)
 	{
 		// Reference:
 		// https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
@@ -283,27 +283,27 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC float step(float _edge, float _a)
+	inline constexpr BX_CONST_FUNC float step(float _edge, float _a)
 	{
 		return _a < _edge ? 0.0f : 1.0f;
 	}
 
-	inline BX_CONST_FUNC float pulse(float _a, float _start, float _end)
+	inline constexpr BX_CONST_FUNC float pulse(float _a, float _start, float _end)
 	{
 		return step(_a, _start) - step(_a, _end);
 	}
 
-	inline BX_CONST_FUNC float smoothStep(float _a)
+	inline constexpr BX_CONST_FUNC float smoothStep(float _a)
 	{
 		return square(_a)*(3.0f - 2.0f*_a);
 	}
 
-	inline BX_CONST_FUNC float bias(float _time, float _bias)
+	inline constexpr BX_CONST_FUNC float bias(float _time, float _bias)
 	{
 		return _time / ( ( (1.0f/_bias - 2.0f)*(1.0f - _time) ) + 1.0f);
 	}
 
-	inline BX_CONST_FUNC float gain(float _time, float _gain)
+	inline constexpr BX_CONST_FUNC float gain(float _time, float _gain)
 	{
 		if (_time < 0.5f)
 		{
