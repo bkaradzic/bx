@@ -1005,6 +1005,42 @@ namespace bx
 		mtxQuatTranslation(_result, quat, _translation);
 	}
 
+	inline Vec3 mul(const Vec3& _vec, const float* _mat)
+	{
+		Vec3 result;
+		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
+		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9] + _mat[13];
+		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
+		return result;
+	}
+
+	inline Vec3 mulXyz0(const Vec3& _vec, const float* _mat)
+	{
+		Vec3 result;
+		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8];
+		result.y = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9];
+		result.z = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10];
+		return result;
+	}
+
+	inline Vec3 mulH(const Vec3& _vec, const float* _mat)
+	{
+		const float xx   = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
+		const float yy   = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9] + _mat[13];
+		const float zz   = _vec.x * _mat[2] + _vec.y * _mat[6] + _vec.z * _mat[10] + _mat[14];
+		const float ww   = _vec.x * _mat[3] + _vec.y * _mat[7] + _vec.z * _mat[11] + _mat[15];
+		const float invW = sign(ww) / ww;
+
+		Vec3 result =
+		{
+			xx * invW,
+			yy * invW,
+			zz * invW,
+		};
+
+		return result;
+	}
+
 	inline void vec3MulMtx(float* _result, const float* _vec, const float* _mat)
 	{
 		_result[0] = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8] + _mat[12];
