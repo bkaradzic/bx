@@ -292,6 +292,9 @@ namespace bx
 	constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b);
 
 	///
+	constexpr BX_CONST_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c);
+
+	///
 	constexpr BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b);
 
 	///

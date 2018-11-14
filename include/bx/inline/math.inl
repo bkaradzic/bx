@@ -404,6 +404,11 @@ namespace bx
 		};
 	}
 
+	inline constexpr BX_CONST_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c)
+	{
+		return add(mul(_a, _b), _c);
+	}
+
 	inline constexpr BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
 	{
 		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
