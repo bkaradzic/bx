@@ -324,90 +324,99 @@ namespace bx
 		return _a + angleDiff(_a, _b) * _t;
 	}
 
-	inline BX_CONST_FUNC Vec3 abs(const Vec3&  _a)
+	inline constexpr BX_CONST_FUNC Vec3 abs(const Vec3&  _a)
 	{
-		Vec3 result;
-		result.x = abs(_a.x);
-		result.y = abs(_a.y);
-		result.z = abs(_a.z);
-		return result;
+		return
+		{
+			abs(_a.x),
+			abs(_a.y),
+			abs(_a.z),
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 neg(const Vec3&  _a)
+	inline constexpr BX_CONST_FUNC Vec3 neg(const Vec3&  _a)
 	{
-		Vec3 result;
-		result.x = -_a.x;
-		result.y = -_a.y;
-		result.z = -_a.z;
-		return result;
+		return
+		{
+			-_a.x,
+			-_a.y,
+			-_a.z,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = _a.x + _b.x;
-		result.y = _a.y + _b.y;
-		result.z = _a.z + _b.z;
-		return result;
+		return
+		{
+			_a.x + _b.x,
+			_a.y + _b.y,
+			_a.z + _b.z,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b)
+	inline constexpr BX_CONST_FUNC Vec3 add(const Vec3&  _a, float _b)
 	{
-		Vec3 result;
-		result.x = _a.x + _b;
-		result.y = _a.y + _b;
-		result.z = _a.z + _b;
-		return result;
+		return
+		{
+			_a.x + _b,
+			_a.y + _b,
+			_a.z + _b,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = _a.x - _b.x;
-		result.y = _a.y - _b.y;
-		result.z = _a.z - _b.z;
-		return result;
+		return
+		{
+			_a.x - _b.x,
+			_a.y - _b.y,
+			_a.z - _b.z,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b)
+	inline constexpr BX_CONST_FUNC Vec3 sub(const Vec3&  _a, float _b)
 	{
-		Vec3 result;
-		result.x = _a.x - _b;
-		result.y = _a.y - _b;
-		result.z = _a.z - _b;
-		return result;
+		return
+		{
+			_a.x - _b,
+			_a.y - _b,
+			_a.z - _b,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = _a.x * _b.x;
-		result.y = _a.y * _b.y;
-		result.z = _a.z * _b.z;
-		return result;
+		return
+		{
+			_a.x * _b.x,
+			_a.y * _b.y,
+			_a.z * _b.z,
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b)
+	inline constexpr BX_CONST_FUNC Vec3 mul(const Vec3&  _a, float _b)
 	{
-		Vec3 result;
-		result.x = _a.x * _b;
-		result.y = _a.y * _b;
-		result.z = _a.z * _b;
-		return result;
+		return
+		{
+			_a.x * _b,
+			_a.y * _b,
+			_a.z * _b,
+		};
 	}
 
-	inline BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC float dot(const Vec3&  _a, const Vec3&  _b)
 	{
 		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
 	}
 
-	inline BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 cross(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = _a.y*_b.z - _a.z*_b.y;
-		result.y = _a.z*_b.x - _a.x*_b.z;
-		result.z = _a.x*_b.y - _a.y*_b.x;
-		return result;
+		return
+		{
+			_a.y*_b.z - _a.z*_b.y,
+			_a.z*_b.x - _a.x*_b.z,
+			_a.x*_b.y - _a.y*_b.x,
+		};
 	}
 
 	inline BX_CONST_FUNC float length(const Vec3&  _a)
@@ -415,22 +424,24 @@ namespace bx
 		return sqrt(dot(_a, _a) );
 	}
 
-	inline BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t)
+	inline constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, float _t)
 	{
-		Vec3 result;
-		result.x = lerp(_a.x, _b.x, _t);
-		result.y = lerp(_a.y, _b.y, _t);
-		result.z = lerp(_a.z, _b.z, _t);
-		return result;
+		return
+		{
+			lerp(_a.x, _b.x, _t),
+			lerp(_a.y, _b.y, _t),
+			lerp(_a.z, _b.z, _t),
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t)
+	inline constexpr BX_CONST_FUNC Vec3 lerp(const Vec3&  _a, const Vec3&  _b, const Vec3&  _t)
 	{
-		Vec3 result;
-		result.x = lerp(_a.x, _b.x, _t.x);
-		result.y = lerp(_a.y, _b.y, _t.y);
-		result.z = lerp(_a.z, _b.z, _t.z);
-		return result;
+		return
+		{
+			lerp(_a.x, _b.x, _t.x),
+			lerp(_a.y, _b.y, _t.y),
+			lerp(_a.z, _b.z, _t.z),
+		};
 	}
 
 	inline BX_CONST_FUNC Vec3 normalize(const Vec3&  _a)
@@ -440,31 +451,34 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 min(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = min(_a.x, _b.x);
-		result.y = min(_a.y, _b.y);
-		result.z = min(_a.z, _b.z);
-		return result;
+		return
+		{
+			min(_a.x, _b.x),
+			min(_a.y, _b.y),
+			min(_a.z, _b.z),
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b)
+	inline constexpr BX_CONST_FUNC Vec3 max(const Vec3&  _a, const Vec3&  _b)
 	{
-		Vec3 result;
-		result.x = max(_a.x, _b.x);
-		result.y = max(_a.y, _b.y);
-		result.z = max(_a.z, _b.z);
-		return result;
+		return
+		{
+			max(_a.x, _b.x),
+			max(_a.y, _b.y),
+			max(_a.z, _b.z),
+		};
 	}
 
-	inline BX_CONST_FUNC Vec3 rcp(const Vec3&  _a)
+	inline constexpr BX_CONST_FUNC Vec3 rcp(const Vec3&  _a)
 	{
-		Vec3 result;
-		result.x = 1.0f / _a.x;
-		result.y = 1.0f / _a.y;
-		result.z = 1.0f / _a.z;
-		return result;
+		return
+		{
+			1.0f / _a.x,
+			1.0f / _a.y,
+			1.0f / _a.z,
+		};
 	}
 
 	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n)
