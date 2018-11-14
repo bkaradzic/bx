@@ -27,8 +27,8 @@
 
 namespace bx
 {
-	const int32_t kExitSuccess = 0;
-	const int32_t kExitFailure = 1;
+	constexpr int32_t kExitSuccess = 0;
+	constexpr int32_t kExitFailure = 1;
 
 	/// Template for avoiding MSVC: C4127: conditional expression is constant
 	template<bool>
