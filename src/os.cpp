@@ -261,7 +261,7 @@ namespace bx
 	|| BX_CRT_NONE
 		BX_UNUSED(_name, _value);
 #else
-		if (NULL == _value)
+		if (NULL != _value)
 		{
 			::setenv(_name, _value, 1);
 		}
