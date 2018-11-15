@@ -141,7 +141,7 @@ namespace bx
 		for (uint32_t ii = 0, num = _num-1; ii < num; ++ii)
 		{
 			uint32_t jj = ii + 1 + _rng->gen() % (num - ii);
-			bx::xchg(_array[ii], _array[jj]);
+			bx::swap(_array[ii], _array[jj]);
 		}
 	}
 
