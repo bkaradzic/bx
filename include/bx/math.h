@@ -268,6 +268,12 @@ namespace bx
 	BX_CONST_FUNC float angleLerp(float _a, float _b, float _t);
 
 	///
+	Vec3 load(const void* _ptr);
+
+	///
+	void store(void* _ptr, const Vec3& _a);
+
+	///
 	constexpr BX_CONST_FUNC Vec3 abs(const Vec3&  _a);
 
 	///
@@ -334,13 +340,7 @@ namespace bx
 	void toLatLong(float* _outU, float* _outV, const Vec3&  _dir);
 
 	///
-	void vec3Move(float* _result, const float* _a);
-
-	///
 	void vec3Abs(float* _result, const float* _a);
-
-	///
-	void vec3Neg(float* _result, const float* _a);
 
 	///
 	void vec3Add(float* _result, const float* _a, const float* _b);
@@ -377,15 +377,6 @@ namespace bx
 
 	///
 	float vec3Norm(float* _result, const float* _a);
-
-	///
-	void vec3Min(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec3Max(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec3Rcp(float* _result, const float* _a);
 
 	/// Calculate tangent frame from normal.
 	///

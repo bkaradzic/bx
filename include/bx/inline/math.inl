@@ -324,6 +324,25 @@ namespace bx
 		return _a + angleDiff(_a, _b) * _t;
 	}
 
+	inline Vec3 load(const void* _ptr)
+	{
+		const float* ptr = reinterpret_cast<const float*>(_ptr);
+		return
+		{
+			ptr[0],
+			ptr[1],
+			ptr[2],
+		};
+	}
+
+	inline void store(void* _ptr, const Vec3& _a)
+	{
+		float* ptr = reinterpret_cast<float*>(_ptr);
+		ptr[0] = _a.x;
+		ptr[1] = _a.y;
+		ptr[2] = _a.z;
+	}
+
 	inline constexpr BX_CONST_FUNC Vec3 abs(const Vec3&  _a)
 	{
 		return
@@ -550,25 +569,11 @@ namespace bx
 		*_outV = theta*bx::kInvPi;
 	}
 
-	inline void vec3Move(float* _result, const float* _a)
-	{
-		_result[0] = _a[0];
-		_result[1] = _a[1];
-		_result[2] = _a[2];
-	}
-
 	inline void vec3Abs(float* _result, const float* _a)
 	{
 		_result[0] = abs(_a[0]);
 		_result[1] = abs(_a[1]);
 		_result[2] = abs(_a[2]);
-	}
-
-	inline void vec3Neg(float* _result, const float* _a)
-	{
-		_result[0] = -_a[0];
-		_result[1] = -_a[1];
-		_result[2] = -_a[2];
 	}
 
 	inline void vec3Add(float* _result, const float* _a, const float* _b)
@@ -652,27 +657,6 @@ namespace bx
 		_result[1] = _a[1] * invLen;
 		_result[2] = _a[2] * invLen;
 		return len;
-	}
-
-	inline void vec3Min(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = min(_a[0], _b[0]);
-		_result[1] = min(_a[1], _b[1]);
-		_result[2] = min(_a[2], _b[2]);
-	}
-
-	inline void vec3Max(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = max(_a[0], _b[0]);
-		_result[1] = max(_a[1], _b[1]);
-		_result[2] = max(_a[2], _b[2]);
-	}
-
-	inline void vec3Rcp(float* _result, const float* _a)
-	{
-		_result[0] = 1.0f / _a[0];
-		_result[1] = 1.0f / _a[1];
-		_result[2] = 1.0f / _a[2];
 	}
 
 	inline void vec3TangentFrame(const float* _n, float* _t, float* _b)
