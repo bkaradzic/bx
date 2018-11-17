@@ -255,66 +255,48 @@ namespace bx
 		return _a - fract(_a);
 	}
 
-	void mtxLookAtImpl(float* _result, const float* _eye, const float* _view, const float* _up)
+	static void mtxLookAtImpl(float* _result, const Vec3& _eye, const Vec3& _view, const Vec3& _up)
 	{
-		float up[3] = { 0.0f, 1.0f, 0.0f };
-		if (NULL != _up)
-		{
-			up[0] = _up[0];
-			up[1] = _up[1];
-			up[2] = _up[2];
-		}
-
-		float tmp[4];
-		vec3Cross(tmp, up, _view);
-
-		float right[4];
-		vec3Norm(right, tmp);
-
-		vec3Cross(up, _view, right);
+		const Vec3 uxv   = cross(_up, _view);
+		const Vec3 right = normalize(uxv);
+		const Vec3 up    = cross(_view, right);
 
 		memSet(_result, 0, sizeof(float)*16);
-		_result[ 0] = right[0];
-		_result[ 1] = up[0];
-		_result[ 2] = _view[0];
+		_result[ 0] = right.x;
+		_result[ 1] = up.x;
+		_result[ 2] = _view.x;
 
-		_result[ 4] = right[1];
-		_result[ 5] = up[1];
-		_result[ 6] = _view[1];
+		_result[ 4] = right.y;
+		_result[ 5] = up.y;
+		_result[ 6] = _view.y;
 
-		_result[ 8] = right[2];
-		_result[ 9] = up[2];
-		_result[10] = _view[2];
+		_result[ 8] = right.z;
+		_result[ 9] = up.z;
+		_result[10] = _view.z;
 
-		_result[12] = -vec3Dot(right, _eye);
-		_result[13] = -vec3Dot(up, _eye);
-		_result[14] = -vec3Dot(_view, _eye);
+		_result[12] = -dot(right, _eye);
+		_result[13] = -dot(up, _eye);
+		_result[14] = -dot(_view, _eye);
 		_result[15] = 1.0f;
 	}
 
-	void mtxLookAtLh(float* _result, const float* _eye, const float* _at, const float* _up)
+	void mtxLookAtLh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
 	{
-		float tmp[4];
-		vec3Sub(tmp, _at, _eye);
-
-		float view[4];
-		vec3Norm(view, tmp);
+		const Vec3 tmp  = sub(_at, _eye);
+		const Vec3 view = normalize(tmp);
 
 		mtxLookAtImpl(_result, _eye, view, _up);
 	}
 
-	void mtxLookAtRh(float* _result, const float* _eye, const float* _at, const float* _up)
+	void mtxLookAtRh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
 	{
-		float tmp[4];
-		vec3Sub(tmp, _eye, _at);
-
-		float view[4];
-		vec3Norm(view, tmp);
+		const Vec3 tmp = sub(_eye, _at);
+		const Vec3 view = normalize(tmp);
 
 		mtxLookAtImpl(_result, _eye, view, _up);
 	}
 
-	void mtxLookAt(float* _result, const float* _eye, const float* _at, const float* _up)
+	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
 	{
 		mtxLookAtLh(_result, _eye, _at, _up);
 	}

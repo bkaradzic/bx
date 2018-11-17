@@ -464,13 +464,13 @@ namespace bx
 	void mtxQuatTranslationHMD(float* _result, const float* _quat, const float* _translation);
 
 	///
-	void mtxLookAtLh(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
+	void mtxLookAtLh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up = { 0.0f, 1.0f, 0.0f });
 
 	///
-	void mtxLookAtRh(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
+	void mtxLookAtRh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up = { 0.0f, 1.0f, 0.0f });
 
 	///
-	void mtxLookAt(float* _result, const float* _eye, const float* _at, const float* _up = NULL);
+	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up = { 0.0f, 1.0f, 0.0f });
 
 	///
 	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc);
