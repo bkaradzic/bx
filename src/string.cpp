@@ -1124,8 +1124,7 @@ namespace bx
 	{
 		if (1 < _max)
 		{
-			StaticMemoryBlockWriter writer(_out, uint32_t(_max-1) );
-			_out[_max-1] = '\0';
+			StaticMemoryBlockWriter writer(_out, uint32_t(_max) );
 
 			Error err;
 			va_list argListCopy;
@@ -1137,6 +1136,10 @@ namespace bx
 			{
 				size += write(&writer, '\0', &err);
 				return size - 1 /* size without '\0' terminator */;
+			}
+			else
+			{
+				_out[_max-1] = '\0';
 			}
 		}
 
