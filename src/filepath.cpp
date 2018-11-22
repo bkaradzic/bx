@@ -153,12 +153,12 @@ namespace bx
 		return size;
 	}
 
-	static bool getEnv(const char* _name, FileInfo::Enum _type, char* _out, uint32_t* _inOutSize)
+	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileInfo::Enum _type)
 	{
 		uint32_t len = *_inOutSize;
 		*_out = '\0';
 
-		if (getEnv(_name, _out, &len) )
+		if (getEnv(_out, &len, _name) )
 		{
 			FileInfo fi;
 			if (stat(_out, fi)
@@ -203,9 +203,9 @@ namespace bx
 	{
 		return false
 #if BX_PLATFORM_WINDOWS
-			|| getEnv("USERPROFILE", FileInfo::Directory, _out, _inOutSize)
+			|| getEnv(_out, _inOutSize, "USERPROFILE", FileInfo::Directory)
 #endif // BX_PLATFORM_WINDOWS
-			|| getEnv("HOME", FileInfo::Directory, _out, _inOutSize)
+			|| getEnv(_out, _inOutSize, "HOME", FileInfo::Directory)
 			;
 	}
 
@@ -217,21 +217,21 @@ namespace bx
 		*_inOutSize = len;
 		return result;
 #else
-		static const char* s_tmp[] =
+		static const StringView s_tmp[] =
 		{
 			"TMPDIR",
 			"TMP",
 			"TEMP",
 			"TEMPDIR",
 
-			NULL
+			""
 		};
 
-		for (const char** tmp = s_tmp; *tmp != NULL; ++tmp)
+		for (const StringView* tmp = s_tmp; !tmp->isEmpty(); ++tmp)
 		{
 			uint32_t len = *_inOutSize;
 			*_out = '\0';
-			bool ok = getEnv(*tmp, FileInfo::Directory, _out, &len);
+			bool ok = getEnv(_out, &len, *tmp, FileInfo::Directory);
 
 			if (ok
 			&&  len != 0
