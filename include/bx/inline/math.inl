@@ -49,8 +49,9 @@ namespace bx
 
 	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)
 	{
-		// Reference:
-		// http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
+		// Reference(s):
+		// - http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
+		//
 		const uint32_t tmp0   = uint32_sra(_value, 31);
 		const uint32_t tmp1   = uint32_neg(tmp0);
 		const uint32_t mask   = uint32_or(tmp1, 0x80000000);
@@ -259,8 +260,9 @@ namespace bx
 
 	inline constexpr BX_CONST_FUNC bool equal(float _a, float _b, float _epsilon)
 	{
-		// Reference:
-		// https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
+		// Reference(s):
+		// - https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
+		//
 		const float lhs = abs(_a - _b);
 		const float rhs = _epsilon * max(1.0f, abs(_a), abs(_b) );
 		return lhs <= rhs;
@@ -305,6 +307,11 @@ namespace bx
 
 	inline constexpr BX_CONST_FUNC float gain(float _time, float _gain)
 	{
+		// Reference(s):
+		// - Bias And Gain Are Your Friend
+		//   https://web.archive.org/web/20181126040535/https://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
+		//   https://web.archive.org/web/20181126040558/http://demofox.org/biasgain.html
+		//
 		if (_time < 0.5f)
 		{
 			return bias(_time * 2.0f, _gain) * 0.5f;

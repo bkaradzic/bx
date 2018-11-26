@@ -250,10 +250,6 @@ namespace bx
 	///
 	constexpr BX_CONST_FUNC float smoothStep(float _a);
 
-	// References:
-	//  - Bias And Gain Are Your Friend
-	//    http://blog.demofox.org/2012/09/24/bias-and-gain-are-your-friend/
-	//  - http://demofox.org/biasgain.html
 	///
 	constexpr BX_CONST_FUNC float bias(float _time, float _bias);
 

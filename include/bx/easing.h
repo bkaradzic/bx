@@ -8,10 +8,6 @@
 
 #include "math.h"
 
-// Reference:
-// http://easings.net/
-// http://robertpenner.com/easing/
-
 namespace bx
 {
 	///

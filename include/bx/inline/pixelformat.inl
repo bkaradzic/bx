@@ -707,8 +707,9 @@ namespace bx
 	template<int32_t MantissaBits, int32_t ExpBits>
 	inline void encodeRgbE(float* _dst, const float* _src)
 	{
-		// Reference:
-		// https://www.opengl.org/registry/specs/EXT/texture_shared_exponent.txt
+		// Reference(s):
+		// - https://web.archive.org/web/20181126040035/https://www.khronos.org/registry/OpenGL/extensions/EXT/EXT_texture_shared_exponent.txt
+		//
 		const int32_t expMax  = (1<<ExpBits) - 1;
 		const int32_t expBias = (1<<(ExpBits - 1) ) - 1;
 		const float   sharedExpMax = float(expMax) / float(expMax + 1) * float(1 << (expMax - expBias) );

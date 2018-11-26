@@ -7,6 +7,10 @@
 #	error "Must be included from bx/easing.h!"
 #endif // BX_EASING_H_HEADER_GUARD
 
+ // Reference(s):
+ // - https://web.archive.org/web/20181126040153/https://easings.net/
+ // - https://web.archive.org/web/20181126040212/http://robertpenner.com/easing/
+ //
 namespace bx
 {
 	template<EaseFn ease>
