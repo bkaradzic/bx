@@ -59,37 +59,37 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC bool isNan(float _f)
+	inline BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp > UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isNan(double _f)
+	inline BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp > UINT64_C(0x7ff0000000000000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isFinite(float _f)
+	inline BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp < UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isFinite(double _f)
+	inline BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp < UINT64_C(0x7ff0000000000000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isInfinite(float _f)
+	inline BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
 		return tmp == UINT32_C(0x7f800000);
 	}
 
-	inline constexpr BX_CONST_FUNC bool isInfinite(double _f)
+	inline BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
 		return tmp == UINT64_C(0x7ff0000000000000);

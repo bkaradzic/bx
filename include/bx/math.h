@@ -88,27 +88,27 @@ namespace bx
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	constexpr BX_CONST_FUNC bool isNan(float _f);
+	BX_CONST_FUNC bool isNan(float _f);
 
 	/// Returns true if _f is a number that is NaN.
 	///
-	constexpr BX_CONST_FUNC bool isNan(double _f);
+	BX_CONST_FUNC bool isNan(double _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isFinite(float _f);
+	BX_CONST_FUNC bool isFinite(float _f);
 
 	/// Returns true if _f is not infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isFinite(double _f);
+	BX_CONST_FUNC bool isFinite(double _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isInfinite(float _f);
+	BX_CONST_FUNC bool isInfinite(float _f);
 
 	/// Returns true if _f is infinite and is not a NaN.
 	///
-	constexpr BX_CONST_FUNC bool isInfinite(double _f);
+	BX_CONST_FUNC bool isInfinite(double _f);
 
 	/// Returns the largest integer value not greater than _f.
 	///
