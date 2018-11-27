@@ -24,25 +24,18 @@ TEST_CASE("StrideAlign")
 TEST_CASE("uint32_cnt")
 {
 	REQUIRE( 0 == bx::uint32_cnttz(UINT32_C(1) ) );
-	REQUIRE( 0 == bx::uint32_cnttz_ref(UINT32_C(1) ) );
 
 	REQUIRE(31 == bx::uint32_cntlz(UINT32_C(1) ) );
-	REQUIRE(31 == bx::uint32_cntlz_ref(UINT32_C(1) ) );
 
 	REQUIRE( 0 == bx::uint64_cnttz(UINT64_C(1) ) );
-	REQUIRE( 0 == bx::uint64_cnttz_ref(UINT64_C(1) ) );
 
 	REQUIRE(63 == bx::uint64_cntlz(UINT64_C(1) ) );
-	REQUIRE(63 == bx::uint64_cntlz_ref(UINT64_C(1) ) );
 
 	REQUIRE( 1 == bx::uint32_cntbits(1) );
-	REQUIRE( 1 == bx::uint32_cntbits_ref(1) );
 
 	REQUIRE(16 == bx::uint32_cntbits(UINT16_MAX) );
-	REQUIRE(16 == bx::uint32_cntbits_ref(UINT16_MAX) );
 
 	REQUIRE(32 == bx::uint32_cntbits(UINT32_MAX) );
-	REQUIRE(32 == bx::uint32_cntbits_ref(UINT32_MAX) );
 }
 
 TEST_CASE("uint32_part")
