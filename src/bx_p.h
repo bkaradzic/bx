@@ -15,6 +15,9 @@
 #	define BX_WARN  _BX_WARN
 #	define BX_CHECK _BX_CHECK
 #	define BX_CONFIG_ALLOCATOR_DEBUG 1
+#elif !defined(NDEBUG)
+#	define BX_WARN  _BX_WARN
+#	define BX_CHECK _BX_CHECK
 #endif // BX_CONFIG_DEBUG
 
 #define _BX_TRACE(_format, ...)                                                                       \
