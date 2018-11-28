@@ -29,162 +29,162 @@
 
 namespace bx
 {
-	inline constexpr BX_CONST_FUNC uint32_t uint32_li(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_li(uint32_t _a)
 	{
 		return _a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_dec(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_dec(uint32_t _a)
 	{
 		return _a - 1;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_inc(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_inc(uint32_t _a)
 	{
 		return _a + 1;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_not(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_not(uint32_t _a)
 	{
 		return ~_a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_neg(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_neg(uint32_t _a)
 	{
 		return -(int32_t)_a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_ext(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_ext(uint32_t _a)
 	{
 		return ( (int32_t)_a)>>31;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_and(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_and(uint32_t _a, uint32_t _b)
 	{
 		return _a & _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_andc(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_andc(uint32_t _a, uint32_t _b)
 	{
 		return _a & ~_b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_xor(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_xor(uint32_t _a, uint32_t _b)
 	{
 		return _a ^ _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_xorl(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_xorl(uint32_t _a, uint32_t _b)
 	{
 		return !_a != !_b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_or(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_or(uint32_t _a, uint32_t _b)
 	{
 		return _a | _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_orc(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_orc(uint32_t _a, uint32_t _b)
 	{
 		return _a | ~_b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_sll(uint32_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_sll(uint32_t _a, int32_t _sa)
 	{
 		return _a << _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_srl(uint32_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_srl(uint32_t _a, int32_t _sa)
 	{
 		return _a >> _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_sra(uint32_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_sra(uint32_t _a, int32_t _sa)
 	{
 		return ( (int32_t)_a) >> _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_rol(uint32_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_rol(uint32_t _a, int32_t _sa)
 	{
 		return ( _a << _sa) | (_a >> (32-_sa) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_ror(uint32_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_ror(uint32_t _a, int32_t _sa)
 	{
 		return ( _a >> _sa) | (_a << (32-_sa) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_add(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_add(uint32_t _a, uint32_t _b)
 	{
 		return _a + _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_iadd(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_iadd(uint32_t _a, uint32_t _b)
 	{
 		return int32_t(_a) + int32_t(_b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_sub(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_sub(uint32_t _a, uint32_t _b)
 	{
 		return _a - _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_isub(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_isub(uint32_t _a, uint32_t _b)
 	{
 		return int32_t(_a) - int32_t(_b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_mul(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_mul(uint32_t _a, uint32_t _b)
 	{
 		return _a * _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_div(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_div(uint32_t _a, uint32_t _b)
 	{
 		return _a / _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_mod(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_mod(uint32_t _a, uint32_t _b)
 	{
 		return _a % _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmpeq(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmpeq(uint32_t _a, uint32_t _b)
 	{
 		return -(_a == _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmpneq(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmpneq(uint32_t _a, uint32_t _b)
 	{
 		return -(_a != _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmplt(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmplt(uint32_t _a, uint32_t _b)
 	{
 		return -(_a < _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmple(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmple(uint32_t _a, uint32_t _b)
 	{
 		return -(_a <= _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmpgt(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmpgt(uint32_t _a, uint32_t _b)
 	{
 		return -(_a > _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cmpge(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cmpge(uint32_t _a, uint32_t _b)
 	{
 		return -(_a >= _b);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_setnz(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_setnz(uint32_t _a)
 	{
 		return -!!_a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_satadd(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_satadd(uint32_t _a, uint32_t _b)
 	{
 		const uint32_t add    = uint32_add(_a, _b);
 		const uint32_t lt     = uint32_cmplt(add, _a);
@@ -193,7 +193,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_satsub(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_satsub(uint32_t _a, uint32_t _b)
 	{
 		const uint32_t sub    = uint32_sub(_a, _b);
 		const uint32_t le     = uint32_cmple(sub, _a);
@@ -202,7 +202,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_satmul(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_satmul(uint32_t _a, uint32_t _b)
 	{
 		const uint64_t mul    = (uint64_t)_a * (uint64_t)_b;
 		const uint32_t hi     = mul >> 32;
@@ -212,7 +212,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_sels(uint32_t test, uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_sels(uint32_t test, uint32_t _a, uint32_t _b)
 	{
 		const uint32_t mask   = uint32_ext(test);
 		const uint32_t sel_a  = uint32_and(_a, mask);
@@ -222,7 +222,7 @@ namespace bx
 		return (result);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_selb(uint32_t _mask, uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_selb(uint32_t _mask, uint32_t _a, uint32_t _b)
 	{
 		const uint32_t sel_a  = uint32_and(_a, _mask);
 		const uint32_t sel_b  = uint32_andc(_b, _mask);
@@ -231,7 +231,7 @@ namespace bx
 		return (result);
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_imin(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_imin(uint32_t _a, uint32_t _b)
 	{
 		const uint32_t a_sub_b = uint32_sub(_a, _b);
 		const uint32_t result  = uint32_sels(a_sub_b, _a, _b);
@@ -239,7 +239,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_imax(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_imax(uint32_t _a, uint32_t _b)
 	{
 		const uint32_t b_sub_a = uint32_sub(_b, _a);
 		const uint32_t result  = uint32_sels(b_sub_a, _a, _b);
@@ -247,27 +247,27 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b)
 	{
 		return _a > _b ? _b : _a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b, uint32_t _c)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_min(uint32_t _a, uint32_t _b, uint32_t _c)
 	{
 		return uint32_min(_a, uint32_min(_b, _c) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b)
 	{
 		return _a > _b ? _a : _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b, uint32_t _c)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_max(uint32_t _a, uint32_t _b, uint32_t _c)
 	{
 		return uint32_max(_a, uint32_max(_b, _c) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max)
 	{
 		const uint32_t tmp    = uint32_max(_a, _min);
 		const uint32_t result = uint32_min(tmp, _max);
@@ -275,7 +275,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_iclamp(uint32_t _a, uint32_t _min, uint32_t _max)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_iclamp(uint32_t _a, uint32_t _min, uint32_t _max)
 	{
 		const uint32_t tmp    = uint32_imax(_a, _min);
 		const uint32_t result = uint32_imin(tmp, _max);
@@ -283,7 +283,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_incwrap(uint32_t _val, uint32_t _min, uint32_t _max)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_incwrap(uint32_t _val, uint32_t _min, uint32_t _max)
 	{
 		const uint32_t inc          = uint32_inc(_val);
 		const uint32_t max_diff     = uint32_sub(_max, _val);
@@ -295,7 +295,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_decwrap(uint32_t _val, uint32_t _min, uint32_t _max)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_decwrap(uint32_t _val, uint32_t _min, uint32_t _max)
 	{
 		const uint32_t dec          = uint32_dec(_val);
 		const uint32_t min_diff     = uint32_sub(_min, _val);
@@ -307,7 +307,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cntbits(uint32_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntbits(uint32_t _val)
 	{
 		const uint32_t tmp0   = uint32_srl(_val, 1);
 		const uint32_t tmp1   = uint32_and(tmp0, 0x55555555);
@@ -330,7 +330,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cntlz(uint32_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cntlz(uint32_t _val)
 	{
 		const uint32_t tmp0   = uint32_srl(_val, 1);
 		const uint32_t tmp1   = uint32_or(tmp0, _val);
@@ -348,7 +348,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_cnttz(uint32_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_cnttz(uint32_t _val)
 	{
 		const uint32_t tmp0   = uint32_not(_val);
 		const uint32_t tmp1   = uint32_dec(_val);
@@ -358,7 +358,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_part1by1(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_part1by1(uint32_t _a)
 	{
 		// shuffle:
 		// ---- ---- ---- ---- fedc ba98 7654 3210
@@ -386,7 +386,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_part1by2(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_part1by2(uint32_t _a)
 	{
 		// shuffle:
 		// ---- ---- ---- ---- ---- --98 7654 3210
@@ -414,7 +414,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_testpow2(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_testpow2(uint32_t _a)
 	{
 		const uint32_t tmp0   = uint32_dec(_a);
 		const uint32_t tmp1   = uint32_xor(_a, tmp0);
@@ -424,7 +424,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_nextpow2(uint32_t _a)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_nextpow2(uint32_t _a)
 	{
 		const uint32_t tmp0   = uint32_dec(_a);
 		const uint32_t tmp1   = uint32_srl(tmp0, 1);
@@ -442,7 +442,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint64_cntbits(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint64_cntbits(uint64_t _val)
 	{
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
 		const uint32_t hi = uint32_t(_val>>32);
@@ -452,7 +452,7 @@ namespace bx
 		return total;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint64_cntlz(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint64_cntlz(uint64_t _val)
 	{
 		return _val & UINT64_C(0xffffffff00000000)
 			 ? uint32_cntlz(uint32_t(_val>>32) )
@@ -460,7 +460,7 @@ namespace bx
 			 ;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint64_cnttz(uint64_t _val)
+	inline BX_CONSTEXPR_FUNC uint32_t uint64_cnttz(uint64_t _val)
 	{
 		return _val & UINT64_C(0xffffffff)
 			? uint32_cnttz(uint32_t(_val) )
@@ -468,47 +468,47 @@ namespace bx
 			;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_sll(uint64_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_sll(uint64_t _a, int32_t _sa)
 	{
 		return _a << _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_srl(uint64_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_srl(uint64_t _a, int32_t _sa)
 	{
 		return _a >> _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_sra(uint64_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_sra(uint64_t _a, int32_t _sa)
 	{
 		return ( (int64_t)_a) >> _sa;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_rol(uint64_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_rol(uint64_t _a, int32_t _sa)
 	{
 		return ( _a << _sa) | (_a >> (64-_sa) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_ror(uint64_t _a, int32_t _sa)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_ror(uint64_t _a, int32_t _sa)
 	{
 		return ( _a >> _sa) | (_a << (64-_sa) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_add(uint64_t _a, uint64_t _b)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_add(uint64_t _a, uint64_t _b)
 	{
 		return _a + _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_sub(uint64_t _a, uint64_t _b)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_sub(uint64_t _a, uint64_t _b)
 	{
 		return _a - _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b)
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b)
 	{
 		return _a * _b;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_gcd(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_gcd(uint32_t _a, uint32_t _b)
 	{
 		do
 		{
@@ -521,12 +521,12 @@ namespace bx
 		return _a;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t uint32_lcm(uint32_t _a, uint32_t _b)
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_lcm(uint32_t _a, uint32_t _b)
 	{
 		return _a * (_b / uint32_gcd(_a, _b) );
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
 	{
 		const uint32_t mod    = uint32_mod(_offset, _stride);
 		const uint32_t add    = uint32_sub(_stride, mod);
@@ -537,7 +537,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride)
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride)
 	{
 		const uint32_t align  = uint32_lcm(16, _stride);
 		const uint32_t mod    = uint32_mod(_offset, align);
@@ -549,7 +549,7 @@ namespace bx
 		return result;
 	}
 
-	inline constexpr BX_CONST_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride)
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride)
 	{
 		const uint32_t align  = uint32_lcm(256, _stride);
 		const uint32_t mod    = uint32_mod(_offset, align);
