@@ -112,15 +112,19 @@ namespace bx
 	};
 
 	/// Creates a directory named `_filePath`.
+	///
 	bool make(const FilePath& _filePath, Error* _err = NULL);
 
 	/// Creates a directory named `_filePath` along with all necessary parents.
+	///
 	bool makeAll(const FilePath& _filePath, Error* _err = NULL);
 
 	/// Removes file or directory.
+	///
 	bool remove(const FilePath& _filePath, Error* _err = NULL);
 
 	/// Removes file or directory recursivelly.
+	///
 	bool removeAll(const FilePath& _filePath, Error* _err = NULL);
 
 } // namespace bx
