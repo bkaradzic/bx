@@ -366,12 +366,6 @@ namespace bx
 	float vec3Length(const float* _a);
 
 	///
-	void vec3Lerp(float* _result, const float* _a, const float* _b, float _t);
-
-	///
-	void vec3Lerp(float* _result, const float* _a, const float* _b, const float* _c);
-
-	///
 	float vec3Norm(float* _result, const float* _a);
 
 	/// Calculate tangent frame from normal.

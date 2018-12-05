@@ -642,20 +642,6 @@ namespace bx
 		return sqrt(vec3Dot(_a, _a) );
 	}
 
-	inline void vec3Lerp(float* _result, const float* _a, const float* _b, float _t)
-	{
-		_result[0] = lerp(_a[0], _b[0], _t);
-		_result[1] = lerp(_a[1], _b[1], _t);
-		_result[2] = lerp(_a[2], _b[2], _t);
-	}
-
-	inline void vec3Lerp(float* _result, const float* _a, const float* _b, const float* _c)
-	{
-		_result[0] = lerp(_a[0], _b[0], _c[0]);
-		_result[1] = lerp(_a[1], _b[1], _c[1]);
-		_result[2] = lerp(_a[2], _b[2], _c[2]);
-	}
-
 	inline float vec3Norm(float* _result, const float* _a)
 	{
 		const float len = vec3Length(_a);
