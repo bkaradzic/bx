@@ -336,19 +336,10 @@ namespace bx
 	void toLatLong(float* _outU, float* _outV, const Vec3&  _dir);
 
 	///
-	void vec3Abs(float* _result, const float* _a);
-
-	///
 	void vec3Add(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Add(float* _result, const float* _a, float _b);
-
-	///
 	void vec3Sub(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec3Sub(float* _result, const float* _a, float _b);
 
 	///
 	void vec3Mul(float* _result, const float* _a, const float* _b);
