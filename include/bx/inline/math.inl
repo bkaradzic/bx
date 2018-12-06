@@ -592,13 +592,6 @@ namespace bx
 		*_outV = theta*bx::kInvPi;
 	}
 
-	inline void vec3Abs(float* _result, const float* _a)
-	{
-		_result[0] = abs(_a[0]);
-		_result[1] = abs(_a[1]);
-		_result[2] = abs(_a[2]);
-	}
-
 	inline void vec3Add(float* _result, const float* _a, const float* _b)
 	{
 		_result[0] = _a[0] + _b[0];
@@ -606,25 +599,11 @@ namespace bx
 		_result[2] = _a[2] + _b[2];
 	}
 
-	inline void vec3Add(float* _result, const float* _a, float _b)
-	{
-		_result[0] = _a[0] + _b;
-		_result[1] = _a[1] + _b;
-		_result[2] = _a[2] + _b;
-	}
-
 	inline void vec3Sub(float* _result, const float* _a, const float* _b)
 	{
 		_result[0] = _a[0] - _b[0];
 		_result[1] = _a[1] - _b[1];
 		_result[2] = _a[2] - _b[2];
-	}
-
-	inline void vec3Sub(float* _result, const float* _a, float _b)
-	{
-		_result[0] = _a[0] - _b;
-		_result[1] = _a[1] - _b;
-		_result[2] = _a[2] - _b;
 	}
 
 	inline void vec3Mul(float* _result, const float* _a, const float* _b)
@@ -656,20 +635,6 @@ namespace bx
 	inline float vec3Length(const float* _a)
 	{
 		return sqrt(vec3Dot(_a, _a) );
-	}
-
-	inline void vec3Lerp(float* _result, const float* _a, const float* _b, float _t)
-	{
-		_result[0] = lerp(_a[0], _b[0], _t);
-		_result[1] = lerp(_a[1], _b[1], _t);
-		_result[2] = lerp(_a[2], _b[2], _t);
-	}
-
-	inline void vec3Lerp(float* _result, const float* _a, const float* _b, const float* _c)
-	{
-		_result[0] = lerp(_a[0], _b[0], _c[0]);
-		_result[1] = lerp(_a[1], _b[1], _c[1]);
-		_result[2] = lerp(_a[2], _b[2], _c[2]);
 	}
 
 	inline float vec3Norm(float* _result, const float* _a)
