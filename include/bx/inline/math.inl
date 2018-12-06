@@ -95,14 +95,30 @@ namespace bx
 		return tmp == UINT64_C(0x7ff0000000000000);
 	}
 
-	inline BX_CONST_FUNC float round(float _f)
+	inline BX_CONSTEXPR_FUNC float floor(float _a)
 	{
-		return floor(_f + 0.5f);
+		if (_a < 0.0f)
+		{
+			const float fr = fract(-_a);
+			const float result = -_a - fr;
+
+			return -(0.0f != fr
+				? result + 1.0f
+				: result)
+				;
+		}
+
+		return _a - fract(_a);
 	}
 
-	inline BX_CONST_FUNC float ceil(float _a)
+	inline BX_CONSTEXPR_FUNC float ceil(float _a)
 	{
 		return -floor(-_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float round(float _f)
+	{
+		return floor(_f + 0.5f);
 	}
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)

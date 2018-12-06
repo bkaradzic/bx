@@ -239,22 +239,6 @@ namespace bx
 		return result;
 	}
 
-	BX_CONST_FUNC float floor(float _a)
-	{
-		if (_a < 0.0f)
-		{
-			const float fr = fract(-_a);
-			const float result = -_a - fr;
-
-			return -(0.0f != fr
-				? result + 1.0f
-				: result)
-				;
-		}
-
-		return _a - fract(_a);
-	}
-
 	static void mtxLookAtImpl(float* _result, const Vec3& _eye, const Vec3& _view, const Vec3& _up)
 	{
 		const Vec3 uxv   = cross(_up, _view);

@@ -3,8 +3,6 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-// FPU math lib
-
 #ifndef BX_MATH_H_HEADER_GUARD
 #define BX_MATH_H_HEADER_GUARD
 
@@ -112,15 +110,15 @@ namespace bx
 
 	/// Returns the largest integer value not greater than _f.
 	///
-	BX_CONST_FUNC float floor(float _f);
+	BX_CONSTEXPR_FUNC float floor(float _f);
 
 	/// Returns the smallest integer value not less than _f.
 	///
-	BX_CONST_FUNC float ceil(float _f);
+	BX_CONSTEXPR_FUNC float ceil(float _f);
 
 	/// Returns the nearest integer value to _f, rounding halfway cases away from zero,
 	///
-	BX_CONST_FUNC float round(float _f);
+	BX_CONSTEXPR_FUNC float round(float _f);
 
 	/// Returns linear interpolation between two values _a and _b.
 	///
