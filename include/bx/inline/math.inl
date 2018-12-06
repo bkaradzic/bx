@@ -592,6 +592,174 @@ namespace bx
 		*_outV = theta*bx::kInvPi;
 	}
 
+	inline BX_CONSTEXPR_FUNC Quaternion invert(const Quaternion& _a)
+	{
+		return
+		{
+			-_a.x,
+			-_a.y,
+			-_a.z,
+			 _a.w,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 mulXyz(const Quaternion& _a, const Quaternion& _b)
+	{
+		const float ax = _a.x;
+		const float ay = _a.y;
+		const float az = _a.z;
+		const float aw = _a.w;
+
+		const float bx = _b.x;
+		const float by = _b.y;
+		const float bz = _b.z;
+		const float bw = _b.w;
+
+		return
+		{
+			aw * bx + ax * bw + ay * bz - az * by,
+			aw * by - ax * bz + ay * bw + az * bx,
+			aw * bz + ax * by - ay * bx + az * bw,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion& _a, const Quaternion& _b)
+	{
+		const float ax = _a.x;
+		const float ay = _a.y;
+		const float az = _a.z;
+		const float aw = _a.w;
+
+		const float bx = _b.x;
+		const float by = _b.y;
+		const float bz = _b.z;
+		const float bw = _b.w;
+
+		return
+		{
+			aw * bx + ax * bw + ay * bz - az * by,
+			aw * by - ax * bz + ay * bw + az * bx,
+			aw * bz + ax * by - ay * bx + az * bw,
+			aw * bw - ax * bx - ay * by - az * bz,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3& _v, const Quaternion& _q)
+	{
+		const Quaternion tmp0 = invert(_q);
+		const Quaternion qv   = { _v.x, _v.y, _v.z, 0.0f };
+		const Quaternion tmp1 = mul(tmp0, qv);
+		const Vec3 result     = mulXyz(tmp1, _q);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float dot(const Quaternion& _a, const Quaternion& _b)
+	{
+		return
+			  _a.x * _b.x
+			+ _a.y * _b.y
+			+ _a.z * _b.z
+			+ _a.w * _b.w
+			;
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion normalize(const Quaternion& _a)
+	{
+		const float norm = dot(_a, _a);
+		if (0.0f < norm)
+		{
+			const float invNorm = 1.0f / sqrt(norm);
+
+			return
+			{
+				_a.x * invNorm,
+				_a.y * invNorm,
+				_a.z * invNorm,
+				_a.w * invNorm,
+			};
+		}
+
+		return
+		{
+			0.0f,
+			0.0f,
+			0.0f,
+			1.0f,
+		};
+	}
+
+	inline BX_CONST_FUNC Vec3 toEuler(const Quaternion& _a)
+	{
+		const float xx  = _a.x;
+		const float yy  = _a.y;
+		const float zz  = _a.z;
+		const float ww  = _a.w;
+		const float xsq = square(xx);
+		const float ysq = square(yy);
+		const float zsq = square(zz);
+
+		return
+		{
+			atan2(2.0f * (xx * ww - yy * zz), 1.0f - 2.0f * (xsq + zsq) ),
+			atan2(2.0f * (yy * ww + xx * zz), 1.0f - 2.0f * (ysq + zsq) ),
+			asin( 2.0f * (xx * yy + zz * ww) ),
+		};
+	}
+
+	inline BX_CONST_FUNC Quaternion rotateAxis(const Vec3& _axis, float _angle)
+	{
+		const float ha = _angle * 0.5f;
+		const float sa = sin(ha);
+
+		return
+		{
+			_axis.x * sa,
+			_axis.y * sa,
+			_axis.z * sa,
+			cos(ha),
+		};
+	}
+
+	inline BX_CONST_FUNC Quaternion rotateX(float _ax)
+	{
+		const float hx = _ax * 0.5f;
+
+		return
+		{
+			sin(hx),
+			0.0f,
+			0.0f,
+			cos(hx),
+		};
+	}
+
+	inline BX_CONST_FUNC Quaternion rotateY(float _ay)
+	{
+		const float hy = _ay * 0.5f;
+
+		return
+		{
+			0.0f,
+			sin(hy),
+			0.0f,
+			cos(hy),
+		};
+	}
+
+	inline BX_CONST_FUNC Quaternion rotateZ(float _az)
+	{
+		const float hz = _az * 0.5f;
+
+		return
+		{
+			0.0f,
+			0.0f,
+			sin(hz),
+			cos(hz),
+		};
+	}
+
 	inline void vec3Add(float* _result, const float* _a, const float* _b)
 	{
 		_result[0] = _a[0] + _b[0];
@@ -707,168 +875,6 @@ namespace bx
 
 		*_outU = (bx::kPi + phi)/bx::kPi2;
 		*_outV = theta*bx::kInvPi;
-	}
-
-	inline void quatIdentity(float* _result)
-	{
-		_result[0] = 0.0f;
-		_result[1] = 0.0f;
-		_result[2] = 0.0f;
-		_result[3] = 1.0f;
-	}
-
-	inline void quatMove(float* _result, const float* _a)
-	{
-		_result[0] = _a[0];
-		_result[1] = _a[1];
-		_result[2] = _a[2];
-		_result[3] = _a[3];
-	}
-
-	inline void quatMulXYZ(float* _result, const float* _qa, const float* _qb)
-	{
-		const float ax = _qa[0];
-		const float ay = _qa[1];
-		const float az = _qa[2];
-		const float aw = _qa[3];
-
-		const float bx = _qb[0];
-		const float by = _qb[1];
-		const float bz = _qb[2];
-		const float bw = _qb[3];
-
-		_result[0] = aw * bx + ax * bw + ay * bz - az * by;
-		_result[1] = aw * by - ax * bz + ay * bw + az * bx;
-		_result[2] = aw * bz + ax * by - ay * bx + az * bw;
-	}
-
-	inline void quatMul(float* _result, const float* _qa, const float* _qb)
-	{
-		const float ax = _qa[0];
-		const float ay = _qa[1];
-		const float az = _qa[2];
-		const float aw = _qa[3];
-
-		const float bx = _qb[0];
-		const float by = _qb[1];
-		const float bz = _qb[2];
-		const float bw = _qb[3];
-
-		_result[0] = aw * bx + ax * bw + ay * bz - az * by;
-		_result[1] = aw * by - ax * bz + ay * bw + az * bx;
-		_result[2] = aw * bz + ax * by - ay * bx + az * bw;
-		_result[3] = aw * bw - ax * bx - ay * by - az * bz;
-	}
-
-	inline void quatInvert(float* _result, const float* _quat)
-	{
-		_result[0] = -_quat[0];
-		_result[1] = -_quat[1];
-		_result[2] = -_quat[2];
-		_result[3] =  _quat[3];
-	}
-
-	inline float quatDot(const float* _a, const float* _b)
-	{
-		return _a[0]*_b[0]
-			 + _a[1]*_b[1]
-			 + _a[2]*_b[2]
-			 + _a[3]*_b[3]
-			 ;
-	}
-
-	inline void quatNorm(float* _result, const float* _quat)
-	{
-		const float norm = quatDot(_quat, _quat);
-		if (0.0f < norm)
-		{
-			const float invNorm = 1.0f / sqrt(norm);
-			_result[0] = _quat[0] * invNorm;
-			_result[1] = _quat[1] * invNorm;
-			_result[2] = _quat[2] * invNorm;
-			_result[3] = _quat[3] * invNorm;
-		}
-		else
-		{
-			quatIdentity(_result);
-		}
-	}
-
-	inline void quatToEuler(float* _result, const float* _quat)
-	{
-		const float x = _quat[0];
-		const float y = _quat[1];
-		const float z = _quat[2];
-		const float w = _quat[3];
-
-		const float yy = y * y;
-		const float zz = z * z;
-
-		const float xx = x * x;
-		_result[0] = atan2(2.0f * (x * w - y * z), 1.0f - 2.0f * (xx + zz) );
-		_result[1] = atan2(2.0f * (y * w + x * z), 1.0f - 2.0f * (yy + zz) );
-		_result[2] = asin (2.0f * (x * y + z * w) );
-	}
-
-	inline void quatRotateAxis(float* _result, const float* _axis, float _angle)
-	{
-		const float ha = _angle * 0.5f;
-		const float ca = cos(ha);
-		const float sa = sin(ha);
-		_result[0] = _axis[0] * sa;
-		_result[1] = _axis[1] * sa;
-		_result[2] = _axis[2] * sa;
-		_result[3] = ca;
-	}
-
-	inline void quatRotateX(float* _result, float _ax)
-	{
-		const float hx = _ax * 0.5f;
-		const float cx = cos(hx);
-		const float sx = sin(hx);
-		_result[0] = sx;
-		_result[1] = 0.0f;
-		_result[2] = 0.0f;
-		_result[3] = cx;
-	}
-
-	inline void quatRotateY(float* _result, float _ay)
-	{
-		const float hy = _ay * 0.5f;
-		const float cy = cos(hy);
-		const float sy = sin(hy);
-		_result[0] = 0.0f;
-		_result[1] = sy;
-		_result[2] = 0.0f;
-		_result[3] = cy;
-	}
-
-	inline void quatRotateZ(float* _result, float _az)
-	{
-		const float hz = _az * 0.5f;
-		const float cz = cos(hz);
-		const float sz = sin(hz);
-		_result[0] = 0.0f;
-		_result[1] = 0.0f;
-		_result[2] = sz;
-		_result[3] = cz;
-	}
-
-	inline void vec3MulQuat(float* _result, const float* _vec, const float* _quat)
-	{
-		float tmp0[4];
-		quatInvert(tmp0, _quat);
-
-		float qv[4];
-		qv[0] = _vec[0];
-		qv[1] = _vec[1];
-		qv[2] = _vec[2];
-		qv[3] = 0.0f;
-
-		float tmp1[4];
-		quatMul(tmp1, tmp0, qv);
-
-		quatMulXYZ(_result, tmp1, _quat);
 	}
 
 	inline void mtxIdentity(float* _result)

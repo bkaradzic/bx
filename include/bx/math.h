@@ -56,6 +56,12 @@ namespace bx
 		float x, y, z;
 	};
 
+	///
+	struct Quaternion
+	{
+		float x, y, z, w;
+	};
+
 	/// Returns converted the argument _deg to radians.
 	///
 	BX_CONST_FUNC float toRad(float _deg);
@@ -334,6 +340,39 @@ namespace bx
 	void toLatLong(float* _outU, float* _outV, const Vec3&  _dir);
 
 	///
+	BX_CONSTEXPR_FUNC Quaternion invert(const Quaternion& _a);
+
+	///
+	BX_CONSTEXPR_FUNC Vec3 mulXyz(const Quaternion& _a, const Quaternion& _b);
+
+	///
+	BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion& _a, const Quaternion& _b);
+
+	///
+	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3& _v, const Quaternion& _q);
+
+	///
+	BX_CONSTEXPR_FUNC float dot(const Quaternion& _a, const Quaternion& _b);
+
+	///
+	BX_CONSTEXPR_FUNC Quaternion normalize(const Quaternion& _a);
+
+	///
+	BX_CONST_FUNC Vec3 toEuler(const Quaternion& _a);
+
+	///
+	BX_CONST_FUNC Quaternion rotateAxis(const Vec3& _axis, float _angle);
+
+	///
+	BX_CONST_FUNC Quaternion rotateX(float _ax);
+
+	///
+	BX_CONST_FUNC Quaternion rotateY(float _ay);
+
+	///
+	BX_CONST_FUNC Quaternion rotateZ(float _az);
+
+	///
 	void vec3Add(float* _result, const float* _a, const float* _b);
 
 	///
@@ -375,45 +414,6 @@ namespace bx
 	/// @param[in]  _dir Normalized direction vector.
 	///
 	void vec3ToLatLong(float* _outU, float* _outV, const float* _dir);
-
-	///
-	void quatIdentity(float* _result);
-
-	///
-	void quatMove(float* _result, const float* _a);
-
-	///
-	void quatMulXYZ(float* _result, const float* _qa, const float* _qb);
-
-	///
-	void quatMul(float* _result, const float* _qa, const float* _qb);
-
-	///
-	void quatInvert(float* _result, const float* _quat);
-
-	///
-	float quatDot(const float* _a, const float* _b);
-
-	///
-	void quatNorm(float* _result, const float* _quat);
-
-	///
-	void quatToEuler(float* _result, const float* _quat);
-
-	///
-	void quatRotateAxis(float* _result, const float* _axis, float _angle);
-
-	///
-	void quatRotateX(float* _result, float _ax);
-
-	///
-	void quatRotateY(float* _result, float _ay);
-
-	///
-	void quatRotateZ(float* _result, float _az);
-
-	///
-	void vec3MulQuat(float* _result, const float* _vec, const float* _quat);
 
 	///
 	void mtxIdentity(float* _result);
