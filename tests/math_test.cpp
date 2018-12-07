@@ -203,8 +203,8 @@ TEST_CASE("quaternion", "")
 	float mtxQ[16];
 	float mtx[16];
 
-	float quat[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	bx::mtxQuat(mtxQ, quat);
+	bx::Quaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
+	bx::mtxQuat(mtxQ, &quat.x);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);
 
@@ -212,28 +212,27 @@ TEST_CASE("quaternion", "")
 	float ay = bx::kPi/13.0f;
 	float az = bx::kPi/7.0f;
 
-	bx::quatRotateX(quat, ax);
-	bx::mtxQuat(mtxQ, quat);
+	quat = bx::rotateX(ax);
+	bx::mtxQuat(mtxQ, &quat.x);
 	bx::mtxRotateX(mtx, ax);
 	mtxCheck(mtxQ, mtx);
 
-	float euler[3];
-	bx::quatToEuler(euler, quat);
-	CHECK(bx::equal(euler[0], ax, 0.001f) );
+	bx::Vec3 euler = bx::toEuler(quat);
+	CHECK(bx::equal(euler.x, ax, 0.001f) );
 
-	bx::quatRotateY(quat, ay);
-	bx::mtxQuat(mtxQ, quat);
+	quat = bx::rotateY(ay);
+	bx::mtxQuat(mtxQ, &quat.x);
 	bx::mtxRotateY(mtx, ay);
 	mtxCheck(mtxQ, mtx);
 
-	bx::quatToEuler(euler, quat);
-	CHECK(bx::equal(euler[1], ay, 0.001f) );
+	euler = bx::toEuler(quat);
+	CHECK(bx::equal(euler.y, ay, 0.001f) );
 
-	bx::quatRotateZ(quat, az);
-	bx::mtxQuat(mtxQ, quat);
+	quat = bx::rotateZ(az);
+	bx::mtxQuat(mtxQ, &quat.x);
 	bx::mtxRotateZ(mtx, az);
 	mtxCheck(mtxQ, mtx);
 
-	bx::quatToEuler(euler, quat);
-	CHECK(bx::equal(euler[2], az, 0.001f) );
+	euler = bx::toEuler(quat);
+	CHECK(bx::equal(euler.z, az, 0.001f) );
 }

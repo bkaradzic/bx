@@ -1073,6 +1073,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-miphoneos-version-min=7.0",
 			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
+			"-fembed-bitcode",
 		}
 
 	configuration { "ios-simulator" }
