@@ -815,44 +815,6 @@ namespace bx
 		return len;
 	}
 
-	inline void vec3TangentFrame(const float* _n, float* _t, float* _b)
-	{
-		const float nx = _n[0];
-		const float ny = _n[1];
-		const float nz = _n[2];
-
-		if (abs(nx) > abs(nz) )
-		{
-			float invLen = 1.0f / sqrt(nx*nx + nz*nz);
-			_t[0] = -nz * invLen;
-			_t[1] =  0.0f;
-			_t[2] =  nx * invLen;
-		}
-		else
-		{
-			float invLen = 1.0f / sqrt(ny*ny + nz*nz);
-			_t[0] =  0.0f;
-			_t[1] =  nz * invLen;
-			_t[2] = -ny * invLen;
-		}
-
-		vec3Cross(_b, _n, _t);
-	}
-
-	inline void vec3TangentFrame(const float* _n, float* _t, float* _b, float _angle)
-	{
-		vec3TangentFrame(_n, _t, _b);
-
-		const float sa = sin(_angle);
-		const float ca = cos(_angle);
-
-		_t[0] = -sa * _b[0] + ca * _t[0];
-		_t[1] = -sa * _b[1] + ca * _t[1];
-		_t[2] = -sa * _b[2] + ca * _t[2];
-
-		vec3Cross(_b, _n, _t);
-	}
-
 	inline void vec3FromLatLong(float* _vec, float _u, float _v)
 	{
 		const float phi   = _u * kPi2;
@@ -907,13 +869,14 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos)
 	{
-		float tangent[3];
-		float bitangent[3];
-		vec3TangentFrame(_normal, tangent, bitangent);
+		const bx::Vec3 normal = bx::load(_normal);
+		bx::Vec3 tangent;
+		bx::Vec3 bitangent;
+		calcTangentFrame(tangent, bitangent, normal);
 
-		vec3Mul(&_result[ 0], bitangent, _scale);
-		vec3Mul(&_result[ 4], _normal,   _scale);
-		vec3Mul(&_result[ 8], tangent,   _scale);
+		store(&_result[ 0], mul(bitangent, _scale) );
+		store(&_result[ 4], mul(normal,    _scale) );
+		store(&_result[ 8], mul(tangent,   _scale) );
 
 		_result[ 3] = 0.0f;
 		_result[ 7] = 0.0f;
@@ -926,13 +889,14 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle)
 	{
-		float tangent[3];
-		float bitangent[3];
-		vec3TangentFrame(_normal, tangent, bitangent, _angle);
+		const bx::Vec3 normal = bx::load(_normal);
+		bx::Vec3 tangent;
+		bx::Vec3 bitangent;
+		calcTangentFrame(tangent, bitangent, normal, _angle);
 
-		vec3Mul(&_result[ 0], bitangent, _scale);
-		vec3Mul(&_result[ 4], _normal,   _scale);
-		vec3Mul(&_result[ 8], tangent,   _scale);
+		store(&_result[0], mul(bitangent, _scale) );
+		store(&_result[4], mul(normal,    _scale) );
+		store(&_result[8], mul(tangent,   _scale) );
 
 		_result[ 3] = 0.0f;
 		_result[ 7] = 0.0f;
