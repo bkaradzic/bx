@@ -298,6 +298,9 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 mul(const Vec3&  _a, float _b);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const float _b, const Vec3& _c);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c);
 
 	///
@@ -391,21 +394,7 @@ namespace bx
 	void vec3Cross(float* _result, const float* _a, const float* _b);
 
 	///
-	float vec3Length(const float* _a);
-
-	///
 	float vec3Norm(float* _result, const float* _a);
-
-	///
-	void vec3FromLatLong(float* _vec, float _u, float _v);
-
-	/// Convert direction to 2D latitude and longitude.
-	///
-	/// @param[out] _outU U-coordinate.
-	/// @param[out] _outV V-coordinate.
-	/// @param[in]  _dir Normalized direction vector.
-	///
-	void vec3ToLatLong(float* _outU, float* _outV, const float* _dir);
 
 	///
 	void mtxIdentity(float* _result);

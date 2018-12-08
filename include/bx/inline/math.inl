@@ -446,6 +446,11 @@ namespace bx
 		};
 	}
 
+	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const float _b, const Vec3& _c)
+	{
+		return add(mul(_a, _b), _c);
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c)
 	{
 		return add(mul(_a, _b), _c);
@@ -800,43 +805,14 @@ namespace bx
 		_result[2] = _a[0]*_b[1] - _a[1]*_b[0];
 	}
 
-	inline float vec3Length(const float* _a)
-	{
-		return sqrt(vec3Dot(_a, _a) );
-	}
-
 	inline float vec3Norm(float* _result, const float* _a)
 	{
-		const float len = vec3Length(_a);
+		const float len = sqrt(vec3Dot(_a, _a) );
 		const float invLen = 1.0f/len;
 		_result[0] = _a[0] * invLen;
 		_result[1] = _a[1] * invLen;
 		_result[2] = _a[2] * invLen;
 		return len;
-	}
-
-	inline void vec3FromLatLong(float* _vec, float _u, float _v)
-	{
-		const float phi   = _u * kPi2;
-		const float theta = _v * kPi;
-
-		const float st = sin(theta);
-		const float sp = sin(phi);
-		const float ct = cos(theta);
-		const float cp = cos(phi);
-
-		_vec[0] = -st*sp;
-		_vec[1] =  ct;
-		_vec[2] = -st*cp;
-	}
-
-	inline void vec3ToLatLong(float* _outU, float* _outV, const float* _dir)
-	{
-		const float phi   = atan2(_dir[0], _dir[2]);
-		const float theta = acos(_dir[1]);
-
-		*_outU = (bx::kPi + phi)/bx::kPi2;
-		*_outV = theta*bx::kInvPi;
 	}
 
 	inline void mtxIdentity(float* _result)
