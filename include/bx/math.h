@@ -382,19 +382,7 @@ namespace bx
 	void vec3Sub(float* _result, const float* _a, const float* _b);
 
 	///
-	void vec3Mul(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec3Mul(float* _result, const float* _a, float _b);
-
-	///
 	float vec3Dot(const float* _a, const float* _b);
-
-	///
-	void vec3Cross(float* _result, const float* _a, const float* _b);
-
-	///
-	float vec3Norm(float* _result, const float* _a);
 
 	///
 	void mtxIdentity(float* _result);

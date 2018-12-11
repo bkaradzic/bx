@@ -366,7 +366,7 @@ namespace bx
 		ptr[2] = _a.z;
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a)
 	{
 		return
 		{
@@ -376,7 +376,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 neg(const Vec3  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 neg(const Vec3 _a)
 	{
 		return
 		{
@@ -386,7 +386,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -396,7 +396,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3 _a, float _b)
 	{
 		return
 		{
@@ -406,7 +406,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -416,7 +416,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3 _a, float _b)
 	{
 		return
 		{
@@ -426,7 +426,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -436,7 +436,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3  _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, float _b)
 	{
 		return
 		{
@@ -456,12 +456,12 @@ namespace bx
 		return add(mul(_a, _b), _c);
 	}
 
-	inline BX_CONSTEXPR_FUNC float dot(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC float dot(const Vec3 _a, const Vec3 _b)
 	{
 		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 cross(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 cross(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -471,12 +471,12 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC float length(const Vec3  _a)
+	inline BX_CONST_FUNC float length(const Vec3 _a)
 	{
 		return sqrt(dot(_a, _a) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3  _a, const Vec3  _b, float _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, float _t)
 	{
 		return
 		{
@@ -486,7 +486,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3  _a, const Vec3  _b, const Vec3  _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, const Vec3 _t)
 	{
 		return
 		{
@@ -496,14 +496,14 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 normalize(const Vec3  _a)
+	inline BX_CONST_FUNC Vec3 normalize(const Vec3 _a)
 	{
 		const float invLen = 1.0f/length(_a);
-		const Vec3  result = mul(_a, invLen);
+		const Vec3 result = mul(_a, invLen);
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 min(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 min(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -513,7 +513,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 max(const Vec3  _a, const Vec3  _b)
+	inline BX_CONSTEXPR_FUNC Vec3 max(const Vec3 _a, const Vec3 _b)
 	{
 		return
 		{
@@ -523,7 +523,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3  _a)
+	inline BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a)
 	{
 		return
 		{
@@ -588,7 +588,7 @@ namespace bx
 		return result;
 	}
 
-	inline void toLatLong(float* _outU, float* _outV, const Vec3  _dir)
+	inline void toLatLong(float* _outU, float* _outV, const Vec3 _dir)
 	{
 		const float phi   = atan2(_dir.x, _dir.z);
 		const float theta = acos(_dir.y);
@@ -787,40 +787,9 @@ namespace bx
 		_result[2] = _a[2] - _b[2];
 	}
 
-	inline void vec3Mul(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = _a[0] * _b[0];
-		_result[1] = _a[1] * _b[1];
-		_result[2] = _a[2] * _b[2];
-	}
-
-	inline void vec3Mul(float* _result, const float* _a, float _b)
-	{
-		_result[0] = _a[0] * _b;
-		_result[1] = _a[1] * _b;
-		_result[2] = _a[2] * _b;
-	}
-
 	inline float vec3Dot(const float* _a, const float* _b)
 	{
 		return _a[0]*_b[0] + _a[1]*_b[1] + _a[2]*_b[2];
-	}
-
-	inline void vec3Cross(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = _a[1]*_b[2] - _a[2]*_b[1];
-		_result[1] = _a[2]*_b[0] - _a[0]*_b[2];
-		_result[2] = _a[0]*_b[1] - _a[1]*_b[0];
-	}
-
-	inline float vec3Norm(float* _result, const float* _a)
-	{
-		const float len = sqrt(vec3Dot(_a, _a) );
-		const float invLen = 1.0f/len;
-		_result[0] = _a[0] * invLen;
-		_result[1] = _a[1] * invLen;
-		_result[2] = _a[2] * invLen;
-		return len;
 	}
 
 	inline void mtxIdentity(float* _result)
@@ -1108,16 +1077,14 @@ namespace bx
 
 	inline void calcNormal(float _result[3], const float _va[3], const float _vb[3], const float _vc[3])
 	{
-		float ba[3];
-		vec3Sub(ba, _vb, _va);
+		const bx::Vec3 va    = bx::load(_va);
+		const bx::Vec3 vb    = bx::load(_vb);
+		const bx::Vec3 vc    = bx::load(_vc);
+		const bx::Vec3 ba    = bx::sub(vb, va);
+		const bx::Vec3 ca    = bx::sub(vc, va);
+		const bx::Vec3 baxca = bx::cross(ba, ca);
 
-		float ca[3];
-		vec3Sub(ca, _vc, _va);
-
-		float baxca[3];
-		vec3Cross(baxca, ba, ca);
-
-		vec3Norm(_result, baxca);
+		bx::store(_result, bx::normalize(baxca) );
 	}
 
 	inline void calcPlane(float _result[4], const float _va[3], const float _vb[3], const float _vc[3])
@@ -1132,7 +1099,7 @@ namespace bx
 		_result[0] = _normal[0];
 		_result[1] = _normal[1];
 		_result[2] = _normal[2];
-		_result[3] = -vec3Dot(_normal, _pos);
+		_result[3] = -dot(bx::load(_normal), bx::load(_pos) );
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)
