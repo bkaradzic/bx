@@ -31,6 +31,23 @@ namespace bx
 		return max(-1.0f, float(_value) / _scale);
 	}
 
+	// A8
+	inline void packA8(void* _dst, const float* _src)
+	{
+		uint8_t* dst = (uint8_t*)_dst;
+		dst[0] = uint8_t(toUnorm(_src[3], 255.0f) );
+	}
+
+	inline void unpackA8(float* _dst, const void* _src)
+	{
+		const uint8_t* src = (const uint8_t*)_src;
+		const float aa = fromUnorm(src[0], 255.0f);
+		_dst[0] = aa;
+		_dst[1] = aa;
+		_dst[2] = aa;
+		_dst[3] = aa;
+	}
+
 	// R8
 	inline void packR8(void* _dst, const float* _src)
 	{
@@ -45,22 +62,6 @@ namespace bx
 		_dst[1] = 0.0f;
 		_dst[2] = 0.0f;
 		_dst[3] = 1.0f;
-	}
-
-	// A8
-	inline void packA8(void* _dst, const float* _src)
-	{
-		uint8_t* dst = (uint8_t*)_dst;
-		dst[0] = uint8_t(toUnorm(_src[3], 255.0f));
-	}
-
-	inline void unpackA8(float* _dst, const void* _src)
-	{
-		const uint8_t* src = (const uint8_t*)_src;
-		_dst[0] = fromUnorm(src[0], 255.0f);
-		_dst[1] = 0.0f;
-		_dst[2] = 0.0f;
-		_dst[3] = _dst[0];
 	}
 
 	// R8S

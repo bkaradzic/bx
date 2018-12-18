@@ -41,6 +41,10 @@ namespace bx
 	///
 	float fromSnorm(int32_t _value, float _scale);
 
+	// A8
+	void packA8(void* _dst, const float* _src);
+	void unpackA8(float* _dst, const void* _src);
+
 	// R8
 	void packR8(void* _dst, const float* _src);
 	void unpackR8(float* _dst, const void* _src);
