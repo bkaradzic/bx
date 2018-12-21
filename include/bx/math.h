@@ -517,16 +517,7 @@ namespace bx
 	void vec3MulMtx(float* _result, const float* _vec, const float* _mat);
 
 	///
-	void vec3MulMtxXyz0(float* _result, const float* _vec, const float* _mat);
-
-	///
 	void vec3MulMtxH(float* _result, const float* _vec, const float* _mat);
-
-	///
-	void vec4Mul(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec4Mul(float* _result, const float* _a, float _b);
 
 	///
 	void vec4MulMtx(float* _result, const float* _vec, const float* _mat);
