@@ -376,15 +376,6 @@ namespace bx
 	BX_CONST_FUNC Quaternion rotateZ(float _az);
 
 	///
-	void vec3Add(float* _result, const float* _a, const float* _b);
-
-	///
-	void vec3Sub(float* _result, const float* _a, const float* _b);
-
-	///
-	float vec3Dot(const float* _a, const float* _b);
-
-	///
 	void mtxIdentity(float* _result);
 
 	///

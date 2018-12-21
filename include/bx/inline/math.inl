@@ -773,25 +773,6 @@ namespace bx
 		};
 	}
 
-	inline void vec3Add(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = _a[0] + _b[0];
-		_result[1] = _a[1] + _b[1];
-		_result[2] = _a[2] + _b[2];
-	}
-
-	inline void vec3Sub(float* _result, const float* _a, const float* _b)
-	{
-		_result[0] = _a[0] - _b[0];
-		_result[1] = _a[1] - _b[1];
-		_result[2] = _a[2] - _b[2];
-	}
-
-	inline float vec3Dot(const float* _a, const float* _b)
-	{
-		return _a[0]*_b[0] + _a[1]*_b[1] + _a[2]*_b[2];
-	}
-
 	inline void mtxIdentity(float* _result)
 	{
 		memSet(_result, 0, sizeof(float)*16);
