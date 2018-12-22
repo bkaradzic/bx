@@ -347,23 +347,18 @@ namespace bx
 		return _a + angleDiff(_a, _b) * _t;
 	}
 
-	inline Vec3 load(const void* _ptr)
+	template<typename Ty>
+	inline Ty load(const void* _ptr)
 	{
-		const float* ptr = reinterpret_cast<const float*>(_ptr);
-		return
-		{
-			ptr[0],
-			ptr[1],
-			ptr[2],
-		};
+		Ty result;
+		memCopy(&result, _ptr, sizeof(Ty) );
+		return result;
 	}
 
-	inline void store(void* _ptr, const Vec3 _a)
+	template<typename Ty>
+	inline void store(void* _ptr, const Ty& _a)
 	{
-		float* ptr = reinterpret_cast<float*>(_ptr);
-		ptr[0] = _a.x;
-		ptr[1] = _a.y;
-		ptr[2] = _a.z;
+		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
 	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a)
@@ -803,9 +798,9 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos)
 	{
-		const bx::Vec3 normal = bx::load(_normal);
-		bx::Vec3 tangent;
-		bx::Vec3 bitangent;
+		const Vec3 normal = load<Vec3>(_normal);
+		Vec3 tangent;
+		Vec3 bitangent;
 		calcTangentFrame(tangent, bitangent, normal);
 
 		store(&_result[ 0], mul(bitangent, _scale) );
@@ -823,9 +818,9 @@ namespace bx
 
 	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle)
 	{
-		const bx::Vec3 normal = bx::load(_normal);
-		bx::Vec3 tangent;
-		bx::Vec3 bitangent;
+		const Vec3 normal = load<Vec3>(_normal);
+		Vec3 tangent;
+		Vec3 bitangent;
 		calcTangentFrame(tangent, bitangent, normal, _angle);
 
 		store(&_result[0], mul(bitangent, _scale) );
@@ -841,25 +836,25 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxQuat(float* _result, const float* _quat)
+	inline void mtxQuat(float* _result, const Quaternion& _quat)
 	{
-		const float x = _quat[0];
-		const float y = _quat[1];
-		const float z = _quat[2];
-		const float w = _quat[3];
+		const float qx = _quat.x;
+		const float qy = _quat.y;
+		const float qz = _quat.z;
+		const float qw = _quat.w;
 
-		const float x2  =  x + x;
-		const float y2  =  y + y;
-		const float z2  =  z + z;
-		const float x2x = x2 * x;
-		const float x2y = x2 * y;
-		const float x2z = x2 * z;
-		const float x2w = x2 * w;
-		const float y2y = y2 * y;
-		const float y2z = y2 * z;
-		const float y2w = y2 * w;
-		const float z2z = z2 * z;
-		const float z2w = z2 * w;
+		const float x2  = qx + qx;
+		const float y2  = qy + qy;
+		const float z2  = qz + qz;
+		const float x2x = x2 * qx;
+		const float x2y = x2 * qy;
+		const float x2z = x2 * qz;
+		const float x2w = x2 * qw;
+		const float y2y = y2 * qy;
+		const float y2z = y2 * qz;
+		const float y2w = y2 * qw;
+		const float z2z = z2 * qz;
+		const float z2w = z2 * qw;
 
 		_result[ 0] = 1.0f - (y2y + z2z);
 		_result[ 1] =         x2y - z2w;
@@ -882,25 +877,25 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxQuatTranslation(float* _result, const float* _quat, const float* _translation)
+	inline void mtxQuatTranslation(float* _result, const Quaternion& _quat, const Vec3& _translation)
 	{
 		mtxQuat(_result, _quat);
-		_result[12] = -(_result[0]*_translation[0] + _result[4]*_translation[1] + _result[ 8]*_translation[2]);
-		_result[13] = -(_result[1]*_translation[0] + _result[5]*_translation[1] + _result[ 9]*_translation[2]);
-		_result[14] = -(_result[2]*_translation[0] + _result[6]*_translation[1] + _result[10]*_translation[2]);
+		store(&_result[12], neg(mulXyz0(_translation, _result) ) );
 	}
 
-	inline void mtxQuatTranslationHMD(float* _result, const float* _quat, const float* _translation)
+	inline void mtxQuatTranslationHMD(float* _result, const Quaternion& _quat, const Vec3& _translation)
 	{
-		float quat[4];
-		quat[0] = -_quat[0];
-		quat[1] = -_quat[1];
-		quat[2] =  _quat[2];
-		quat[3] =  _quat[3];
+		const Quaternion quat =
+		{
+			-_quat.x,
+			-_quat.y,
+			 _quat.z,
+			 _quat.w,
+		};
 		mtxQuatTranslation(_result, quat, _translation);
 	}
 
-	inline Vec3 mul(const Vec3 _vec, const float* _mat)
+	inline Vec3 mul(const Vec3& _vec, const float* _mat)
 	{
 		Vec3 result;
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
@@ -909,7 +904,7 @@ namespace bx
 		return result;
 	}
 
-	inline Vec3 mulXyz0(const Vec3 _vec, const float* _mat)
+	inline Vec3 mulXyz0(const Vec3& _vec, const float* _mat)
 	{
 		Vec3 result;
 		result.x = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8];
@@ -918,7 +913,7 @@ namespace bx
 		return result;
 	}
 
-	inline Vec3 mulH(const Vec3 _vec, const float* _mat)
+	inline Vec3 mulH(const Vec3& _vec, const float* _mat)
 	{
 		const float xx   = _vec.x * _mat[0] + _vec.y * _mat[4] + _vec.z * _mat[ 8] + _mat[12];
 		const float yy   = _vec.x * _mat[1] + _vec.y * _mat[5] + _vec.z * _mat[ 9] + _mat[13];
@@ -1035,14 +1030,14 @@ namespace bx
 
 	inline void calcNormal(float _result[3], const float _va[3], const float _vb[3], const float _vc[3])
 	{
-		const bx::Vec3 va    = bx::load(_va);
-		const bx::Vec3 vb    = bx::load(_vb);
-		const bx::Vec3 vc    = bx::load(_vc);
-		const bx::Vec3 ba    = bx::sub(vb, va);
-		const bx::Vec3 ca    = bx::sub(vc, va);
-		const bx::Vec3 baxca = bx::cross(ba, ca);
+		const bx::Vec3 va    = load<Vec3>(_va);
+		const bx::Vec3 vb    = load<Vec3>(_vb);
+		const bx::Vec3 vc    = load<Vec3>(_vc);
+		const bx::Vec3 ba    = sub(vb, va);
+		const bx::Vec3 ca    = sub(vc, va);
+		const bx::Vec3 baxca = cross(ba, ca);
 
-		bx::store(_result, bx::normalize(baxca) );
+		store(_result, bx::normalize(baxca) );
 	}
 
 	inline void calcPlane(float _result[4], const float _va[3], const float _vb[3], const float _vc[3])
@@ -1057,7 +1052,7 @@ namespace bx
 		_result[0] = _normal[0];
 		_result[1] = _normal[1];
 		_result[2] = _normal[2];
-		_result[3] = -dot(bx::load(_normal), bx::load(_pos) );
+		_result[3] = -dot(load<Vec3>(_normal), load<Vec3>(_pos) );
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)

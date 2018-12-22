@@ -268,10 +268,12 @@ namespace bx
 	BX_CONST_FUNC float angleLerp(float _a, float _b, float _t);
 
 	///
-	Vec3 load(const void* _ptr);
+	template<typename Ty>
+	Ty load(const void* _ptr);
 
 	///
-	void store(void* _ptr, const Vec3 _a);
+	template<typename Ty>
+	void store(void* _ptr, const Ty& _a);
 
 	///
 	BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a);
@@ -394,13 +396,13 @@ namespace bx
 	void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle);
 
 	///
-	void mtxQuat(float* _result, const float* _quat);
+	void mtxQuat(float* _result, const Quaternion& _quat);
 
 	///
-	void mtxQuatTranslation(float* _result, const float* _quat, const float* _translation);
+	void mtxQuatTranslation(float* _result, const Quaternion& _quat, const Vec3& _translation);
 
 	///
-	void mtxQuatTranslationHMD(float* _result, const float* _quat, const float* _translation);
+	void mtxQuatTranslationHMD(float* _result, const Quaternion& _quat, const Vec3& _translation);
 
 	///
 	void mtxLookAtLh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up = { 0.0f, 1.0f, 0.0f });
@@ -512,6 +514,15 @@ namespace bx
 
 	///
 	void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz);
+
+	///
+	Vec3 mul(const Vec3& _vec, const float* _mat);
+
+	///
+	Vec3 mulXyz0(const Vec3& _vec, const float* _mat);
+
+	///
+	Vec3 mulH(const Vec3& _vec, const float* _mat);
 
 	///
 	void vec3MulMtx(float* _result, const float* _vec, const float* _mat);
