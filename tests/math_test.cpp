@@ -204,7 +204,7 @@ TEST_CASE("quaternion", "")
 	float mtx[16];
 
 	bx::Quaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
-	bx::mtxQuat(mtxQ, &quat.x);
+	bx::mtxQuat(mtxQ, quat);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);
 
@@ -213,7 +213,7 @@ TEST_CASE("quaternion", "")
 	float az = bx::kPi/7.0f;
 
 	quat = bx::rotateX(ax);
-	bx::mtxQuat(mtxQ, &quat.x);
+	bx::mtxQuat(mtxQ, quat);
 	bx::mtxRotateX(mtx, ax);
 	mtxCheck(mtxQ, mtx);
 
@@ -221,7 +221,7 @@ TEST_CASE("quaternion", "")
 	CHECK(bx::equal(euler.x, ax, 0.001f) );
 
 	quat = bx::rotateY(ay);
-	bx::mtxQuat(mtxQ, &quat.x);
+	bx::mtxQuat(mtxQ, quat);
 	bx::mtxRotateY(mtx, ay);
 	mtxCheck(mtxQ, mtx);
 
@@ -229,7 +229,7 @@ TEST_CASE("quaternion", "")
 	CHECK(bx::equal(euler.y, ay, 0.001f) );
 
 	quat = bx::rotateZ(az);
-	bx::mtxQuat(mtxQ, &quat.x);
+	bx::mtxQuat(mtxQ, quat);
 	bx::mtxRotateZ(mtx, az);
 	mtxCheck(mtxQ, mtx);
 
