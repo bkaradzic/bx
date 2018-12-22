@@ -796,43 +796,41 @@ namespace bx
 		mtxScale(_result, _scale, _scale, _scale);
 	}
 
-	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos)
+	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos)
 	{
-		const Vec3 normal = load<Vec3>(_normal);
 		Vec3 tangent;
 		Vec3 bitangent;
-		calcTangentFrame(tangent, bitangent, normal);
+		calcTangentFrame(tangent, bitangent, _normal);
 
 		store(&_result[ 0], mul(bitangent, _scale) );
-		store(&_result[ 4], mul(normal,    _scale) );
+		store(&_result[ 4], mul(_normal,   _scale) );
 		store(&_result[ 8], mul(tangent,   _scale) );
 
 		_result[ 3] = 0.0f;
 		_result[ 7] = 0.0f;
 		_result[11] = 0.0f;
-		_result[12] = _pos[0];
-		_result[13] = _pos[1];
-		_result[14] = _pos[2];
+		_result[12] = _pos.x;
+		_result[13] = _pos.y;
+		_result[14] = _pos.z;
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle)
+	inline void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos, float _angle)
 	{
-		const Vec3 normal = load<Vec3>(_normal);
 		Vec3 tangent;
 		Vec3 bitangent;
-		calcTangentFrame(tangent, bitangent, normal, _angle);
+		calcTangentFrame(tangent, bitangent, _normal, _angle);
 
 		store(&_result[0], mul(bitangent, _scale) );
-		store(&_result[4], mul(normal,    _scale) );
+		store(&_result[4], mul(_normal,   _scale) );
 		store(&_result[8], mul(tangent,   _scale) );
 
 		_result[ 3] = 0.0f;
 		_result[ 7] = 0.0f;
 		_result[11] = 0.0f;
-		_result[12] = _pos[0];
-		_result[13] = _pos[1];
-		_result[14] = _pos[2];
+		_result[12] = _pos.x;
+		_result[13] = _pos.y;
+		_result[14] = _pos.z;
 		_result[15] = 1.0f;
 	}
 
@@ -1028,31 +1026,27 @@ namespace bx
 		_dst[15] =  _src[15];
 	}
 
-	inline void calcNormal(float _result[3], const float _va[3], const float _vb[3], const float _vc[3])
+	inline bx::Vec3 calcNormal(const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
 	{
-		const bx::Vec3 va    = load<Vec3>(_va);
-		const bx::Vec3 vb    = load<Vec3>(_vb);
-		const bx::Vec3 vc    = load<Vec3>(_vc);
-		const bx::Vec3 ba    = sub(vb, va);
-		const bx::Vec3 ca    = sub(vc, va);
+		const bx::Vec3 ba    = sub(_vb, _va);
+		const bx::Vec3 ca    = sub(_vc, _va);
 		const bx::Vec3 baxca = cross(ba, ca);
 
-		store(_result, bx::normalize(baxca) );
+		return bx::normalize(baxca);
 	}
 
-	inline void calcPlane(float _result[4], const float _va[3], const float _vb[3], const float _vc[3])
+	inline void calcPlane(float _result[4], const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
 	{
-		float normal[3];
-		calcNormal(normal, _va, _vb, _vc);
+		bx::Vec3 normal = calcNormal(_va, _vb, _vc);
 		calcPlane(_result, normal, _va);
 	}
 
-	inline void calcPlane(float _result[4], const float _normal[3], const float _pos[3])
+	inline void calcPlane(float _result[4], const bx::Vec3& _normal, const bx::Vec3& _pos)
 	{
-		_result[0] = _normal[0];
-		_result[1] = _normal[1];
-		_result[2] = _normal[2];
-		_result[3] = -dot(load<Vec3>(_normal), load<Vec3>(_pos) );
+		_result[0] = _normal.x;
+		_result[1] = _normal.y;
+		_result[2] = _normal.z;
+		_result[3] = -dot(_normal, _pos);
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)

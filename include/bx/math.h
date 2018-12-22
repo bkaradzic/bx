@@ -390,10 +390,10 @@ namespace bx
 	void mtxScale(float* _result, float _scale);
 
 	///
-	void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos);
+	void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos);
 
 	///
-	void mtxFromNormal(float* _result, const float* _normal, float _scale, const float* _pos, float _angle);
+	void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos, float _angle);
 
 	///
 	void mtxQuat(float* _result, const Quaternion& _quat);
@@ -554,13 +554,13 @@ namespace bx
 	void mtxViewFlipHandedness(float* _dst, const float* _src);
 
 	///
-	void calcNormal(float _result[3], const float _va[3], const float _vb[3], const float _vc[3]);
+	bx::Vec3 calcNormal(const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
 
 	///
-	void calcPlane(float _result[4], const float _va[3], const float _vb[3], const float _vc[3]);
+	void calcPlane(float _result[4], const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
 
 	///
-	void calcPlane(float _result[4], const float _normal[3], const float _pos[3]);
+	void calcPlane(float _result[4], const bx::Vec3& _normal, const bx::Vec3& _pos);
 
 	///
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints);
