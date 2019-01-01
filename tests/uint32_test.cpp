@@ -19,6 +19,13 @@ TEST_CASE("StrideAlign")
 	{
 		REQUIRE(48 == bx::strideAlign16(ii+1, 12) );
 	}
+
+	uint32_t offset = 11;
+	offset = bx::strideAlign(offset, 32);
+	REQUIRE(offset == 32);
+
+	offset = bx::strideAlign(offset, 24);
+	REQUIRE(offset == 48);
 }
 
 TEST_CASE("uint32_cnt")
