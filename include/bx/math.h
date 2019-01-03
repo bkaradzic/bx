@@ -276,6 +276,9 @@ namespace bx
 	void store(void* _ptr, const Ty& _a);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 round(const Vec3 _a);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a);
 
 	///
