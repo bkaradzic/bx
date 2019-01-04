@@ -56,6 +56,12 @@ namespace bx
 		float x, y, z;
 	};
 
+	struct Plane
+	{
+		bx::Vec3 normal;
+		float    dist;
+	};
+
 	///
 	struct Quaternion
 	{
@@ -557,10 +563,10 @@ namespace bx
 	bx::Vec3 calcNormal(const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
 
 	///
-	void calcPlane(float _result[4], const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
+	void calcPlane(Plane& _outPlane, const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
 
 	///
-	void calcPlane(float _result[4], const bx::Vec3& _normal, const bx::Vec3& _pos);
+	void calcPlane(Plane& _outPlane, const bx::Vec3& _normal, const bx::Vec3& _pos);
 
 	///
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints);

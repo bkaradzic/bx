@@ -1035,18 +1035,16 @@ namespace bx
 		return bx::normalize(baxca);
 	}
 
-	inline void calcPlane(float _result[4], const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
+	inline void calcPlane(Plane& _outPlane, const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
 	{
 		bx::Vec3 normal = calcNormal(_va, _vb, _vc);
-		calcPlane(_result, normal, _va);
+		calcPlane(_outPlane, normal, _va);
 	}
 
-	inline void calcPlane(float _result[4], const bx::Vec3& _normal, const bx::Vec3& _pos)
+	inline void calcPlane(Plane& _outPlane, const bx::Vec3& _normal, const bx::Vec3& _pos)
 	{
-		_result[0] = _normal.x;
-		_result[1] = _normal.y;
-		_result[2] = _normal.z;
-		_result[3] = -dot(_normal, _pos);
+		_outPlane.normal = _normal;
+		_outPlane.dist   = -dot(_normal, _pos);
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)
