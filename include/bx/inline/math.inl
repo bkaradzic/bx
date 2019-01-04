@@ -361,6 +361,16 @@ namespace bx
 		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
+	inline BX_CONSTEXPR_FUNC Vec3 round(const Vec3 _a)
+	{
+		return
+		{
+			round(_a.x),
+			round(_a.y),
+			round(_a.z),
+		};
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a)
 	{
 		return
@@ -927,25 +937,6 @@ namespace bx
 		};
 
 		return result;
-	}
-
-	inline void vec3MulMtx(float* _result, const float* _vec, const float* _mat)
-	{
-		_result[0] = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8] + _mat[12];
-		_result[1] = _vec[0] * _mat[ 1] + _vec[1] * _mat[5] + _vec[2] * _mat[ 9] + _mat[13];
-		_result[2] = _vec[0] * _mat[ 2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] + _mat[14];
-	}
-
-	inline void vec3MulMtxH(float* _result, const float* _vec, const float* _mat)
-	{
-		float xx = _vec[0] * _mat[ 0] + _vec[1] * _mat[4] + _vec[2] * _mat[ 8] + _mat[12];
-		float yy = _vec[0] * _mat[ 1] + _vec[1] * _mat[5] + _vec[2] * _mat[ 9] + _mat[13];
-		float zz = _vec[0] * _mat[ 2] + _vec[1] * _mat[6] + _vec[2] * _mat[10] + _mat[14];
-		float ww = _vec[0] * _mat[ 3] + _vec[1] * _mat[7] + _vec[2] * _mat[11] + _mat[15];
-		float invW = sign(ww)/ww;
-		_result[0] = xx*invW;
-		_result[1] = yy*invW;
-		_result[2] = zz*invW;
 	}
 
 	inline void vec4MulMtx(float* _result, const float* _vec, const float* _mat)

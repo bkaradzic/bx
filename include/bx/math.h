@@ -282,6 +282,9 @@ namespace bx
 	void store(void* _ptr, const Ty& _a);
 
 	///
+	BX_CONSTEXPR_FUNC Vec3 round(const Vec3 _a);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a);
 
 	///
@@ -529,12 +532,6 @@ namespace bx
 
 	///
 	Vec3 mulH(const Vec3& _vec, const float* _mat);
-
-	///
-	void vec3MulMtx(float* _result, const float* _vec, const float* _mat);
-
-	///
-	void vec3MulMtxH(float* _result, const float* _vec, const float* _mat);
 
 	///
 	void vec4MulMtx(float* _result, const float* _vec, const float* _mat);
