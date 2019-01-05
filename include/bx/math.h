@@ -414,28 +414,95 @@ namespace bx
 	void mtxQuatTranslationHMD(float* _result, const Quaternion& _quat, const Vec3& _translation);
 
 	///
-	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up = { 0.0f, 1.0f, 0.0f }, Handness::Enum _handness = Handness::Left);
+	void mtxLookAt(
+		  float* _result
+		, const Vec3& _eye
+		, const Vec3& _at
+		, const Vec3& _up = { 0.0f, 1.0f, 0.0f }
+		, Handness::Enum _handness = Handness::Left
+		);
 
 	///
-	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc, Handness::Enum _handness = Handness::Left);
+	void mtxProj(
+		  float* _result
+		, float _ut
+		, float _dt
+		, float _lt
+		, float _rt
+		, float _near
+		, float _far
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		);
 
 	///
-	void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc, Handness::Enum _handness = Handness::Left);
+	void mtxProj(
+		  float* _result
+		, const float _fov[4]
+		, float _near
+		, float _far
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		);
 
 	///
-	void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc, Handness::Enum _handness = Handness::Left);
+	void mtxProj(
+		  float* _result
+		, float _fovy
+		, float _aspect
+		, float _near
+		, float _far
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		);
 
 	///
-	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc, Handness::Enum _handness = Handness::Left, NearFar::Enum _nearFar = NearFar::Default);
+	void mtxProjInf(
+		  float* _result
+		, const float _fov[4]
+		, float _near
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		, NearFar::Enum _nearFar = NearFar::Default
+		);
 
 	///
-	void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc, Handness::Enum _handness = Handness::Left, NearFar::Enum _nearFar = NearFar::Default);
+	void mtxProjInf(
+		  float* _result
+		, float _ut
+		, float _dt
+		, float _lt
+		, float _rt
+		, float _near
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		, NearFar::Enum _nearFar = NearFar::Default
+		);
 
 	///
-	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc, Handness::Enum _handness = Handness::Left, NearFar::Enum _nearFar = NearFar::Default);
+	void mtxProjInf(
+		  float* _result
+		, float _fovy
+		, float _aspect
+		, float _near
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		, NearFar::Enum _nearFar = NearFar::Default
+		);
 
 	///
-	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc, Handness::Enum _handness = Handness::Left);
+	void mtxOrtho(
+		  float* _result
+		, float _left
+		, float _right
+		, float _bottom
+		, float _top
+		, float _near
+		, float _far
+		, float _offset
+		, bool _homogeneousNdc
+		, Handness::Enum _handness = Handness::Left
+		);
 
 	///
 	void mtxRotateX(float* _result, float _ax);
