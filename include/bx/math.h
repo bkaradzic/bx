@@ -56,6 +56,7 @@ namespace bx
 		float x, y, z;
 	};
 
+	///
 	struct Plane
 	{
 		bx::Vec3 normal;
@@ -399,10 +400,21 @@ namespace bx
 	void mtxScale(float* _result, float _scale);
 
 	///
-	void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos);
+	void mtxFromNormal(
+		  float* _result
+		, const Vec3& _normal
+		, float _scale
+		, const Vec3& _pos
+		);
 
 	///
-	void mtxFromNormal(float* _result, const Vec3& _normal, float _scale, const Vec3& _pos, float _angle);
+	void mtxFromNormal(
+		  float* _result
+		, const Vec3& _normal
+		, float _scale
+		, const Vec3& _pos
+		, float _angle
+		);
 
 	///
 	void mtxQuat(float* _result, const Quaternion& _quat);
@@ -523,7 +535,18 @@ namespace bx
 	void mtxRotateZYX(float* _result, float _ax, float _ay, float _az);
 
 	///
-	void mtxSRT(float* _result, float _sx, float _sy, float _sz, float _ax, float _ay, float _az, float _tx, float _ty, float _tz);
+	void mtxSRT(
+		  float* _result
+		, float _sx
+		, float _sy
+		, float _sz
+		, float _ax
+		, float _ay
+		, float _az
+		, float _tx
+		, float _ty
+		, float _tz
+		);
 
 	///
 	Vec3 mul(const Vec3& _vec, const float* _mat);
