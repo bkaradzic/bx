@@ -239,54 +239,37 @@ namespace bx
 		return result;
 	}
 
-	static void mtxLookAtImpl(float* _result, const Vec3& _eye, const Vec3& _view, const Vec3& _up)
+	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up, Handness::Enum _handness)
 	{
-		const Vec3 uxv   = cross(_up, _view);
+		const Vec3 view = normalize(
+			  Handness::Right == _handness
+			? sub(_eye, _at)
+			: sub(_at, _eye)
+			);
+		const Vec3 uxv   = cross(_up, view);
 		const Vec3 right = normalize(uxv);
-		const Vec3 up    = cross(_view, right);
+		const Vec3 up    = cross(view, right);
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = right.x;
 		_result[ 1] = up.x;
-		_result[ 2] = _view.x;
+		_result[ 2] = view.x;
 
 		_result[ 4] = right.y;
 		_result[ 5] = up.y;
-		_result[ 6] = _view.y;
+		_result[ 6] = view.y;
 
 		_result[ 8] = right.z;
 		_result[ 9] = up.z;
-		_result[10] = _view.z;
+		_result[10] = view.z;
 
 		_result[12] = -dot(right, _eye);
-		_result[13] = -dot(up, _eye);
-		_result[14] = -dot(_view, _eye);
+		_result[13] = -dot(up,    _eye);
+		_result[14] = -dot(view,  _eye);
 		_result[15] = 1.0f;
 	}
 
-	void mtxLookAtLh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
-	{
-		const Vec3 tmp  = sub(_at, _eye);
-		const Vec3 view = normalize(tmp);
-
-		mtxLookAtImpl(_result, _eye, view, _up);
-	}
-
-	void mtxLookAtRh(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
-	{
-		const Vec3 tmp = sub(_eye, _at);
-		const Vec3 view = normalize(tmp);
-
-		mtxLookAtImpl(_result, _eye, view, _up);
-	}
-
-	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up)
-	{
-		mtxLookAtLh(_result, _eye, _at, _up);
-	}
-
-	template<Handness::Enum HandnessT>
-	void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc)
+	static void mtxProjXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, float _far, bool _oglNdc, Handness::Enum _handness)
 	{
 		const float diff = _far-_near;
 		const float aa = _oglNdc ? (     _far+_near)/diff : _far/diff;
@@ -295,15 +278,14 @@ namespace bx
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
-		_result[ 9] = (Handness::Right == HandnessT) ?    _y :  -_y;
-		_result[10] = (Handness::Right == HandnessT) ?   -aa :   aa;
-		_result[11] = (Handness::Right == HandnessT) ? -1.0f : 1.0f;
+		_result[ 8] = (Handness::Right == _handness) ?    _x :  -_x;
+		_result[ 9] = (Handness::Right == _handness) ?    _y :  -_y;
+		_result[10] = (Handness::Right == _handness) ?   -aa :   aa;
+		_result[11] = (Handness::Right == _handness) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
-	template<Handness::Enum HandnessT>
-	void mtxProjImpl(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc)
+	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc, Handness::Enum _handness)
 	{
 		const float invDiffRl = 1.0f/(_rt - _lt);
 		const float invDiffUd = 1.0f/(_ut - _dt);
@@ -311,74 +293,26 @@ namespace bx
 		const float height =  2.0f*_near * invDiffUd;
 		const float xx     = (_rt + _lt) * invDiffRl;
 		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjXYWH<HandnessT>(_result, xx, yy, width, height, _near, _far, _oglNdc);
+		mtxProjXYWH(_result, xx, yy, width, height, _near, _far, _oglNdc, _handness);
 	}
 
-	template<Handness::Enum HandnessT>
-	void mtxProjImpl(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc)
+	void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc, Handness::Enum _handness)
 	{
-		mtxProjImpl<HandnessT>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc);
+		mtxProj(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _far, _oglNdc, _handness);
 	}
 
-	template<Handness::Enum HandnessT>
-	void mtxProjImpl(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
+	void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc, Handness::Enum _handness)
 	{
 		const float height = 1.0f/tan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
-		mtxProjXYWH<HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc);
+		mtxProjXYWH(_result, 0.0f, 0.0f, width, height, _near, _far, _oglNdc, _handness);
 	}
 
-	void mtxProj(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
-	}
-
-	void mtxProj(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
-	}
-
-	void mtxProj(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _fovy, _aspect, _near, _far, _oglNdc);
-	}
-
-	void mtxProjLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
-	}
-
-	void mtxProjLh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _fov, _near, _far, _oglNdc);
-	}
-
-	void mtxProjLh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Left>(_result, _fovy, _aspect, _near, _far, _oglNdc);
-	}
-
-	void mtxProjRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Right>(_result, _ut, _dt, _lt, _rt, _near, _far, _oglNdc);
-	}
-
-	void mtxProjRh(float* _result, const float _fov[4], float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Right>(_result, _fov, _near, _far, _oglNdc);
-	}
-
-	void mtxProjRh(float* _result, float _fovy, float _aspect, float _near, float _far, bool _oglNdc)
-	{
-		mtxProjImpl<Handness::Right>(_result, _fovy, _aspect, _near, _far, _oglNdc);
-	}
-
-	template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
-	void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc)
+	static void mtxProjInfXYWH(float* _result, float _x, float _y, float _width, float _height, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
 		float aa;
 		float bb;
-		if (BX_ENABLED(NearFar::Reverse == NearFarT) )
+		if (NearFar::Reverse == _nearFar)
 		{
 			aa = _oglNdc ?       -1.0f :   0.0f;
 			bb = _oglNdc ? -2.0f*_near : -_near;
@@ -392,15 +326,14 @@ namespace bx
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = _width;
 		_result[ 5] = _height;
-		_result[ 8] = (Handness::Right == HandnessT) ?    _x :  -_x;
-		_result[ 9] = (Handness::Right == HandnessT) ?    _y :  -_y;
-		_result[10] = (Handness::Right == HandnessT) ?   -aa :   aa;
-		_result[11] = (Handness::Right == HandnessT) ? -1.0f : 1.0f;
+		_result[ 8] = (Handness::Right == _handness) ?    _x :  -_x;
+		_result[ 9] = (Handness::Right == _handness) ?    _y :  -_y;
+		_result[10] = (Handness::Right == _handness) ?   -aa :   aa;
+		_result[11] = (Handness::Right == _handness) ? -1.0f : 1.0f;
 		_result[14] = -bb;
 	}
 
-	template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
-	void mtxProjInfImpl(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
+	void mtxProjInfImpl(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
 		const float invDiffRl = 1.0f/(_rt - _lt);
 		const float invDiffUd = 1.0f/(_ut - _dt);
@@ -408,100 +341,22 @@ namespace bx
 		const float height =  2.0f*_near * invDiffUd;
 		const float xx     = (_rt + _lt) * invDiffRl;
 		const float yy     = (_ut + _dt) * invDiffUd;
-		mtxProjInfXYWH<NearFarT,HandnessT>(_result, xx, yy, width, height, _near, _oglNdc);
+		mtxProjInfXYWH(_result, xx, yy, width, height, _near, _oglNdc, _handness, _nearFar);
 	}
 
-	template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
-	void mtxProjInfImpl(float* _result, const float _fov[4], float _near, bool _oglNdc)
+	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
-		mtxProjInfImpl<NearFarT,HandnessT>(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc);
+		mtxProjInfImpl(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc, _handness, _nearFar);
 	}
 
-	template<NearFar::Enum NearFarT, Handness::Enum HandnessT>
-	void mtxProjInfImpl(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
+	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
 		const float height = 1.0f/tan(toRad(_fovy)*0.5f);
 		const float width  = height * 1.0f/_aspect;
-		mtxProjInfXYWH<NearFarT,HandnessT>(_result, 0.0f, 0.0f, width, height, _near, _oglNdc);
+		mtxProjInfXYWH(_result, 0.0f, 0.0f, width, height, _near, _oglNdc, _handness, _nearFar);
 	}
 
-	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _fov, _near, _oglNdc);
-	}
-
-	void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _oglNdc);
-	}
-
-	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _fovy, _aspect, _near, _oglNdc);
-	}
-
-	void mtxProjInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _oglNdc);
-	}
-
-	void mtxProjInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _fov, _near, _oglNdc);
-	}
-
-	void mtxProjInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Left>(_result, _fovy, _aspect, _near, _oglNdc);
-	}
-
-	void mtxProjInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Right>(_result, _ut, _dt, _lt, _rt, _near, _oglNdc);
-	}
-
-	void mtxProjInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Right>(_result, _fov, _near, _oglNdc);
-	}
-
-	void mtxProjInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Default,Handness::Right>(_result, _fovy, _aspect, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfLh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Left>(_result, _ut, _dt, _lt, _rt, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfLh(float* _result, const float _fov[4], float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Left>(_result, _fov, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfLh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Left>(_result, _fovy, _aspect, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfRh(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Right>(_result, _ut, _dt, _lt, _rt, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfRh(float* _result, const float _fov[4], float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Right>(_result, _fov, _near, _oglNdc);
-	}
-
-	void mtxProjRevInfRh(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc)
-	{
-		mtxProjInfImpl<NearFar::Reverse,Handness::Right>(_result, _fovy, _aspect, _near, _oglNdc);
-	}
-
-	template<Handness::Enum HandnessT>
-	void mtxOrthoImpl(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc)
+	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc, Handness::Enum _handness)
 	{
 		const float aa = 2.0f/(_right - _left);
 		const float bb = 2.0f/(_top - _bottom);
@@ -516,26 +371,11 @@ namespace bx
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = aa;
 		_result[ 5] = bb;
-		_result[10] = (Handness::Right == HandnessT) ? -cc : cc;
+		_result[10] = Handness::Right == _handness ? -cc : cc;
 		_result[12] = dd + _offset;
 		_result[13] = ee;
 		_result[14] = ff;
 		_result[15] = 1.0f;
-	}
-
-	void mtxOrtho(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc)
-	{
-		mtxOrthoImpl<Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
-	}
-
-	void mtxOrthoLh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc)
-	{
-		mtxOrthoImpl<Handness::Left>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
-	}
-
-	void mtxOrthoRh(float* _result, float _left, float _right, float _bottom, float _top, float _near, float _far, float _offset, bool _oglNdc)
-	{
-		mtxOrthoImpl<Handness::Right>(_result, _left, _right, _bottom, _top, _near, _far, _offset, _oglNdc);
 	}
 
 	void mtxRotateX(float* _result, float _ax)
