@@ -333,7 +333,7 @@ namespace bx
 		_result[14] = -bb;
 	}
 
-	void mtxProjInfImpl(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
+	void mtxProjInf(float* _result, float _ut, float _dt, float _lt, float _rt, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
 		const float invDiffRl = 1.0f/(_rt - _lt);
 		const float invDiffUd = 1.0f/(_ut - _dt);
@@ -346,7 +346,7 @@ namespace bx
 
 	void mtxProjInf(float* _result, const float _fov[4], float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)
 	{
-		mtxProjInfImpl(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc, _handness, _nearFar);
+		mtxProjInf(_result, _fov[0], _fov[1], _fov[2], _fov[3], _near, _oglNdc, _handness, _nearFar);
 	}
 
 	void mtxProjInf(float* _result, float _fovy, float _aspect, float _near, bool _oglNdc, Handness::Enum _handness, NearFar::Enum _nearFar)

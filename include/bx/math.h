@@ -482,14 +482,6 @@ namespace bx
 	///
 	void mtxInverse(float* _result, const float* _a);
 
-	/// Convert LH to RH projection matrix and vice versa.
-	///
-	void mtxProjFlipHandedness(float* _dst, const float* _src);
-
-	/// Convert LH to RH view matrix and vice versa.
-	///
-	void mtxViewFlipHandedness(float* _dst, const float* _src);
-
 	///
 	bx::Vec3 calcNormal(const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc);
 
