@@ -251,7 +251,7 @@ namespace bx
 		if ( SetThreadDescription )
 		{
 			uint32_t length = (uint32_t)bx::strnlen(_name) + 1;
-			uint32_t size = length*sizeof( wchar_t );
+			uint32_t size = length*sizeof(wchar_t);
 			wchar_t* name = (wchar_t*)alloca(size);
 			mbstowcs(name, _name, size-2);
 			SetThreadDescription(ti->m_handle, name);
