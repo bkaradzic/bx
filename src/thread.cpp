@@ -248,9 +248,9 @@ namespace bx
 		// Try to use the new thread naming API from Win10 Creators update onwards if we have it
 		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
 		SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc)(GetProcAddress(GetModuleHandle(L"Kernel32.dll"), "SetThreadDescription"));
-		if ( SetThreadDescription )
+		if (SetThreadDescription)
 		{
-			uint32_t length = (uint32_t)bx::strnlen(_name) + 1;
+			uint32_t length = (uint32_t)bx::strnlen(_name)+1;
 			uint32_t size = length*sizeof(wchar_t);
 			wchar_t* name = (wchar_t*)alloca(size);
 			mbstowcs(name, _name, size-2);
