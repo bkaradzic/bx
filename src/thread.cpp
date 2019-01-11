@@ -245,7 +245,6 @@ namespace bx
 		pthread_set_name_np(ti->m_handle, _name);
 #	endif // defined(__NetBSD__)
 #elif BX_PLATFORM_WINDOWS
-#	if !BX_CRT_NONE
 		// Try to use the new thread naming API from Win10 Creators update onwards if we have it
 		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
 		SetThreadDescriptionProc SetThreadDescription = (SetThreadDescriptionProc)(GetProcAddress(GetModuleHandle(TEXT("Kernel32.dll")), "SetThreadDescription"));
@@ -257,7 +256,6 @@ namespace bx
 			mbstowcs(name, _name, size-2);
 			SetThreadDescription(ti->m_handle, name);
 		}
-#	endif // BX_CRT_NONE	
 #	if BX_COMPILER_MSVC
 #		pragma pack(push, 8)
 			struct ThreadName
