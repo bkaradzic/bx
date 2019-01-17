@@ -687,9 +687,10 @@ namespace bx
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
-	StringView findIdentifierMatch(const StringView& _str, const char** _words)
+	StringView findIdentifierMatch(const StringView& _str, const char** _words, int32_t _num)
 	{
-		for (StringView word = *_words; !word.isEmpty(); ++_words, word = *_words)
+		int32_t ii = 0;
+		for (StringView word = *_words; ii < _num && !word.isEmpty(); ++ii, ++_words, word = *_words)
 		{
 			StringView match = findIdentifierMatch(_str, word);
 			if (!match.isEmpty() )
