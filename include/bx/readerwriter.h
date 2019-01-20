@@ -10,6 +10,7 @@
 #include "endian.h"
 #include "error.h"
 #include "filepath.h"
+#include "math.h"
 #include "string.h"
 #include "uint32_t.h"
 
