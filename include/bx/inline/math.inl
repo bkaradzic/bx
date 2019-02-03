@@ -598,8 +598,8 @@ namespace bx
 		const float phi   = atan2(_dir.x, _dir.z);
 		const float theta = acos(_dir.y);
 
-		*_outU = (bx::kPi + phi)/bx::kPi2;
-		*_outV = theta*bx::kInvPi;
+		*_outU = (kPi + phi)/kPi2;
+		*_outV = theta*kInvPi;
 	}
 
 	inline BX_CONSTEXPR_FUNC Quaternion invert(const Quaternion _a)
@@ -975,25 +975,30 @@ namespace bx
 		_result[15] = _a[15];
 	}
 
-	inline bx::Vec3 calcNormal(const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
+	inline Vec3 calcNormal(const Vec3& _va, const Vec3& _vb, const Vec3& _vc)
 	{
-		const bx::Vec3 ba    = sub(_vb, _va);
-		const bx::Vec3 ca    = sub(_vc, _va);
-		const bx::Vec3 baxca = cross(ba, ca);
+		const Vec3 ba    = sub(_vb, _va);
+		const Vec3 ca    = sub(_vc, _va);
+		const Vec3 baxca = cross(ba, ca);
 
-		return bx::normalize(baxca);
+		return normalize(baxca);
 	}
 
-	inline void calcPlane(Plane& _outPlane, const bx::Vec3& _va, const bx::Vec3& _vb, const bx::Vec3& _vc)
+	inline void calcPlane(Plane& _outPlane, const Vec3& _va, const Vec3& _vb, const Vec3& _vc)
 	{
-		bx::Vec3 normal = calcNormal(_va, _vb, _vc);
+		Vec3 normal = calcNormal(_va, _vb, _vc);
 		calcPlane(_outPlane, normal, _va);
 	}
 
-	inline void calcPlane(Plane& _outPlane, const bx::Vec3& _normal, const bx::Vec3& _pos)
+	inline void calcPlane(Plane& _outPlane, const Vec3& _normal, const Vec3& _pos)
 	{
 		_outPlane.normal = _normal;
 		_outPlane.dist   = -dot(_normal, _pos);
+	}
+
+	inline float distance(const Plane& _plane, const Vec3& _pos)
+	{
+		return dot(_plane.normal, _pos) + _plane.dist;
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)
