@@ -537,21 +537,10 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride)
+	template<uint32_t Min>
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
 	{
-		const uint32_t align  = uint32_lcm(16, _stride);
-		const uint32_t mod    = uint32_mod(_offset, align);
-		const uint32_t mask   = uint32_cmpeq(mod, 0);
-		const uint32_t tmp0   = uint32_selb(mask, 0, align);
-		const uint32_t tmp1   = uint32_add(_offset, tmp0);
-		const uint32_t result = uint32_sub(tmp1, mod);
-
-		return result;
-	}
-
-	inline BX_CONSTEXPR_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride)
-	{
-		const uint32_t align  = uint32_lcm(256, _stride);
+		const uint32_t align  = uint32_lcm(Min, _stride);
 		const uint32_t mod    = uint32_mod(_offset, align);
 		const uint32_t mask   = uint32_cmpeq(mod, 0);
 		const uint32_t tmp0   = uint32_selb(mask, 0, align);

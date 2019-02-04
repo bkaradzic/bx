@@ -14,10 +14,10 @@ TEST_CASE("StrideAlign")
 		REQUIRE(12 == bx::strideAlign(ii+1, 12) );
 	}
 
-	REQUIRE(0  == bx::strideAlign16(0, 12) );
+	REQUIRE(0  == bx::strideAlign<16>(0, 12) );
 	for (uint32_t ii = 0; ii < 12; ++ii)
 	{
-		REQUIRE(48 == bx::strideAlign16(ii+1, 12) );
+		REQUIRE(48 == bx::strideAlign<16>(ii+1, 12) );
 	}
 
 	uint32_t offset = 11;

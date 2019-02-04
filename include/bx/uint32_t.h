@@ -217,13 +217,10 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
 
-	/// Align to arbitrary stride and 16-bytes.
+	/// Align to arbitrary stride and Min bytes.
 	///
-	BX_CONSTEXPR_FUNC uint32_t strideAlign16(uint32_t _offset, uint32_t _stride);
-
-	/// Align to arbitrary stride and 256-bytes.
-	///
-	BX_CONSTEXPR_FUNC uint32_t strideAlign256(uint32_t _offset, uint32_t _stride);
+	template<uint32_t Min>
+	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
 
 	/// Convert float to half-float.
 	///
