@@ -361,6 +361,24 @@ namespace bx
 		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
+	inline Vec3::Vec3()
+	{
+	}
+
+	constexpr Vec3::Vec3(float _v)
+		: x(_v)
+		, y(_v)
+		, z(_v)
+	{
+	}
+
+	constexpr Vec3::Vec3(float _x, float _y, float _z)
+		: x(_x)
+		, y(_y)
+		, z(_z)
+	{
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 round(const Vec3 _a)
 	{
 		return

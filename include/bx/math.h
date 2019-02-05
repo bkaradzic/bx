@@ -53,6 +53,15 @@ namespace bx
 	///
 	struct Vec3
 	{
+		///
+		Vec3();
+
+		///
+		constexpr Vec3(float _v);
+
+		///
+		constexpr Vec3(float _x, float _y, float _z);
+
 		float x, y, z;
 	};
 
