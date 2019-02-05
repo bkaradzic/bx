@@ -654,18 +654,10 @@ namespace bx
 		};
 	}
 
-	namespace detail
-	{
-		inline BX_CONSTEXPR_FUNC Quaternion loadQ(const Vec3 _v)
-		{
-			return { _v.x, _v.y, _v.z, 0.0f };
-		}
-	}
-
 	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _v, const Quaternion _q)
 	{
 		const Quaternion tmp0 = invert(_q);
-		const Quaternion qv   = detail::loadQ(_v);
+		const Quaternion qv   = { _v.x, _v.y, _v.z, 0.0f };
 		const Quaternion tmp1 = mul(tmp0, qv);
 		const Vec3 result     = mulXyz(tmp1, _q);
 
