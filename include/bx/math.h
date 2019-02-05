@@ -59,8 +59,8 @@ namespace bx
 	///
 	struct Plane
 	{
-		Vec3 normal;
-		float    dist;
+		Vec3  normal;
+		float dist;
 	};
 
 	///
