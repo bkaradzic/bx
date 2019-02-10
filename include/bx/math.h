@@ -334,6 +334,12 @@ namespace bx
 	BX_CONST_FUNC float length(const Vec3 _a);
 
 	///
+	BX_CONST_FUNC float distanceSq(const Vec3 _a, const Vec3 _b);
+
+	///
+	BX_CONST_FUNC float distance(const Vec3 _a, const Vec3 _b);
+
+	///
 	BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, float _t);
 
 	///

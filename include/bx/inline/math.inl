@@ -499,6 +499,17 @@ namespace bx
 		return sqrt(dot(_a, _a) );
 	}
 
+	inline BX_CONST_FUNC float distanceSq(const Vec3 _a, const Vec3 _b)
+	{
+		const Vec3 ba = sub(_b, _a);
+		return dot(ba, ba);
+	}
+
+	inline BX_CONST_FUNC float distance(const Vec3 _a, const Vec3 _b)
+	{
+		return length(sub(_b, _a) );
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, float _t)
 	{
 		return
