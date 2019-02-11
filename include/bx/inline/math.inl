@@ -277,7 +277,8 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon)
 	{
 		// Reference(s):
-		// - https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
+		// - Floating-point tolerances revisited
+		//   https://web.archive.org/web/20181103180318/http://realtimecollisiondetection.net/blog/?p=89
 		//
 		const float lhs = abs(_a - _b);
 		const float rhs = _epsilon * max(1.0f, abs(_a), abs(_b) );
