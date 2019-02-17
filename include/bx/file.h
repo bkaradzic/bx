@@ -75,23 +75,50 @@ namespace bx
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
-	///
-	struct FileInfo
+	struct FileType
 	{
 		enum Enum
 		{
-			Regular,
-			Directory,
+			File,
+			Dir,
 
 			Count
 		};
-
-		uint64_t m_size;
-		Enum m_type;
 	};
 
 	///
-	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo);
+	struct FileInfo
+	{
+		FilePath filePath;
+		uint64_t size;
+		FileType::Enum type;
+	};
+
+	///
+	class DirectoryReader : public ReaderOpenI, public CloserI, public ReaderI
+	{
+	public:
+		///
+		DirectoryReader();
+
+		///
+		virtual ~DirectoryReader();
+
+		///
+		virtual bool open(const FilePath& _filePath, Error* _err) override;
+
+		///
+		virtual void close() override;
+
+		///
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
+
+	private:
+		BX_ALIGN_DECL(16, uint8_t) m_internal[sizeof(FilePath)+sizeof(FileInfo)+16];
+	};
+
+	///
+	bool stat(FileInfo& _outFileInfo, const FilePath& _filePath);
 
 } // namespace bx
 

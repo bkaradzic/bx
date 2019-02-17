@@ -154,7 +154,7 @@ namespace bx
 		return size;
 	}
 
-	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileInfo::Enum _type)
+	static bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name, FileType::Enum _type)
 	{
 		uint32_t len = *_inOutSize;
 		*_out = '\0';
@@ -162,8 +162,8 @@ namespace bx
 		if (getEnv(_out, &len, _name) )
 		{
 			FileInfo fi;
-			if (stat(_out, fi)
-			&&  _type == fi.m_type)
+			if (stat(fi, _out)
+			&&  _type == fi.type)
 			{
 				*_inOutSize = len;
 				return true;
@@ -204,9 +204,9 @@ namespace bx
 	{
 		return false
 #if BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "USERPROFILE", FileInfo::Directory)
+			|| getEnv(_out, _inOutSize, "USERPROFILE", FileType::Dir)
 #endif // BX_PLATFORM_WINDOWS
-			|| getEnv(_out, _inOutSize, "HOME", FileInfo::Directory)
+			|| getEnv(_out, _inOutSize, "HOME", FileType::Dir)
 			;
 	}
 
@@ -232,7 +232,7 @@ namespace bx
 		{
 			uint32_t len = *_inOutSize;
 			*_out = '\0';
-			bool ok = getEnv(_out, &len, *tmp, FileInfo::Directory);
+			bool ok = getEnv(_out, &len, *tmp, FileType::Dir);
 
 			if (ok
 			&&  len != 0
@@ -244,8 +244,8 @@ namespace bx
 		}
 
 		FileInfo fi;
-		if (stat("/tmp", fi)
-		&&  FileInfo::Directory == fi.m_type)
+		if (stat(fi, "/tmp")
+		&&  FileType::Dir == fi.type)
 		{
 			strCopy(_out, *_inOutSize, "/tmp");
 			*_inOutSize = 4;
@@ -385,7 +385,8 @@ namespace bx
 		const StringView fileName = getFileName();
 		if (!fileName.isEmpty() )
 		{
-			return strFind(fileName, '.');
+			const StringView dot = strFind(fileName, '.');
+			return StringView(dot.getPtr(), fileName.getTerm() );
 		}
 
 		return StringView();
@@ -443,9 +444,9 @@ namespace bx
 
 		FileInfo fi;
 
-		if (stat(_filePath, fi) )
+		if (stat(fi, _filePath) )
 		{
-			if (FileInfo::Directory == fi.m_type)
+			if (FileType::Dir == fi.type)
 			{
 				return true;
 			}
@@ -482,9 +483,9 @@ namespace bx
 #if BX_CRT_MSVC
 		int32_t result = -1;
 		FileInfo fi;
-		if (stat(_filePath, fi) )
+		if (stat(fi, _filePath) )
 		{
-			if (FileInfo::Directory == fi.m_type)
+			if (FileType::Dir == fi.type)
 			{
 				result = ::_rmdir(_filePath.get() );
 			}
@@ -522,13 +523,13 @@ namespace bx
 
 		FileInfo fi;
 
-		if (!stat(_filePath, fi) )
+		if (!stat(fi, _filePath) )
 		{
 			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
 			return false;
 		}
 
-		if (FileInfo::Directory != fi.m_type)
+		if (FileType::Dir != fi.type)
 		{
 			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
 			return false;

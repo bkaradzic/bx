@@ -9,6 +9,7 @@
 #if BX_CRT_NONE
 #	include "crt0.h"
 #else
+#	include <dirent.h>
 #	include <stdio.h>
 #	include <sys/stat.h>
 #endif // !BX_CRT_NONE
@@ -553,14 +554,168 @@ namespace bx
 		return impl->write(_data, _size, _err);
 	}
 
-	bool stat(const FilePath& _filePath, FileInfo& _outFileInfo)
+	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
+	{
+	public:
+		///
+		DirectoryReaderImpl();
+
+		///
+		virtual ~DirectoryReaderImpl();
+
+		///
+		virtual bool open(const FilePath& _filePath, Error* _err) override;
+
+		///
+		virtual void close() override;
+
+		///
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
+
+	private:
+		FileInfo m_cache;
+		DIR*     m_dir;
+		int32_t  m_pos;
+	};
+
+	DirectoryReaderImpl::DirectoryReaderImpl()
+		: m_dir(NULL)
+		, m_pos(0)
+	{
+	}
+
+	DirectoryReaderImpl::~DirectoryReaderImpl()
+	{
+		close();
+	}
+
+	static bool fetch(FileInfo& _out, DIR* _dir)
+	{
+		for (;;)
+		{
+			const dirent* item = readdir(_dir);
+
+			if (NULL == item)
+			{
+				return false;
+			}
+
+			if (0 != (item->d_type & DT_DIR) )
+			{
+				_out.type = FileType::Dir;
+				_out.size = UINT64_MAX;
+				_out.filePath.set(item->d_name);
+				return true;
+			}
+
+			if (0 != (item->d_type & DT_REG) )
+			{
+				_out.type = FileType::File;
+				_out.size = UINT64_MAX;
+				_out.filePath.set(item->d_name);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	bool DirectoryReaderImpl::open(const FilePath& _filePath, Error* _err)
+	{
+		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+		m_dir = opendir(_filePath.get() );
+
+		if (NULL == m_dir)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+			return false;
+		}
+
+		m_pos = 0;
+
+		return true;
+	}
+
+	void DirectoryReaderImpl::close()
+	{
+		if (NULL != m_dir)
+		{
+			closedir(m_dir);
+			m_dir = NULL;
+		}
+	}
+
+	int32_t DirectoryReaderImpl::read(void* _data, int32_t _size, Error* _err)
+	{
+		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+		int32_t total = 0;
+
+		uint8_t* out = (uint8_t*)_data;
+
+		for (; 0 < _size;)
+		{
+			if (0 == m_pos)
+			{
+				if (!fetch(m_cache, m_dir) )
+				{
+					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+					return total;
+				}
+			}
+
+			const uint8_t* src = (const uint8_t*)&m_cache;
+			int32_t size = min<int32_t>(_size, sizeof(m_cache)-m_pos);
+			memCopy(&out[total], &src[m_pos], size);
+			total += size;
+			_size -= size;
+
+			m_pos += size;
+			m_pos %= sizeof(m_cache);
+		}
+
+		return total;
+	}
+
+	DirectoryReader::DirectoryReader()
+	{
+		BX_STATIC_ASSERT(sizeof(DirectoryReaderImpl) <= sizeof(m_internal) );
+		BX_PLACEMENT_NEW(m_internal, DirectoryReaderImpl);
+	}
+
+	DirectoryReader::~DirectoryReader()
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		impl->~DirectoryReaderImpl();
+	}
+
+	bool DirectoryReader::open(const FilePath& _filePath, Error* _err)
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		return impl->open(_filePath, _err);
+	}
+
+	void DirectoryReader::close()
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		impl->close();
+	}
+
+	int32_t DirectoryReader::read(void* _data, int32_t _size, Error* _err)
+	{
+		DirectoryReaderImpl* impl = reinterpret_cast<DirectoryReaderImpl*>(m_internal);
+		return impl->read(_data, _size, _err);
+	}
+
+	bool stat(FileInfo& _outFileInfo, const FilePath& _filePath)
 	{
 #if BX_CRT_NONE
 		BX_UNUSED(_filePath, _outFileInfo);
 		return false;
 #else
-		_outFileInfo.m_size = 0;
-		_outFileInfo.m_type = FileInfo::Count;
+		_outFileInfo.size = 0;
+		_outFileInfo.type = FileType::Count;
 
 #	if BX_COMPILER_MSVC
 		struct ::_stat64 st;
@@ -573,11 +728,11 @@ namespace bx
 
 		if (0 != (st.st_mode & _S_IFREG) )
 		{
-			_outFileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.type = FileType::File;
 		}
 		else if (0 != (st.st_mode & _S_IFDIR) )
 		{
-			_outFileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.type = FileType::Dir;
 		}
 #	else
 		struct ::stat st;
@@ -589,15 +744,15 @@ namespace bx
 
 		if (0 != (st.st_mode & S_IFREG) )
 		{
-			_outFileInfo.m_type = FileInfo::Regular;
+			_outFileInfo.type = FileType::File;
 		}
 		else if (0 != (st.st_mode & S_IFDIR) )
 		{
-			_outFileInfo.m_type = FileInfo::Directory;
+			_outFileInfo.type = FileType::Dir;
 		}
 #	endif // BX_COMPILER_MSVC
 
-		_outFileInfo.m_size = st.st_size;
+		_outFileInfo.size = st.st_size;
 
 		return true;
 #endif // BX_CRT_NONE
