@@ -638,7 +638,7 @@ namespace bx
 
 				if (NULL == item)
 				{
-					return false;
+					break;
 				}
 
 				if (0 != (item->d_type & DT_DIR) )
