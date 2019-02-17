@@ -11,19 +11,19 @@
 
 namespace bx
 {
-	///
+	/// Returns standard input reader.
 	ReaderI* getStdIn();
 
-	///
+	/// Returns standard output writer.
 	WriterI* getStdOut();
 
-	///
+	/// Returns standard error writer.
 	WriterI* getStdErr();
 
-	///
+	/// Returns null output writer.
 	WriterI* getNullOut();
 
-	///
+	/// File reader.
 	class FileReader : public FileReaderI
 	{
 	public:
@@ -49,7 +49,7 @@ namespace bx
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
-	///
+	/// File writer.
 	class FileWriter : public FileWriterI
 	{
 	public:
@@ -75,26 +75,28 @@ namespace bx
 		BX_ALIGN_DECL(16, uint8_t) m_internal[64];
 	};
 
+	/// File type.
 	struct FileType
 	{
+		/// File types:
 		enum Enum
 		{
-			File,
-			Dir,
+			File, //!< File.
+			Dir,  //!< Directory.
 
 			Count
 		};
 	};
 
-	///
+	/// File info.
 	struct FileInfo
 	{
-		FilePath filePath;
-		uint64_t size;
-		FileType::Enum type;
+		FilePath       filePath; //!< File path.
+		uint64_t       size;     //!< File size.
+		FileType::Enum type;     //!< File type.
 	};
 
-	///
+	/// Directory reader.
 	class DirectoryReader : public ReaderOpenI, public CloserI, public ReaderI
 	{
 	public:
@@ -117,7 +119,7 @@ namespace bx
 		BX_ALIGN_DECL(16, uint8_t) m_internal[sizeof(FilePath)+sizeof(FileInfo)+16];
 	};
 
-	///
+	/// FIle stat.
 	bool stat(FileInfo& _outFileInfo, const FilePath& _filePath);
 
 } // namespace bx
