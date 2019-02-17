@@ -15,10 +15,12 @@
 #endif // !BX_CRT_NONE
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
-#	define BX_CONFIG_CRT_FILE_READER_WRITER !(0 \
-			|| BX_CRT_NONE                      \
-			)
+#	define BX_CONFIG_CRT_FILE_READER_WRITER !BX_CRT_NONE
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
+
+#ifndef BX_CONFIG_CRT_DIRECTORY_READER
+#	define BX_CONFIG_CRT_DIRECTORY_READER !BX_CRT_NONE
+#endif // BX_CONFIG_CRT_DIRECTORY_READER
 
 namespace bx
 {
@@ -554,129 +556,150 @@ namespace bx
 		return impl->write(_data, _size, _err);
 	}
 
+#if BX_CONFIG_CRT_DIRECTORY_READER
+
 	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
 	{
 	public:
-		///
-		DirectoryReaderImpl();
+		DirectoryReaderImpl()
+			: m_dir(NULL)
+			, m_pos(0)
+		{
+		}
 
-		///
-		virtual ~DirectoryReaderImpl();
+		virtual ~DirectoryReaderImpl()
+		{
+			close();
+		}
 
-		///
-		virtual bool open(const FilePath& _filePath, Error* _err) override;
+		virtual bool open(const FilePath& _filePath, Error* _err) override
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-		///
-		virtual void close() override;
+			m_dir = opendir(_filePath.get() );
 
-		///
-		virtual int32_t read(void* _data, int32_t _size, Error* _err) override;
+			if (NULL == m_dir)
+			{
+				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
+				return false;
+			}
 
-	private:
+			m_pos = 0;
+
+			return true;
+		}
+
+		virtual void close() override
+		{
+			if (NULL != m_dir)
+			{
+				closedir(m_dir);
+				m_dir = NULL;
+			}
+		}
+
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
+		{
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+
+			int32_t total = 0;
+
+			uint8_t* out = (uint8_t*)_data;
+
+			while (0 < _size)
+			{
+				if (0 == m_pos)
+				{
+					if (!fetch(m_cache, m_dir) )
+					{
+						BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+						return total;
+					}
+				}
+
+				const uint8_t* src = (const uint8_t*)&m_cache;
+				int32_t size = min<int32_t>(_size, sizeof(m_cache)-m_pos);
+				memCopy(&out[total], &src[m_pos], size);
+				total += size;
+				_size -= size;
+
+				m_pos += size;
+				m_pos %= sizeof(m_cache);
+			}
+
+			return total;
+		}
+
+		static bool fetch(FileInfo& _out, DIR* _dir)
+		{
+			for (;;)
+			{
+				const dirent* item = readdir(_dir);
+
+				if (NULL == item)
+				{
+					return false;
+				}
+
+				if (0 != (item->d_type & DT_DIR) )
+				{
+					_out.type = FileType::Dir;
+					_out.size = UINT64_MAX;
+					_out.filePath.set(item->d_name);
+					return true;
+				}
+
+				if (0 != (item->d_type & DT_REG) )
+				{
+					_out.type = FileType::File;
+					_out.size = UINT64_MAX;
+					_out.filePath.set(item->d_name);
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		FileInfo m_cache;
 		DIR*     m_dir;
 		int32_t  m_pos;
 	};
 
-	DirectoryReaderImpl::DirectoryReaderImpl()
-		: m_dir(NULL)
-		, m_pos(0)
-	{
-	}
+#else
 
-	DirectoryReaderImpl::~DirectoryReaderImpl()
+	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
 	{
-		close();
-	}
-
-	static bool fetch(FileInfo& _out, DIR* _dir)
-	{
-		for (;;)
+	public:
+		DirectoryReaderImpl()
 		{
-			const dirent* item = readdir(_dir);
-
-			if (NULL == item)
-			{
-				return false;
-			}
-
-			if (0 != (item->d_type & DT_DIR) )
-			{
-				_out.type = FileType::Dir;
-				_out.size = UINT64_MAX;
-				_out.filePath.set(item->d_name);
-				return true;
-			}
-
-			if (0 != (item->d_type & DT_REG) )
-			{
-				_out.type = FileType::File;
-				_out.size = UINT64_MAX;
-				_out.filePath.set(item->d_name);
-				return true;
-			}
 		}
 
-		return false;
-	}
-
-	bool DirectoryReaderImpl::open(const FilePath& _filePath, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		m_dir = opendir(_filePath.get() );
-
-		if (NULL == m_dir)
+		virtual ~DirectoryReaderImpl()
 		{
+		}
+
+		virtual bool open(const FilePath& _filePath, Error* _err) override
+		{
+			BX_UNUSED(_filePath);
 			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "DirectoryReader: Failed to open directory.");
 			return false;
 		}
 
-		m_pos = 0;
-
-		return true;
-	}
-
-	void DirectoryReaderImpl::close()
-	{
-		if (NULL != m_dir)
+		virtual void close() override
 		{
-			closedir(m_dir);
-			m_dir = NULL;
-		}
-	}
-
-	int32_t DirectoryReaderImpl::read(void* _data, int32_t _size, Error* _err)
-	{
-		BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
-
-		int32_t total = 0;
-
-		uint8_t* out = (uint8_t*)_data;
-
-		for (; 0 < _size;)
-		{
-			if (0 == m_pos)
-			{
-				if (!fetch(m_cache, m_dir) )
-				{
-					BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
-					return total;
-				}
-			}
-
-			const uint8_t* src = (const uint8_t*)&m_cache;
-			int32_t size = min<int32_t>(_size, sizeof(m_cache)-m_pos);
-			memCopy(&out[total], &src[m_pos], size);
-			total += size;
-			_size -= size;
-
-			m_pos += size;
-			m_pos %= sizeof(m_cache);
 		}
 
-		return total;
-	}
+		virtual int32_t read(void* _data, int32_t _size, Error* _err) override
+		{
+			BX_UNUSED(_data, _size);
+			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
+			BX_ERROR_SET(_err, BX_ERROR_READERWRITER_EOF, "DirectoryReader: EOF.");
+			return 0;
+		}
+	};
+
+#endif // BX_CONFIG_CRT_DIRECTORY_READER
 
 	DirectoryReader::DirectoryReader()
 	{
