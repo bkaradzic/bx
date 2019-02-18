@@ -321,6 +321,31 @@ namespace bx
 	/// Converts string to 32-bit unsigned integer value.
 	bool fromString(uint32_t* _out, const StringView& _str);
 
+	///
+	class LineReader
+	{
+	public:
+		///
+		LineReader(const bx::StringView& _str);
+
+		///
+		void reset();
+
+		///
+		StringView next();
+
+		///
+		bool isDone() const;
+
+		///
+		uint32_t getLine() const;
+
+	private:
+		const bx::StringView m_str;
+		bx::StringView m_curr;
+		uint32_t m_line;
+	};
+
 } // namespace bx
 
 #include "inline/string.inl"
