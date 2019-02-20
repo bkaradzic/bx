@@ -79,9 +79,13 @@ namespace bx
 		///
 		void join(const StringView& _str);
 
-		/// Returns C string to file path.
+		/// Implicitly converts FilePath to StringView.
 		///
-		const char* get() const;
+		operator StringView() const;
+
+		/// Returns zero-terminated C string pointer to file path.
+		///
+		const char* getCPtr() const;
 
 		/// If path is `/abv/gd/555/333/pod.mac` returns `/abv/gd/555/333/`.
 		///

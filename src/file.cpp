@@ -6,21 +6,23 @@
 #include "bx_p.h"
 #include <bx/file.h>
 
-#if BX_CRT_NONE
-#	include "crt0.h"
-#else
-#	include <dirent.h>
-#	include <stdio.h>
-#	include <sys/stat.h>
-#endif // !BX_CRT_NONE
-
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER
 #	define BX_CONFIG_CRT_FILE_READER_WRITER !BX_CRT_NONE
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 #ifndef BX_CONFIG_CRT_DIRECTORY_READER
-#	define BX_CONFIG_CRT_DIRECTORY_READER !BX_CRT_NONE
+#	define BX_CONFIG_CRT_DIRECTORY_READER (BX_PLATFORM_OS_DESKTOP && !BX_CRT_NONE)
 #endif // BX_CONFIG_CRT_DIRECTORY_READER
+
+#if BX_CRT_NONE
+#	include "crt0.h"
+#else
+#	if BX_CONFIG_CRT_DIRECTORY_READER
+#		include <dirent.h>
+#	endif // BX_CONFIG_CRT_DIRECTORY_READER
+#	include <stdio.h>
+#	include <sys/stat.h>
+#endif // !BX_CRT_NONE
 
 namespace bx
 {
@@ -100,7 +102,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.get(), "rb");
+			m_file = fopen(_filePath.getCPtr(), "rb");
 			if (NULL == m_file)
 			{
 				BX_ERROR_SET(_err, BX_ERROR_READERWRITER_OPEN, "FileReader: Failed to open file.");
@@ -180,7 +182,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.get(), _append ? "ab" : "wb");
+			m_file = fopen(_filePath.getCPtr(), _append ? "ab" : "wb");
 
 			if (NULL == m_file)
 			{
@@ -576,7 +578,7 @@ namespace bx
 		{
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			m_dir = opendir(_filePath.get() );
+			m_dir = opendir(_filePath.getCPtr() );
 
 			if (NULL == m_dir)
 			{
@@ -742,7 +744,7 @@ namespace bx
 
 #	if BX_COMPILER_MSVC
 		struct ::_stat64 st;
-		int32_t result = ::_stat64(_filePath.get(), &st);
+		int32_t result = ::_stat64(_filePath.getCPtr(), &st);
 
 		if (0 != result)
 		{
@@ -759,7 +761,7 @@ namespace bx
 		}
 #	else
 		struct ::stat st;
-		int32_t result = ::stat(_filePath.get(), &st);
+		int32_t result = ::stat(_filePath.getCPtr(), &st);
 		if (0 != result)
 		{
 			return false;

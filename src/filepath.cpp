@@ -10,7 +10,6 @@
 
 #if !BX_CRT_NONE
 #	include <stdio.h>  // remove
-#	include <dirent.h> // opendir
 
 #	if BX_CRT_MSVC
 #		include <direct.h>   // _getcwd
@@ -336,7 +335,12 @@ namespace bx
 		set(tmp);
 	}
 
-	const char* FilePath::get() const
+	FilePath::operator StringView() const
+	{
+		return StringView(m_filePath, strLen(m_filePath) );
+	}
+
+	const char* FilePath::getCPtr() const
 	{
 		return m_filePath;
 	}
@@ -360,7 +364,7 @@ namespace bx
 			return StringView(fileName.getPtr()+1);
 		}
 
-		return get();
+		return getCPtr();
 	}
 
 	StringView FilePath::getBaseName() const
@@ -414,14 +418,14 @@ namespace bx
 		}
 
 #if BX_CRT_MSVC
-		int32_t result = ::_mkdir(_filePath.get() );
+		int32_t result = ::_mkdir(_filePath.getCPtr() );
 #elif BX_CRT_MINGW
-		int32_t result = ::mkdir(_filePath.get());
+		int32_t result = ::mkdir(_filePath.getCPtr());
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
 #else
-		int32_t result = ::mkdir(_filePath.get(), 0700);
+		int32_t result = ::mkdir(_filePath.getCPtr(), 0700);
 #endif // BX_CRT_MSVC
 
 		if (0 != result)
@@ -455,7 +459,7 @@ namespace bx
 			return false;
 		}
 
-		const StringView dir   = strRTrim(_filePath.get(), "/");
+		const StringView dir   = strRTrim(_filePath, "/");
 		const StringView slash = strRFind(dir, '/');
 
 		if (!slash.isEmpty()
@@ -487,18 +491,18 @@ namespace bx
 		{
 			if (FileType::Dir == fi.type)
 			{
-				result = ::_rmdir(_filePath.get() );
+				result = ::_rmdir(_filePath.getCPtr() );
 			}
 			else
 			{
-				result = ::remove(_filePath.get() );
+				result = ::remove(_filePath.getCPtr() );
 			}
 		}
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
 #else
-		int32_t result = ::remove(_filePath.get() );
+		int32_t result = ::remove(_filePath.getCPtr() );
 #endif // BX_CRT_MSVC
 
 		if (0 != result)
@@ -535,38 +539,38 @@ namespace bx
 			return false;
 		}
 
-#if BX_CRT_NONE
-		BX_UNUSED(_filePath);
-		return false;
-#elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_OSX
-		DIR* dir = opendir(_filePath.get() );
-		if (NULL == dir)
+		Error err;
+		DirectoryReader dr;
+
+		if (!bx::open(&dr, _filePath) )
 		{
 			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
 			return false;
 		}
 
-		for (dirent* item = readdir(dir); NULL != item; item = readdir(dir) )
+		while (err.isOk() )
 		{
-			if (0 == strCmp(item->d_name, ".")
-			||  0 == strCmp(item->d_name, "..") )
-			{
-				continue;
-			}
+			bx::read(&dr, fi, &err);
 
-			FilePath path(_filePath);
-			path.join(item->d_name);
-			if (!removeAll(path, _err) )
+			if (err.isOk() )
 			{
-				_err->reset();
-				break;
+				if (0 == strCmp(fi.filePath, ".")
+				||  0 == strCmp(fi.filePath, "..") )
+				{
+					continue;
+				}
+
+				FilePath path(_filePath);
+				path.join(fi.filePath);
+				if (!removeAll(path, _err) )
+				{
+					_err->reset();
+					break;
+				}
 			}
 		}
 
-		closedir(dir);
-#endif // !BX_CRT_NONE
+		bx::close(&dr);
 
 		return remove(_filePath, _err);
 	}
