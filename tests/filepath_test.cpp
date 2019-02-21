@@ -4,7 +4,7 @@
  */
 
 #include "test.h"
-#include <bx/filepath.h>
+#include <bx/file.h>
 
 struct FilePathTest
 {

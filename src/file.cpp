@@ -20,8 +20,13 @@
 #	if BX_CONFIG_CRT_DIRECTORY_READER
 #		include <dirent.h>
 #	endif // BX_CONFIG_CRT_DIRECTORY_READER
-#	include <stdio.h>
-#	include <sys/stat.h>
+#	include <stdio.h> // remove
+#	if BX_CRT_MSVC
+#		include <direct.h>   // _getcwd
+#	else
+#		include <sys/stat.h> // stat, mkdir
+#		include <unistd.h>   // getcwd
+#	endif // BX_CRT_MSVC
 #endif // !BX_CRT_NONE
 
 namespace bx
@@ -781,6 +786,173 @@ namespace bx
 
 		return true;
 #endif // BX_CRT_NONE
+	}
+
+	bool make(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+#if BX_CRT_MSVC
+		int32_t result = ::_mkdir(_filePath.getCPtr() );
+#elif BX_CRT_MINGW
+		int32_t result = ::mkdir(_filePath.getCPtr());
+#elif BX_CRT_NONE
+		BX_UNUSED(_filePath);
+		int32_t result = -1;
+#else
+		int32_t result = ::mkdir(_filePath.getCPtr(), 0700);
+#endif // BX_CRT_MSVC
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool makeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+		FileInfo fi;
+
+		if (stat(fi, _filePath) )
+		{
+			if (FileType::Dir == fi.type)
+			{
+				return true;
+			}
+
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		const StringView dir   = strRTrim(_filePath, "/");
+		const StringView slash = strRFind(dir, '/');
+
+		if (!slash.isEmpty()
+		&&  slash.getPtr() - dir.getPtr() > 1)
+		{
+			if (!makeAll(StringView(dir.getPtr(), slash.getPtr() ), _err) )
+			{
+				return false;
+			}
+		}
+
+		FilePath path(dir);
+		return make(path, _err);
+	}
+
+	bool remove(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (!_err->isOk() )
+		{
+			return false;
+		}
+
+#if BX_CRT_MSVC
+		int32_t result = -1;
+		FileInfo fi;
+		if (stat(fi, _filePath) )
+		{
+			if (FileType::Dir == fi.type)
+			{
+				result = ::_rmdir(_filePath.getCPtr() );
+			}
+			else
+			{
+				result = ::remove(_filePath.getCPtr() );
+			}
+		}
+#elif BX_CRT_NONE
+		BX_UNUSED(_filePath);
+		int32_t result = -1;
+#else
+		int32_t result = ::remove(_filePath.getCPtr() );
+#endif // BX_CRT_MSVC
+
+		if (0 != result)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool removeAll(const FilePath& _filePath, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+		if (remove(_filePath, _err) )
+		{
+			return true;
+		}
+
+		_err->reset();
+
+		FileInfo fi;
+
+		if (!stat(fi, _filePath) )
+		{
+			BX_ERROR_SET(_err, BX_ERROR_ACCESS, "The parent directory does not allow write permission to the process.");
+			return false;
+		}
+
+		if (FileType::Dir != fi.type)
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		Error err;
+		DirectoryReader dr;
+
+		if (!bx::open(&dr, _filePath) )
+		{
+			BX_ERROR_SET(_err, BX_ERROR_NOT_DIRECTORY, "File already exist, and is not directory.");
+			return false;
+		}
+
+		while (err.isOk() )
+		{
+			bx::read(&dr, fi, &err);
+
+			if (err.isOk() )
+			{
+				if (0 == strCmp(fi.filePath, ".")
+				||  0 == strCmp(fi.filePath, "..") )
+				{
+					continue;
+				}
+
+				FilePath path(_filePath);
+				path.join(fi.filePath);
+				if (!removeAll(path, _err) )
+				{
+					_err->reset();
+					break;
+				}
+			}
+		}
+
+		bx::close(&dr);
+
+		return remove(_filePath, _err);
 	}
 
 } // namespace bx
