@@ -20,12 +20,12 @@
 #	if BX_CONFIG_CRT_DIRECTORY_READER
 #		include <dirent.h>
 #	endif // BX_CONFIG_CRT_DIRECTORY_READER
-#	include <stdio.h> // remove
+#	include <stdio.h>      // remove
+#	include <sys/stat.h>   // stat, mkdir
 #	if BX_CRT_MSVC
-#		include <direct.h>   // _getcwd
+#		include <direct.h> // _getcwd
 #	else
-#		include <sys/stat.h> // stat, mkdir
-#		include <unistd.h>   // getcwd
+#		include <unistd.h> // getcwd
 #	endif // BX_CRT_MSVC
 #endif // !BX_CRT_NONE
 

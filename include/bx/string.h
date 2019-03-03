@@ -21,6 +21,7 @@ namespace bx
 	};
 
 	/// Non-zero-terminated string view.
+	///
 	class StringView
 	{
 	public:
@@ -77,9 +78,16 @@ namespace bx
 		///
 		void clear();
 
+		/// Returns pointer to non-terminated string.
+		///
+		/// @attention Use of this pointer in standard C/C++ functions is not safe. You must use it
+		///   in conjunction with `getTerm()` or getLength()`.
 		///
 		const char* getPtr() const;
 
+		/// Returns pointer past last character in string view.
+		///
+		/// @attention Dereferencing this pointer is not safe.
 		///
 		const char* getTerm() const;
 
