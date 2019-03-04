@@ -66,7 +66,7 @@ public:
 		bx::write(
 			  _writer
 			, &err
-			, "static const char* %.*s =\n\t\""
+			, "static const char* %.*s = /* Generated with bin2c. */\n\t\""
 			, m_name.getLength()
 			, m_name.getPtr()
 			);
@@ -92,7 +92,14 @@ public:
 				}
 				else
 				{
-					bx::write(_writer, ch, &err);
+					switch (ch)
+					{
+					case '\n': bx::write(_writer, "\\\"\n\t\"", &err);  break;
+					case '\r':                                 BX_FALLTHROUGH;
+					case '\t': bx::write(_writer, "\\", &err); BX_FALLTHROUGH;
+					default  : bx::write(_writer, ch,   &err);          break;
+					}
+
 					escaped = false;
 				}
 			}
@@ -114,7 +121,7 @@ public:
 		bx::write(
 			  _writer
 			, &err
-			, "static const uint8_t %.*s[%d] =\n{\n"
+			, "static const uint8_t %.*s[%d] = /* Generated with bin2c. */\n{\n"
 			, m_name.getLength()
 			, m_name.getPtr()
 			, size
