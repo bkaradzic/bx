@@ -229,6 +229,7 @@ function toolchain(_buildDir, _libDir)
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
+			premake.gcc.ar   = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
 
