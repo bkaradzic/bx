@@ -195,6 +195,7 @@ function toolchain(_buildDir, _libDir)
 	flags {
 		"Cpp14",
 		"ExtraWarnings",
+		"FloatFast",
 	}
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then
