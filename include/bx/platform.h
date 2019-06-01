@@ -426,7 +426,9 @@
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
 
-#if defined(__cplusplus)
+#if BX_COMPILER_MSVC
+#	define BX_CPP_NAME "C++MsvcUnknown"
+#elif defined(__cplusplus)
 #	if __cplusplus < 201103L
 #		error "Pre-C++11 compiler is not supported!"
 #	elif __cplusplus < 201402L
@@ -439,6 +441,8 @@
 // See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
 #		define BX_CPP_NAME "C++WayTooModern"
 #	endif // BX_CPP_NAME
+#else
+#	define BX_CPP_NAME "C++Unknown"
 #endif // defined(__cplusplus)
 
 #endif // BX_PLATFORM_H_HEADER_GUARD
