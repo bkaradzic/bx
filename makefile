@@ -6,18 +6,7 @@
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
-	$(GENIE) vs2017
-	$(GENIE) --gcc=android-arm gmake
-	$(GENIE) --gcc=android-mips gmake
-	$(GENIE) --gcc=android-x86 gmake
-	$(GENIE) --gcc=mingw-gcc gmake
-	$(GENIE) --gcc=linux-gcc gmake
 	$(GENIE) --gcc=haiku gmake
-	$(GENIE) --gcc=osx gmake
-	$(GENIE) --gcc=ios-arm gmake
-	$(GENIE) --gcc=ios-simulator gmake
-	$(GENIE) --gcc=ios-simulator64 gmake
-	$(GENIE) xcode8
 
 .build/projects/gmake-android-arm:
 	$(GENIE) --gcc=android-arm gmake
@@ -154,6 +143,7 @@ BUILD_OUTPUT_DIR=haiku64_gcc
 BUILD_TOOLS_CONFIG=release64
 EXE=
 endif
+else
 OS=linux
 BUILD_PROJECT_DIR=gmake-linux
 BUILD_OUTPUT_DIR=linux64_gcc
