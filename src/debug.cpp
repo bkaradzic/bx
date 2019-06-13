@@ -9,6 +9,10 @@
 #include <bx/readerwriter.h> // WriterI
 #include <inttypes.h>        // PRIx*
 
+#if BX_PLATFORM_EMSCRIPTEN
+#include <emscripten/emscripten.h>
+#endif
+
 #if BX_CRT_NONE
 #	include "crt0.h"
 #elif BX_PLATFORM_ANDROID
@@ -43,6 +47,11 @@ namespace bx
 		// NaCl doesn't like int 3:
 		// NativeClient: NaCl module load failed: Validation failure. File violates Native Client safety rules.
 		__asm__ ("int $3");
+#elif BX_PLATFORM_EMSCRIPTEN
+		emscripten_log(EM_LOG_CONSOLE | EM_LOG_ERROR | EM_LOG_C_STACK | EM_LOG_JS_STACK | EM_LOG_DEMANGLE, "debugBreak!");
+        // Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
+		//emscripten_debugger();
+        EM_ASM({ debugger; });
 #else // cross platform implementation
 		int* int3 = (int*)3L;
 		*int3 = 3;
