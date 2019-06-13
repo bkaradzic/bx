@@ -237,9 +237,10 @@ namespace bx
 		bool result = len != 0 && len < *_inOutSize;
 		*_inOutSize = len;
 		return result;
-#elif  BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
+#elif  BX_PLATFORM_EMSCRIPTEN \
+	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_XBOXONE    \
+	|| BX_PLATFORM_WINRT      \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, _out, _inOutSize);
 		return false;
@@ -279,9 +280,10 @@ namespace bx
 
 #if BX_PLATFORM_WINDOWS
 		::SetEnvironmentVariableA(name, value);
-#elif  BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
+#elif  BX_PLATFORM_EMSCRIPTEN \
+	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_XBOXONE    \
+	|| BX_PLATFORM_WINRT      \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, value);
 #else
