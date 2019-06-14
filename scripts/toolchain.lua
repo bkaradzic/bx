@@ -664,9 +664,9 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "mingw-clang" }
 		buildoptions {
-			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
-			"-isystem$(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
-			"-isystem$(MINGW)/x86_64-w64-mingw32/include",
+			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++",
+			"-isystem $(MINGW)/lib/gcc/x86_64-w64-mingw32/4.8.1/include/c++/x86_64-w64-mingw32",
+			"-isystem $(MINGW)/x86_64-w64-mingw32/include",
 		}
 		linkoptions {
 			"-Qunused-arguments",
@@ -926,9 +926,9 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "asmjs/obj"))
 		libdirs { path.join(_libDir, "lib/asmjs") }
 		buildoptions {
-			"-i\"system$(EMSCRIPTEN)/system/include\"",
-			"-i\"system$(EMSCRIPTEN)/system/include/libcxx\"",
-			"-i\"system$(EMSCRIPTEN)/system/include/libc\"",
+			"-isystem \"$(EMSCRIPTEN)/system/include\"",
+			"-isystem \"$(EMSCRIPTEN)/system/include/libcxx\"",
+			"-isystem \"$(EMSCRIPTEN)/system/include/libc\"",
 			"-Wunused-value",
 			"-Wundef",
 		}
