@@ -12,12 +12,12 @@
 #	include <bx/cpu.h>
 #	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_HAIKU   \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI     \
-	|| BX_PLATFORM_HAIKU
+	|| BX_PLATFORM_RPI
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \

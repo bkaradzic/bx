@@ -18,24 +18,24 @@
 #	include <windows.h>
 #	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID    \
-	|| BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_BSD        \
+	|| BX_PLATFORM_EMSCRIPTEN \
+	|| BX_PLATFORM_HAIKU      \
 	|| BX_PLATFORM_HURD       \
 	|| BX_PLATFORM_IOS        \
 	|| BX_PLATFORM_LINUX      \
+	|| BX_PLATFORM_NX         \
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_RPI        \
-	|| BX_PLATFORM_STEAMLINK  \
-	|| BX_PLATFORM_NX         \
-	|| BX_PLATFORM_HAIKU
+	|| BX_PLATFORM_STEAMLINK
 #	include <sched.h> // sched_yield
 #	if BX_PLATFORM_BSD       \
+	|| BX_PLATFORM_HAIKU     \
 	|| BX_PLATFORM_IOS       \
 	|| BX_PLATFORM_OSX       \
 	|| BX_PLATFORM_PS4       \
-	|| BX_PLATFORM_STEAMLINK \
-	|| BX_PLATFORM_HAIKU
+	|| BX_PLATFORM_STEAMLINK
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
@@ -67,7 +67,6 @@
 
 namespace bx
 {
-
 	void sleep(uint32_t _ms)
 	{
 #if BX_PLATFORM_WINDOWS

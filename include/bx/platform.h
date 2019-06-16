@@ -48,6 +48,7 @@
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_BSD        0
 #define BX_PLATFORM_EMSCRIPTEN 0
+#define BX_PLATFORM_HAIKU      0
 #define BX_PLATFORM_HURD       0
 #define BX_PLATFORM_IOS        0
 #define BX_PLATFORM_LINUX      0
@@ -59,7 +60,6 @@
 #define BX_PLATFORM_WINDOWS    0
 #define BX_PLATFORM_WINRT      0
 #define BX_PLATFORM_XBOXONE    0
-#define BX_PLATFORM_HAIKU      0
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Compilers
 #if defined(__clang__)
@@ -261,6 +261,7 @@
 	||  BX_PLATFORM_ANDROID    \
 	||  BX_PLATFORM_BSD        \
 	||  BX_PLATFORM_EMSCRIPTEN \
+	||  BX_PLATFORM_HAIKU      \
 	||  BX_PLATFORM_HURD       \
 	||  BX_PLATFORM_IOS        \
 	||  BX_PLATFORM_LINUX      \
@@ -269,7 +270,6 @@
 	||  BX_PLATFORM_PS4        \
 	||  BX_PLATFORM_RPI        \
 	||  BX_PLATFORM_STEAMLINK  \
-	||  BX_PLATFORM_HAIKU      \
 	)
 
 ///
@@ -277,6 +277,7 @@
 	||  BX_PLATFORM_ANDROID    \
 	||  BX_PLATFORM_BSD        \
 	||  BX_PLATFORM_EMSCRIPTEN \
+	||  BX_PLATFORM_HAIKU      \
 	||  BX_PLATFORM_HURD       \
 	||  BX_PLATFORM_IOS        \
 	||  BX_PLATFORM_LINUX      \
@@ -288,7 +289,6 @@
 	||  BX_PLATFORM_WINDOWS    \
 	||  BX_PLATFORM_WINRT      \
 	||  BX_PLATFORM_XBOXONE    \
-	||  BX_PLATFORM_HAIKU      \
 	)
 
 ///
@@ -302,11 +302,11 @@
 ///
 #define BX_PLATFORM_OS_DESKTOP  (0 \
 	||  BX_PLATFORM_BSD            \
+	||  BX_PLATFORM_HAIKU          \
 	||  BX_PLATFORM_HURD           \
 	||  BX_PLATFORM_LINUX          \
 	||  BX_PLATFORM_OSX            \
 	||  BX_PLATFORM_WINDOWS        \
-	||  BX_PLATFORM_HAIKU          \
 	)
 
 ///
@@ -365,6 +365,8 @@
 		BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
 		BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
 		BX_STRINGIZE(__EMSCRIPTEN_tiny__)
+#elif BX_PLATFORM_HAIKU
+#	define BX_PLATFORM_NAME "Haiku"
 #elif BX_PLATFORM_HURD
 #	define BX_PLATFORM_NAME "Hurd"
 #elif BX_PLATFORM_IOS
@@ -389,8 +391,6 @@
 #	define BX_PLATFORM_NAME "WinRT"
 #elif BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_NAME "Xbox One"
-#elif BX_PLATFORM_HAIKU
-#	define BX_PLATFORM_NAME "Haiku"
 #else
 #	error "Unknown BX_PLATFORM!"
 #endif // BX_PLATFORM_

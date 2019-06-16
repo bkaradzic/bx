@@ -15,12 +15,12 @@
 #if BX_CRT_NONE
 #	include "crt0.h"
 #elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_HAIKU   \
 	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI     \
-	|| BX_PLATFORM_HAIKU
+	|| BX_PLATFORM_RPI
 #	include <pthread.h>
 #	if defined(__FreeBSD__)
 #		include <pthread_np.h>
