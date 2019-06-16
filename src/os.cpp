@@ -27,13 +27,15 @@
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_RPI        \
 	|| BX_PLATFORM_STEAMLINK  \
-	|| BX_PLATFORM_NX
+	|| BX_PLATFORM_NX         \
+	|| BX_PLATFORM_HAIKU
 #	include <sched.h> // sched_yield
-#	if BX_PLATFORM_BSD  \
-	|| BX_PLATFORM_IOS  \
-	|| BX_PLATFORM_OSX  \
-	|| BX_PLATFORM_PS4  \
-	|| BX_PLATFORM_STEAMLINK
+#	if BX_PLATFORM_BSD       \
+	|| BX_PLATFORM_IOS       \
+	|| BX_PLATFORM_OSX       \
+	|| BX_PLATFORM_PS4       \
+	|| BX_PLATFORM_STEAMLINK \
+	|| BX_PLATFORM_HAIKU
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
@@ -50,6 +52,9 @@
 #		include <stdio.h>  // fopen
 #		include <unistd.h> // syscall
 #		include <sys/syscall.h>
+#	elif   BX_PLATFORM_HAIKU
+#		include <stdio.h>  // fopen
+#		include <unistd.h> // syscall
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
 #	elif BX_PLATFORM_HURD
