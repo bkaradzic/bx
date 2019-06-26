@@ -224,15 +224,15 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "android-arm64" == _OPTIONS["gcc"] then
 
-			if not os.getenv("ANDROID_NDK_ARM")
+			if not os.getenv("ANDROID_NDK_ARM64")
 			or not os.getenv("ANDROID_NDK_CLANG")
 			or not os.getenv("ANDROID_NDK_ROOT") then
-				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM, and ANDROID_NDK_ROOT environment variables.")
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_ARM64, and ANDROID_NDK_ROOT environment variables.")
 			end
 
 			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
 			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
-			premake.gcc.ar   = "$(ANDROID_NDK_ARM)/bin/aarch64-linux-android-ar"
+			premake.gcc.ar   = "$(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-ar"
 
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-arm64"))
@@ -919,7 +919,7 @@ function toolchain(_buildDir, _libDir)
 			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/aarch64-linux-android",
 		}
 		buildoptions {
-			"-gcc-toolchain $(ANDROID_NDK_ARM)",
+			"-gcc-toolchain $(ANDROID_NDK_ARM64)",
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64"),
 			"-target aarch64-none-linux-androideabi",
 			"-march=armv8-a",
@@ -927,7 +927,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 		linkoptions {
-			"-gcc-toolchain $(ANDROID_NDK_ARM)",
+			"-gcc-toolchain $(ANDROID_NDK_ARM64)",
 			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64"),
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtbegin_so.o"),
 			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-arm64/usr/lib/crtend_so.o"),
@@ -1248,7 +1248,7 @@ function strip()
 	configuration { "android-arm64", "Release" }
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
-			"$(SILENT) $(ANDROID_NDK_ARM)/bin/aarch64-linux-android-strip -s \"$(TARGET)\""
+			"$(SILENT) $(ANDROID_NDK_ARM64)/bin/aarch64-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "android-x86", "Release" }
