@@ -8,6 +8,7 @@ GENIE=../bx/tools/bin/$(OS)/genie
 all:
 	$(GENIE) vs2017
 	$(GENIE) --gcc=android-arm gmake
+	$(GENIE) --gcc=android-arm64 gmake
 	$(GENIE) --gcc=android-mips gmake
 	$(GENIE) --gcc=android-x86 gmake
 	$(GENIE) --gcc=mingw-gcc gmake
@@ -26,6 +27,14 @@ android-arm-debug: .build/projects/gmake-android-arm
 android-arm-release: .build/projects/gmake-android-arm
 	make -R -C .build/projects/gmake-android-arm config=release
 android-arm: android-arm-debug android-arm-release
+
+.build/projects/gmake-android-arm64:
+	$(GENIE) --gcc=android-arm64 gmake
+android-arm64-debug: .build/projects/gmake-android-arm64
+	make -R -C .build/projects/gmake-android-arm64 config=debug
+android-arm64-release: .build/projects/gmake-android-arm64
+	make -R -C .build/projects/gmake-android-arm64 config=release
+android-arm64: android-arm64-debug android-arm64-release
 
 .build/projects/gmake-android-mips:
 	$(GENIE) --gcc=android-mips gmake
