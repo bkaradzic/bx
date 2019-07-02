@@ -9,10 +9,6 @@
 #include <bx/readerwriter.h> // WriterI
 #include <inttypes.h>        // PRIx*
 
-#if BX_PLATFORM_EMSCRIPTEN
-#include <emscripten/emscripten.h>
-#endif
-
 #if BX_CRT_NONE
 #	include "crt0.h"
 #elif BX_PLATFORM_ANDROID
@@ -28,8 +24,8 @@ extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _
 #		include <CoreFoundation/CFString.h>
 extern "C" void NSLog(CFStringRef _format, ...);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
-#	include <emscripten.h>
+#elif BX_PLATFORM_EMSCRIPTEN
+#	include <emscripten/emscripten.h>
 #else
 #	include <stdio.h> // fputs, fflush
 #endif // BX_PLATFORM_WINDOWS
@@ -49,9 +45,9 @@ namespace bx
 		__asm__ ("int $3");
 #elif BX_PLATFORM_EMSCRIPTEN
 		emscripten_log(EM_LOG_CONSOLE | EM_LOG_ERROR | EM_LOG_C_STACK | EM_LOG_JS_STACK | EM_LOG_DEMANGLE, "debugBreak!");
-        // Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
+		// Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
 		//emscripten_debugger();
-        EM_ASM({ debugger; });
+		EM_ASM({ debugger; });
 #else // cross platform implementation
 		int* int3 = (int*)3L;
 		*int3 = 3;
