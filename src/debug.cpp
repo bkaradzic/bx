@@ -74,7 +74,7 @@ namespace bx
 #	else
 		NSLog(__CFStringMakeConstantString("%s"), _out);
 #	endif // defined(__OBJC__)
-#elif 0 // BX_PLATFORM_EMSCRIPTEN
+#elif BX_PLATFORM_EMSCRIPTEN
 		emscripten_log(EM_LOG_CONSOLE, "%s", _out);
 #else
 		fputs(_out, stdout);
