@@ -338,7 +338,9 @@
 		BX_STRINGIZE(__clang_minor__) "." \
 		BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
+#	if BX_COMPILER_MSVC >= 1920 // Visual Studio 2019
+#		define BX_COMPILER_NAME "MSVC 16.0"
+#	elif BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
 #		define BX_COMPILER_NAME "MSVC 15.0"
 #	elif BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
 #		define BX_COMPILER_NAME "MSVC 14.0"
