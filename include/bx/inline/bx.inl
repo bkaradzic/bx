@@ -24,7 +24,11 @@ namespace bx
 	template<class Ty>
 	inline constexpr bool isTriviallyCopyable()
 	{
+#if _GNUC_VER < 501
+		return __has_trivial_copy(Ty) && __has_trivial_destructor(Ty);
+#else
 		return __is_trivially_copyable(Ty);
+#endif
 	}
 
 	template<>

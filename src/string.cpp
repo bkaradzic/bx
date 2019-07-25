@@ -674,6 +674,11 @@ namespace bx
 		StringView ptr = strFind(_str, _word);
 		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
+			// added by pgruenbacher July 2019 to brute-force resolve issue where
+			// strings were not being compared correctly.
+			if (_str.getPtr() == ptr.getPtr() && _str.getLength() == len) {
+				return ptr;
+			}
 			char ch = *(ptr.getPtr() - 1);
 			if (isAlphaNum(ch) || '_' == ch)
 			{
