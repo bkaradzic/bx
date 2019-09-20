@@ -596,6 +596,71 @@ namespace bx
 		_result[15] = +(xx*(yy*zz - zy*yz) - xy*(yx*zz - zx*yz) + xz*(yx*zy - zx*yy) ) * invDet;
 	}
 
+	void mtx3Cofactor(float* _result, const float* _a)
+	{
+		float xx = _a[0];
+		float xy = _a[1];
+		float xz = _a[2];
+		float yx = _a[3];
+		float yy = _a[4];
+		float yz = _a[5];
+		float zx = _a[6];
+		float zy = _a[7];
+		float zz = _a[8];
+
+		_result[0] = +(yy*zz - yz * zy);
+		_result[1] = -(yx*zz - yz * zx);
+		_result[2] = +(yx*zy - yy * zx);
+
+		_result[3] = -(xy*zz - xz * zy);
+		_result[4] = +(xx*zz - xz * zx);
+		_result[5] = -(xx*zy - xy * zx);
+
+		_result[6] = +(xy*yz - xz * yy);
+		_result[7] = -(xx*yz - xz * yx);
+		_result[8] = +(xx*yy - xy * yx);
+	}
+
+	void mtxCofactor(float* _result, const float* _a)
+	{
+		float xx = _a[0];
+		float xy = _a[1];
+		float xz = _a[2];
+		float xw = _a[3];
+		float yx = _a[4];
+		float yy = _a[5];
+		float yz = _a[6];
+		float yw = _a[7];
+		float zx = _a[8];
+		float zy = _a[9];
+		float zz = _a[10];
+		float zw = _a[11];
+		float wx = _a[12];
+		float wy = _a[13];
+		float wz = _a[14];
+		float ww = _a[15];
+
+		_result[0] = +(yy*(zz*ww - wz * zw) - yz * (zy*ww - wy * zw) + yw * (zy*wz - wy * zz));
+		_result[1] = -(yx*(zz*ww - wz * zw) - yz * (zx*ww - wx * zw) + yw * (zx*wz - wx * zz));
+		_result[2] = +(yx*(zy*ww - wy * zw) - yy * (zx*ww - wx * zw) + yw * (zx*wy - wx * zy));
+		_result[3] = -(yx*(zy*wz - wy * zz) - yy * (zx*wz - wx * zz) + yz * (zx*wy - wx * zy));
+
+		_result[4] = -(xy*(zz*ww - wz * zw) - xz * (zy*ww - wy * zw) + xw * (zy*wz - wy * zz));
+		_result[5] = +(xx*(zz*ww - wz * zw) - xz * (zx*ww - wx * zw) + xw * (zx*wz - wx * zz));
+		_result[6] = -(xx*(zy*ww - wy * zw) - xy * (zx*ww - wx * zw) + xw * (zx*wy - wx * zy));
+		_result[7] = +(xx*(zy*wz - wy * zz) - xy * (zx*wz - wx * zz) + xz * (zx*wy - wx * zy));
+
+		_result[8] = +(xy*(yz*ww - wz * yw) - xz * (yy*ww - wy * yw) + xw * (yy*wz - wy * yz));
+		_result[9] = -(xx*(yz*ww - wz * yw) - xz * (yx*ww - wx * yw) + xw * (yx*wz - wx * yz));
+		_result[10] = +(xx*(yy*ww - wy * yw) - xy * (yx*ww - wx * yw) + xw * (yx*wy - wx * yy));
+		_result[11] = -(xx*(yy*wz - wy * yz) - xy * (yx*wz - wx * yz) + xz * (yx*wy - wx * yy));
+
+		_result[12] = -(xy*(yz*zw - zz * yw) - xz * (yy*zw - zy * yw) + xw * (yy*zz - zy * yz));
+		_result[13] = +(xx*(yz*zw - zz * yw) - xz * (yx*zw - zx * yw) + xw * (yx*zz - zx * yz));
+		_result[14] = -(xx*(yy*zw - zy * yw) - xy * (yx*zw - zx * yw) + xw * (yx*zy - zx * yy));
+		_result[15] = +(xx*(yy*zz - zy * yz) - xy * (yx*zz - zx * yz) + xz * (yx*zy - zx * yy));
+	}
+
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints)
 	{
 		float sumX  = 0.0f;
