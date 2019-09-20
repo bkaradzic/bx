@@ -588,6 +588,12 @@ namespace bx
 	void mtxInverse(float* _result, const float* _a);
 
 	///
+	void mtx3Cofactor(float* _result, const float* _a);
+
+	///
+	void mtxCofactor(float* _result, const float* _a);
+
+	///
 	Vec3 calcNormal(const Vec3& _va, const Vec3& _vb, const Vec3& _vc);
 
 	///
