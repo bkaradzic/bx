@@ -33,6 +33,7 @@ TEST_CASE("uint32_cnt")
 	REQUIRE( 0 == bx::uint32_cnttz<uint8_t >(1) );
 	REQUIRE( 7 == bx::uint32_cnttz<uint8_t >(1<<7) );
 	REQUIRE( 8 == bx::uint32_cnttz<uint8_t >(0) );
+	REQUIRE( 1 == bx::uint32_cnttz<uint8_t >(0x3e) );
 	REQUIRE( 0 == bx::uint32_cnttz<uint16_t>(1) );
 	REQUIRE(15 == bx::uint32_cnttz<uint16_t>(1<<15) );
 	REQUIRE(16 == bx::uint32_cnttz<uint16_t>(0) );
@@ -44,6 +45,7 @@ TEST_CASE("uint32_cnt")
 
 	REQUIRE( 7 == bx::uint32_cntlz<uint8_t >(1) );
 	REQUIRE( 8 == bx::uint32_cntlz<uint8_t >(0) );
+	REQUIRE( 2 == bx::uint32_cntlz<uint8_t >(0x3e) );
 	REQUIRE(15 == bx::uint32_cntlz<uint16_t>(1) );
 	REQUIRE(16 == bx::uint32_cntlz<uint16_t>(0) );
 	REQUIRE(31 == bx::uint32_cntlz<uint32_t>(1) );
