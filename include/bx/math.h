@@ -225,7 +225,8 @@ namespace bx
 
 	/// Returns the base 2 logarithm of _a.
 	///
-	BX_CONST_FUNC float log2(float _a);
+	template<typename Ty>
+	BX_CONST_FUNC Ty log2(Ty _a);
 
 	/// Returns the square root of _a.
 	///

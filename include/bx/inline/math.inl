@@ -10,6 +10,7 @@
 #endif // BX_MATH_H_HEADER_GUARD
 
 #include <bx/simd_t.h>
+#include <bx/uint32_t.h>
 
 namespace bx
 {
@@ -191,9 +192,16 @@ namespace bx
 		return pow(2.0f, _a);
 	}
 
+	template<>
 	inline BX_CONST_FUNC float log2(float _a)
 	{
 		return log(_a) * kInvLogNat2;
+	}
+
+	template<>
+	inline BX_CONST_FUNC int32_t log2(int32_t _a)
+	{
+		return 31 - uint32_cntlz(_a);
 	}
 
 	inline BX_CONST_FUNC float rsqrtRef(float _a)
