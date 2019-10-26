@@ -127,6 +127,11 @@ namespace bx
 		return _a + (_b - _a) * _t;
 	}
 
+	inline BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value)
+	{
+		return (_value - _a) / (_b - _a);
+	}
+
 	inline BX_CONSTEXPR_FUNC float sign(float _a)
 	{
 		return _a < 0.0f ? -1.0f : 1.0f;
