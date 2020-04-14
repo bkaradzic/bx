@@ -984,7 +984,7 @@ void ini_property_value_set( ini_t* ini, int section, int property, char const* 
             else
                 {
                 INI_MEMCPY( ini->properties[ p ].value, value, (size_t) length );
-                ini->properties[ p ].name[ length ] = '\0';
+                ini->properties[ p ].value[ length ] = '\0';
                 }
             }
         }
