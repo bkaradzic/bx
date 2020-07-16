@@ -8,9 +8,9 @@
 #endif // BX_CPU_H_HEADER_GUARD
 
 #if BX_COMPILER_MSVC
-#	if BX_PLATFORM_WINRT | (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
+#	if BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
 #		include <windows.h>
-#	endif // BX_PLATFORM_WINRT | (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
+#	endif // BX_PLATFORM_WINRT || (BX_PLATFORM_WINDOWS && (!BX_CPU_X86))
 
 #	if BX_CPU_X86
 #		include <emmintrin.h> // _mm_fence
