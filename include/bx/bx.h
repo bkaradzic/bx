@@ -22,6 +22,8 @@
 ///
 #if BX_COMPILER_MSVC
 #	define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
+#	undef min
+#	undef max
 #else
 #	define BX_IGNORE_C4127(_x) (!!(_x) )
 #endif // BX_COMPILER_MSVC
