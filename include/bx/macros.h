@@ -243,4 +243,6 @@
 // static_assert sometimes causes unused-local-typedef...
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wunused-local-typedef")
 
+#define BX_CAST_FUNCTION(proto, func) ((proto)(void(*)(void))func)
+
 #endif // BX_MACROS_H_HEADER_GUARD
