@@ -140,10 +140,18 @@ namespace tinystl {
 
 	template<typename T, typename Alloc>
 	static inline void buffer_reserve(buffer<T, Alloc>* b, size_t capacity) {
+		typedef T* pointer;
+
+		if (b->first == 0)
+		{
+			b->first = b->last = (pointer)Alloc::static_allocate(sizeof(T) * capacity);
+			b->capacity = b->first + capacity;
+			return;
+		}
+
 		if (b->first + capacity <= b->capacity)
 			return;
 
-		typedef T* pointer;
 		const size_t size = (size_t)(b->last - b->first);
 		pointer newfirst = (pointer)Alloc::static_allocate(sizeof(T) * capacity);
 		buffer_move_urange(newfirst, b->first, b->last);
