@@ -27,7 +27,7 @@ project "bin2c"
 			"pthread",
 		}
 
-	configuration { "vs20* or mingw*" }
+	configuration { "vs20* or mingw* or cmake", "windows" }
 		links {
 			"psapi",
 		}

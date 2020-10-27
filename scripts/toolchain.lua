@@ -534,12 +534,12 @@ function toolchain(_buildDir, _libDir)
 			"ExtraWarnings",
 		}
 
-	configuration { "vs*", "x32" }
+	configuration { "vs* or cmake", "x32", "windows" }
 		flags {
 			"EnableSSE2",
 		}
 
-	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
+	configuration { "vs* or cmake", "windows" }
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		defines {
 			"WIN32",

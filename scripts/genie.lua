@@ -65,7 +65,7 @@ project "bx.test"
 		"bx",
 	}
 
-	configuration { "vs* or mingw*" }
+	configuration { "vs* or mingw* or cmake", "windows" }
 		links {
 			"psapi",
 		}
