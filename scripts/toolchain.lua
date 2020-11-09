@@ -504,7 +504,6 @@ function toolchain(_buildDir, _libDir)
 		"NoExceptions",
 		"NoEditAndContinue",
 		"NoFramePointer",
-		"Symbols",
 	}
 
 	defines {
@@ -515,6 +514,9 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "Debug" }
 		targetsuffix "Debug"
+		flags {
+			"Symbols",
+		}
 		defines {
 			"_DEBUG",
 		}
