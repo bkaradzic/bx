@@ -36,7 +36,7 @@
 #	include <windows.h>
 #	include <limits.h>
 #	include <errno.h>
-#	if BX_PLATFORM_WINRT
+#	if !USE_WINRT_CPP && BX_PLATFORM_WINRT
 using namespace Platform;
 using namespace Windows::Foundation;
 using namespace Windows::System::Threading;
@@ -146,7 +146,8 @@ namespace bx
 			return false;
 		}
 #elif  BX_PLATFORM_WINDOWS \
-	|| BX_PLATFORM_XBOXONE
+	|| BX_PLATFORM_XBOXONE \
+	|| USE_WINRT_CPP
 		ti->m_handle = ::CreateThread(NULL
 				, m_stackSize
 				, (LPTHREAD_START_ROUTINE)ti->threadFunc
