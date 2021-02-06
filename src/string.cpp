@@ -563,7 +563,7 @@ namespace bx
 	StringView strFindNl(const StringView& _str)
 	{
 		StringView str(_str);
-		
+
 		// This method returns the character past the \n, so
 		// there is no need to look for he \r which preceedes it.
 		StringView eol = strFind(str, "\n");
@@ -571,7 +571,7 @@ namespace bx
 		{
 			return StringView(eol.getTerm(), str.getTerm() );
 		}
-		return StringView(str.getTerm(), str.getTerm() );
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	StringView strFindEol(const StringView& _str)
