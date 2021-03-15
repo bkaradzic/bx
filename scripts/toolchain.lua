@@ -52,6 +52,7 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm",     "Android - ARM"              },
 			{ "android-arm64",   "Android - ARM64"            },
 			{ "android-x86",     "Android - x86"              },
+			{ "android-x86_64",  "Android - x86_64"           },
 			{ "wasm2js",         "Emscripten/Wasm2JS"         },
 			{ "wasm",            "Emscripten/Wasm"            },
 			{ "freebsd",         "FreeBSD"                    },
@@ -112,7 +113,7 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger     = "with-android",
 		value       = "#",
-		description = "Set Android platform version (default: android-14).",
+		description = "Set Android platform version (default: android-24).",
 	}
 
 	newoption {
@@ -251,6 +252,20 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar   = "$(ANDROID_NDK_X86)/bin/i686-linux-android-ar"
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86"))
+
+		elseif "android-x86_64" == _OPTIONS["gcc"] then
+
+			if not os.getenv("ANDROID_NDK_X86_64")
+			or not os.getenv("ANDROID_NDK_CLANG")
+			or not os.getenv("ANDROID_NDK_ROOT") then
+				print("Set ANDROID_NDK_CLANG, ANDROID_NDK_X86_64, and ANDROID_NDK_ROOT environment variables.")
+			end
+
+			premake.gcc.cc   = "$(ANDROID_NDK_CLANG)/bin/clang"
+			premake.gcc.cxx  = "$(ANDROID_NDK_CLANG)/bin/clang++"
+			premake.gcc.ar   = "$(ANDROID_NDK_X86_64)/bin/x86_64-linux-android-ar"
+			premake.gcc.llvm = true
+			location (path.join(_buildDir, "projects", _ACTION .. "-android-x86_64"))
 
 		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
 
@@ -932,6 +947,35 @@ function toolchain(_buildDir, _libDir)
 			"-target i686-none-linux-android",
 		}
 
+	configuration { "android-x86_64" }
+		targetdir (path.join(_buildDir, "android-x86_64/bin"))
+		objdir (path.join(_buildDir, "android-x86_64/obj"))
+		libdirs {
+			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libs/x86_64",
+		}
+		includedirs {
+			"$(ANDROID_NDK_ROOT)/sysroot/usr/include/x86_64-linux-android",
+		}
+		buildoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X86_64)",
+			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86_64"),
+			"-target x86_64-none-linux-android",
+			"-march=x86-64",
+			"-mtune=atom",
+			"-mstackrealign",
+			"-msse3",
+			"-mfpmath=sse",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		linkoptions {
+			"-gcc-toolchain $(ANDROID_NDK_X86_64)",
+			"--sysroot=" .. path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86_64"),
+			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86_64/usr/lib64/crtbegin_so.o"),
+			path.join("$(ANDROID_NDK_ROOT)/platforms", androidPlatform, "arch-x86_64/usr/lib64/crtend_so.o"),
+			"-target x86_64-none-linux-android",
+		}
+
 	configuration { "wasm*" }
 		buildoptions {
 			"-Wunused-value",
@@ -1238,6 +1282,12 @@ function strip()
 		postbuildcommands {
 			"$(SILENT) echo Stripping symbols.",
 			"$(SILENT) $(ANDROID_NDK_X86)/bin/i686-linux-android-strip -s \"$(TARGET)\""
+		}
+
+	configuration { "android-x86_64", "Release" }
+		postbuildcommands {
+			"$(SILENT) echo Stripping symbols.",
+			"$(SILENT) $(ANDROID_NDK_X86_64)/bin/x86_64-linux-android-strip -s \"$(TARGET)\""
 		}
 
 	configuration { "linux-* or rpi", "Release" }
