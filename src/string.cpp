@@ -940,16 +940,18 @@ namespace bx
 			else if ('%' == ch)
 			{
 				// %[flags][width][.precision][length sub-specifier]specifier
-				read(&reader, ch);
+				read(&reader, ch, &err);
 
 				Param param;
 
 				// flags
-				while (' ' == ch
+				while (err.isOk()
+				&& (   ' ' == ch
 				||     '-' == ch
 				||     '+' == ch
 				||     '0' == ch
 				||     '#' == ch)
+				   )
 				{
 					switch (ch)
 					{
@@ -961,7 +963,7 @@ namespace bx
 						case '#': param.spec = true; break;
 					}
 
-					read(&reader, ch);
+					read(&reader, ch, &err);
 				}
 
 				if (param.left)
@@ -972,7 +974,7 @@ namespace bx
 				// width
 				if ('*' == ch)
 				{
-					read(&reader, ch);
+					read(&reader, ch, &err);
 					param.width = va_arg(_argList, int32_t);
 
 					if (0 > param.width)
@@ -984,41 +986,45 @@ namespace bx
 				}
 				else
 				{
-					while (isNumeric(ch) )
+					while (err.isOk()
+					&&     isNumeric(ch) )
 					{
 						param.width = param.width * 10 + ch - '0';
-						read(&reader, ch);
+						read(&reader, ch, &err);
 					}
 				}
 
 				// .precision
 				if ('.' == ch)
 				{
-					read(&reader, ch);
+					read(&reader, ch, &err);
 
 					if ('*' == ch)
 					{
-						read(&reader, ch);
+						read(&reader, ch, &err);
 						param.prec = va_arg(_argList, int32_t);
 					}
 					else
 					{
 						param.prec = 0;
-						while (isNumeric(ch) )
+						while (err.isOk()
+						&&     isNumeric(ch) )
 						{
 							param.prec = param.prec * 10 + ch - '0';
-							read(&reader, ch);
+							read(&reader, ch, &err);
 						}
 					}
 				}
 
 				// length sub-specifier
-				while ('h' == ch
+				while (err.isOk()
+				&& (   'h' == ch
 				||     'I' == ch
 				||     'l' == ch
 				||     'j' == ch
 				||     't' == ch
 				||     'z' == ch)
+				   )
 				{
 					switch (ch)
 					{
@@ -1036,14 +1042,14 @@ namespace bx
 								default: break;
 							}
 
-							read(&reader, ch);
+							read(&reader, ch, &err);
 							switch (ch)
 							{
 								case 'h': param.bits = sizeof(signed char  )*8; break;
 								case 'l': param.bits = sizeof(long long int)*8; break;
 								case '3':
 								case '6':
-									read(&reader, ch);
+									read(&reader, ch, &err);
 									switch (ch)
 									{
 										case '2': param.bits = sizeof(int32_t)*8; break;
@@ -1057,7 +1063,12 @@ namespace bx
 							break;
 					}
 
-					read(&reader, ch);
+					read(&reader, ch, &err);
+				}
+
+				if (!err.isOk() )
+				{
+					break;
 				}
 
 				// specifier

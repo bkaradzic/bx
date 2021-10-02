@@ -179,6 +179,13 @@ TEST_CASE("vsnprintf s")
 	REQUIRE(test("(null)", "%s", NULL) );
 }
 
+TEST_CASE("vsnprintf t")
+{
+	size_t size = -1;
+
+	REQUIRE(test("-1", "%td", size) );
+}
+
 TEST_CASE("vsnprintf g")
 {
 	REQUIRE(test("   0.01",  "%7.2g", .01) );
@@ -223,4 +230,16 @@ TEST_CASE("vsnprintf write")
 
 	bx::StringView str(tmp, len);
 	REQUIRE(0 == bx::strCmp(str, "1389") );
+}
+
+TEST_CASE("snprintf invalid")
+{
+	char temp[64];
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0", 1) );
+	REQUIRE(0 == bx::snprintf(temp, sizeof(temp), "%-03.0t", 1) );
 }
