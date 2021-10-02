@@ -536,16 +536,22 @@ TEST_CASE("strFindBlock", "")
 	REQUIRE(19 == result.getLength() );
 }
 
-TEST_CASE("hasPrefix", "")
+TEST_CASE("prefix", "")
 {
 	REQUIRE( bx::hasPrefix("abvgd-1389.0", "abv") );
 	REQUIRE(!bx::hasPrefix("abvgd-1389.0", "bvg") );
 	REQUIRE( bx::hasPrefix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "abv"), "gd-1389.0") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
 }
 
-TEST_CASE("hasSuffix", "")
+TEST_CASE("suffix", "")
 {
 	REQUIRE( bx::hasSuffix("abvgd-1389.0", "389.0") );
 	REQUIRE(!bx::hasSuffix("abvgd-1389.0", "1389") );
 	REQUIRE( bx::hasSuffix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "389.0"), "abvgd-1") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
 }

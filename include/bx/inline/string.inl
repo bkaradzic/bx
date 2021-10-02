@@ -308,4 +308,24 @@ namespace bx
 			;
 	}
 
+	inline StringView strTrimPrefix(const StringView& _str, const StringView& _prefix)
+	{
+		if (hasPrefix(_str, _prefix) )
+		{
+			return StringView(_str.getPtr() + _prefix.getLength(), _str.getTerm() );
+		}
+
+		return _str;
+	}
+
+	inline StringView strTrimSuffix(const StringView& _str, const StringView& _suffix)
+	{
+		if (hasSuffix(_str, _suffix) )
+		{
+			return StringView(_str.getPtr(), _str.getTerm() - _suffix.getLength() );
+		}
+
+		return _str;
+	}
+
 } // namespace bx

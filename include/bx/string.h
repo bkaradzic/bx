@@ -266,6 +266,12 @@ namespace bx
 	/// Returns string view with whitespace characters trimmed from left and right.
 	StringView strTrimSpace(const StringView& _str);
 
+	/// Returns string view with prefix trimmed.
+	StringView strTrimPrefix(const StringView& _str, const StringView& _prefix);
+
+	/// Returns string view with suffix trimmed.
+	StringView strTrimSuffix(const StringView& _str, const StringView& _suffix);
+
 	/// Find new line. Returns pointer after new line terminator.
 	StringView strFindNl(const StringView& _str);
 
