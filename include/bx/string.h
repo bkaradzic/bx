@@ -91,15 +91,19 @@ namespace bx
 		///
 		const char* getTerm() const;
 
-		///
+		/// Returns `true` if string is empty.
 		bool isEmpty() const;
 
-		///
+		/// Returns string length.
 		int32_t getLength() const;
+
+		/// Returns `true` if string is zero terminated.
+		bool is0Terminated() const;
 
 	protected:
 		const char* m_ptr;
 		int32_t     m_len;
+		bool        m_0terminated;
 	};
 
 	/// ASCII string
@@ -114,13 +118,13 @@ namespace bx
 		StringT(const StringT<AllocatorT>& _rhs);
 
 		///
-		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
-
-		///
 		StringT(const StringView& _rhs);
 
 		///
 		~StringT();
+
+		///
+		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
 
 		///
 		void set(const StringView& _str);
@@ -137,6 +141,9 @@ namespace bx
 		/// Returns zero-terminated C string pointer.
 		///
 		const char* getCPtr() const;
+
+	protected:
+		int32_t m_capacity;
 	};
 
 	/// Retruns true if character is part of space set.

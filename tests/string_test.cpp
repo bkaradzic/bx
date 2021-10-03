@@ -555,3 +555,29 @@ TEST_CASE("suffix", "")
 	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "389.0"), "abvgd-1") );
 	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
 }
+
+TEST_CASE("0terminated", "")
+{
+	const bx::StringView t0("1389");
+	REQUIRE(t0.is0Terminated() );
+	const bx::StringView t1(strTrimPrefix(t0, "13") );
+	REQUIRE(!t1.is0Terminated() );
+	const bx::StringView t2(strTrimSuffix(t0, "89") );
+	REQUIRE(!t2.is0Terminated() );
+
+	bx::DefaultAllocator crt;
+	g_allocator = &crt;
+
+	typedef bx::StringT<&g_allocator> String;
+
+	String st;
+	REQUIRE(st.is0Terminated() );
+
+	st = strTrimPrefix(t0, "13");
+	REQUIRE(2 == st.getLength() );
+	REQUIRE(st.is0Terminated() );
+
+	st = strTrimSuffix(t0, "89");
+	REQUIRE(2 == st.getLength() );
+	REQUIRE(st.is0Terminated() );
+}

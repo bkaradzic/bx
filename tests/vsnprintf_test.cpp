@@ -184,6 +184,22 @@ TEST_CASE("vsnprintf t")
 	size_t size = -1;
 
 	REQUIRE(test("-1", "%td", size) );
+
+	REQUIRE(test("3221225472", "%td", size_t(3221225472) ) );
+}
+
+TEST_CASE("vsnprintf n")
+{
+	char temp[64];
+
+	int32_t p0, p1, p2;
+	bx::snprintf(temp, sizeof(temp), "%n", &p0);
+	REQUIRE(0 == p0);
+
+	bx::snprintf(temp, sizeof(temp), "01%n23%n45%n", &p0, &p1, &p2);
+	REQUIRE(2 == p0);
+	REQUIRE(4 == p1);
+	REQUIRE(6 == p2);
 }
 
 TEST_CASE("vsnprintf g")
@@ -214,6 +230,11 @@ TEST_CASE("vsnprintf")
 	REQUIRE(test("hello, world!", "%.*s, %.*s!"
 		, hello.getLength(), hello.getPtr()
 		, world.getLength(), world.getPtr()
+		) );
+
+	REQUIRE(test("hello, world!", "%S, %S!"
+		, hello
+		, world
 		) );
 }
 

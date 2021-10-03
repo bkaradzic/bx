@@ -813,6 +813,11 @@ namespace bx
 			return write(_writer, _str, _param.prec, _param, _err);
 		}
 
+		static int32_t write(WriterI* _writer, const StringView& _str, const Param& _param, Error* _err)
+		{
+			return write(_writer, _str.getPtr(), min(_param.prec, _str.getLength() ), _param, _err);
+		}
+
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
 		{
 			char str[33];
@@ -939,12 +944,15 @@ namespace bx
 			}
 			else if ('%' == ch)
 			{
-				// %[flags][width][.precision][length sub-specifier]specifier
+				// %[Flags][Width][.Precision][Leegth]Type
 				read(&reader, ch, &err);
 
 				Param param;
 
-				// flags
+				// Reference(s):
+				//  - Flags field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Flags_field
+				//
 				while (err.isOk()
 				&& (   ' ' == ch
 				||     '-' == ch
@@ -971,7 +979,10 @@ namespace bx
 					param.fill = ' ';
 				}
 
-				// width
+				// Reference(s):
+				//  - Width field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Width_field
+				//
 				if ('*' == ch)
 				{
 					read(&reader, ch, &err);
@@ -994,7 +1005,9 @@ namespace bx
 					}
 				}
 
-				// .precision
+				// Reference(s):
+				//  - Precision field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Precision_field
 				if ('.' == ch)
 				{
 					read(&reader, ch, &err);
@@ -1016,7 +1029,9 @@ namespace bx
 					}
 				}
 
-				// length sub-specifier
+				// Reference(s):
+				//  - Length field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Length_field
 				while (err.isOk()
 				&& (   'h' == ch
 				||     'I' == ch
@@ -1031,8 +1046,8 @@ namespace bx
 						default: break;
 
 						case 'j': param.bits = sizeof(intmax_t )*8; break;
-						case 't': param.bits = sizeof(size_t   )*8; break;
-						case 'z': param.bits = sizeof(ptrdiff_t)*8; break;
+						case 't': param.bits = sizeof(ptrdiff_t)*8; break;
+						case 'z': param.bits = sizeof(size_t   )*8; break;
 
 						case 'h': case 'I': case 'l':
 							switch (ch)
@@ -1071,7 +1086,9 @@ namespace bx
 					break;
 				}
 
-				// specifier
+				// Reference(s):
+				//  - Type field
+				//    https://en.wikipedia.org/wiki/Printf_format_string#Type_field
 				switch (toLower(ch) )
 				{
 					case 'c':
@@ -1079,7 +1096,14 @@ namespace bx
 						break;
 
 					case 's':
-						size += write(_writer, va_arg(_argList, const char*), param, _err);
+						if (isUpper(ch) )
+						{
+							size += write(_writer, va_arg(_argList, const StringView), param, _err);
+						}
+						else
+						{
+							size += write(_writer, va_arg(_argList, const char*), param, _err);
+						}
 						break;
 
 					case 'o':
@@ -1129,6 +1153,10 @@ namespace bx
 						default: size += write(_writer, va_arg(_argList, uint32_t), param, _err); break;
 						case 64: size += write(_writer, va_arg(_argList, uint64_t), param, _err); break;
 						}
+						break;
+
+					case 'n':
+						*va_arg(_argList, int32_t*) = size;
 						break;
 
 					default:
