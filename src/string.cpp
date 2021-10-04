@@ -1089,21 +1089,18 @@ namespace bx
 				// Reference(s):
 				//  - Type field
 				//    https://en.wikipedia.org/wiki/Printf_format_string#Type_field
-				switch (toLower(ch) )
+				switch (ch)
 				{
 					case 'c':
 						size += write(_writer, char(va_arg(_argList, int32_t) ), param, _err);
 						break;
 
 					case 's':
-						if (isUpper(ch) )
-						{
-							size += write(_writer, va_arg(_argList, const StringView), param, _err);
-						}
-						else
-						{
-							size += write(_writer, va_arg(_argList, const char*), param, _err);
-						}
+						size += write(_writer, va_arg(_argList, const char*), param, _err);
+						break;
+
+					case 'S':
+						size += write(_writer, va_arg(_argList, const StringView), param, _err);
 						break;
 
 					case 'o':
@@ -1126,8 +1123,11 @@ namespace bx
 						break;
 
 					case 'e':
+					case 'E':
 					case 'f':
+					case 'F':
 					case 'g':
+					case 'G':
 						param.upper = isUpper(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
@@ -1137,6 +1137,7 @@ namespace bx
 						break;
 
 					case 'x':
+					case 'X':
 						param.base  = 16;
 						param.upper = isUpper(ch);
 						switch (param.bits)
