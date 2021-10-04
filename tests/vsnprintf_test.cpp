@@ -233,8 +233,8 @@ TEST_CASE("vsnprintf")
 		) );
 
 	REQUIRE(test("hello, world!", "%S, %S!"
-		, hello
-		, world
+		, &hello
+		, &world
 		) );
 }
 

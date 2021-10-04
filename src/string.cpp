@@ -1100,7 +1100,7 @@ namespace bx
 						break;
 
 					case 'S':
-						size += write(_writer, va_arg(_argList, const StringView), param, _err);
+						size += write(_writer, *va_arg(_argList, const StringView*), param, _err);
 						break;
 
 					case 'o':
