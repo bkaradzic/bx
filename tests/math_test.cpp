@@ -228,7 +228,7 @@ void mtxCheck(const float* _a, const float* _b)
 			, _b[12], _b[13], _b[14], _b[15]
 			);
 
-		CHECK(false);
+		REQUIRE(false);
 	}
 }
 
@@ -238,7 +238,13 @@ TEST_CASE("quaternion", "")
 	float mtx[16];
 
 	bx::Quaternion quat = bx::init::Identity;
-	bx::mtxQuat(mtxQ, quat);
+	bx::Quaternion q2 = bx::init::None;
+
+	bx::Vec3 axis = bx::init::None;
+	bx::Vec3 euler = bx::init::None;
+	float angle;
+
+	bx::mtxFromQuaternion(mtxQ, quat);
 	bx::mtxIdentity(mtx);
 	mtxCheck(mtxQ, mtx);
 
@@ -246,27 +252,51 @@ TEST_CASE("quaternion", "")
 	float ay = bx::kPi/13.0f;
 	float az = bx::kPi/7.0f;
 
-	quat = bx::rotateX(ax);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateX(mtx, ax);
-	mtxCheck(mtxQ, mtx);
+	{ // x
+		quat = bx::rotateX(ax);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateX(mtx, ax);
+		mtxCheck(mtxQ, mtx);
 
-	bx::Vec3 euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.x, ax, 0.001f) );
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::equal(axis, bx::Vec3{1.0f, 0.0f, 0.0f}, 0.01f) );
+		REQUIRE(bx::equal(angle, ax, 0.01f) );
 
-	quat = bx::rotateY(ay);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateY(mtx, ay);
-	mtxCheck(mtxQ, mtx);
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::equal(euler.x, ax, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::equal(quat, q2, 0.001f) );
+	}
 
-	euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.y, ay, 0.001f) );
+	{ // y
+		quat = bx::rotateY(ay);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateY(mtx, ay);
+		mtxCheck(mtxQ, mtx);
 
-	quat = bx::rotateZ(az);
-	bx::mtxQuat(mtxQ, quat);
-	bx::mtxRotateZ(mtx, az);
-	mtxCheck(mtxQ, mtx);
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::equal(axis, bx::Vec3{0.0f, 1.0f, 0.0f}, 0.01f) );
+		REQUIRE(bx::equal(angle, ay, 0.01f) );
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::equal(euler.y, ay, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::equal(quat, q2, 0.001f) );
 
-	euler = bx::toEuler(quat);
-	CHECK(bx::equal(euler.z, az, 0.001f) );
+	}
+
+	{ // z
+		quat = bx::rotateZ(az);
+		bx::mtxFromQuaternion(mtxQ, quat);
+		bx::mtxRotateZ(mtx, az);
+		mtxCheck(mtxQ, mtx);
+
+		bx::toAxisAngle(axis, angle, quat);
+		REQUIRE(bx::equal(axis, bx::Vec3{0.0f, 0.0f, 1.0f}, 0.01f) );
+		REQUIRE(bx::equal(angle, az, 0.01f) );
+
+		euler = bx::toEuler(quat);
+		REQUIRE(bx::equal(euler.z, az, 0.001f) );
+		q2 = bx::fromEuler(euler);
+		REQUIRE(bx::equal(quat, q2, 0.001f) );
+	}
 }

@@ -690,6 +690,14 @@ namespace bx
 		};
 	}
 
+	inline BX_CONSTEXPR_FUNC bool equal(const Vec3 _a, const Vec3 _b, float _epsilon)
+	{
+		return equal(_a.x, _b.x, _epsilon)
+			&& equal(_a.y, _b.y, _epsilon)
+			&& equal(_a.z, _b.z, _epsilon)
+			;
+	}
+
 	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n)
 	{
 		const float nx = _n.x;
@@ -891,6 +899,24 @@ namespace bx
 		return normalize(qq);
 	}
 
+	inline BX_CONST_FUNC Quaternion fromEuler(const Vec3 _euler)
+	{
+		const float sx = sin(_euler.x * 0.5f);
+		const float cx = cos(_euler.x * 0.5f);
+		const float sy = sin(_euler.y * 0.5f);
+		const float cy = cos(_euler.y * 0.5f);
+		const float sz = sin(_euler.z * 0.5f);
+		const float cz = cos(_euler.z * 0.5f);
+
+		return
+		{
+			sx * cy * cz - cx * sy * sz,
+			cx * sy * cz + sx * cy * sz,
+			cx * cy * sz - sx * sy * cz,
+			cx * cy * cz + sx * sy * sz,
+		};
+	}
+
 	inline BX_CONST_FUNC Vec3 toEuler(const Quaternion _a)
 	{
 		const float xx  = _a.x;
@@ -960,7 +986,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Quaternion rotateAxis(const Vec3 _axis, float _angle)
+	inline BX_CONST_FUNC Quaternion fromAxisAngle(const Vec3 _axis, float _angle)
 	{
 		const float ha = _angle * 0.5f;
 		const float sa = sin(ha);
@@ -972,6 +998,24 @@ namespace bx
 			_axis.z * sa,
 			cos(ha),
 		};
+	}
+
+	inline void toAxisAngle(Vec3& _outAxis, float& _outAngle, const Quaternion _a)
+	{
+		const float ww = _a.w;
+		const float sa = sqrt(1.0f - square(ww) );
+
+		_outAngle = 2.0f * acos(ww);
+
+		if (0.001f > sa)
+		{
+			_outAxis = { _a.x, _a.y, _a.z };
+			return;
+		}
+
+		const float invSa = 1.0f/sa;
+
+		_outAxis = { _a.x * invSa, _a.y * invSa, _a.z * invSa };
 	}
 
 	inline BX_CONST_FUNC Quaternion rotateX(float _ax)
@@ -1011,6 +1055,15 @@ namespace bx
 			sin(hz),
 			cos(hz),
 		};
+	}
+
+	inline BX_CONSTEXPR_FUNC bool equal(const Quaternion _a, const Quaternion _b, float _epsilon)
+	{
+		return equal(_a.x, _b.x, _epsilon)
+			&& equal(_a.y, _b.y, _epsilon)
+			&& equal(_a.z, _b.z, _epsilon)
+			&& equal(_a.w, _b.w, _epsilon)
+			;
 	}
 
 	inline void mtxIdentity(float* _result)
@@ -1079,12 +1132,12 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxQuat(float* _result, const Quaternion& _quat)
+	inline void mtxFromQuaternion(float* _result, const Quaternion& _rotation)
 	{
-		const float qx = _quat.x;
-		const float qy = _quat.y;
-		const float qz = _quat.z;
-		const float qw = _quat.w;
+		const float qx = _rotation.x;
+		const float qy = _rotation.y;
+		const float qz = _rotation.z;
+		const float qw = _rotation.w;
 
 		const float x2  = qx + qx;
 		const float y2  = qy + qy;
@@ -1120,22 +1173,10 @@ namespace bx
 		_result[15] = 1.0f;
 	}
 
-	inline void mtxQuatTranslation(float* _result, const Quaternion& _quat, const Vec3& _translation)
+	inline void mtxFromQuaternion(float* _result, const Quaternion& _rotation, const Vec3& _translation)
 	{
-		mtxQuat(_result, _quat);
+		mtxFromQuaternion(_result, _rotation);
 		store(&_result[12], neg(mulXyz0(_translation, _result) ) );
-	}
-
-	inline void mtxQuatTranslationHMD(float* _result, const Quaternion& _quat, const Vec3& _translation)
-	{
-		const Quaternion quat =
-		{
-			-_quat.x,
-			-_quat.y,
-			 _quat.z,
-			 _quat.w,
-		};
-		mtxQuatTranslation(_result, quat, _translation);
 	}
 
 	inline Vec3 mul(const Vec3& _vec, const float* _mat)
