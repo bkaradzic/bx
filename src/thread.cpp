@@ -34,6 +34,9 @@
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE \
 	|| BX_PLATFORM_WINRT
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #	include <limits.h>
 #	include <errno.h>

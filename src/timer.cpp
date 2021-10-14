@@ -13,6 +13,9 @@
 #elif BX_PLATFORM_EMSCRIPTEN
 #	include <emscripten.h>
 #elif BX_PLATFORM_WINDOWS || BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT
+#	ifndef WIN32_LEAN_AND_MEAN
+#		define WIN32_LEAN_AND_MEAN
+#	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
 #else
 #	include <sys/time.h> // gettimeofday
