@@ -316,7 +316,7 @@ namespace bx
 		return _a - _b * floor(_a / _b);
 	}
 
-	inline BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon)
 	{
 		// Reference(s):
 		// - Floating-point tolerances revisited
@@ -327,12 +327,12 @@ namespace bx
 		return lhs <= rhs;
 	}
 
-	inline BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon)
+	inline BX_CONST_FUNC bool isEqual(const float* _a, const float* _b, uint32_t _num, float _epsilon)
 	{
-		bool result = equal(_a[0], _b[0], _epsilon);
+		bool result = isEqual(_a[0], _b[0], _epsilon);
 		for (uint32_t ii = 1; result && ii < _num; ++ii)
 		{
-			result = equal(_a[ii], _b[ii], _epsilon);
+			result = isEqual(_a[ii], _b[ii], _epsilon);
 		}
 		return result;
 	}
@@ -690,11 +690,11 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC bool equal(const Vec3 _a, const Vec3 _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool isEqual(const Vec3 _a, const Vec3 _b, float _epsilon)
 	{
-		return equal(_a.x, _b.x, _epsilon)
-			&& equal(_a.y, _b.y, _epsilon)
-			&& equal(_a.z, _b.z, _epsilon)
+		return isEqual(_a.x, _b.x, _epsilon)
+			&& isEqual(_a.y, _b.y, _epsilon)
+			&& isEqual(_a.z, _b.z, _epsilon)
 			;
 	}
 
@@ -1057,12 +1057,12 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC bool equal(const Quaternion _a, const Quaternion _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool isEqual(const Quaternion _a, const Quaternion _b, float _epsilon)
 	{
-		return equal(_a.x, _b.x, _epsilon)
-			&& equal(_a.y, _b.y, _epsilon)
-			&& equal(_a.z, _b.z, _epsilon)
-			&& equal(_a.w, _b.w, _epsilon)
+		return isEqual(_a.x, _b.x, _epsilon)
+			&& isEqual(_a.y, _b.y, _epsilon)
+			&& isEqual(_a.z, _b.z, _epsilon)
+			&& isEqual(_a.w, _b.w, _epsilon)
 			;
 	}
 

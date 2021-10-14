@@ -333,10 +333,10 @@ namespace bx
 	BX_CONST_FUNC float mod(float _a, float _b);
 
 	///
-	BX_CONSTEXPR_FUNC bool equal(float _a, float _b, float _epsilon);
+	BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon);
 
 	///
-	BX_CONST_FUNC bool equal(const float* _a, const float* _b, uint32_t _num, float _epsilon);
+	BX_CONST_FUNC bool isEqual(const float* _a, const float* _b, uint32_t _num, float _epsilon);
 
 	///
 	BX_CONST_FUNC float wrap(float _a, float _wrap);
@@ -448,7 +448,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a);
 
 	///
-	BX_CONSTEXPR_FUNC bool equal(const Vec3 _a, const Vec3 _b, float _epsilon);
+	BX_CONSTEXPR_FUNC bool isEqual(const Vec3 _a, const Vec3 _b, float _epsilon);
 
 	///
 	void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n);
@@ -523,7 +523,7 @@ namespace bx
 	BX_CONST_FUNC Quaternion rotateZ(float _az);
 
 	///
-	BX_CONSTEXPR_FUNC bool equal(const Quaternion _a, const Quaternion _b, float _epsilon);
+	BX_CONSTEXPR_FUNC bool isEqual(const Quaternion _a, const Quaternion _b, float _epsilon);
 
 	///
 	void mtxIdentity(float* _result);
