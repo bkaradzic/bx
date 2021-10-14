@@ -181,7 +181,7 @@ TEST_CASE("vsnprintf s")
 
 TEST_CASE("vsnprintf t")
 {
-	size_t size = -1;
+	size_t size = size_t(-1);
 
 	REQUIRE(test("-1", "%td", size) );
 
