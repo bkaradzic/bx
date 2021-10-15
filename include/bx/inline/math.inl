@@ -1272,9 +1272,16 @@ namespace bx
 		_outPlane.dist   = -dot(_normal, _pos);
 	}
 
-	inline float distance(const Plane& _plane, const Vec3& _pos)
+	inline BX_CONSTEXPR_FUNC float distance(const Plane& _plane, const Vec3& _pos)
 	{
 		return dot(_plane.normal, _pos) + _plane.dist;
+	}
+
+	inline BX_CONSTEXPR_FUNC bool isEqual(const Plane& _a, const Plane& _b, float _epsilon)
+	{
+		return isEqual(_a.normal, _b.normal, _epsilon)
+			&& isEqual(_a.dist,   _b.dist,   _epsilon)
+			;
 	}
 
 	inline BX_CONST_FUNC float toLinear(float _a)

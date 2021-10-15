@@ -723,7 +723,10 @@ namespace bx
 	void calcPlane(Plane& _outPlane, const Vec3& _normal, const Vec3& _pos);
 
 	///
-	float distance(const Plane& _plane, const Vec3& _pos);
+	BX_CONSTEXPR_FUNC float distance(const Plane& _plane, const Vec3& _pos);
+
+	///
+	BX_CONSTEXPR_FUNC bool isEqual(const Plane& _a, const Plane& _b, float _epsilon);
 
 	///
 	void calcLinearFit2D(float _result[2], const void* _points, uint32_t _stride, uint32_t _numPoints);
