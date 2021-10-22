@@ -304,7 +304,7 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float fract(float _a);
 
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c).
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
 	///
 	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
 
@@ -406,6 +406,14 @@ namespace bx
 
 	///
 	BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b);
+
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const float _b, const Vec3 _c);
+
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const Vec3 _b, const Vec3 _c);
 
 	///
 	BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c);

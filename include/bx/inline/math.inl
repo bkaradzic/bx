@@ -592,6 +592,16 @@ namespace bx
 		return mul(_a, rcp(_b) );
 	}
 
+	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const float _b, const Vec3 _c)
+	{
+		return sub(_c, mul(_a, _b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const Vec3 _b, const Vec3 _c)
+	{
+		return sub(_c, mul(_a, _b) );
+	}
+
 	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c)
 	{
 		return add(mul(_a, _b), _c);
