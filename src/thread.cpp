@@ -3,7 +3,6 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include "bx_p.h"
 #include <bx/os.h>
 #include <bx/thread.h>
 
@@ -267,7 +266,7 @@ namespace bx
 
 		if (NULL != SetThreadDescription)
 		{
-			uint32_t length = (uint32_t)bx::strLen(_name)+1;
+			uint32_t length = (uint32_t)strLen(_name)+1;
 			uint32_t size = length*sizeof(wchar_t);
 			wchar_t* name = (wchar_t*)alloca(size);
 			mbstowcs(name, _name, size-2);

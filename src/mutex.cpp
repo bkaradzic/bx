@@ -3,7 +3,6 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include "bx_p.h"
 #include <bx/mutex.h>
 
 #if BX_CONFIG_SUPPORTS_THREADING
@@ -59,12 +58,12 @@ namespace bx
 	{
 		uint32_t* futex = (uint32_t*)m_internal;
 
-		if (State::Unlocked == bx::atomicCompareAndSwap<uint32_t>(futex, State::Unlocked, State::Locked) )
+		if (State::Unlocked == atomicCompareAndSwap<uint32_t>(futex, State::Unlocked, State::Locked) )
 		{
 			return;
 		}
 
-		while (State::Unlocked != bx::atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Contested) )
+		while (State::Unlocked != atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Contested) )
 		{
 			crt0::futexWait(futex, State::Contested);
 		}
@@ -74,7 +73,7 @@ namespace bx
 	{
 		uint32_t* futex = (uint32_t*)m_internal;
 
-		if (State::Contested == bx::atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Unlocked) )
+		if (State::Contested == atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Unlocked) )
 		{
 			crt0::futexWake(futex, State::Locked);
 		}

@@ -372,7 +372,7 @@ namespace bx
 	{
 	public:
 		///
-		LineReader(const bx::StringView& _str);
+		LineReader(const StringView& _str);
 
 		///
 		void reset();
@@ -387,8 +387,8 @@ namespace bx
 		uint32_t getLine() const;
 
 	private:
-		const bx::StringView m_str;
-		bx::StringView m_curr;
+		const StringView m_str;
+		StringView m_curr;
 		uint32_t m_line;
 	};
 

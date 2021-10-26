@@ -15,6 +15,28 @@ local function userdefines()
 	return defines
 end
 
+function using_bx()
+	includedirs {
+		path.join(BX_DIR, "include"),
+	}
+
+	links {
+		"bx",
+	}
+
+	configuration { "Debug" }
+		defines {
+			"BX_CONFIG_DEBUG=1",
+		}
+
+	configuration { "Release" }
+		defines {
+			"BX_CONFIG_DEBUG=0",
+		}
+
+	configuration {}
+end
+
 project "bx"
 	kind "StaticLib"
 
@@ -31,11 +53,6 @@ project "bx"
 	}
 
 	defines (userdefines())
-
-	configuration { "Debug" }
-		defines {
-			"BX_CONFIG_DEBUG=1",
-		}
 
 	configuration { "linux-*" }
 		buildoptions {
@@ -74,5 +91,15 @@ project "bx"
 			path.join(BX_DIR, "src/amalgamated.**"),
 		}
 	end
+
+	configuration { "Debug" }
+		defines {
+			"BX_CONFIG_DEBUG=1",
+		}
+
+	configuration { "Release" }
+		defines {
+			"BX_CONFIG_DEBUG=0",
+		}
 
 	configuration {}

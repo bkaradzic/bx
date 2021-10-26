@@ -3,7 +3,6 @@
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
-#include "bx_p.h"
 #include <bx/rng.h>
 #include <bx/math.h>
 #include <bx/bounds.h>

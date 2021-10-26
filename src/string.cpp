@@ -3,7 +3,6 @@
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
-#include "bx_p.h"
 #include <bx/allocator.h>
 #include <bx/file.h>
 #include <bx/hash.h>
