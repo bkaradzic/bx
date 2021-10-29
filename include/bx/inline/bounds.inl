@@ -9,14 +9,69 @@
 
 namespace bx
 {
+	inline Interval::Interval(float _val)
+		: min(_val)
+		, max(_val)
+	{
+	}
+
+	inline Interval::Interval(float _min, float _max)
+		: min(_min)
+		, max(_max)
+	{
+	}
+
+	inline void Interval::set(float _val)
+	{
+		min = _val;
+		max = _val;
+	}
+
+	inline void Interval::setCenter(float _val)
+	{
+		const float extents = (max - min) * 0.5f;
+		min = _val - extents;
+		max = _val + extents;
+	}
+
+	inline void Interval::expand(float _val)
+	{
+		min = bx::min(min, _val);
+		max = bx::max(max, _val);
+	}
+
 	inline Vec3 getPointAt(const Ray& _ray, float _t)
 	{
 		return mad(_ray.dir, _t, _ray.pos);
 	}
 
+	inline Vec3 getPointAt(const Line& _line, float _t)
+	{
+		return mad(_line.dir, _t, _line.pos);
+	}
+
+	inline Vec3 getPointAt(const LineSegment& _line, float _t)
+	{
+		return lerp(_line.pos, _line.end, _t);
+	}
+
 	inline bool intersect(const Ray& _ray, const Plane& _plane, Hit* _hit)
 	{
 		return intersect(_ray, _plane, false, _hit);
+	}
+
+	inline bool overlap(const Interval& _interval, float _t)
+	{
+		return _t > _interval.min
+			&& _t < _interval.max
+			;
+	}
+
+	inline bool overlap(const Interval& _intervalA, const Interval& _intervalB)
+	{
+		return _intervalA.max > _intervalB.min
+			&& _intervalB.max > _intervalA.min
+			;
 	}
 
 	inline bool overlap(const Aabb& _aabb, const Sphere& _sphere)

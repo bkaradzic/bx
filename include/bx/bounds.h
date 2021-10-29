@@ -11,6 +11,20 @@
 namespace bx
 {
 	///
+	struct Line
+	{
+		Vec3 pos = init::None;
+		Vec3 dir = init::None;
+	};
+
+	///
+	struct LineSegment
+	{
+		Vec3 pos = init::None;
+		Vec3 end = init::None;
+	};
+
+	///
 	struct Aabb
 	{
 		Vec3 min = init::None;
@@ -20,33 +34,33 @@ namespace bx
 	///
 	struct Capsule
 	{
-		Vec3 pos = init::None;
-		Vec3 end = init::None;
-		float    radius;
+		Vec3  pos = init::None;
+		Vec3  end = init::None;
+		float radius;
 	};
 
 	///
 	struct Cone
 	{
-		Vec3 pos = init::None;
-		Vec3 end = init::None;
-		float    radius;
+		Vec3  pos = init::None;
+		Vec3  end = init::None;
+		float radius;
 	};
 
 	///
 	struct Cylinder
 	{
-		Vec3 pos = init::None;
-		Vec3 end = init::None;
-		float    radius;
+		Vec3  pos = init::None;
+		Vec3  end = init::None;
+		float radius;
 	};
 
 	///
 	struct Disk
 	{
-		Vec3 center = init::None;
-		Vec3 normal = init::None;
-		float    radius;
+		Vec3  center = init::None;
+		Vec3  normal = init::None;
+		float radius;
 	};
 
 	///
@@ -58,8 +72,8 @@ namespace bx
 	///
 	struct Sphere
 	{
-		Vec3 center = init::None;
-		float    radius;
+		Vec3  center = init::None;
+		float radius;
 	};
 
 	///
@@ -85,7 +99,35 @@ namespace bx
 	};
 
 	///
+	struct Interval
+	{
+		///
+		Interval(float _val);
+
+		///
+		Interval(float _min, float _max);
+
+		///
+		void set(float _val);
+
+		///
+		void setCenter(float _val);
+
+		///
+		void expand(float _val);
+
+		float min;
+		float max;
+	};
+
+	///
 	Vec3 getPointAt(const Ray& _ray, float _t);
+
+	///
+	Vec3 getPointAt(const Line& _line, float _t);
+
+	///
+	Vec3 getPointAt(const LineSegment& _line, float _t);
 
 	///
 	Vec3 getCenter(const Aabb& _aabb);
@@ -182,6 +224,30 @@ namespace bx
 
 	/// Intersect ray / triangle.
 	bool intersect(const Ray& _ray, const Triangle& _triangle, Hit* _hit = NULL);
+
+	///
+	Vec3 closestPoint(const Line& _line, const Vec3& _point);
+
+	///
+	Vec3 closestPoint(const LineSegment& _line, const Vec3& _point);
+
+	///
+	Vec3 closestPoint(const Plane& _plane, const Vec3& _point);
+
+	///
+	Vec3 closestPoint(const Aabb& _aabb, const Vec3& _point);
+
+	///
+	Vec3 closestPoint(const Obb& _obb, const Vec3& _point);
+
+	///
+	Vec3 closestPoint(const Triangle& _triangle, const Vec3& _point);
+
+	///
+	bool overlap(const Interval& _interval, float _pos);
+
+	///
+	bool overlap(const Interval& _intervalA, const Interval& _intervalB);
 
 	///
 	bool overlap(const Aabb& _aabb, const Vec3& _pos);

@@ -856,43 +856,6 @@ namespace bx
 		calcPlane(_outPlane, _triangle.v0, _triangle.v1, _triangle.v2);
 	}
 
-	struct Interval
-	{
-		Interval(float _val)
-			: start(_val)
-			, end(_val)
-		{
-		}
-
-		Interval(float _start, float _end)
-			: start(_start)
-			, end(_end)
-		{
-		}
-
-		void set(float _val)
-		{
-			start = _val;
-			end   = _val;
-		}
-
-		void expand(float _val)
-		{
-			start = min(_val, start);
-			end   = max(_val, end);
-		}
-
-		float start;
-		float end;
-	};
-
-	bool overlap(const Interval& _a, const Interval& _b)
-	{
-		return _a.end > _b.start
-			&& _b.end > _a.start
-			;
-	}
-
 	float projectToAxis(const Vec3& _axis, const Vec3& _point)
 	{
 		return dot(_axis, _point);
@@ -913,7 +876,7 @@ namespace bx
 	Interval projectToAxis(const Vec3& _axis, const Aabb& _aabb)
 	{
 		const float extent = abs(projectToAxis(abs(_axis), getExtents(_aabb) ) );
-		const float center =         projectToAxis(    _axis , getCenter (_aabb) );
+		const float center =     projectToAxis(    _axis , getCenter (_aabb) );
 		return
 		{
 			center - extent,
@@ -1057,17 +1020,6 @@ namespace bx
 		return isNearZero(dot(_v, _v) );
 	}
 
-	struct Line
-	{
-		Vec3 pos = init::None;
-		Vec3 dir = init::None;
-	};
-
-	inline Vec3 getPointAt(const Line& _line, float _t)
-	{
-		return mad(_line.dir, _t, _line.pos);
-	}
-
 	bool intersect(Line& _outLine, const Plane& _planeA, const Plane& _planeB)
 	{
 		const Vec3  axb   = cross(_planeA.normal, _planeB.normal);
@@ -1105,17 +1057,6 @@ namespace bx
 		const Vec3 result = mul(tmp4, -1.0f/denom);
 
 		return result;
-	}
-
-	struct LineSegment
-	{
-		Vec3 pos;
-		Vec3 end;
-	};
-
-	inline Vec3 getPointAt(const LineSegment& _line, float _t)
-	{
-		return lerp(_line.pos, _line.end, _t);
 	}
 
 	bool intersect(float& _outTa, float& _outTb, const LineSegment& _a, const LineSegment& _b)
@@ -1380,7 +1321,7 @@ namespace bx
 	}
 
 	static void calcObbVertices(
-		Vec3* _outVertices
+		  Vec3* _outVertices
 		, const Vec3& _axisX
 		, const Vec3& _axisY
 		, const Vec3& _axisZ
@@ -1485,7 +1426,7 @@ namespace bx
 			const Vec3 bd = sub(_capsuleB.end, _capsuleB.pos);
 
 			return overlap(
-				Sphere{mad(ad, ta, _capsuleA.pos), _capsuleA.radius}
+				  Sphere{mad(ad, ta, _capsuleA.pos), _capsuleA.radius}
 				, Sphere{mad(bd, tb, _capsuleB.pos), _capsuleB.radius}
 				);
 		}
