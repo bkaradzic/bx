@@ -887,10 +887,11 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const int32_t prec = INT32_MAX == _param.prec ? len-(dot+1-str) : _param.prec;
+
 				const int32_t precLen = int32_t(
 						dot
-						+ uint32_min(prec + _param.spec, 1)
+						+ min(prec + _param.spec, 1)
 						+ prec
 						- str
 						);
@@ -900,8 +901,10 @@ namespace bx
 					{
 						str[ii] = '0';
 					}
+
 					str[precLen] = '\0';
 				}
+
 				len = precLen;
 			}
 
