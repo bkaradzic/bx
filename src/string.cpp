@@ -887,25 +887,34 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec = INT32_MAX == _param.prec ? len-(dot+1-str) : _param.prec;
+				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const char* strEnd = str + len;
+				const char* exponent = strFind(str, INT32_MAX, 'e');
+				const char* fracEnd = NULL != exponent ? exponent : strEnd;
+				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
+				const int32_t curPrec = int32_t(fracEnd - fracBegin);
 
-				const int32_t precLen = int32_t(
-						dot
-						+ min(prec + _param.spec, 1)
-						+ prec
-						- str
-						);
-				if (precLen > len)
+				// Move exponent to its final location after trimming or adding extra 0s.
+				if (fracEnd != strEnd)
 				{
-					for (int32_t ii = len; ii < precLen; ++ii)
-					{
-						str[ii] = '0';
-					}
-
-					str[precLen] = '\0';
+					const int32_t exponentLen = int32_t(strEnd - fracEnd);
+					char* finalExponentPtr = &fracBegin[prec];
+					memMove(finalExponentPtr, fracEnd, exponentLen); // NOTE: Use memMove because there may be overlap.
+					finalExponentPtr[exponentLen] = '\0';
+					len = int32_t(&finalExponentPtr[exponentLen] - str);
+				}
+				else
+				{
+					len = (int32_t)(fracBegin + prec - str);
 				}
 
-				len = precLen;
+				if (curPrec < prec)
+				{
+					for (int32_t ii = curPrec; ii < prec; ++ii)
+					{
+						fracBegin[ii] = '0';
+					}
+				}
 			}
 
 			return write(_writer, str, len, _param, _err);
