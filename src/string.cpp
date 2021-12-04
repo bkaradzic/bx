@@ -134,7 +134,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			*_inOutStr = toLower(*_inOutStr);
+			_inOutStr[ii] = toLower(_inOutStr[ii]);
 		}
 	}
 
@@ -153,7 +153,7 @@ namespace bx
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
-			*_inOutStr = toUpper(*_inOutStr);
+			_inOutStr[ii] = toUpper(_inOutStr[ii]);
 		}
 	}
 
@@ -877,11 +877,6 @@ namespace bx
 			if (len == 0)
 			{
 				return 0;
-			}
-
-			if (_param.upper)
-			{
-				toUpperUnsafe(str, len);
 			}
 
 			const char* dot = strFind(str, INT32_MAX, '.');
