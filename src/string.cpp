@@ -887,10 +887,11 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
-				const char* strEnd = str + len;
+				const int32_t prec   = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const char* strEnd   = str + len;
 				const char* exponent = strFind(str, INT32_MAX, 'e');
-				const char* fracEnd = NULL != exponent ? exponent : strEnd;
+				const char* fracEnd  = NULL != exponent ? exponent : strEnd;
+
 				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
 				const int32_t curPrec = int32_t(fracEnd - fracBegin);
 
@@ -899,7 +900,8 @@ namespace bx
 				{
 					const int32_t exponentLen = int32_t(strEnd - fracEnd);
 					char* finalExponentPtr = &fracBegin[prec];
-					memMove(finalExponentPtr, fracEnd, exponentLen); // NOTE: Use memMove because there may be overlap.
+					memMove(finalExponentPtr, fracEnd, exponentLen);
+
 					finalExponentPtr[exponentLen] = '\0';
 					len = int32_t(&finalExponentPtr[exponentLen] - str);
 				}
