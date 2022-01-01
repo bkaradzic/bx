@@ -475,12 +475,16 @@ TEST_CASE("StringView", "")
 
 TEST_CASE("Trim", "")
 {
+	REQUIRE(bx::strLTrim("a", "a").isEmpty() );
+	REQUIRE(bx::strRTrim("a", "a").isEmpty() );
+	REQUIRE(bx::strTrim("a", "a").isEmpty() );	
+
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "ab"), "vgd") );
-	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "") );
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vgd"), "abvgd") );
 	REQUIRE(0 == bx::strCmp(bx::strLTrim("/555333/podmac/", "/"), "555333/podmac/") );
 
-	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "") );
 	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "abv"), "abvgd") );
 	REQUIRE(0 == bx::strCmp(bx::strRTrim("/555333/podmac/", "/"), "/555333/podmac") );
 
@@ -500,6 +504,10 @@ TEST_CASE("TrimSpace", "")
 	REQUIRE(bx::strLTrimSpace("").isEmpty() );
 	REQUIRE(bx::strRTrimSpace("").isEmpty() );
 	REQUIRE(bx::strTrimSpace( "").isEmpty() );
+
+	REQUIRE(bx::strLTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "\n").isEmpty() );
 
 	const bx::StringView t0("1389");
 	const bx::StringView t1("    1389");

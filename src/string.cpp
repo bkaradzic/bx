@@ -480,7 +480,7 @@ namespace bx
 			}
 		}
 
-		return _str;
+		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
 	StringView strLTrimSpace(const StringView& _str)
@@ -523,7 +523,9 @@ namespace bx
 				{
 					return StringView(ptr, ii + 1);
 				}
-			}
+		}
+
+			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
@@ -542,6 +544,8 @@ namespace bx
 					return StringView(ptr, ii + 1);
 				}
 			}
+			
+			return StringView(_str.getPtr(), _str.getPtr());
 		}
 
 		return _str;
