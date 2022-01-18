@@ -23,54 +23,50 @@ namespace bx
 
 	inline void HashMurmur2A::add(const void* _data, int _len)
 	{
-		if (BX_UNLIKELY(!isAligned(_data, 4) ) )
-		{
-			addUnaligned(_data, _len);
-			return;
-		}
-
-		addAligned(_data, _len);
-	}
-
-	inline void HashMurmur2A::addAligned(const void* _data, int _len)
-	{
 		const uint8_t* data = (const uint8_t*)_data;
 		m_size += _len;
 
+		// Mix tail before checking for data alignment because the start address of data
+		// can be correctly or badly aligned depending on m_count value.
 		mixTail(data, _len);
 
+		if (BX_LIKELY(isAligned(data, 4) ) )
+		{
+			addAligned(data, _len);
+		}
+		else
+		{
+			addUnaligned(data, _len);
+		}
+
+		mixTail(data, _len);
+	}
+
+	inline void HashMurmur2A::addAligned(const uint8_t*& _data, int& _len)
+	{
 		while(_len >= 4)
 		{
-			uint32_t kk = *(uint32_t*)data;
+			uint32_t kk = *(uint32_t*)_data;
 
 			mmix(m_hash, kk);
 
-			data += 4;
+			_data += 4;
 			_len -= 4;
 		}
-
-		mixTail(data, _len);
 	}
 
-	inline void HashMurmur2A::addUnaligned(const void* _data, int _len)
+	inline void HashMurmur2A::addUnaligned(const uint8_t*& _data, int& _len)
 	{
-		const uint8_t* data = (const uint8_t*)_data;
-		m_size += _len;
-
-		mixTail(data, _len);
-
 		while(_len >= 4)
 		{
 			uint32_t kk;
-			readUnaligned(data, kk);
+			readUnaligned(_data, kk);
 
 			mmix(m_hash, kk);
 
-			data += 4;
+			_data += 4;
 			_len -= 4;
 		}
-
-		mixTail(data, _len);
 	}
 
 	template<typename Ty>

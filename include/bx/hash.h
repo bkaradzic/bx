@@ -32,10 +32,10 @@ namespace bx
 
 	private:
 		///
-		void addAligned(const void* _data, int _len);
+		void addAligned(const uint8_t*& _data, int& _len);
 
 		///
-		void addUnaligned(const void* _data, int _len);
+		void addUnaligned(const uint8_t*& _data, int& _len);
 
 		///
 		static void readUnaligned(const void* _data, uint32_t& _out);
