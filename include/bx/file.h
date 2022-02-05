@@ -134,7 +134,7 @@ namespace bx
 	///
 	bool remove(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
 
-	/// Removes file or directory recursivelly.
+	/// Removes file or directory recursively.
 	///
 	bool removeAll(const FilePath& _filePath, Error* _err = bx::ErrorIgnore{});
 

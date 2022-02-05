@@ -28,13 +28,13 @@ namespace bx
 	///
 	uint64_t endianSwap(uint64_t _in);
 
-	/// Input argument is encoded as little endian, convert it if neccessary
-	/// depending on host CPU endianess.
+	/// Input argument is encoded as little endian, convert it if necessary
+	/// depending on host CPU endianness.
 	template <typename Ty>
 	Ty toLittleEndian(const Ty _in);
 
-	/// Input argument is encoded as big endian, convert it if neccessary
-	/// depending on host CPU endianess.
+	/// Input argument is encoded as big endian, convert it if necessary
+	/// depending on host CPU endianness.
 	template <typename Ty>
 	Ty toBigEndian(const Ty _in);
 
