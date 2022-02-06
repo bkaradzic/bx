@@ -174,7 +174,7 @@ namespace bx
 		uint32_t    m_size;
 	};
 
-	/// Sizer writer. Dummy writter that only counts number of bytes written into it.
+	/// Sizer writer. Dummy writer that only counts number of bytes written into it.
 	class SizerWriter : public WriterSeekerI
 	{
 	public:
@@ -271,8 +271,8 @@ namespace bx
 	template<typename Ty>
 	int32_t read(ReaderI* _reader, Ty& _value, Error* _err);
 
-	/// Read value and converts it to host endianess. _fromLittleEndian specifies
-	/// underlying stream endianess.
+	/// Read value and converts it to host endianness. _fromLittleEndian specifies
+	/// underlying stream endianness.
 	template<typename Ty>
 	int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err);
 

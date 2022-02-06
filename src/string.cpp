@@ -412,7 +412,7 @@ namespace bx
 				++ptr;
 				--stringLen;
 
-				// Search pattern lenght can't be longer than the string.
+				// Search pattern length can't be longer than the string.
 				if (findLen > stringLen)
 				{
 					return NULL;

@@ -46,7 +46,7 @@ namespace bx
 					if ('"' == *curr)
 					{
 						term = '"';
-						++curr; // skip begining quote
+						++curr; // skip beginning quote
 					}
 					else
 					{

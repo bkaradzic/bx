@@ -253,7 +253,7 @@ namespace bx
 	///
 	BX_CONST_FUNC float atan(float _a);
 
-	/// Retruns the inverse tangent of _y/_x.
+	/// Returns the inverse tangent of _y/_x.
 	///
 	BX_CONST_FUNC float atan2(float _y, float _x);
 
@@ -308,11 +308,11 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
 
-	/// Returns resul of addition (_a + _b).
+	/// Returns result of addition (_a + _b).
 	///
 	BX_CONSTEXPR_FUNC float add(float _a, float _b);
 
-	/// Returns resul of subtracion (_a - _b).
+	/// Returns result of subtracion (_a - _b).
 	///
 	BX_CONSTEXPR_FUNC float sub(float _a, float _b);
 

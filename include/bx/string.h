@@ -146,19 +146,19 @@ namespace bx
 		int32_t m_capacity;
 	};
 
-	/// Retruns true if character is part of space set.
+	/// Returns true if character is part of space set.
 	bool isSpace(char _ch);
 
 	/// Returns true if string view contains only space characters.
 	bool isSpace(const StringView& _str);
 
-	/// Retruns true if character is uppercase.
+	/// Returns true if character is uppercase.
 	bool isUpper(char _ch);
 
 	/// Returns true if string view contains only uppercase characters.
 	bool isUpper(const StringView& _str);
 
-	/// Retruns true if character is lowercase.
+	/// Returns true if character is lowercase.
 	bool isLower(char _ch);
 
 	/// Returns true if string view contains only lowercase characters.
@@ -167,19 +167,19 @@ namespace bx
 	/// Returns true if character is part of alphabet set.
 	bool isAlpha(char _ch);
 
-	/// Retruns true if string view contains only alphabet characters.
+	/// Returns true if string view contains only alphabet characters.
 	bool isAlpha(const StringView& _str);
 
 	/// Returns true if character is part of numeric set.
 	bool isNumeric(char _ch);
 
-	/// Retruns true if string view contains only numeric characters.
+	/// Returns true if string view contains only numeric characters.
 	bool isNumeric(const StringView& _str);
 
 	/// Returns true if character is part of alpha numeric set.
 	bool isAlphaNum(char _ch);
 
-	/// Returns true if string view contains only alpha-numeric characters.
+	/// Returns true if string view contains only alphanumeric characters.
 	bool isAlphaNum(const StringView& _str);
 
 	/// Returns true if character is part of hexadecimal set.
@@ -194,7 +194,7 @@ namespace bx
 	/// Returns true if string vieww contains only printable characters.
 	bool isPrint(const StringView& _str);
 
-	/// Retruns lower case character representing _ch.
+	/// Returns lower case character representing _ch.
 	char toLower(char _ch);
 
 	/// Lower case string in place assuming length passed is valid.
@@ -231,7 +231,7 @@ namespace bx
 	/// including zero terminator. Copy will be terminated with '\0'.
 	int32_t strCopy(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
-	/// Concatinate string.
+	/// Concatenate string.
 	int32_t strCat(char* _dst, int32_t _dstSize, const StringView& _str, int32_t _num = INT32_MAX);
 
 	/// Test whether the string _str begins with prefix.
@@ -282,7 +282,7 @@ namespace bx
 	/// Find new line. Returns pointer after new line terminator.
 	StringView strFindNl(const StringView& _str);
 
-	/// Find end of line. Retuns pointer to new line terminator.
+	/// Find end of line. Returns pointer to new line terminator.
 	StringView strFindEol(const StringView& _str);
 
 	/// Returns StringView of word or empty.

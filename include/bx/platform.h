@@ -16,7 +16,7 @@
 #define BX_COMPILER_GCC            0
 #define BX_COMPILER_MSVC           0
 
-// Endianess
+// Endianness
 #define BX_CPU_ENDIAN_BIG    0
 #define BX_CPU_ENDIAN_LITTLE 0
 
