@@ -37,10 +37,6 @@
 #define BX_CRT_MSVC   0
 #define BX_CRT_NEWLIB 0
 
-#ifndef BX_CRT_MUSL
-#	define BX_CRT_MUSL 0
-#endif // BX_CRT_MUSL
-
 #ifndef BX_CRT_NONE
 #	define BX_CRT_NONE 0
 #endif // BX_CRT_NONE
@@ -253,7 +249,6 @@
 	&& !BX_CRT_LIBCXX \
 	&& !BX_CRT_MINGW  \
 	&& !BX_CRT_MSVC   \
-	&& !BX_CRT_MUSL   \
 	&& !BX_CRT_NEWLIB
 #		undef  BX_CRT_NONE
 #		define BX_CRT_NONE 1
@@ -429,8 +424,6 @@
 #	define BX_CRT_NAME "Clang C Library"
 #elif BX_CRT_NEWLIB
 #	define BX_CRT_NAME "Newlib"
-#elif BX_CRT_MUSL
-#	define BX_CRT_NAME "musl libc"
 #elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
 #else
