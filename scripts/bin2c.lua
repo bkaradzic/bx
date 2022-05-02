@@ -20,6 +20,10 @@ project "bin2c"
 		links {
 			"pthread",
 		}
+	configuration { "osx-*" }
+		linkoptions {
+			"-framework Foundation"
+		}
 
 	configuration { "vs20* or mingw*" }
 		links {
