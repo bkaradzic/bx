@@ -109,11 +109,7 @@
 
 /// The return value of the function is solely a function of the arguments.
 ///
-#if __cplusplus < 201402
-#	define BX_CONSTEXPR_FUNC BX_CONST_FUNC
-#else
-#	define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
-#endif // __cplusplus < 201402
+#define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
 
 ///
 #define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
