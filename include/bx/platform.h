@@ -438,13 +438,9 @@
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
 
-#if BX_COMPILER_MSVC
-#	define BX_CPP_NAME "C++MsvcUnknown"
-#elif defined(__cplusplus)
-#	if __cplusplus < 201103L
-#		error "Pre-C++11 compiler is not supported!"
-#	elif __cplusplus < 201402L
-#		define BX_CPP_NAME "C++11"
+#if defined(__cplusplus)
+#	if __cplusplus < 201402L
+#		error "C++14 standard support is required to build."
 #	elif __cplusplus < 201703L
 #		define BX_CPP_NAME "C++14"
 #	elif __cplusplus < 201704L
