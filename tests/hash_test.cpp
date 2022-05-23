@@ -117,8 +117,8 @@ uint32_t MurmurHash2A ( const void * key, int len, uint32_t seed )
 
 	switch(len)
 	{
-	case 3: t ^= data[2] << 16;
-	case 2: t ^= data[1] << 8;
+	case 3: t ^= data[2] << 16; BX_FALLTHROUGH;
+	case 2: t ^= data[1] << 8;  BX_FALLTHROUGH;
 	case 1: t ^= data[0];
 	};
 
