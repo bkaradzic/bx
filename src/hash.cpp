@@ -188,6 +188,11 @@ static void mixTail(HashMurmur2APod& _self, const uint8_t*& _data, int32_t& _len
 	}
 }
 
+BX_FORCE_INLINE uint32_t readAligned(const uint8_t* _data)
+{
+	return *(uint32_t*)_data;
+}
+
 BX_FORCE_INLINE uint32_t readUnaligned(const uint8_t* _data)
 {
 	if (BX_ENABLED(BX_CPU_ENDIAN_BIG) )
@@ -210,7 +215,10 @@ BX_FORCE_INLINE uint32_t readUnaligned(const uint8_t* _data)
 	}
 }
 
-static void addAligned(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
+typedef uint32_t (*ReadDataFn)(const uint8_t* _data);
+
+template<ReadDataFn FnT>
+static void addData(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
 {
 	_self.m_size += _len;
 
@@ -218,26 +226,7 @@ static void addAligned(HashMurmur2APod& _self, const uint8_t* _data, int32_t _le
 
 	while (_len >= 4)
 	{
-		uint32_t kk = *(uint32_t*)_data;
-
-		mmix(_self.m_hash, kk);
-
-		_data += 4;
-		_len  -= 4;
-	}
-
-	mixTail(_self, _data, _len);
-}
-
-static void addUnaligned(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
-{
-	_self.m_size += _len;
-
-	mixTail(_self, _data, _len);
-
-	while (_len >= 4)
-	{
-		uint32_t kk = readUnaligned(_data);
+		uint32_t kk = FnT(_data);
 
 		mmix(_self.m_hash, kk);
 
@@ -256,11 +245,11 @@ void HashMurmur2A::add(const void* _data, int32_t _len)
 
 	if (BX_UNLIKELY(!isAligned(_data, 4) ) )
 	{
-		addUnaligned(self, data, _len);
+		addData<readUnaligned>(self, data, _len);
 		return;
 	}
 
-	addAligned(self, data, _len);
+	addData<readAligned>(self, data, _len);
 }
 
 uint32_t HashMurmur2A::end()
