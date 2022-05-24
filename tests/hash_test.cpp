@@ -93,7 +93,7 @@ TEST_CASE("HashAdler32", "")
 
 #define mmix(h,k) { k *= m; k ^= k >> r; k *= m; h *= m; h ^= k; }
 
-uint32_t MurmurHash2A ( const void * key, int len, uint32_t seed )
+uint32_t MurmurHash2A(const void * key, int len, uint32_t seed = 0)
 {
 	const uint32_t m = 0x5bd1e995;
 	const int r = 24;
@@ -147,4 +147,13 @@ TEST_CASE("HashMurmur2A", "")
 
 		REQUIRE(test.murmur2a == MurmurHash2A(test.input, bx::strLen(test.input), seed) );
 	}
+}
+
+TEST_CASE("HashMurmur2A-Separate-Add", "")
+{
+	bx::HashMurmur2A hash;
+	hash.begin();
+	hash.add("0123456789");
+	hash.add("abvgd012345");
+	REQUIRE(MurmurHash2A("0123456789abvgd012345", 21) == hash.end() );
 }
