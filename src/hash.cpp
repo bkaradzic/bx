@@ -188,81 +188,79 @@ static void mixTail(HashMurmur2APod& _self, const uint8_t*& _data, int32_t& _len
 	}
 }
 
-static void addAligned(HashMurmur2APod& _self, const void* _data, int32_t _len)
+BX_FORCE_INLINE uint32_t readUnaligned(const uint8_t* _data)
 {
-	const uint8_t* data = (const uint8_t*)_data;
-	_self.m_size += _len;
-
-	mixTail(_self, data, _len);
-
-	while(_len >= 4)
-	{
-		uint32_t kk = *(uint32_t*)data;
-
-		mmix(_self.m_hash, kk);
-
-		data += 4;
-		_len -= 4;
-	}
-
-	mixTail(_self, data, _len);
-}
-
-BX_FORCE_INLINE void readUnaligned(const void* _data, uint32_t& _out)
-{
-	const uint8_t* data = (const uint8_t*)_data;
 	if (BX_ENABLED(BX_CPU_ENDIAN_BIG) )
 	{
-		_out = 0
-			| data[0]<<24
-			| data[1]<<16
-			| data[2]<<8
-			| data[3]
+		return 0
+			| _data[0]<<24
+			| _data[1]<<16
+			| _data[2]<<8
+			| _data[3]
 			;
 	}
 	else
 	{
-		_out = 0
-			| data[0]
-			| data[1]<<8
-			| data[2]<<16
-			| data[3]<<24
+		return 0
+			| _data[0]
+			| _data[1]<<8
+			| _data[2]<<16
+			| _data[3]<<24
 			;
 	}
 }
 
-static void addUnaligned(HashMurmur2APod& _self, const void* _data, int32_t _len)
+static void addAligned(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
 {
-	const uint8_t* data = (const uint8_t*)_data;
 	_self.m_size += _len;
 
-	mixTail(_self, data, _len);
+	mixTail(_self, _data, _len);
 
-	while(_len >= 4)
+	while (_len >= 4)
 	{
-		uint32_t kk;
-		readUnaligned(data, kk);
+		uint32_t kk = *(uint32_t*)_data;
 
 		mmix(_self.m_hash, kk);
 
-		data += 4;
-		_len -= 4;
+		_data += 4;
+		_len  -= 4;
 	}
 
-	mixTail(_self, data, _len);
+	mixTail(_self, _data, _len);
+}
+
+static void addUnaligned(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
+{
+	_self.m_size += _len;
+
+	mixTail(_self, _data, _len);
+
+	while (_len >= 4)
+	{
+		uint32_t kk = readUnaligned(_data);
+
+		mmix(_self.m_hash, kk);
+
+		_data += 4;
+		_len  -= 4;
+	}
+
+	mixTail(_self, _data, _len);
 }
 
 void HashMurmur2A::add(const void* _data, int32_t _len)
 {
 	HashMurmur2APod& self = *(HashMurmur2APod*)this;
 
+	const uint8_t* data = (const uint8_t*)_data;
+
 	if (BX_UNLIKELY(!isAligned(_data, 4) ) )
 	{
-		addUnaligned(self, _data, _len);
+		addUnaligned(self, data, _len);
 		return;
 	}
 
-	addAligned(self, _data, _len);
+	addAligned(self, data, _len);
 }
 
 uint32_t HashMurmur2A::end()
