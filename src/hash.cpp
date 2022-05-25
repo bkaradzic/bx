@@ -242,7 +242,7 @@ void HashMurmur2A::add(const void* _data, int32_t _len)
 	m_size += _len;
 	mixTail(self, data, _len);
 
-	if (BX_UNLIKELY(!isAligned(_data, 4) ) )
+	if (BX_UNLIKELY(!isAligned(data, 4) ) )
 	{
 		addData<readUnaligned>(self, data, _len);
 		return;
