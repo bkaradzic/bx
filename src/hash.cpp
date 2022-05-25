@@ -220,10 +220,6 @@ typedef uint32_t (*ReadDataFn)(const uint8_t* _data);
 template<ReadDataFn FnT>
 static void addData(HashMurmur2APod& _self, const uint8_t* _data, int32_t _len)
 {
-	_self.m_size += _len;
-
-	mixTail(_self, _data, _len);
-
 	while (_len >= 4)
 	{
 		uint32_t kk = FnT(_data);
@@ -242,6 +238,9 @@ void HashMurmur2A::add(const void* _data, int32_t _len)
 	HashMurmur2APod& self = *(HashMurmur2APod*)this;
 
 	const uint8_t* data = (const uint8_t*)_data;
+
+	m_size += _len;
+	mixTail(self, data, _len);
 
 	if (BX_UNLIKELY(!isAligned(_data, 4) ) )
 	{
