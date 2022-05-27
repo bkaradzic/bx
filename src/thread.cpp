@@ -24,7 +24,7 @@
 	|| BX_PLATFORM_RPI	   \
 	|| BX_PLATFORM_NX
 #	include <pthread.h>
-#	if defined(__FreeBSD__)
+#	if defined(__FreeBSD__) || defined(__OpenBSD__)
 #		include <pthread_np.h>
 #	endif
 #	if BX_PLATFORM_LINUX && (BX_CRT_GLIBC < 21200)
