@@ -31,7 +31,7 @@ namespace bx
 	typedef float (*LerpFn)(float _a, float _b, float _t);
 
 	///
-	struct Handness
+	struct Handedness
 	{
 		enum Enum
 		{
@@ -574,7 +574,7 @@ namespace bx
 		, const Vec3& _eye
 		, const Vec3& _at
 		, const Vec3& _up = { 0.0f, 1.0f, 0.0f }
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		);
 
 	///
@@ -587,7 +587,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		);
 
 	///
@@ -597,7 +597,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		);
 
 	///
@@ -608,7 +608,7 @@ namespace bx
 		, float _near
 		, float _far
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		);
 
 	///
@@ -617,7 +617,7 @@ namespace bx
 		, const float _fov[4]
 		, float _near
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -630,7 +630,7 @@ namespace bx
 		, float _rt
 		, float _near
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -641,7 +641,7 @@ namespace bx
 		, float _aspect
 		, float _near
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		, NearFar::Enum _nearFar = NearFar::Default
 		);
 
@@ -656,7 +656,7 @@ namespace bx
 		, float _far
 		, float _offset
 		, bool _homogeneousNdc
-		, Handness::Enum _handness = Handness::Left
+		, Handedness::Enum _handedness = Handedness::Left
 		);
 
 	///
