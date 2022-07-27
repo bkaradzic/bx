@@ -107,6 +107,13 @@ TEST_CASE("libm", "")
 		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
 	}
 
+	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
+	{
+		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
+	}
+
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
@@ -135,6 +142,13 @@ TEST_CASE("libm", "")
 		REQUIRE(bx::isEqual(bx::sin(xx), ::sinf(xx), 0.00001f) );
 	}
 
+	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
+	{
+		bx::write(writer, &err, "sin(%f) == %f (expected: %f)\n", xx, bx::sin(xx), ::sinf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sin(xx), ::sinf(xx), 0.00001f) );
+	}
+
 	for (float xx = -1.0f; xx < 1.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "sinh(%f) == %f (expected: %f)\n", xx, bx::sinh(xx), ::sinhf(xx) );
@@ -150,6 +164,13 @@ TEST_CASE("libm", "")
 	}
 
 	for (float xx = -100.0f; xx < 100.0f; xx += 0.1f)
+	{
+		bx::write(writer, &err, "cos(%f) == %f (expected: %f)\n", xx, bx::cos(xx), ::cosf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::cos(xx), ::cosf(xx), 0.00001f) );
+	}
+
+	for (float xx = -bx::kPi2; xx < bx::kPi2; xx += 0.0001f)
 	{
 		bx::write(writer, &err, "cos(%f) == %f (expected: %f)\n", xx, bx::cos(xx), ::cosf(xx) );
 		REQUIRE(err.isOk() );
