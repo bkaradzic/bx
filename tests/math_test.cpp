@@ -70,7 +70,6 @@ TEST_CASE("libm", "")
 	REQUIRE(   0.0f == bx::abs( 0.0f) );
 
 	REQUIRE(389.0f == bx::mod(1389.0f, 1000.0f) );
-	REQUIRE(bx::isNan(bx::mod(0.0f, 0.0f) ) );
 
 	REQUIRE( 13.0f == bx::floor( 13.89f) );
 	REQUIRE(-14.0f == bx::floor(-13.89f) );
