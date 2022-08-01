@@ -89,6 +89,8 @@ function toolchain(_buildDir, _libDir)
 			{ "winstore100",   "Universal Windows App 10.0"      },
 			{ "durango",       "Durango"                         },
 			{ "orbis",         "Orbis"                           },
+			{ "GDKOne",        "GDK Xbox One"                    },
+			{ "GDKScarlett",   "GDK Xbox Scarlett"               },
 		},
 	}
 
@@ -433,6 +435,10 @@ function toolchain(_buildDir, _libDir)
 			premake.vstudio.storeapp = "durango"
 			platforms { "Durango" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-durango"))
+
+		elseif "GDKOne" == _OPTIONS["vs"] or "GDKScarlett" == _OPTIONS["vs"] then
+			platforms { "GDKOne", "GDKScarlett" }
+
 		elseif "orbis" == _OPTIONS["vs"] then
 
 			if not os.getenv("SCE_ORBIS_SDK_DIR") then
@@ -521,7 +527,7 @@ function toolchain(_buildDir, _libDir)
 			"EnableSSE2",
 		}
 
-	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
+	configuration { "vs*", "not orbis", "not NX32", "not NX64" ,"GDKOne or GDKScarlett" }
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		defines {
 			"WIN32",
@@ -957,6 +963,32 @@ function toolchain(_buildDir, _libDir)
 		removeflags { "StaticRuntime" }
 		defines {
 			"NOMINMAX",
+		}
+
+	configuration { "GDKOne"}
+		targetdir (path.join(_buildDir, "gdkone/bin/$(Platform)/$(Configuration)"))
+		objdir (path.join(_buildDir, "gdkone/obj/$(Platform)/$(Configuration)"))
+		defines {
+			"_WIN64",
+			"NOMINMAX",
+			"UNICODE",
+			"_UNICODE",
+		}
+		buildoptions {
+		    "/favor:AMD64"
+		}
+
+	configuration { "GDKScarlett" }
+		targetdir (path.join(_buildDir, "gdkscarlett/bin/$(Platform)/$(Configuration)"))
+		objdir (path.join(_buildDir, "gdkscarlett/obj/$(Platform)/$(Configuration)"))
+		defines {
+			"_WIN64",
+			"NOMINMAX",
+			"UNICODE",
+			"_UNICODE",
+		}
+		buildoptions {
+		    "/favor:AMD64"
 		}
 
 	configuration { "netbsd" }
