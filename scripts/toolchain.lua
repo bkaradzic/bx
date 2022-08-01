@@ -105,6 +105,7 @@ function toolchain(_buildDir, _libDir)
 			{ "winstore100",   "Universal Windows App 10.0"      },
 			{ "durango",       "Durango"                         },
 			{ "orbis",         "Orbis"                           },
+			{ "gdk",           "GDK Desktop/Xbox"                },
 		},
 	}
 
@@ -418,6 +419,11 @@ function toolchain(_buildDir, _libDir)
 			premake.vstudio.storeapp = "durango"
 			platforms { "Durango" }
 			location (path.join(_buildDir, "projects", _ACTION .. "-durango"))
+
+		elseif "gdk" == _OPTIONS["vs"] then
+			platforms { "gdk-desktop", "gdk-xboxone", "gdk-scarlett" }
+			location (path.join(_buildDir, "projects", _ACTION .. "-gdk"))
+
 		elseif "orbis" == _OPTIONS["vs"] then
 
 			if not os.getenv("SCE_ORBIS_SDK_DIR") then
@@ -506,7 +512,7 @@ function toolchain(_buildDir, _libDir)
 			"EnableSSE2",
 		}
 
-	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
+	configuration { "vs*", "not orbis", "not NX32", "not NX64"}
 		includedirs { path.join(bxDir, "include/compat/msvc") }
 		defines {
 			"WIN32",
@@ -899,6 +905,22 @@ function toolchain(_buildDir, _libDir)
 		removeflags { "StaticRuntime" }
 		defines {
 			"NOMINMAX",
+		}
+
+	configuration { "gdk"}
+		targetdir (path.join(_buildDir, "gdk/bin/$(Platform)/$(Configuration)"))
+		objdir (path.join(_buildDir, "gdk/obj/$(Platform)/$(Configuration)"))
+		defines {
+			"_WIN64",
+			"NOMINMAX",
+			"UNICODE",
+			"_UNICODE",
+		}
+		removeflags { "StaticRuntime" }
+
+	configuration { "gdk", "gdk-xboxone or gdk-scarlett"}
+		buildoptions {
+			"/favor:AMD64",
 		}
 
 	configuration { "netbsd" }

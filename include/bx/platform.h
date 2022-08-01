@@ -151,7 +151,7 @@
 #endif // BX_CPU_PPC
 
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Operating_Systems
-#if defined(_DURANGO) || defined(_XBOX_ONE)
+#if defined (_DURANGO) || defined(_XBOX_ONE) || defined(_GAMING_XBOX)
 #	undef  BX_PLATFORM_XBOXONE
 #	define BX_PLATFORM_XBOXONE 1
 #elif defined(_WIN32) || defined(_WIN64)
