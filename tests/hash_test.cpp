@@ -29,7 +29,7 @@ void makeCrcTable(uint32_t _poly)
 
 struct HashTest
 {
-	uint32_t crc32;
+	uint32_t crc32[bx::HashCrc32::Count];
 	uint32_t adler32;
 	uint32_t murmur2a;
 	const char* input;
@@ -37,12 +37,14 @@ struct HashTest
 
 const HashTest s_hashTest[] =
 {
-	{ 0,          1,          0,          ""       },
-	{ 0xe8b7be43, 0x00620062, 0x803888b,  "a"      },
-	{ 0x9e83486d, 0x012600c4, 0x618515af, "ab"     },
-	{ 0xc340daab, 0x06060205, 0x94e3dc4d, "abvgd"  },
-	{ 0x07642fe2, 0x020a00d6, 0xe602fc07, "1389"   },
-	{ 0x26d75737, 0x04530139, 0x58d37863, "555333" },
+	//  Crc32                               | Adler32   | Murmur2A  | Input
+	//  Ieee        Castagnoli  Koopman     |           |           |
+	{ { 0,          0,          0          }, 1,          0,          ""       },
+	{ { 0xe8b7be43, 0xc1d04330, 0x0da2aa8a }, 0x00620062, 0x0803888b, "a"      },
+	{ { 0x9e83486d, 0xe2a22936, 0x31ec935a }, 0x012600c4, 0x618515af, "ab"     },
+	{ { 0xc340daab, 0x49e1b6e3, 0x945a1e78 }, 0x06060205, 0x94e3dc4d, "abvgd"  },
+	{ { 0x07642fe2, 0x45a04162, 0x3d4bf72d }, 0x020a00d6, 0xe602fc07, "1389"   },
+	{ { 0x26d75737, 0xb73d7b80, 0xd524eb40 }, 0x04530139, 0x58d37863, "555333" },
 };
 
 TEST_CASE("HashCrc32", "")
@@ -59,10 +61,13 @@ TEST_CASE("HashCrc32", "")
 	{
 		const HashTest& test = s_hashTest[ii];
 
-		bx::HashCrc32 hash;
-		hash.begin();
-		hash.add(test.input, bx::strLen(test.input) );
-		REQUIRE(test.crc32 == hash.end() );
+		for (uint32_t jj = 0; jj < bx::HashCrc32::Count; ++jj)
+		{
+			bx::HashCrc32 hash;
+			hash.begin(bx::HashCrc32::Enum(jj) );
+			hash.add(test.input, bx::strLen(test.input) );
+			REQUIRE(test.crc32[jj] == hash.end() );
+		}
 	}
 }
 
