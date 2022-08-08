@@ -51,5 +51,50 @@ namespace bx
 		quickSortR(pivot, _data, _num, _stride, _fn);
 	}
 
+	bool isSorted(const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		const uint8_t* data = (uint8_t*)_data;
+
+		for (uint32_t ii = 1; ii < _num; ++ii)
+		{
+			int32_t result = _fn(&data[(ii-1)*_stride], &data[ii*_stride]);
+
+			if (0 < result)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	int32_t binarySearch(const void* _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		uint32_t offset = 0;
+		const uint8_t* data = (uint8_t*)_data;
+
+		for (uint32_t ll = _num; offset < ll;)
+		{
+			const uint32_t idx = (offset + ll) / 2;
+
+			int32_t result = _fn(_key, &data[idx * _stride]);
+
+			if (result < 0)
+			{
+				ll = idx;
+			}
+			else if (result > 0)
+			{
+				offset = idx + 1;
+			}
+			else
+			{
+				return idx;
+			}
+		}
+
+		return -1;
+	}
+
 } // namespace bx
 

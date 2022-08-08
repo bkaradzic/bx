@@ -10,9 +10,21 @@
 
 namespace bx
 {
+	/// The function compares the `_lhs` and `_rhs` values.
+	///
+	/// @returns Returns value:
+	///   - less than zero if `_lhs` is less than `_rhs`
+	///   - zero if `_lhs` is equivalent to `_rhs`
+	///   - greater than zero if `_lhs` is greater than `_rhs`
 	///
 	typedef int32_t (*ComparisonFn)(const void* _lhs, const void* _rhs);
 
+	/// Performs sort (Quick Sort algorithm).
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _stride Element stride in bytes.
+	/// @param _fn Comparison function.
 	///
 	void quickSort(
 		  void* _data
@@ -53,6 +65,42 @@ namespace bx
 		, Ty* _values
 		, Ty* _tempValues
 		, uint32_t _size
+		);
+
+	/// Performs check if array is sorted.
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _stride Element stride in bytes.
+	/// @param _fn Comparison function.
+	///
+	/// @returns Returns `true` if array is sorted, otherwise returns `false`.
+	///
+	bool isSorted(
+		  const void* _data
+		, uint32_t _num
+		, uint32_t _stride
+		, const ComparisonFn _fn
+		);
+
+	/// Performs binary search of a sorted array.
+	///
+	/// @param _key Pointer to the key to search for.
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _stride Element stride in bytes.
+	/// @param _fn Comparison function.
+	///
+	/// @remarks Array must be sorted!
+	///
+	/// @returns Returns index of element or -1 if the key is not found in sorted array.
+	///
+	int32_t binarySearch(
+		  const void* _key
+		, const void* _data
+		, uint32_t _num
+		, uint32_t _stride
+		, const ComparisonFn _fn
 		);
 
 } // namespace bx
