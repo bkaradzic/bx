@@ -19,11 +19,11 @@ TEST_CASE("quickSort", "")
 	};
 
 	auto strCmpFn = [](const void* _lhs, const void* _rhs)
-		{
-			const char* lhs = *(const char**)_lhs;
-			const char* rhs = *(const char**)_rhs;
-			return bx::strCmp(lhs, rhs);
-		};
+	{
+		const char* lhs = *(const char**)_lhs;
+		const char* rhs = *(const char**)_rhs;
+		return bx::strCmp(lhs, rhs);
+	};
 
 	REQUIRE(!bx::isSorted(str, BX_COUNTOF(str), sizeof(str[0]), strCmpFn) );
 
@@ -51,11 +51,11 @@ TEST_CASE("quickSort", "")
 	REQUIRE(-1 == bx::binarySearch("kupina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 
 	auto byteCmpFn = [](const void* _lhs, const void* _rhs)
-		{
-			int8_t lhs = *(const int8_t*)_lhs;
-			int8_t rhs = *(const int8_t*)_rhs;
-			return lhs - rhs;
-		};
+	{
+		int8_t lhs = *(const int8_t*)_lhs;
+		int8_t rhs = *(const int8_t*)_rhs;
+		return lhs - rhs;
+	};
 
 	int8_t byte[128];
 	bx::RngMwc rng;
