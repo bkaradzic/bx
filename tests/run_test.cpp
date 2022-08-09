@@ -17,5 +17,15 @@ int runAllTests(int _argc, const char* _argv[])
 		", Time: " __TIME__
 		", C++: " BX_CPP_NAME
 		);
-	return Catch::Session().run(_argc, _argv);
+
+	using namespace Catch;
+
+	Session session;
+
+	ConfigData config;
+	config.useColour = BX_PLATFORM_EMSCRIPTEN ? UseColour::No : UseColour::Auto;
+
+	session.useConfigData(config);
+
+	return session.run(_argc, _argv);
 }
