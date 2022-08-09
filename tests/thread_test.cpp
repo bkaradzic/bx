@@ -6,6 +6,8 @@
 #include "test.h"
 #include <bx/thread.h>
 
+#if BX_CONFIG_SUPPORTS_THREADING
+
 bx::DefaultAllocator s_allocator;
 bx::MpScUnboundedBlockingQueue<void> s_mpsc(&s_allocator);
 
@@ -69,3 +71,5 @@ TEST_CASE("MpScUnboundedBlockingQueue", "")
 
 	REQUIRE(result == 0x1389);
 }
+
+#endif // BX_CONFIG_SUPPORTS_THREADING

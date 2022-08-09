@@ -941,7 +941,7 @@ function toolchain(_buildDir, _libDir)
 		}
 
 		linkoptions {
-			"-s MAX_WEBGL_VERSION=2"
+			"-s MAX_WEBGL_VERSION=2",
 		}
 
 	configuration { "wasm2js" }
@@ -949,7 +949,7 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "wasm2js/obj"))
 		libdirs { path.join(_libDir, "lib/wasm2js") }
 		linkoptions {
-			"-s WASM=0"
+			"-s WASM=0",
 		}
 
 	configuration { "wasm" }
