@@ -96,12 +96,18 @@ namespace bx
 		return tmp == UINT64_C(0x7ff0000000000000);
 	}
 
+	inline float forceEval(float _a)
+	{
+		volatile float result = _a;
+		return result;
+	}
+
 	inline BX_CONSTEXPR_FUNC float floor(float _a)
 	{
 		if (_a < 0.0f)
 		{
 			const float fr = fract(-_a);
-			const float result = -_a - fr;
+			const float result = forceEval(-_a - fr);
 
 			return -(0.0f != fr
 				? result + 1.0f
