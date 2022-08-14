@@ -899,7 +899,7 @@ namespace bx
 		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x1f) ) / 31.0f;
 		_dst[2] = float( ( (packed>>10) & 0x1f) ) / 31.0f;
-		_dst[3] = float( ( (packed>>14) &  0x1) );
+		_dst[3] = float( ( (packed>>15) &  0x1) );
 	}
 
 	// BGR5A1
@@ -919,7 +919,7 @@ namespace bx
 		_dst[0] = float( ( (packed>>10) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x1f) ) / 31.0f;
 		_dst[2] = float( ( (packed    ) & 0x1f) ) / 31.0f;
-		_dst[3] = float( ( (packed>>14) &  0x1) );
+		_dst[3] = float( ( (packed>>15) &  0x1) );
 	}
 
 	// RGB10A2
