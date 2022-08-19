@@ -221,7 +221,7 @@ namespace bx
 	void packRgba4(void* _dst, const float* _src);
 	void unpackRgba4(float* _dst, const void* _src);
 
-	// RGBA4
+	// BGRA4
 	void packBgra4(void* _dst, const float* _src);
 	void unpackBgra4(float* _dst, const void* _src);
 

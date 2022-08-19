@@ -881,7 +881,7 @@ namespace bx
 		_dst[3] = float( ( (packed>>12) & 0xf) ) / 15.0f;
 	}
 
-	// RGBA4
+	// BGRA4
 	inline void packBgra4(void* _dst, const float* _src)
 	{
 		*( (uint16_t*)_dst) = 0
