@@ -210,6 +210,13 @@ TEST_CASE("libm", "")
 	REQUIRE(bx::isEqual(bx::atan2(0.0f, 0.0f), ::atan2f(0.0f, 0.0f), 0.00001f) );
 }
 
+TEST_CASE("sign", "")
+{
+	REQUIRE(-1 == bx::sign(-0.1389f) );
+	REQUIRE( 0 == bx::sign( 0.0000f) );
+	REQUIRE( 1 == bx::sign( 0.1389f) );
+}
+
 TEST_CASE("ToBits", "")
 {
 	REQUIRE(UINT32_C(0x12345678)         == bx::floatToBits( bx::bitsToFloat( UINT32_C(0x12345678) ) ) );

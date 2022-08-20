@@ -135,7 +135,7 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float sign(float _a)
 	{
-		return _a < 0.0f ? -1.0f : 1.0f;
+		return (0.0f < _a) - (0.0f > _a);
 	}
 
 	inline BX_CONSTEXPR_FUNC float abs(float _a)

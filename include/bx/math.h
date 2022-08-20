@@ -205,7 +205,11 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value);
 
-	/// Returns the sign of _a.
+	/// Extracts the sign of value `_a`.
+	///
+	/// @param[in] _a Value.
+	///
+	/// @returns -1 if `_a` less than zero, 0 if `_a` is equal to 0, or +1 if `_a` is greater than zero.
 	///
 	BX_CONSTEXPR_FUNC float sign(float _a);
 
