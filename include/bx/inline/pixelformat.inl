@@ -823,8 +823,8 @@ namespace bx
 		memCopy(_dst, _src, 16);
 	}
 
-	// R5G6B5
-	inline void packR5G6B5(void* _dst, const float* _src)
+	// B5G6R5
+	inline void packB5G6R5(void* _dst, const float* _src)
 	{
 		*( (uint16_t*)_dst) = 0
 			| uint16_t(toUnorm(_src[0], 31.0f)<<11)
@@ -833,12 +833,31 @@ namespace bx
 			;
 	}
 
-	inline void unpackR5G6B5(float* _dst, const void* _src)
+	inline void unpackB5G6R5(float* _dst, const void* _src)
 	{
 		uint16_t packed = *( (const uint16_t*)_src);
 		_dst[0] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
 		_dst[1] = float( ( (packed>> 5) & 0x3f) ) / 63.0f;
 		_dst[2] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[3] = 1.0f;
+	}
+
+	// R5G6B5
+	inline void packR5G6B5(void* _dst, const float* _src)
+	{
+		*( (uint16_t*)_dst) = 0
+			| uint16_t(toUnorm(_src[0], 31.0f)    )
+			| uint16_t(toUnorm(_src[1], 63.0f)<< 5)
+			| uint16_t(toUnorm(_src[2], 31.0f)<<11)
+			;
+	}
+
+	inline void unpackR5G6B5(float* _dst, const void* _src)
+	{
+		uint16_t packed = *( (const uint16_t*)_src);
+		_dst[0] = float( ( (packed    ) & 0x1f) ) / 31.0f;
+		_dst[1] = float( ( (packed>> 5) & 0x3f) ) / 63.0f;
+		_dst[2] = float( ( (packed>>11) & 0x1f) ) / 31.0f;
 		_dst[3] = 1.0f;
 	}
 
@@ -862,7 +881,7 @@ namespace bx
 		_dst[3] = float( ( (packed>>12) & 0xf) ) / 15.0f;
 	}
 
-	// RGBA4
+	// BGRA4
 	inline void packBgra4(void* _dst, const float* _src)
 	{
 		*( (uint16_t*)_dst) = 0
