@@ -68,6 +68,54 @@ namespace bx
 		return true;
 	}
 
+	uint32_t lowerBound(const void* _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		uint32_t offset = 0;
+		const uint8_t* data = (uint8_t*)_data;
+
+		for (uint32_t ll = _num; offset < ll;)
+		{
+			const uint32_t idx = (offset + ll) / 2;
+
+			int32_t result = _fn(_key, &data[idx * _stride]);
+
+			if (result <= 0)
+			{
+				ll = idx;
+			}
+			else
+			{
+				offset = idx + 1;
+			}
+		}
+
+		return offset;
+	}
+
+	uint32_t upperBound(const void* _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
+	{
+		uint32_t offset = 0;
+		const uint8_t* data = (uint8_t*)_data;
+
+		for (uint32_t ll = _num; offset < ll;)
+		{
+			const uint32_t idx = (offset + ll) / 2;
+
+			int32_t result = _fn(_key, &data[idx * _stride]);
+
+			if (result < 0)
+			{
+				ll = idx;
+			}
+			else
+			{
+				offset = idx + 1;
+			}
+		}
+
+		return offset;
+	}
+
 	int32_t binarySearch(const void* _key, const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
 	{
 		uint32_t offset = 0;
