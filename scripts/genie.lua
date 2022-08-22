@@ -54,7 +54,12 @@ project "bx.test"
 		BX_THIRD_PARTY_DIR,
 	}
 
+	defines {
+		"CATCH_AMALGAMATED_CUSTOM_MAIN",
+	}
+
 	files {
+		path.join(BX_DIR, "3rdparty/catch/catch_amalgamated.cpp"),
 		path.join(BX_DIR, "tests/*_test.cpp"),
 		path.join(BX_DIR, "tests/*.h"),
 		path.join(BX_DIR, "tests/dbg.*"),

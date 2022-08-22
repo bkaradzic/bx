@@ -23,7 +23,7 @@ int runAllTests(int _argc, const char* _argv[])
 	Session session;
 
 	ConfigData config;
-	config.useColour = BX_PLATFORM_EMSCRIPTEN ? UseColour::No : UseColour::Auto;
+	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN ? ColourMode::None : ColourMode::PlatformDefault;
 
 	session.useConfigData(config);
 

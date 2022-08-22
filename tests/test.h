@@ -10,7 +10,7 @@
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' : conversion from 'int' to 'const char *' of greater size
-#include <catch/catch.hpp>
+#include <catch/catch_amalgamated.hpp>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
 #define TEST(_x) TEST_CASE(#_x, "")
