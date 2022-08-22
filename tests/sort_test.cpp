@@ -83,8 +83,8 @@ TEST_CASE("lower/upperBound int32_t", "")
 	const uint32_t resultLowerBound[] = { 0, 1, 4, 4, 5, 6,  9, 11, 12, 13 };
 	const uint32_t resultUpperBound[] = { 1, 4, 4, 5, 6, 9, 11, 12, 13, 14 };
 
-	static_assert(10 == BX_COUNTOF(resultLowerBound) );
-	static_assert(10 == BX_COUNTOF(resultUpperBound) );
+	STATIC_REQUIRE(10 == BX_COUNTOF(resultLowerBound) );
+	STATIC_REQUIRE(10 == BX_COUNTOF(resultUpperBound) );
 
 	for (int32_t key = test[0], keyMax = test[BX_COUNTOF(test)-1], ii = 0; key <= keyMax; ++key, ++ii)
 	{
