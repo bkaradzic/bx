@@ -6,6 +6,8 @@
 #include <bx/math.h>
 #include <bx/uint32_t.h>
 
+#include <bx/string.h>
+
 namespace bx
 {
 	const float kInfinity = bitsToFloat(UINT32_C(0x7f800000) );
@@ -112,7 +114,7 @@ namespace bx
 
 		if (maxaxy == 0.0f)
 		{
-			return 0.0f*sign(_y);
+			return _y < 0.0f ? -0.0f : 0.0f;
 		}
 
 		const float mxy    = minaxy / maxaxy;
@@ -125,7 +127,7 @@ namespace bx
 		const float tmp5   = tmp4 * mxy;
 		const float tmp6   = ay > ax   ? kPiHalf - tmp5 : tmp5;
 		const float tmp7   = _x < 0.0f ? kPi     - tmp6 : tmp6;
-		const float result = (_y < 0.0f ? -1.0f : 1.0f)*tmp7;
+		const float result = _y < 0.0f ? -tmp7 : tmp7;
 
 		return result;
 	}
