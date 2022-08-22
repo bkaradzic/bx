@@ -966,8 +966,8 @@ namespace bx
 	{
 		*( (uint32_t*)_dst) = 0
 			| ( (halfFromFloat(_src[0])>> 4) &      0x7ff)
-			| ( (halfFromFloat(_src[0])<< 7) &   0x3ff800)
-			| ( (halfFromFloat(_src[0])<<17) & 0xffc00000)
+			| ( (halfFromFloat(_src[1])<< 7) &   0x3ff800)
+			| ( (halfFromFloat(_src[2])<<17) & 0xffc00000)
 			;
 	}
 
