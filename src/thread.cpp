@@ -87,7 +87,6 @@ namespace bx
 	void* ThreadInternal::threadFunc(void* _arg)
 	{
 		Thread* thread = (Thread*)_arg;
-		thread->setThreadName(thread->m_name);
 		union
 		{
 			void* ptr;
@@ -330,6 +329,7 @@ namespace bx
 #endif // BX_PLATFORM_WINDOWS
 
 		m_sem.post();
+		setThreadName(m_name);
 		int32_t result = m_fn(this, m_userData);
 		return result;
 	}
