@@ -63,6 +63,7 @@ TEST_CASE("log2", "")
 TEST_CASE("libm", "")
 {
 	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
 
 	REQUIRE(1389.0f == bx::abs(-1389.0f) );
 	REQUIRE(1389.0f == bx::abs( 1389.0f) );
@@ -80,8 +81,6 @@ TEST_CASE("libm", "")
 	REQUIRE(-13.0f == bx::trunc(-13.89f) );
 	REQUIRE(bx::isEqual( 0.89f, bx::fract( 13.89f), 0.000001f) );
 	REQUIRE(bx::isEqual(-0.89f, bx::fract(-13.89f), 0.000001f) );
-
-	bx::Error err;
 
 	for (int32_t yy = -10; yy < 10; ++yy)
 	{
@@ -196,6 +195,16 @@ TEST_CASE("libm", "")
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::atan(xx), ::atanf(xx), 0.00001f) );
 	}
+}
+
+TEST_CASE("atan2", "")
+{
+	bx::WriterI* writer = bx::getNullOut();
+	bx::Error err;
+
+	REQUIRE(bx::isEqual(bx::atan2(0.0f,  0.0f), ::atan2f(0.0f,  0.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::atan2(0.0f,  1.0f), ::atan2f(0.0f,  1.0f), 0.00001f) );
+	REQUIRE(bx::isEqual(bx::atan2(0.0f, -1.0f), ::atan2f(0.0f, -1.0f), 0.00001f) );
 
 	for (float yy = -100.0f; yy < 100.0f; yy += 0.1f)
 	{
@@ -206,8 +215,6 @@ TEST_CASE("libm", "")
 			REQUIRE(bx::isEqual(bx::atan2(yy, xx), ::atan2f(yy, xx), 0.00001f) );
 		}
 	}
-
-	REQUIRE(bx::isEqual(bx::atan2(0.0f, 0.0f), ::atan2f(0.0f, 0.0f), 0.00001f) );
 }
 
 TEST_CASE("sign", "")

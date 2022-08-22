@@ -125,7 +125,7 @@ namespace bx
 		const float tmp5   = tmp4 * mxy;
 		const float tmp6   = ay > ax   ? kPiHalf - tmp5 : tmp5;
 		const float tmp7   = _x < 0.0f ? kPi     - tmp6 : tmp6;
-		const float result = sign(_y)*tmp7;
+		const float result = (_y < 0.0f ? -1.0f : 1.0f)*tmp7;
 
 		return result;
 	}
