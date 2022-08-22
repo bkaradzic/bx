@@ -87,6 +87,7 @@ namespace bx
 	void* ThreadInternal::threadFunc(void* _arg)
 	{
 		Thread* thread = (Thread*)_arg;
+		thread->setThreadName(thread->m_name);
 		union
 		{
 			void* ptr;
@@ -135,6 +136,15 @@ namespace bx
 		m_fn = _fn;
 		m_userData = _userData;
 		m_stackSize = _stackSize;
+
+        if (NULL != _name)
+        {
+            strCopy(m_name, sizeof(m_name), _name);
+        }
+        else
+        {
+            m_name[0] = '\0';
+        }
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
@@ -193,11 +203,6 @@ namespace bx
 
 		m_running = true;
 		m_sem.wait();
-
-		if (NULL != _name)
-		{
-			setThreadName(_name);
-		}
 
 		return true;
 	}
