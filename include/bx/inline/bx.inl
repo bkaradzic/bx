@@ -59,6 +59,52 @@ namespace bx
 		Ty tmp = _a; _a = _b; _b = tmp;
 	}
 
+	template<class Ty>
+	struct IsSignedT { static constexpr bool value = Ty(-1) < Ty(0); };
+
+	template<class Ty, bool SignT = IsSignedT<Ty>::value>
+	struct Limits;
+
+	template<class Ty>
+	struct Limits<Ty, true>
+	{
+		static constexpr Ty max = ( ( (Ty(1) << ( (sizeof(Ty) * 8) - 2) ) - Ty(1) ) << 1) | Ty(1);
+		static constexpr Ty min = -max - Ty(1);
+	};
+
+	template<class Ty>
+	struct Limits<Ty, false>
+	{
+		static constexpr Ty min = 0;
+		static constexpr Ty max = Ty(-1);
+	};
+
+	template<>
+	struct Limits<float, true>
+	{
+		static constexpr float min = -kFloatLargest;
+		static constexpr float max =  kFloatLargest;
+	};
+
+	template<>
+	struct Limits<double, true>
+	{
+		static constexpr double min = -kDoubleLargest;
+		static constexpr double max =  kDoubleLargest;
+	};
+
+	template<typename Ty>
+	inline constexpr Ty max()
+	{
+		return bx::Limits<Ty>::max;
+	}
+
+	template<typename Ty>
+	inline constexpr Ty min()
+	{
+		return bx::Limits<Ty>::min;
+	}
+
 	template<typename Ty>
 	inline constexpr Ty min(const Ty& _a, const Ty& _b)
 	{

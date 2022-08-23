@@ -4,6 +4,7 @@
  */
 
 #include "test.h"
+#include <bx/bx.h>
 #include <bx/sort.h>
 #include <bx/string.h>
 #include <bx/rng.h>
@@ -110,12 +111,12 @@ void compareTest(const Ty& _min, const Ty& _max)
 {
 	REQUIRE(_min < _max);
 
-	REQUIRE(-1 == compareAscendingTest<Ty>(std::numeric_limits<Ty>::min(), std::numeric_limits<Ty>::max() ) );
-	REQUIRE(-1 == compareAscendingTest<Ty>(Ty(0),                          std::numeric_limits<Ty>::max() ) );
-	REQUIRE( 0 == compareAscendingTest<Ty>(std::numeric_limits<Ty>::min(), std::numeric_limits<Ty>::min() ) );
-	REQUIRE( 0 == compareAscendingTest<Ty>(std::numeric_limits<Ty>::max(), std::numeric_limits<Ty>::max() ) );
-	REQUIRE( 1 == compareAscendingTest<Ty>(std::numeric_limits<Ty>::max(), Ty(0)                          ) );
-	REQUIRE( 1 == compareAscendingTest<Ty>(std::numeric_limits<Ty>::max(), std::numeric_limits<Ty>::min() ) );
+	REQUIRE(-1 == compareAscendingTest<Ty>(bx::min<Ty>(), bx::max<Ty>() ) );
+	REQUIRE(-1 == compareAscendingTest<Ty>(Ty(0),         bx::max<Ty>() ) );
+	REQUIRE( 0 == compareAscendingTest<Ty>(bx::min<Ty>(), bx::min<Ty>() ) );
+	REQUIRE( 0 == compareAscendingTest<Ty>(bx::max<Ty>(), bx::max<Ty>() ) );
+	REQUIRE( 1 == compareAscendingTest<Ty>(bx::max<Ty>(), Ty(0)         ) );
+	REQUIRE( 1 == compareAscendingTest<Ty>(bx::max<Ty>(), bx::min<Ty>() ) );
 
 	REQUIRE(-1 == compareAscendingTest<Ty>(_min, _max) );
 	REQUIRE( 0 == compareAscendingTest<Ty>(_min, _min) );
