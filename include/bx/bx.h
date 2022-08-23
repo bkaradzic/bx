@@ -14,6 +14,7 @@
 
 #include "platform.h"
 #include "config.h"
+#include "constants.h"
 #include "macros.h"
 #include "debug.h"
 
@@ -32,12 +33,6 @@
 
 namespace bx
 {
-	/// Used to return successful execution of a program code.
-	constexpr int32_t kExitSuccess = 0;
-
-	/// Used to return unsuccessful execution of a program code.
-	constexpr int32_t kExitFailure = 1;
-
 	/// Returns true if type `Ty` is trivially copyable / POD type.
 	template<class Ty>
 	constexpr bool isTriviallyCopyable();
@@ -56,6 +51,14 @@ namespace bx
 
 	/// Swap memory.
 	void swap(void* _a, void* _b, size_t _numBytes);
+
+	/// Returns numeric minimum of type.
+	template<typename Ty>
+	constexpr Ty min();
+
+	/// Returns numeric maximum of type.
+	template<typename Ty>
+	constexpr Ty max();
 
 	/// Returns minimum of two values.
 	template<typename Ty>
