@@ -54,6 +54,18 @@ namespace bx
 	}
 
 	template<typename Ty>
+	inline Ty* addressOf(void* _ptr, ptrdiff_t _offset)
+	{
+		return (Ty*)( (uint8_t*)_ptr + _offset);
+	}
+
+	template<typename Ty>
+	inline const Ty* addressOf(const void* _ptr, ptrdiff_t _offset)
+	{
+		return (const Ty*)( (const uint8_t*)_ptr + _offset);
+	}
+
+	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
 		Ty tmp = _a; _a = _b; _b = tmp;

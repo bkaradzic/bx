@@ -22,6 +22,10 @@
 #define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
 
 ///
+#define BX_OFFSETOF(_type, _member) \
+	(reinterpret_cast<ptrdiff_t>(&(reinterpret_cast<_type*>(16)->_member) )-ptrdiff_t(16) )
+
+///
 #if BX_COMPILER_MSVC
 #	define BX_IGNORE_C4127(_x) bx::ignoreC4127(!!(_x) )
 #else
@@ -44,6 +48,14 @@ namespace bx
 	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
 	template <class Ty>
 	const Ty* addressOf(const Ty& _a);
+
+	///
+	template<typename Ty>
+	Ty* addressOf(void* _ptr, ptrdiff_t _offset);
+
+	///
+	template<typename Ty>
+	const Ty* addressOf(const void* _ptr, ptrdiff_t _offset);
 
 	/// Swap two values.
 	template<typename Ty>
