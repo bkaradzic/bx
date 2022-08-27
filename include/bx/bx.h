@@ -38,15 +38,15 @@
 namespace bx
 {
 	/// Returns true if type `Ty` is trivially copyable / POD type.
-	template<class Ty>
+	template<typename Ty>
 	constexpr bool isTriviallyCopyable();
 
 	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
-	template <class Ty>
+	template<typename Ty>
 	Ty* addressOf(Ty& _a);
 
 	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
-	template <class Ty>
+	template<typename Ty>
 	const Ty* addressOf(const Ty& _a);
 
 	///

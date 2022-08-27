@@ -27,13 +27,13 @@ namespace bx
 		return _x;
 	}
 
-	template<class Ty>
+	template<typename Ty>
 	inline constexpr bool isTriviallyCopyable()
 	{
 		return __is_trivially_copyable(Ty);
 	}
 
-	template<class Ty>
+	template<typename Ty>
 	inline Ty* addressOf(Ty& _a)
 	{
 		return reinterpret_cast<Ty*>(
@@ -43,7 +43,7 @@ namespace bx
 			);
 	}
 
-	template<class Ty>
+	template<typename Ty>
 	inline const Ty* addressOf(const Ty& _a)
 	{
 		return reinterpret_cast<const Ty*>(
@@ -71,20 +71,20 @@ namespace bx
 		Ty tmp = _a; _a = _b; _b = tmp;
 	}
 
-	template<class Ty>
+	template<typename Ty>
 	struct IsSignedT { static constexpr bool value = Ty(-1) < Ty(0); };
 
-	template<class Ty, bool SignT = IsSignedT<Ty>::value>
+	template<typename Ty, bool SignT = IsSignedT<Ty>::value>
 	struct Limits;
 
-	template<class Ty>
+	template<typename Ty>
 	struct Limits<Ty, true>
 	{
 		static constexpr Ty max = ( ( (Ty(1) << ( (sizeof(Ty) * 8) - 2) ) - Ty(1) ) << 1) | Ty(1);
 		static constexpr Ty min = -max - Ty(1);
 	};
 
-	template<class Ty>
+	template<typename Ty>
 	struct Limits<Ty, false>
 	{
 		static constexpr Ty min = 0;
