@@ -339,36 +339,36 @@ TEST_CASE("quaternion", "")
 
 TEST_CASE("limits", "")
 {
-	STATIC_REQUIRE(bx::Limits<int8_t>::min == INT8_MIN);
-	STATIC_REQUIRE(bx::Limits<int8_t>::max == INT8_MAX);
+	STATIC_REQUIRE(bx::LimitsT<int8_t>::min == INT8_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int8_t>::max == INT8_MAX);
 
-	STATIC_REQUIRE(bx::Limits<signed char>::min == CHAR_MIN);
-	STATIC_REQUIRE(bx::Limits<signed char>::max == CHAR_MAX);
+	STATIC_REQUIRE(bx::LimitsT<signed char>::min == CHAR_MIN);
+	STATIC_REQUIRE(bx::LimitsT<signed char>::max == CHAR_MAX);
 
-	STATIC_REQUIRE(bx::Limits<unsigned char>::min == 0);
-	STATIC_REQUIRE(bx::Limits<unsigned char>::max == UCHAR_MAX);
+	STATIC_REQUIRE(bx::LimitsT<unsigned char>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<unsigned char>::max == UCHAR_MAX);
 
-	STATIC_REQUIRE(bx::Limits<int16_t>::min == INT16_MIN);
-	STATIC_REQUIRE(bx::Limits<int16_t>::max == INT16_MAX);
+	STATIC_REQUIRE(bx::LimitsT<int16_t>::min == INT16_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int16_t>::max == INT16_MAX);
 
-	STATIC_REQUIRE(bx::Limits<uint16_t>::min == 0);
-	STATIC_REQUIRE(bx::Limits<uint16_t>::max == UINT16_MAX);
+	STATIC_REQUIRE(bx::LimitsT<uint16_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint16_t>::max == UINT16_MAX);
 
-	STATIC_REQUIRE(bx::Limits<int32_t>::min == INT32_MIN);
-	STATIC_REQUIRE(bx::Limits<int32_t>::max == INT32_MAX);
+	STATIC_REQUIRE(bx::LimitsT<int32_t>::min == INT32_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int32_t>::max == INT32_MAX);
 
-	STATIC_REQUIRE(bx::Limits<uint32_t>::min == 0);
-	STATIC_REQUIRE(bx::Limits<uint32_t>::max == UINT32_MAX);
+	STATIC_REQUIRE(bx::LimitsT<uint32_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint32_t>::max == UINT32_MAX);
 
-	STATIC_REQUIRE(bx::Limits<int64_t>::min == INT64_MIN);
-	STATIC_REQUIRE(bx::Limits<int64_t>::max == INT64_MAX);
+	STATIC_REQUIRE(bx::LimitsT<int64_t>::min == INT64_MIN);
+	STATIC_REQUIRE(bx::LimitsT<int64_t>::max == INT64_MAX);
 
-	STATIC_REQUIRE(bx::Limits<uint64_t>::min == 0);
-	STATIC_REQUIRE(bx::Limits<uint64_t>::max == UINT64_MAX);
+	STATIC_REQUIRE(bx::LimitsT<uint64_t>::min == 0);
+	STATIC_REQUIRE(bx::LimitsT<uint64_t>::max == UINT64_MAX);
 
-	STATIC_REQUIRE(bx::Limits<float>::min == std::numeric_limits<float>::lowest() );
-	STATIC_REQUIRE(bx::Limits<float>::max == std::numeric_limits<float>::max() );
+	STATIC_REQUIRE(bx::LimitsT<float>::min == std::numeric_limits<float>::lowest() );
+	STATIC_REQUIRE(bx::LimitsT<float>::max == std::numeric_limits<float>::max() );
 
-	STATIC_REQUIRE(bx::Limits<double>::min == std::numeric_limits<double>::lowest() );
-	STATIC_REQUIRE(bx::Limits<double>::max == std::numeric_limits<double>::max() );
+	STATIC_REQUIRE(bx::LimitsT<double>::min == std::numeric_limits<double>::lowest() );
+	STATIC_REQUIRE(bx::LimitsT<double>::max == std::numeric_limits<double>::max() );
 }

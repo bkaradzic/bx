@@ -54,15 +54,15 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline Ty* addressOf(void* _ptr, ptrdiff_t _offset)
+	inline Ty* addressOf(void* _ptr, ptrdiff_t _offsetInBytes)
 	{
-		return (Ty*)( (uint8_t*)_ptr + _offset);
+		return (Ty*)( (uint8_t*)_ptr + _offsetInBytes);
 	}
 
 	template<typename Ty>
-	inline const Ty* addressOf(const void* _ptr, ptrdiff_t _offset)
+	inline const Ty* addressOf(const void* _ptr, ptrdiff_t _offsetInBytes)
 	{
-		return (const Ty*)( (const uint8_t*)_ptr + _offset);
+		return (const Ty*)( (const uint8_t*)_ptr + _offsetInBytes);
 	}
 
 	template<typename Ty>
@@ -72,34 +72,34 @@ namespace bx
 	}
 
 	template<typename Ty>
-	struct IsSignedT { static constexpr bool value = Ty(-1) < Ty(0); };
-
-	template<typename Ty, bool SignT = IsSignedT<Ty>::value>
-	struct Limits;
+	constexpr bool isSigned()
+	{
+		return Ty(-1) < Ty(0);
+	}
 
 	template<typename Ty>
-	struct Limits<Ty, true>
+	struct LimitsT<Ty, true>
 	{
 		static constexpr Ty max = ( ( (Ty(1) << ( (sizeof(Ty) * 8) - 2) ) - Ty(1) ) << 1) | Ty(1);
 		static constexpr Ty min = -max - Ty(1);
 	};
 
 	template<typename Ty>
-	struct Limits<Ty, false>
+	struct LimitsT<Ty, false>
 	{
 		static constexpr Ty min = 0;
 		static constexpr Ty max = Ty(-1);
 	};
 
 	template<>
-	struct Limits<float, true>
+	struct LimitsT<float, true>
 	{
 		static constexpr float min = -kFloatLargest;
 		static constexpr float max =  kFloatLargest;
 	};
 
 	template<>
-	struct Limits<double, true>
+	struct LimitsT<double, true>
 	{
 		static constexpr double min = -kDoubleLargest;
 		static constexpr double max =  kDoubleLargest;
@@ -108,13 +108,13 @@ namespace bx
 	template<typename Ty>
 	inline constexpr Ty max()
 	{
-		return bx::Limits<Ty>::max;
+		return bx::LimitsT<Ty>::max;
 	}
 
 	template<typename Ty>
 	inline constexpr Ty min()
 	{
-		return bx::Limits<Ty>::min;
+		return bx::LimitsT<Ty>::min;
 	}
 
 	template<typename Ty>

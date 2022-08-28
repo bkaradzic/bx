@@ -41,6 +41,14 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isTriviallyCopyable();
 
+	/// Returns true if type `Ty` is signed type.
+	template<typename Ty>
+	constexpr bool isSigned();
+
+	/// Arithmetic type `Ty` limits.
+	template<typename Ty, bool SignT = isSigned<Ty>()>
+	struct LimitsT;
+
 	/// Find the address of an object of a class that has an overloaded unary ampersand (&) operator.
 	template<typename Ty>
 	Ty* addressOf(Ty& _a);
@@ -49,13 +57,25 @@ namespace bx
 	template<typename Ty>
 	const Ty* addressOf(const Ty& _a);
 
+	/// Returns typed pointer from typeless pointer offseted.
+	///
+	/// @param[in] _ptr Pointer to get offset from.
+	/// @param[in] _offsetInBytes Offset from pointer in bytes.
+	///
+	/// @returns Typed pointer from typeless pointer offseted.
 	///
 	template<typename Ty>
-	Ty* addressOf(void* _ptr, ptrdiff_t _offset);
+	Ty* addressOf(void* _ptr, ptrdiff_t _offsetInBytes = 0);
 
+	/// Returns typed pointer from typeless pointer offseted.
+	///
+	/// @param[in] _ptr Pointer to get offset from.
+	/// @param[in] _offsetInBytes Offset from pointer in bytes.
+	///
+	/// @returns Typed pointer from typeless pointer offseted.
 	///
 	template<typename Ty>
-	const Ty* addressOf(const void* _ptr, ptrdiff_t _offset);
+	const Ty* addressOf(const void* _ptr, ptrdiff_t _offsetInBytes = 0);
 
 	/// Swap two values.
 	template<typename Ty>

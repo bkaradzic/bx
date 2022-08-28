@@ -406,18 +406,18 @@ namespace bx
 		memCopy(_ptr, &_a, sizeof(Ty) );
 	}
 
-	inline Vec3::Vec3(init::NoneType)
+	inline Vec3::Vec3(init::NoneTag)
 	{
 	}
 
-	constexpr Vec3::Vec3(init::ZeroType)
+	constexpr Vec3::Vec3(init::ZeroTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
 	{
 	}
 
-	constexpr Vec3::Vec3(init::IdentityType)
+	constexpr Vec3::Vec3(init::IdentityTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
@@ -438,18 +438,18 @@ namespace bx
 	{
 	}
 
-	inline Plane::Plane(init::NoneType)
+	inline Plane::Plane(init::NoneTag)
 		: normal(init::None)
 	{
 	}
 
-	constexpr Plane::Plane(init::ZeroType)
+	constexpr Plane::Plane(init::ZeroTag)
 		: normal(init::Zero)
 		, dist(0.0f)
 	{
 	}
 
-	constexpr Plane::Plane(init::IdentityType)
+	constexpr Plane::Plane(init::IdentityTag)
 		: normal(0.0f, 1.0f, 0.0f)
 		, dist(0.0f)
 	{
@@ -461,11 +461,11 @@ namespace bx
 	{
 	}
 
-	inline Quaternion::Quaternion(init::NoneType)
+	inline Quaternion::Quaternion(init::NoneTag)
 	{
 	}
 
-	constexpr Quaternion::Quaternion(init::ZeroType)
+	constexpr Quaternion::Quaternion(init::ZeroTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
@@ -473,7 +473,7 @@ namespace bx
 	{
 	}
 
-	constexpr Quaternion::Quaternion(init::IdentityType)
+	constexpr Quaternion::Quaternion(init::IdentityTag)
 		: x(0.0f)
 		, y(0.0f)
 		, z(0.0f)
