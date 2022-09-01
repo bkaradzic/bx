@@ -28,18 +28,6 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline constexpr bool isTriviallyCopyable()
-	{
-		return __is_trivially_copyable(Ty);
-	}
-
-	template<typename Ty>
-	constexpr bool isSigned()
-	{
-		return Ty(-1) < Ty(0);
-	}
-
-	template<typename Ty>
 	inline Ty* addressOf(Ty& _a)
 	{
 		return reinterpret_cast<Ty*>(
@@ -74,7 +62,7 @@ namespace bx
 	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
-		Ty tmp = _a; _a = _b; _b = tmp;
+		Ty tmp = move(_a); _a = move(_b); _b = move(tmp);
 	}
 
 	template<typename Ty>

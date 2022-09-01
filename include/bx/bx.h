@@ -17,6 +17,7 @@
 #include "constants.h"
 #include "macros.h"
 #include "debug.h"
+#include "typetraits.h"
 
 ///
 #define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
@@ -37,14 +38,6 @@
 
 namespace bx
 {
-	/// Returns true if type `Ty` is trivially copyable / POD type.
-	template<typename Ty>
-	constexpr bool isTriviallyCopyable();
-
-	/// Returns true if type `Ty` is signed type.
-	template<typename Ty>
-	constexpr bool isSigned();
-
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;
