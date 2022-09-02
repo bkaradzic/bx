@@ -275,6 +275,11 @@ namespace bx
 	template<typename Ty>
 	constexpr Ty&& forward(RemoveReferenceT<Ty>&& _type);
 
+	/// Converts any type `Ty` to a reference type, making it possible to use member functions
+	/// in decltype expressions without the need to go through constructors.
+	template<typename Ty>
+	AddRvalueReferenceType<Ty> declVal();
+
 } // namespace bx
 
 #endif // BX_TYPETRAITS_H_HEADER_GUARD
