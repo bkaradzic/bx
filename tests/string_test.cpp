@@ -16,7 +16,7 @@ TEST_CASE("stringPrintfTy", "")
 {
 	std::string test;
 	bx::stringPrintf(test, "printf into std::string.");
-	REQUIRE(0 == bx::strCmp(bx::StringView(test), "printf into std::string.") );
+	REQUIRE(0 == bx::strCmp(bx::StringView(test.data(), int32_t(test.length() ) ), "printf into std::string.") );
 }
 
 TEST_CASE("prettify", "")

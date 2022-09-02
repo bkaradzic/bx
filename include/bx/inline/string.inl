@@ -75,19 +75,9 @@ namespace bx
 		return *this;
 	}
 
-	inline StringView::StringView(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
-	}
-
 	inline StringView::StringView(const char* _ptr)
 	{
 		set(_ptr, INT32_MAX);
-	}
-
-	inline StringView::StringView(char* _ptr, int32_t _len)
-	{
-		set(_ptr, _len);
 	}
 
 	inline StringView::StringView(const char* _ptr, int32_t _len)
@@ -98,17 +88,6 @@ namespace bx
 	inline StringView::StringView(const char* _ptr, const char* _term)
 	{
 		set(_ptr, _term);
-	}
-
-	template<typename Ty>
-	inline StringView::StringView(const Ty& _container)
-	{
-		set(_container);
-	}
-
-	inline void StringView::set(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
 	}
 
 	inline void StringView::set(const char* _ptr)
@@ -131,12 +110,6 @@ namespace bx
 	inline void StringView::set(const char* _ptr, const char* _term)
 	{
 		set(_ptr, int32_t(_term-_ptr) );
-	}
-
-	template<typename Ty>
-	inline void StringView::set(const Ty& _container)
-	{
-		set(_container.data(), int32_t(_container.length() ) );
 	}
 
 	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)
