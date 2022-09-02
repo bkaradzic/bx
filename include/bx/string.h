@@ -310,10 +310,6 @@ namespace bx
 	template <typename Ty>
 	void stringPrintf(Ty& _out, const char* _format, ...);
 
-	/// Replace all instances of substring.
-	template <typename Ty>
-	Ty replaceAll(const Ty& _str, const char* _from, const char* _to);
-
 	/// Convert size in bytes to human readable string kibi units.
 	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units = Units::Kibi);
 

@@ -37,22 +37,6 @@ namespace bx
 		va_end(argList);
 	}
 
-	template <typename Ty>
-	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
-	{
-		Ty str = _str;
-		typename Ty::size_type startPos = 0;
-		const typename Ty::size_type fromLen = strLen(_from);
-		const typename Ty::size_type toLen   = strLen(_to);
-		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
-		{
-			str.replace(startPos, fromLen, _to);
-			startPos += toLen;
-		}
-
-		return str;
-	}
-
 	inline StringView::StringView()
 	{
 		clear();
