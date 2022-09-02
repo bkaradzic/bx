@@ -35,13 +35,13 @@ namespace bx
 	template<typename Ty>  using TypeIdentityType = typename TypeIdentityT<Ty>::Type;
 
 	//---
-	template<bool BoolT, typename Ty, typename Uy> struct ConditionalT                { using type = Ty; };
-	template<            typename Ty, typename Uy> struct ConditionalT<false, Ty, Uy> { using type = Uy; };
+	template<bool BoolT, typename Ty, typename Uy> struct ConditionalT                { using Type = Ty; };
+	template<            typename Ty, typename Uy> struct ConditionalT<false, Ty, Uy> { using Type = Uy; };
 	template<bool BoolT, typename Ty, typename Uy>  using ConditionalType = typename ConditionalT<BoolT, Ty, Uy>::Type;
 
 	//---
 	template<bool BoolT, typename Ty = void> struct EnableIfT           {                  };
-	template<            typename Ty       > struct EnableIfT<true, Ty> { using type = Ty; };
+	template<            typename Ty       > struct EnableIfT<true, Ty> { using Type = Ty; };
 	template<bool BoolT, typename Ty       >  using EnableIfType = typename EnableIfT<BoolT, Ty>::Type;
 
 	//---
