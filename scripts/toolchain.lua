@@ -1014,7 +1014,6 @@ function toolchain(_buildDir, _libDir)
 			"-arch arm64",
 			"-Wno-error=unused-command-line-argument",
 			"-Wno-unused-command-line-argument",
-			"-Wno-unused-private-field",
 		}
 
 	configuration { "osx*" }
@@ -1033,7 +1032,6 @@ function toolchain(_buildDir, _libDir)
 			"-Wfatal-errors",
 			"-Wunused-value",
 			"-Wundef",
-			"-Wno-unused-private-field",
 		}
 		includedirs { path.join(bxDir, "include/compat/ios") }
 
