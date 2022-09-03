@@ -438,19 +438,4 @@
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
 
-#if defined(__cplusplus)
-#	if __cplusplus < 201402L
-#		error "C++14 standard support is required to build."
-#	elif __cplusplus < 201703L
-#		define BX_CPP_NAME "C++14"
-#	elif __cplusplus < 201704L
-#		define BX_CPP_NAME "C++17"
-#	else
-// See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
-#		define BX_CPP_NAME "C++WayTooModern"
-#	endif // BX_CPP_NAME
-#else
-#	define BX_CPP_NAME "C++Unknown"
-#endif // defined(__cplusplus)
-
 #endif // BX_PLATFORM_H_HEADER_GUARD
