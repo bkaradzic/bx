@@ -284,7 +284,7 @@ namespace bx
 	template<typename Ty>
 	inline constexpr bool isMoveConstructible()
 	{
-		return isConstructible<Ty>();
+		return isConstructible<Ty, AddRvalueReferenceType<Ty>>();
 	}
 
 	template<typename Ty, typename... ArgsT>
