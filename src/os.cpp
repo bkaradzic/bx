@@ -191,6 +191,11 @@ namespace bx
 
 	void dlclose(void* _handle)
 	{
+		if (NULL == _handle)
+		{
+			return;
+		}
+
 #if BX_PLATFORM_WINDOWS
 		::FreeLibrary( (HMODULE)_handle);
 #elif  BX_PLATFORM_EMSCRIPTEN \
