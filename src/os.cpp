@@ -185,7 +185,9 @@ namespace bx
 		BX_UNUSED(_filePath);
 		return NULL;
 #else
-		return ::dlopen(_filePath.getCPtr(), RTLD_LOCAL|RTLD_LAZY);
+		void* so = ::dlopen(_filePath.getCPtr(), RTLD_LOCAL|RTLD_LAZY);
+		BX_WARN(NULL != so, "dlopen failed: \"%s\".", ::dlerror() );
+		return so;
 #endif // BX_PLATFORM_
 	}
 
