@@ -700,7 +700,8 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions { "-m64" }
 
-	configuration { "linux-clang" }
+	configuration { "linux-*" }
+		includedirs { path.join(bxDir, "include/compat/linux") }
 
 	configuration { "linux-gcc-6" }
 		buildoptions {
