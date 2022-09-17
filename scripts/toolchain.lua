@@ -185,9 +185,11 @@ function toolchain(_buildDir, _libDir)
 		tvosPlatform = _OPTIONS["with-tvos"]
 	end
 
-	local windowsPlatform = string.gsub(os.getenv("WindowsSDKVersion") or "8.1", "\\", "")
+	local windowsPlatform = nil
 	if _OPTIONS["with-windows"] then
 		windowsPlatform = _OPTIONS["with-windows"]
+	elseif nil ~= os.getenv("WindowsSDKVersion") then
+		windowsPlatform = string.gsub(os.getenv("WindowsSDKVersion"), "\\", "")
 	end
 
 	local compiler32bit = false
@@ -411,8 +413,10 @@ function toolchain(_buildDir, _libDir)
 		then
 
 		local action = premake.action.current()
-		action.vstudio.windowsTargetPlatformVersion    = windowsPlatform
-		action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
+		if nil ~= windowsPlatform then
+			action.vstudio.windowsTargetPlatformVersion    = windowsPlatform
+			action.vstudio.windowsTargetPlatformMinVersion = windowsPlatform
+		end
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			if "vs2017-clang" == _OPTIONS["vs"] then
