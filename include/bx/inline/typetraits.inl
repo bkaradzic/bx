@@ -142,7 +142,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	constexpr bool isEnum()
+	inline constexpr bool isEnum()
 	{
 		return __is_enum(Ty);
 	}
@@ -441,7 +441,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	constexpr RemoveReferenceType<Ty>&& move(Ty&& _a)
+	inline constexpr RemoveReferenceType<Ty>&& move(Ty&& _a)
 	{
 		return static_cast<RemoveReferenceType<Ty>&&>(_a);
 	}
