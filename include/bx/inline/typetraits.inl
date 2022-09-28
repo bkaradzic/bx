@@ -144,37 +144,37 @@ namespace bx
 	template<typename Ty>
 	inline constexpr bool isEnum()
 	{
-		return __is_enum(Ty);
+		return !!__is_enum(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isUnion()
 	{
-		return __is_union(Ty);
+		return !!__is_union(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isAbstract()
 	{
-		return __is_abstract(Ty);
+		return !!__is_abstract(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isAggregate()
 	{
-		return __is_aggregate(Ty);
+		return !!__is_aggregate(Ty);
 	}
 
 	template<typename BaseT, typename DerivedT>
 	inline constexpr bool isBaseOf()
 	{
-		return __is_base_of(BaseT, DerivedT);
+		return !!__is_base_of(BaseT, DerivedT);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isPolymorphic()
 	{
-		return __is_polymorphic(Ty);
+		return !!__is_polymorphic(Ty);
 	}
 
 	template<typename Ty>
@@ -186,31 +186,31 @@ namespace bx
 	template<typename Ty>
 	inline constexpr bool isClass()
 	{
-		return __is_class(Ty);
+		return !!__is_class(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isFinal()
 	{
-		return __is_final(Ty);
+		return !!__is_final(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isEmpty()
 	{
-		return __is_empty(Ty);
+		return !!__is_empty(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isStandardLayout()
 	{
-		return __is_standard_layout(Ty);
+		return !!__is_standard_layout(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTrivial()
 	{
-		return __is_trivial(Ty);
+		return !!__is_trivial(Ty);
 	}
 
 	template<typename Ty>
@@ -224,7 +224,7 @@ namespace bx
 	template<typename Ty, typename FromT>
 	inline constexpr bool isAssignable()
 	{
-		return __is_assignable(Ty, FromT);
+		return !!__is_assignable(Ty, FromT);
 	}
 
 	template<typename Ty>
@@ -248,7 +248,7 @@ namespace bx
 	template<typename Ty, typename FromT>
 	inline constexpr bool isTriviallyAssignable()
 	{
-		return __is_trivially_assignable(Ty, FromT);
+		return !!__is_trivially_assignable(Ty, FromT);
 	}
 
 	template<typename Ty>
@@ -272,7 +272,7 @@ namespace bx
 	template<typename Ty, typename... ArgsT>
 	inline constexpr bool isConstructible()
 	{
-		return __is_constructible(Ty, ArgsT...);
+		return !!__is_constructible(Ty, ArgsT...);
 	}
 
 	template<typename Ty>
@@ -290,7 +290,7 @@ namespace bx
 	template<typename Ty, typename... ArgsT>
 	inline constexpr bool isTriviallyConstructible()
 	{
-		return __is_trivially_constructible(Ty, ArgsT...);
+		return !!__is_trivially_constructible(Ty, ArgsT...);
 	}
 
 	template<typename Ty>
@@ -308,16 +308,16 @@ namespace bx
 	template<typename Ty>
 	inline constexpr bool isTriviallyCopyable()
 	{
-		return __is_trivially_copyable(Ty);
+		return !!__is_trivially_copyable(Ty);
 	}
 
 	template<typename Ty>
 	inline constexpr bool isTriviallyDestructible()
 	{
 #if BX_COMPILER_GCC
-		return __has_trivial_destructor(Ty);
+		return !!__has_trivial_destructor(Ty);
 #else
-		return __is_trivially_destructible(Ty);
+		return !!__is_trivially_destructible(Ty);
 #endif // BX_COMPILER_GCC
 	}
 

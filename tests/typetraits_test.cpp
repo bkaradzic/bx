@@ -655,3 +655,34 @@ TEST_CASE("type-traits isBaseOf", "")
 	STATIC_REQUIRE(!bx::isBaseOf<TestClassDerivedB, TestClassDerivedX >() );
 	STATIC_REQUIRE(!bx::isBaseOf<int32_t,           int32_t           >() );
 }
+
+TEST_CASE("type-traits isAggregate", "")
+{
+	STATIC_REQUIRE( bx::isAggregate<TestClass              >() );
+	STATIC_REQUIRE( bx::isAggregate<TestClassFinal         >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassCtor          >() );
+	STATIC_REQUIRE( bx::isAggregate<TestClassMember        >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassMemberPrivate >() );
+	STATIC_REQUIRE( bx::isAggregate<TestClassStaticOnly    >() );
+#if __cplusplus < BX_LANGUAGE_CPP20
+	STATIC_REQUIRE( bx::isAggregate<TestClassDefaultCtor   >() );
+#else
+	STATIC_REQUIRE(!bx::isAggregate<TestClassDefaultCtor   >() );
+#endif
+	STATIC_REQUIRE( bx::isAggregate<TestClassDefaultDtor   >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassVirtualDtor   >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassAbstractBase  >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassPolymorphic   >() );
+#if __cplusplus < BX_LANGUAGE_CPP17
+	STATIC_REQUIRE(!bx::isAggregate<TestClassDerivedA      >() );
+	STATIC_REQUIRE(!bx::isAggregate<TestClassDerivedB      >() );
+#else
+	STATIC_REQUIRE( bx::isAggregate<TestClassDerivedA      >() );
+	STATIC_REQUIRE( bx::isAggregate<TestClassDerivedB      >() );
+#endif
+	STATIC_REQUIRE(!bx::isAggregate<TestClassDerivedX      >() );
+	STATIC_REQUIRE( bx::isAggregate<TestUnion              >() );
+	STATIC_REQUIRE( bx::isAggregate<TestUnionEmpty         >() );
+	STATIC_REQUIRE( bx::isAggregate<TestUnion[]            >() );
+	STATIC_REQUIRE( bx::isAggregate<int32_t[]              >() );
+}
