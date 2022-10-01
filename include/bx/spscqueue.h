@@ -18,7 +18,6 @@ namespace bx
 		BX_CLASS(SpScUnboundedQueue
 			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
@@ -60,7 +59,6 @@ namespace bx
 		BX_CLASS(SpScUnboundedQueueT
 			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
@@ -90,7 +88,6 @@ namespace bx
 		BX_CLASS(SpScBlockingUnboundedQueue
 			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
@@ -121,7 +118,6 @@ namespace bx
 		BX_CLASS(SpScBlockingUnboundedQueueT
 			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
