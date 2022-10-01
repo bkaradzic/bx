@@ -15,7 +15,7 @@ namespace bx
 	{
 		BX_CLASS(Mutex
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
@@ -41,7 +41,7 @@ namespace bx
 		BX_CLASS(MutexScope
 			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:

@@ -15,6 +15,14 @@ namespace bx
 	template<typename Ty, size_t NumT>
 	char (&CountOfRequireArrayArgumentT(const Ty (&)[NumT]) )[NumT];
 
+	struct Ignore
+	{
+		template <typename Ty>
+		constexpr void operator=(Ty&&) const
+		{
+		}
+	};
+
 	template<bool B>
 	struct isEnabled
 	{
@@ -148,3 +156,5 @@ namespace bx
 	}
 
 } // namespace bx
+
+constexpr bx::Ignore _;

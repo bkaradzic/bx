@@ -199,13 +199,13 @@
 
 ///
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
-	private: _class()
+	_class() = delete
 
 #define BX_CLASS_NO_COPY(_class) \
-	private: _class(const _class& _rhs)
+	_class(const _class& _rhs) = delete
 
-#define BX_CLASS_NO_ASSIGNMENT(_class) \
-	private: _class& operator=(const _class& _rhs)
+#define BX_CLASS_NO_COPY_ASSIGNMENT(_class) \
+	_class& operator=(const _class& _rhs) = delete
 
 #define BX_CLASS_ALLOCATOR(_class)              \
 	public: void* operator new(size_t _size);   \

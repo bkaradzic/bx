@@ -21,7 +21,7 @@
 	|| BX_PLATFORM_IOS     \
 	|| BX_PLATFORM_OSX     \
 	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI	   \
+	|| BX_PLATFORM_RPI     \
 	|| BX_PLATFORM_NX
 #	include <pthread.h>
 #	if BX_PLATFORM_BSD

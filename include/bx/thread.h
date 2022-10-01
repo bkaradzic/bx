@@ -21,7 +21,7 @@ namespace bx
 	{
 		BX_CLASS(Thread
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:

@@ -17,8 +17,9 @@ namespace bx
 	class MpScUnboundedQueueT
 	{
 		BX_CLASS(MpScUnboundedQueueT
+			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
@@ -47,8 +48,9 @@ namespace bx
 	class MpScUnboundedBlockingQueue
 	{
 		BX_CLASS(MpScUnboundedBlockingQueue
+			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:

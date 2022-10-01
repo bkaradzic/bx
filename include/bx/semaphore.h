@@ -15,7 +15,7 @@ namespace bx
 	{
 		BX_CLASS(Semaphore
 			, NO_COPY
-			, NO_ASSIGNMENT
+			, NO_COPY_ASSIGNMENT
 			);
 
 	public:
