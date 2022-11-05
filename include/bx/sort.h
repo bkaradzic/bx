@@ -43,7 +43,7 @@ namespace bx
 
 	/// Performs sort (Quick Sort algorithm).
 	///
-	/// @param _data Pointer to sorted array data.
+	/// @param _data Pointer to array data.
 	/// @param _num Number of elements.
 	/// @param _stride Element stride in bytes.
 	/// @param _fn Comparison function.
@@ -57,22 +57,65 @@ namespace bx
 
 	/// Performs sort (Quick Sort algorithm).
 	///
-	/// @param _data Pointer to sorted array data.
-	/// @param _num Number of elements.
-	/// @param _fn Comparison function.
-	///
-	template<typename Ty>
-	void quickSort(Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
-
-	/// Performs sort (Quick Sort algorithm).
-	///
-	/// @param _data Pointer to sorted array data.
+	/// @param _data Pointer to array data.
 	/// @param _num Number of elements.
 	/// @param _stride Element stride in bytes.
 	/// @param _fn Comparison function.
 	///
 	template<typename Ty>
 	void quickSort(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn = compareAscending<Ty>);
+
+	/// Performs sort (Quick Sort algorithm).
+	///
+	/// @param _data Pointer to array data.
+	/// @param _num Number of elements.
+	/// @param _fn Comparison function.
+	///
+	template<typename Ty>
+	void quickSort(Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
+
+	/// Performs reordering of duplicate elements in the array in the way that unique elements
+	/// are sorted to the front of array, and duplicates are after the return value index.
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _stride Element stride in bytes.
+	/// @param _fn Comparison function.
+	///
+	/// @remarks Array must be sorted!
+	///
+	/// @returns Returns the count of unique elements.
+	///
+	uint32_t unique(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn);
+
+	/// Performs reordering of duplicate elements in the array in the way that unique elements
+	/// are sorted to the front of array, and duplicates are after the return value index.
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _stride Element stride in bytes.
+	/// @param _fn Comparison function.
+	///
+	/// @remarks Array must be sorted!
+	///
+	/// @returns Returns the count of unique elements.
+	///
+	template<typename Ty>
+	uint32_t unique(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn = compareAscending<Ty>);
+
+	/// Performs reordering of duplicate elements in the array in the way that unique elements
+	/// are sorted to the front of array, and duplicates are after the return value index.
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _fn Comparison function.
+	///
+	/// @remarks Array must be sorted!
+	///
+	/// @returns Returns the count of unique elements.
+	///
+	template<typename Ty>
+	uint32_t unique(Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
 
 	/// Performs check if array is sorted.
 	///
@@ -94,17 +137,6 @@ namespace bx
 	///
 	/// @param _data Pointer to sorted array data.
 	/// @param _num Number of elements.
-	/// @param _fn Comparison function.
-	///
-	/// @returns Returns `true` if array is sorted, otherwise returns `false`.
-	///
-	template<typename Ty>
-	bool isSorted(const Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
-
-	/// Performs check if array is sorted.
-	///
-	/// @param _data Pointer to sorted array data.
-	/// @param _num Number of elements.
 	/// @param _stride Element stride in bytes.
 	/// @param _fn Comparison function.
 	///
@@ -112,6 +144,17 @@ namespace bx
 	///
 	template<typename Ty>
 	bool isSorted(const void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn = compareAscending<Ty>);
+
+	/// Performs check if array is sorted.
+	///
+	/// @param _data Pointer to sorted array data.
+	/// @param _num Number of elements.
+	/// @param _fn Comparison function.
+	///
+	/// @returns Returns `true` if array is sorted, otherwise returns `false`.
+	///
+	template<typename Ty>
+	bool isSorted(const Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
 
 	/// Returns an index to the first element greater or equal than the `_key` value.
 	///
@@ -209,7 +252,8 @@ namespace bx
 	///
 	/// @remarks Array must be sorted!
 	///
-	/// @returns Returns index of element or -1 if the key is not found in sorted array.
+	/// @returns Returns positive value index of element if found, or negative number that is bitwise
+	///   complement (~) of the index of the next element that's larger than item.
 	///
 	int32_t binarySearch(
 		  const void* _key
@@ -228,7 +272,8 @@ namespace bx
 	///
 	/// @remarks Array must be sorted!
 	///
-	/// @returns Returns index of element or -1 if the key is not found in sorted array.
+	/// @returns Returns positive value index of element if found, or negative number that is bitwise
+	///   complement (~) of the index of the next element that's larger than item.
 	///
 	template<typename Ty>
 	int32_t binarySearch(const Ty& _key, const Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
@@ -243,7 +288,8 @@ namespace bx
 	///
 	/// @remarks Array must be sorted!
 	///
-	/// @returns Returns index of element or -1 if the key is not found in sorted array.
+	/// @returns Returns positive value index of element if found, or negative number that is bitwise
+	///   complement (~) of the index of the next element that's larger than item.
 	///
 	template<typename Ty>
 	int32_t binarySearch(const Ty& _key, const void* _data, uint32_t _num, uint32_t _stride = sizeof(Ty), const ComparisonFn _fn = compareAscending<Ty>);

@@ -17,6 +17,7 @@
 #include "constants.h"
 #include "macros.h"
 #include "debug.h"
+#include "typetraits.h"
 
 ///
 #define BX_COUNTOF(_x) sizeof(bx::CountOfRequireArrayArgumentT(_x) )
@@ -37,14 +38,6 @@
 
 namespace bx
 {
-	/// Returns true if type `Ty` is trivially copyable / POD type.
-	template<typename Ty>
-	constexpr bool isTriviallyCopyable();
-
-	/// Returns true if type `Ty` is signed type.
-	template<typename Ty>
-	constexpr bool isSigned();
-
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>
 	struct LimitsT;
@@ -94,27 +87,27 @@ namespace bx
 
 	/// Returns minimum of two values.
 	template<typename Ty>
-	constexpr Ty min(const Ty& _a, const Ty& _b);
+	constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b);
 
 	/// Returns maximum of two values.
 	template<typename Ty>
-	constexpr Ty max(const Ty& _a, const Ty& _b);
+	constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b);
 
 	/// Returns minimum of three or more values.
 	template<typename Ty, typename... Args>
-	constexpr Ty min(const Ty& _a, const Ty& _b, const Args&... _args);
+	constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
 	/// Returns maximum of three or more values.
 	template<typename Ty, typename... Args>
-	constexpr Ty max(const Ty& _a, const Ty& _b, const Args&... _args);
+	constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
 	/// Returns middle of three or more values.
 	template<typename Ty, typename... Args>
-	constexpr Ty mid(const Ty& _a, const Ty& _b, const Args&... _args);
+	constexpr Ty mid(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args);
 
 	/// Returns clamped value between min/max.
 	template<typename Ty>
-	constexpr Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max);
+	constexpr Ty clamp(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max);
 
 	/// Returns true if value `_a` is power of 2.
 	template<typename Ty>

@@ -28,18 +28,6 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline constexpr bool isTriviallyCopyable()
-	{
-		return __is_trivially_copyable(Ty);
-	}
-
-	template<typename Ty>
-	constexpr bool isSigned()
-	{
-		return Ty(-1) < Ty(0);
-	}
-
-	template<typename Ty>
 	inline Ty* addressOf(Ty& _a)
 	{
 		return reinterpret_cast<Ty*>(
@@ -74,7 +62,7 @@ namespace bx
 	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
-		Ty tmp = _a; _a = _b; _b = tmp;
+		Ty tmp = move(_a); _a = move(_b); _b = move(tmp);
 	}
 
 	template<typename Ty>
@@ -118,37 +106,37 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline constexpr Ty min(const Ty& _a, const Ty& _b)
+	inline constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b)
 	{
 		return _a < _b ? _a : _b;
 	}
 
 	template<typename Ty>
-	inline constexpr Ty max(const Ty& _a, const Ty& _b)
+	inline constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b)
 	{
 		return _a > _b ? _a : _b;
 	}
 
 	template<typename Ty, typename... Args>
-	inline constexpr Ty min(const Ty& _a, const Ty& _b, const Args&... _args)
+	inline constexpr Ty min(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args)
 	{
 		return min(min(_a, _b), _args...);
 	}
 
 	template<typename Ty, typename... Args>
-	inline constexpr Ty max(const Ty& _a, const Ty& _b, const Args&... _args)
+	inline constexpr Ty max(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args)
 	{
 		return max(max(_a, _b), _args...);
 	}
 
 	template<typename Ty, typename... Args>
-	inline constexpr Ty mid(const Ty& _a, const Ty& _b, const Args&... _args)
+	inline constexpr Ty mid(const Ty& _a, const TypeIdentityType<Ty>& _b, const Args&... _args)
 	{
 		return max(min(_a, _b), min(max(_a, _b), _args...) );
 	}
 
 	template<typename Ty>
-	inline constexpr Ty clamp(const Ty& _a, const Ty& _min, const Ty& _max)
+	inline constexpr Ty clamp(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max)
 	{
 		return max(min(_a, _max), _min);
 	}

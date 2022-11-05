@@ -197,16 +197,24 @@
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(_x)
 #endif // BX_COMPILER_
 
-///
+/// No default constructor.
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
-	private: _class()
+	_class() = delete
 
-#define BX_CLASS_NO_COPY(_class) \
-	private: _class(const _class& _rhs)
+/// No copy constructor.
+#define BX_CLASS_NO_COPY_CTOR(_class) \
+	_class(const _class& _rhs) = delete
 
-#define BX_CLASS_NO_ASSIGNMENT(_class) \
-	private: _class& operator=(const _class& _rhs)
+/// No copy assignment operator.
+#define BX_CLASS_NO_COPY_ASSIGNMENT(_class) \
+	_class& operator=(const _class& _rhs) = delete
 
+/// No copy construcor, and copy assignment operator.
+#define BX_CLASS_NO_COPY(_class)   \
+	BX_CLASS_NO_COPY_CTOR(_class); \
+	BX_CLASS_NO_COPY_ASSIGNMENT(_class)
+
+///
 #define BX_CLASS_ALLOCATOR(_class)              \
 	public: void* operator new(size_t _size);   \
 	public: void  operator delete(void* _ptr);  \

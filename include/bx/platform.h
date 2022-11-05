@@ -41,6 +41,12 @@
 #	define BX_CRT_NONE 0
 #endif // BX_CRT_NONE
 
+// Language standard version
+#define BX_LANGUAGE_CPP14 201402L
+#define BX_LANGUAGE_CPP17 201703L
+#define BX_LANGUAGE_CPP20 202002L
+#define BX_LANGUAGE_CPP23 202207L
+
 // Platform
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_BSD        0
@@ -437,5 +443,22 @@
 #elif BX_ARCH_64BIT
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
+
+//#if defined(__cplusplus)
+//#	if   __cplusplus < BX_LANGUAGE_CPP14
+//#		error "C++14 standard support is required to build."
+//#	elif __cplusplus < BX_LANGUAGE_CPP17
+//#		define BX_CPP_NAME "C++14"
+//#	elif __cplusplus < BX_LANGUAGE_CPP20
+//#		define BX_CPP_NAME "C++17"
+//#	elif __cplusplus < BX_LANGUAGE_CPP23
+//#		define BX_CPP_NAME "C++20"
+//#	else
+//// See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
+//#		define BX_CPP_NAME "C++WayTooModern"
+//#	endif // BX_CPP_NAME
+//#else
+//#	define BX_CPP_NAME "C++Unknown"
+//#endif // defined(__cplusplus)
 
 #endif // BX_PLATFORM_H_HEADER_GUARD

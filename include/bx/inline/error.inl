@@ -101,6 +101,7 @@ namespace bx
 		: m_err(_err)
 		, m_name(_name)
 	{
+		BX_UNUSED(m_err);
 		BX_ASSERT(NULL != _err, "_err can't be NULL");
 	}
 

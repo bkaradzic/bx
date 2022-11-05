@@ -38,7 +38,6 @@ namespace bx
 	{
 		BX_CLASS(Error
 			, NO_COPY
-			, NO_ASSIGNMENT
 			);
 
 	public:
@@ -105,8 +104,8 @@ namespace bx
 	class ErrorScope
 	{
 		BX_CLASS(ErrorScope
+			, NO_DEFAULT_CTOR
 			, NO_COPY
-			, NO_ASSIGNMENT
 			);
 
 	public:

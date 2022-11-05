@@ -9,7 +9,7 @@
 #include <bx/string.h>
 #include <bx/rng.h>
 
-TEST_CASE("quickSort", "")
+TEST_CASE("sort-quickSort", "")
 {
 	const char* str[] =
 	{
@@ -37,12 +37,12 @@ TEST_CASE("quickSort", "")
 		return bx::strCmp(lhs, rhs);
 	};
 
-	REQUIRE(-1 == bx::binarySearch("sljiva", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
+	REQUIRE(~4 == bx::binarySearch("sljiva", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 0 == bx::binarySearch("jabuka", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 1 == bx::binarySearch("jagoda", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 2 == bx::binarySearch("kruska", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 3 == bx::binarySearch("malina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
-	REQUIRE(-1 == bx::binarySearch("kupina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
+	REQUIRE(~3 == bx::binarySearch("kupina", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 
 	REQUIRE( 0 == bx::lowerBound("jabuka", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
 	REQUIRE( 1 == bx::upperBound("jabuka", str, BX_COUNTOF(str), sizeof(str[0]), bsearchStrCmpFn) );
@@ -75,7 +75,28 @@ TEST_CASE("quickSort", "")
 	REQUIRE(bx::isSorted(byte, BX_COUNTOF(byte) ) );
 }
 
-TEST_CASE("lower/upperBound int32_t", "")
+TEST_CASE("sort-unique", "")
+{
+	//                   0    1    2    3    4    5    6    7    8    9   10   11   12   13 | 14
+	int32_t test[] = { 100, 101, 101, 101, 103, 104, 105, 105, 105, 106, 106, 107, 108, 109 };
+	REQUIRE(bx::isSorted(test, BX_COUNTOF(test) ) );
+
+	REQUIRE(0 == bx::unique(test, 0) );
+	REQUIRE(1 == bx::unique(test, 1) );
+
+	REQUIRE(2 == bx::unique(test, 4) );
+	bx::quickSort(test, BX_COUNTOF(test) );
+
+	REQUIRE(3 == bx::unique(test, 5) );
+	bx::quickSort(test, BX_COUNTOF(test) );
+
+	uint32_t last = bx::unique(test, BX_COUNTOF(test) );
+	REQUIRE(9 == last);
+
+	REQUIRE(9 == bx::unique(test, last) );
+}
+
+TEST_CASE("sort-lower/upperBound int32_t", "")
 {
 	//                         0    1    2    3    4    5    6    7    8    9   10   11   12   13 | 14
 	const int32_t test[] = { 100, 101, 101, 101, 103, 104, 105, 105, 105, 106, 106, 107, 108, 109 };
@@ -129,7 +150,7 @@ void compareTest(const Ty& _min, const Ty& _max)
 	REQUIRE(-1 == compareDescendingTest<Ty>(_max, _min) );
 }
 
-TEST_CASE("ComparisonFn", "")
+TEST_CASE("sort-ComparisonFn", "")
 {
 	compareTest< int8_t>(  -13,   89);
 	compareTest<int16_t>(-1389, 1389);

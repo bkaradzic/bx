@@ -37,22 +37,6 @@ namespace bx
 		va_end(argList);
 	}
 
-	template <typename Ty>
-	inline Ty replaceAll(const Ty& _str, const char* _from, const char* _to)
-	{
-		Ty str = _str;
-		typename Ty::size_type startPos = 0;
-		const typename Ty::size_type fromLen = strLen(_from);
-		const typename Ty::size_type toLen   = strLen(_to);
-		while ( (startPos = str.find(_from, startPos) ) != Ty::npos)
-		{
-			str.replace(startPos, fromLen, _to);
-			startPos += toLen;
-		}
-
-		return str;
-	}
-
 	inline StringView::StringView()
 	{
 		clear();
@@ -75,19 +59,9 @@ namespace bx
 		return *this;
 	}
 
-	inline StringView::StringView(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
-	}
-
 	inline StringView::StringView(const char* _ptr)
 	{
 		set(_ptr, INT32_MAX);
-	}
-
-	inline StringView::StringView(char* _ptr, int32_t _len)
-	{
-		set(_ptr, _len);
 	}
 
 	inline StringView::StringView(const char* _ptr, int32_t _len)
@@ -98,17 +72,6 @@ namespace bx
 	inline StringView::StringView(const char* _ptr, const char* _term)
 	{
 		set(_ptr, _term);
-	}
-
-	template<typename Ty>
-	inline StringView::StringView(const Ty& _container)
-	{
-		set(_container);
-	}
-
-	inline void StringView::set(char* _ptr)
-	{
-		set(_ptr, INT32_MAX);
 	}
 
 	inline void StringView::set(const char* _ptr)
@@ -131,12 +94,6 @@ namespace bx
 	inline void StringView::set(const char* _ptr, const char* _term)
 	{
 		set(_ptr, int32_t(_term-_ptr) );
-	}
-
-	template<typename Ty>
-	inline void StringView::set(const Ty& _container)
-	{
-		set(_container.data(), int32_t(_container.length() ) );
 	}
 
 	inline void StringView::set(const StringView& _str, int32_t _start, int32_t _len)
