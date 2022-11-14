@@ -853,6 +853,7 @@ function toolchain(_buildDir, _libDir)
  		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
  		libdirs { path.join(_libDir, "lib/linux_ppc64le_gcc") }
  		buildoptions {
+			"-fsigned-char",
  			"-Wunused-value",
  			"-Wundef",
 			"-mcpu=power8",
