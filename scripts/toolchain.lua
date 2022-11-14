@@ -73,7 +73,6 @@ function toolchain(_buildDir, _libDir)
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
-			{ "linux-gcc-6",     "Linux (GCC-6 compiler)"     },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
@@ -285,12 +284,6 @@ function toolchain(_buildDir, _libDir)
 		elseif "linux-gcc-afl" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "afl-gcc"
 			premake.gcc.cxx = "afl-g++"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
-
-		elseif "linux-gcc-6" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "gcc-6"
-			premake.gcc.cxx = "g++-6"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
@@ -660,19 +653,6 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "linux-*" }
 		includedirs { path.join(bxDir, "include/compat/linux") }
-
-	configuration { "linux-gcc-6" }
-		buildoptions {
---			"-fno-omit-frame-pointer",
---			"-fsanitize=address",
---			"-fsanitize=undefined",
---			"-fsanitize=float-divide-by-zero",
---			"-fsanitize=float-cast-overflow",
-		}
-		links {
---			"asan",
---			"ubsan",
-		}
 
 	configuration { "linux-gcc" }
 		buildoptions {
