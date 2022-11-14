@@ -77,6 +77,7 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
 			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
+			{ "linux-ppc64le-gcc",  "Linux (PPC, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
@@ -304,6 +305,9 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
+
+		elseif "linux-ppc64le-gcc" == _OPTIONS["gcc"] then
+ 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-gcc"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
@@ -843,6 +847,23 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-s MAX_WEBGL_VERSION=2",
 		}
+
+	configuration { "linux-ppc64le-gcc" }
+ 		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
+ 		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
+ 		libdirs { path.join(_libDir, "lib/linux_ppc64le_gcc") }
+ 		buildoptions {
+ 			"-Wunused-value",
+ 			"-Wundef",
+			"-mcpu=power8",
+ 		}
+ 		links {
+ 			"rt",
+ 			"dl",
+ 		}
+ 		linkoptions {
+ 			"-Wl,--gc-sections",
+ 		}
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
