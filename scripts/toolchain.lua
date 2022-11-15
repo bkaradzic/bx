@@ -75,7 +75,6 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
-			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
 			{ "linux-ppc64le-gcc",  "Linux (PPC, GCC compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
@@ -299,9 +298,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.cxx = "afl-clang++"
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-clang"))
-
-		elseif "linux-mips-gcc" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux-mips-gcc"))
 
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
@@ -720,22 +716,6 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/linux64_clang") }
 		buildoptions {
 			"-m64",
-		}
-
-	configuration { "linux-mips-gcc" }
-		targetdir (path.join(_buildDir, "linux32_mips_gcc/bin"))
-		objdir (path.join(_buildDir, "linux32_mips_gcc/obj"))
-		libdirs { path.join(_libDir, "lib/linux32_mips_gcc") }
-		buildoptions {
-			"-Wunused-value",
-			"-Wundef",
-		}
-		links {
-			"rt",
-			"dl",
-		}
-		linkoptions {
-			"-Wl,--gc-sections",
 		}
 
 	configuration { "linux-arm-gcc" }
