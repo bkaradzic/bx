@@ -53,22 +53,6 @@ linux-release64: .build/projects/gmake-linux
 	make -R -C .build/projects/gmake-linux config=release64
 linux: linux-debug64 linux-release64
 
-.build/projects/gmake-linux-ppc64le-clang:
-	$(GENIE) --gcc=linux-ppc64le-clang gmake
-linux-ppc64le-clang-debug: .build/projects/gmake-linux-ppc64le-clang
-	make -R -C .build/projects/gmake-linux-ppc64le-clang config=debug64
-linux-ppc64le-clang-release: .build/projects/gmake-linux-ppc64le-clang
-	make -R -C .build/projects/gmake-linux-ppc64le-clang config=release64
-linux-ppc64le-clang: linux-ppc64le-clang-debug linux-ppc64le-clang-release
-
-.build/projects/gmake-linux-ppc64le-gcc:
-	$(GENIE) --gcc=linux-ppc64le-gcc gmake
-linux-ppc64le-gcc-debug: .build/projects/gmake-linux-ppc64le-gcc
-	make -R -C .build/projects/gmake-linux-ppc64le-gcc config=debug64
-linux-ppc64le-gcc-release: .build/projects/gmake-linux-ppc64le-gcc
-	make -R -C .build/projects/gmake-linux-ppc64le-gcc config=release64
-linux-ppc64le-gcc: linux-ppc64le-gcc-debug linux-ppc64le-gcc-release
-
 .build/projects/gmake-haiku:
 	$(GENIE) --gcc=haiku gmake
 haiku-debug64: .build/projects/gmake-haiku
