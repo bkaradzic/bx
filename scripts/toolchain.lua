@@ -76,7 +76,8 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
-			{ "linux-ppc64le-gcc",  "Linux (PPC, GCC compiler)"  },
+			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
+			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
@@ -304,6 +305,13 @@ function toolchain(_buildDir, _libDir)
 
 		elseif "linux-ppc64le-gcc" == _OPTIONS["gcc"] then
  			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-gcc"))
+
+		elseif "linux-ppc64le-clang" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
+			premake.gcc.ar  = "ar"
+			premake.gcc.llvm = true
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-clang"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
@@ -828,23 +836,30 @@ function toolchain(_buildDir, _libDir)
 			"-s MAX_WEBGL_VERSION=2",
 		}
 
-	configuration { "linux-ppc64le-gcc" }
- 		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
- 		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
- 		libdirs { path.join(_libDir, "lib/linux_ppc64le_gcc") }
- 		buildoptions {
+	configuration { "linux-ppc64le*" }
+		buildoptions {
 			"-fsigned-char",
- 			"-Wunused-value",
- 			"-Wundef",
+			"-Wunused-value",
+			"-Wundef",
 			"-mcpu=power8",
- 		}
- 		links {
- 			"rt",
- 			"dl",
- 		}
- 		linkoptions {
- 			"-Wl,--gc-sections",
- 		}
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
+	configuration { "linux-ppc64le-gcc" }
+		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
+		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux_ppc64le_gcc") }
+
+	configuration { "linux-ppc64le-clang" }
+		targetdir (path.join(_buildDir, "linux_ppc64le_clang/bin"))
+		objdir (path.join(_buildDir, "linux_ppc64le_clang/obj"))
+		libdirs { path.join(_libDir, "lib/linux_ppc64le_clang") }
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
