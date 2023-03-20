@@ -445,14 +445,14 @@
 #endif // BX_ARCH_
 
 #if defined(__cplusplus)
-#	if   __cplusplus < BX_LANGUAGE_CPP14
-#		error "C++14 standard support is required to build."
-#	elif __cplusplus < BX_LANGUAGE_CPP17
-#		define BX_CPP_NAME "C++14"
-#	elif __cplusplus < BX_LANGUAGE_CPP20
+#	if (__cplusplus < BX_LANGUAGE_CPP17 || HXCPP_CPP14)
+#       define BX_CPP_NAME "C++14"
+#	elif (__cplusplus < BX_LANGUAGE_CPP20 || HXCPP_CPP17)
 #		define BX_CPP_NAME "C++17"
 #	elif __cplusplus < BX_LANGUAGE_CPP23
 #		define BX_CPP_NAME "C++20"
+#   elif __cplusplus < BX_LANGUAGE_CPP14
+#		error "C++14 standard support is required to build."
 #	else
 // See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
 #		define BX_CPP_NAME "C++WayTooModern"
