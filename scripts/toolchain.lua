@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2023 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bx/blob/master/LICENSE
 --
 
@@ -73,11 +73,11 @@ function toolchain(_buildDir, _libDir)
 			{ "freebsd",         "FreeBSD"                    },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
-			{ "linux-gcc-6",     "Linux (GCC-6 compiler)"     },
 			{ "linux-clang",     "Linux (Clang compiler)"     },
 			{ "linux-clang-afl", "Linux (Clang + AFL fuzzer)" },
-			{ "linux-mips-gcc",  "Linux (MIPS, GCC compiler)" },
 			{ "linux-arm-gcc",   "Linux (ARM, GCC compiler)"  },
+			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
+			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
 			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
@@ -288,12 +288,6 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
 
-		elseif "linux-gcc-6" == _OPTIONS["gcc"] then
-			premake.gcc.cc  = "gcc-6"
-			premake.gcc.cxx = "g++-6"
-			premake.gcc.ar  = "ar"
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux"))
-
 		elseif "linux-clang" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "clang"
 			premake.gcc.cxx = "clang++"
@@ -306,11 +300,18 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.ar  = "ar"
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-clang"))
 
-		elseif "linux-mips-gcc" == _OPTIONS["gcc"] then
-			location (path.join(_buildDir, "projects", _ACTION .. "-linux-mips-gcc"))
-
 		elseif "linux-arm-gcc" == _OPTIONS["gcc"] then
 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-arm-gcc"))
+
+		elseif "linux-ppc64le-gcc" == _OPTIONS["gcc"] then
+ 			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-gcc"))
+
+		elseif "linux-ppc64le-clang" == _OPTIONS["gcc"] then
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
+			premake.gcc.ar  = "ar"
+			premake.gcc.llvm = true
+			location (path.join(_buildDir, "projects", _ACTION .. "-linux-ppc64le-clang"))
 
 		elseif "mingw-gcc" == _OPTIONS["gcc"] then
 			if not os.getenv("MINGW") then
@@ -500,9 +501,9 @@ function toolchain(_buildDir, _libDir)
 			"-Wno-tautological-constant-compare",
 		}
 
-	configuration { "vs*", "x32" }
+	configuration { "vs*", "not NX32", "not NX64" }
 		flags {
-			"EnableSSE2",
+			"EnableAVX",
 		}
 
 	configuration { "vs*", "not orbis", "not NX32", "not NX64" }
@@ -601,7 +602,7 @@ function toolchain(_buildDir, _libDir)
 			"-Wunused-value",
 			"-fdata-sections",
 			"-ffunction-sections",
-			"-msse2",
+			"-msse4.2",
 			"-Wunused-value",
 			"-Wundef",
 		}
@@ -661,19 +662,6 @@ function toolchain(_buildDir, _libDir)
 	configuration { "linux-*" }
 		includedirs { path.join(bxDir, "include/compat/linux") }
 
-	configuration { "linux-gcc-6" }
-		buildoptions {
---			"-fno-omit-frame-pointer",
---			"-fsanitize=address",
---			"-fsanitize=undefined",
---			"-fsanitize=float-divide-by-zero",
---			"-fsanitize=float-cast-overflow",
-		}
-		links {
---			"asan",
---			"ubsan",
-		}
-
 	configuration { "linux-gcc" }
 		buildoptions {
 			"-mfpmath=sse",
@@ -681,7 +669,7 @@ function toolchain(_buildDir, _libDir)
 
 	configuration { "linux-gcc* or linux-clang*" }
 		buildoptions {
-			"-msse2",
+			"-msse4.2",
 --			"-Wdouble-promotion",
 --			"-Wduplicated-branches",
 --			"-Wduplicated-cond",
@@ -736,22 +724,6 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/linux64_clang") }
 		buildoptions {
 			"-m64",
-		}
-
-	configuration { "linux-mips-gcc" }
-		targetdir (path.join(_buildDir, "linux32_mips_gcc/bin"))
-		objdir (path.join(_buildDir, "linux32_mips_gcc/obj"))
-		libdirs { path.join(_libDir, "lib/linux32_mips_gcc") }
-		buildoptions {
-			"-Wunused-value",
-			"-Wundef",
-		}
-		links {
-			"rt",
-			"dl",
-		}
-		linkoptions {
-			"-Wl,--gc-sections",
 		}
 
 	configuration { "linux-arm-gcc" }
@@ -837,7 +809,7 @@ function toolchain(_buildDir, _libDir)
 			"--target=i686-none-linux-android" .. androidApiLevel,
 			"-mtune=atom",
 			"-mstackrealign",
-			"-msse3",
+			"-msse4.2",
 			"-mfpmath=sse",
 		}
 		linkoptions {
@@ -863,6 +835,31 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-s MAX_WEBGL_VERSION=2",
 		}
+
+	configuration { "linux-ppc64le*" }
+		buildoptions {
+			"-fsigned-char",
+			"-Wunused-value",
+			"-Wundef",
+			"-mcpu=power8",
+		}
+		links {
+			"rt",
+			"dl",
+		}
+		linkoptions {
+			"-Wl,--gc-sections",
+		}
+
+	configuration { "linux-ppc64le-gcc" }
+		targetdir (path.join(_buildDir, "linux_ppc64le_gcc/bin"))
+		objdir (path.join(_buildDir, "linux_ppc64le_gcc/obj"))
+		libdirs { path.join(_libDir, "lib/linux_ppc64le_gcc") }
+
+	configuration { "linux-ppc64le-clang" }
+		targetdir (path.join(_buildDir, "linux_ppc64le_clang/bin"))
+		objdir (path.join(_buildDir, "linux_ppc64le_clang/obj"))
+		libdirs { path.join(_libDir, "lib/linux_ppc64le_clang") }
 
 	configuration { "wasm2js" }
 		targetdir (path.join(_buildDir, "wasm2js/bin"))
@@ -920,7 +917,7 @@ function toolchain(_buildDir, _libDir)
 		}
 		buildoptions {
 			"-arch x86_64",
-			"-msse2",
+			"-msse4.2",
 			"-target x86_64-apple-macos" .. (#macosPlatform > 0 and macosPlatform or "10.11"),
 		}
 

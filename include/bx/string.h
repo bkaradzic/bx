@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -129,7 +129,16 @@ namespace bx
 		int32_t m_capacity;
 	};
 
-	/// Returns true if character is part of space set.
+	/// Returns true if character is part of white space set.
+	///
+	/// White space set is:
+	///   ' '  - Space.
+	///   '\t' - Horizontal tab.
+	///   '\n' - Line feed / new line.
+	///   '\r' - Carriage return.
+	///   '\v' - Vertical tab.
+	///   '\f' - Form feed / new page.
+	///
 	bool isSpace(char _ch);
 
 	/// Returns true if string view contains only space characters.

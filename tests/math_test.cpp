@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -11,18 +11,28 @@
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
 
-#if !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 TEST_CASE("isFinite, isInfinite, isNan", "")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
-		REQUIRE(std::isnan(u.f)    == bx::isNan(u.f) );
-		REQUIRE(std::isfinite(u.f) == bx::isFinite(u.f) );
-		REQUIRE(std::isinf(u.f)    == bx::isInfinite(u.f) );
+
+#if BX_PLATFORM_OSX
+		BX_UNUSED(u);
+		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
+		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
+		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
+#elif BX_COMPILER_MSVC
+		REQUIRE(!!::_isnanf(u.f)  == bx::isNan(u.f));
+		REQUIRE(!!::_finitef(u.f) == bx::isFinite(u.f));
+		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f));
+#else
+		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
+		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
+		REQUIRE(::isinff(u.f)  == bx::isInfinite(u.f) );
+#endif // BX_PLATFORM_OSX
 	}
 }
-#endif // !BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1800
 
 bool log2_test(float _a)
 {
@@ -100,18 +110,72 @@ TEST_CASE("libm", "")
 		REQUIRE(bx::isEqual(bx::exp(xx), ::expf(xx), 0.00001f) );
 	}
 
-	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
+	// rsqrt
+	REQUIRE(bx::isInfinite(1.0f/::sqrtf(0.0f) ) );
+	REQUIRE(bx::isInfinite(bx::rsqrt(0.0f) ) );
+
+	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
 		bx::write(writer, &err, "rsqrt(%f) == %f (expected: %f)\n", xx, bx::rsqrt(xx), 1.0f/::sqrtf(xx) );
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::rsqrt(xx), 1.0f/::sqrtf(xx), 0.00001f) );
 	}
 
+	// rsqrtRef
+	REQUIRE(bx::isInfinite(bx::rsqrtRef(0.0f) ) );
+
+	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
+	{
+		bx::write(writer, &err, "rsqrtRef(%f) == %f (expected: %f)\n", xx, bx::rsqrtRef(xx), 1.0f/::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::rsqrtRef(xx), 1.0f/::sqrtf(xx), 0.00001f) );
+	}
+
+	// rsqrtSimd
+	REQUIRE(bx::isInfinite(bx::rsqrtSimd(0.0f) ) );
+
+	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
+	{
+		bx::write(writer, &err, "rsqrtSimd(%f) == %f (expected: %f)\n", xx, bx::rsqrtSimd(xx), 1.0f/::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::rsqrtSimd(xx), 1.0f/::sqrtf(xx), 0.00001f) );
+	}
+
+	// sqrt
+	REQUIRE(bx::isNan(::sqrtf(-1.0f) ) );
+	REQUIRE(bx::isNan(bx::sqrt(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrt(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrt(1.0f), ::sqrtf(1.0f), 0.0f) );
+
 	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
 	{
 		bx::write(writer, &err, "sqrt(%f) == %f (expected: %f)\n", xx, bx::sqrt(xx), ::sqrtf(xx) );
 		REQUIRE(err.isOk() );
 		REQUIRE(bx::isEqual(bx::sqrt(xx), ::sqrtf(xx), 0.00001f) );
+	}
+
+	// sqrtRef
+	REQUIRE(bx::isNan(bx::sqrtRef(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrtRef(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrtRef(1.0f), ::sqrtf(1.0f), 0.0f) );
+
+	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
+	{
+		bx::write(writer, &err, "sqrtRef(%f) == %f (expected: %f)\n", xx, bx::sqrtRef(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrtRef(xx), ::sqrtf(xx), 0.00001f) );
+	}
+
+	// sqrtSimd
+	REQUIRE(bx::isNan(bx::sqrtSimd(-1.0f) ) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(0.0f), ::sqrtf(0.0f), 0.0f) );
+	REQUIRE(bx::isEqual(bx::sqrtSimd(1.0f), ::sqrtf(1.0f), 0.0f) );
+
+	for (float xx = 0.0f; xx < 1000000.0f; xx += 1000.f)
+	{
+		bx::write(writer, &err, "sqrtSimd(%f) == %f (expected: %f)\n", xx, bx::sqrtSimd(xx), ::sqrtf(xx) );
+		REQUIRE(err.isOk() );
+		REQUIRE(bx::isEqual(bx::sqrtSimd(xx), ::sqrtf(xx), 0.00001f) );
 	}
 
 	for (float xx = 0.0f; xx < 100.0f; xx += 0.1f)
@@ -266,6 +330,15 @@ void mtxCheck(const float* _a, const float* _b)
 
 		REQUIRE(false);
 	}
+}
+
+TEST_CASE("vec3", "")
+{
+	bx::Vec3 normalized = bx::normalize({0.0f, 1.0f, 0.0f});
+	REQUIRE(bx::isEqual(normalized, {0.0f, 1.0f, 0.0f}, 0.0f) );
+
+	float length = bx::length(normalized);
+	REQUIRE(bx::isEqual(length, 1.0f, 0.0f) );
 }
 
 TEST_CASE("quaternion", "")

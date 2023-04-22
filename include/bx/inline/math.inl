@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2022 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2023 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
@@ -55,7 +55,7 @@ namespace bx
 		//
 		const uint32_t tmp0   = uint32_sra(_value, 31);
 		const uint32_t tmp1   = uint32_neg(tmp0);
-		const uint32_t mask   = uint32_or(tmp1, 0x80000000);
+		const uint32_t mask   = uint32_or(tmp1, kFloatSignMask);
 		const uint32_t result = uint32_xor(_value, mask);
 		return result;
 	}
@@ -63,37 +63,37 @@ namespace bx
 	inline BX_CONST_FUNC bool isNan(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp > UINT32_C(0x7f800000);
+		return tmp > kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isNan(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp > UINT64_C(0x7ff0000000000000);
+		return tmp > kDoubleExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isFinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp < UINT32_C(0x7f800000);
+		return tmp < kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isFinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp < UINT64_C(0x7ff0000000000000);
+		return tmp < kDoubleExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isInfinite(float _f)
 	{
 		const uint32_t tmp = floatToBits(_f) & INT32_MAX;
-		return tmp == UINT32_C(0x7f800000);
+		return tmp == kFloatExponentMask;
 	}
 
 	inline BX_CONST_FUNC bool isInfinite(double _f)
 	{
 		const uint64_t tmp = doubleToBits(_f) & INT64_MAX;
-		return tmp == UINT64_C(0x7ff0000000000000);
+		return tmp == kDoubleExponentMask;
 	}
 
 	inline BX_CONSTEXPR_FUNC float floor(float _a)
@@ -212,17 +212,27 @@ namespace bx
 
 	inline BX_CONST_FUNC float rsqrtRef(float _a)
 	{
+		if (_a < kNearZero)
+		{
+			return kFloatInfinity;
+		}
+
 		return pow(_a, -0.5f);
 	}
 
 	inline BX_CONST_FUNC float sqrtRef(float _a)
 	{
-		if (_a < kNearZero)
-		{
-			return 0.0f;
-		}
+		return _a*pow(_a, -0.5f);
+	}
 
-		return 1.0f/rsqrtRef(_a);
+	inline BX_CONST_FUNC float rsqrtSimd(float _a)
+	{
+		const simd128_t aa     = simd_splat(_a);
+		const simd128_t rsqrta = simd_rsqrt_nr(aa);
+		float result;
+		simd_stx(&result, rsqrta);
+
+		return result;
 	}
 
 	inline BX_CONST_FUNC float sqrtSimd(float _a)
@@ -235,36 +245,21 @@ namespace bx
 		return result;
 	}
 
-	inline BX_CONST_FUNC float sqrt(float _a)
-	{
-#if BX_CONFIG_SUPPORTS_SIMD
-		return sqrtSimd(_a);
-#else
-		return sqrtRef(_a);
-#endif // BX_CONFIG_SUPPORTS_SIMD
-	}
-
-	inline BX_CONST_FUNC float rsqrtSimd(float _a)
-	{
-		if (_a < kNearZero)
-		{
-			return 0.0f;
-		}
-
-		const simd128_t aa     = simd_splat(_a);
-		const simd128_t rsqrta = simd_rsqrt_nr(aa);
-		float result;
-		simd_stx(&result, rsqrta);
-
-		return result;
-	}
-
 	inline BX_CONST_FUNC float rsqrt(float _a)
 	{
 #if BX_CONFIG_SUPPORTS_SIMD
 		return rsqrtSimd(_a);
 #else
 		return rsqrtRef(_a);
+#endif // BX_CONFIG_SUPPORTS_SIMD
+	}
+
+	inline BX_CONST_FUNC float sqrt(float _a)
+	{
+#if BX_CONFIG_SUPPORTS_SIMD
+		return sqrtSimd(_a);
+#else
+		return sqrtRef(_a);
 #endif // BX_CONFIG_SUPPORTS_SIMD
 	}
 
