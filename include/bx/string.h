@@ -20,16 +20,51 @@ namespace bx
 		};
 	};
 
+	/// Zero-terminated string literal.
+	///
+	class StringLiteral
+	{
+	public:
+		/// Construct default/empty string literal.
+		///
+		constexpr StringLiteral();
+
+		/// Construct string literal from C-style string literal.
+		///
+		template<int32_t SizeT>
+		constexpr StringLiteral(const char (&str)[SizeT]);
+
+		/// Returns string length.
+		///
+		constexpr int32_t getLength() const;
+
+		/// Returns zero-terminated C string pointer to string literal.
+		///
+		constexpr const char* getCPtr() const;
+
+	private:
+		const char* m_ptr;
+		int32_t     m_len;
+	};
+
 	/// Non-zero-terminated string view.
 	///
 	class StringView
 	{
 	public:
+		/// Construct default/empty string view.
 		///
 		StringView();
 
+		/// Construct string view from string literal.
 		///
-		StringView(const StringView& _rhs, int32_t _start = 0, int32_t _len = INT32_MAX);
+		constexpr StringView(const StringLiteral& _str);
+
+		///
+		StringView(const StringView& _rhs);
+
+		///
+		StringView(const StringView& _rhs, int32_t _start, int32_t _len);
 
 		///
 		StringView& operator=(const char* _rhs);
@@ -56,7 +91,10 @@ namespace bx
 		void set(const char* _ptr, const char* _term);
 
 		///
-		void set(const StringView& _str, int32_t _start = 0, int32_t _len = INT32_MAX);
+		void set(const StringView& _str);
+
+		///
+		void set(const StringView& _str, int32_t _start, int32_t _len);
 
 		///
 		void clear();
@@ -75,12 +113,15 @@ namespace bx
 		const char* getTerm() const;
 
 		/// Returns `true` if string is empty.
+		///
 		bool isEmpty() const;
 
 		/// Returns string length.
+		///
 		int32_t getLength() const;
 
 		/// Returns `true` if string is zero terminated.
+		///
 		bool is0Terminated() const;
 
 	protected:
