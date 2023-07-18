@@ -100,6 +100,7 @@ function toolchain(_buildDir, _libDir)
 		value = "toolset",
 		description = "Choose VS toolset",
 		allowed = {
+			{ "vs2022-clang",  "Clang with MS CodeGen"           },
 			{ "vs2017-clang",  "Clang with MS CodeGen"           },
 			{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
 			{ "winstore100",   "Universal Windows App 10.0"      },
@@ -397,6 +398,8 @@ function toolchain(_buildDir, _libDir)
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
 			if "vs2017-clang" == _OPTIONS["vs"] then
 				premake.vstudio.toolset = "v141_clang_c2"
+			elseif "vs2022-clang" == _OPTIONS["vs"] then
+				premake.vstudio.toolset = "ClangCL"
 			else
 				premake.vstudio.toolset = ("LLVM-" .. _ACTION)
 			end

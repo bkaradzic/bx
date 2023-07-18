@@ -73,6 +73,9 @@
 #		undef  BX_COMPILER_CLANG_ANALYZER
 #		define BX_COMPILER_CLANG_ANALYZER 1
 #	endif // defined(__clang_analyzer__)
+#	if defined(_WIN32) || defined(_WIN64)
+#	define BX_WINDOWS_CLANG 1
+#	endif // defined(_WIN32) || defined(_WIN64)
 #elif defined(_MSC_VER)
 #	undef  BX_COMPILER_MSVC
 #	define BX_COMPILER_MSVC _MSC_VER
@@ -444,22 +447,22 @@
 #	define BX_ARCH_NAME "64-bit"
 #endif // BX_ARCH_
 
-//#if defined(__cplusplus)
-//#	if   __cplusplus < BX_LANGUAGE_CPP14
-//#		error "C++14 standard support is required to build."
-//#	elif __cplusplus < BX_LANGUAGE_CPP17
-//#		define BX_CPP_NAME "C++14"
-//#	elif __cplusplus < BX_LANGUAGE_CPP20
-//#		define BX_CPP_NAME "C++17"
-//#	elif __cplusplus < BX_LANGUAGE_CPP23
-//#		define BX_CPP_NAME "C++20"
-//#	else
-//// See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
-//#		define BX_CPP_NAME "C++WayTooModern"
-//#	endif // BX_CPP_NAME
-//#else
-//#	define BX_CPP_NAME "C++Unknown"
-//#endif // defined(__cplusplus)
+#if defined(__cplusplus)
+#	if   __cplusplus < BX_LANGUAGE_CPP14
+#		error "C++14 standard support is required to build."
+#	elif __cplusplus < BX_LANGUAGE_CPP17
+#		define BX_CPP_NAME "C++14"
+#	elif __cplusplus < BX_LANGUAGE_CPP20
+#		define BX_CPP_NAME "C++17"
+#	elif __cplusplus < BX_LANGUAGE_CPP23
+#		define BX_CPP_NAME "C++20"
+#	else
+// See: https://gist.github.com/bkaradzic/2e39896bc7d8c34e042b#orthodox-c
+#		define BX_CPP_NAME "C++WayTooModern"
+#	endif // BX_CPP_NAME
+#else
+#	define BX_CPP_NAME "C++Unknown"
+#endif // defined(__cplusplus)
 
 #if BX_PLATFORM_BSD   \
  || BX_PLATFORM_HAIKU \
