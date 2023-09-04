@@ -63,6 +63,9 @@ namespace bx
 		virtual bool open(const FilePath& _filePath, bool _append, Error* _err) override;
 
 		///
+		virtual void flush() override;
+
+		///
 		virtual void close() override;
 
 		///

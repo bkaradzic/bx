@@ -8,6 +8,7 @@ GENIE=../bx/tools/bin/$(OS)/genie
 all:
 	$(GENIE)                       vs2017
 	$(GENIE)                       vs2019
+	$(GENIE)                       vs2022
 	$(GENIE) --gcc=android-arm     gmake
 	$(GENIE) --gcc=android-arm64   gmake
 	$(GENIE) --gcc=android-x86     gmake

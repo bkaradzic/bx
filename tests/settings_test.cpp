@@ -24,6 +24,7 @@ TEST_CASE("Settings", "")
 	if (bx::open(&writer, filePath, false, bx::ErrorIgnore{}) )
 	{
 		bx::write(&writer, settings, bx::ErrorIgnore{});
+		bx::flush(&writer);
 		bx::close(&writer);
 	}
 

@@ -33,6 +33,10 @@ namespace bx
 	{
 	}
 
+	inline FlusherI ::~FlusherI()
+	{
+	}
+
 	inline CloserI::~CloserI()
 	{
 	}
@@ -469,9 +473,14 @@ namespace bx
 		return _process->open(_filePath, _args, _err);
 	}
 
-	inline void close(CloserI* _reader)
+	inline void flush(FlusherI* _flusher)
 	{
-		_reader->close();
+		_flusher->flush();
+	}
+
+	inline void close(CloserI* _closer)
+	{
+		_closer->close();
 	}
 
 } // namespace bx

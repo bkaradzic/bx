@@ -104,6 +104,16 @@ namespace bx
 		virtual bool open(const FilePath& _filePath, const StringView& _args, Error* _err = ErrorIgnore{}) = 0;
 	};
 
+	/// Flusher interface.
+	struct BX_NO_VTABLE FlusherI
+	{
+		///
+		virtual ~FlusherI() = 0;
+
+		///
+		virtual void flush() = 0;
+	};
+
 	/// Closer interface.
 	struct BX_NO_VTABLE CloserI
 	{
@@ -120,7 +130,7 @@ namespace bx
 	};
 
 	/// File writer interface.
-	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public WriterSeekerI
+	struct BX_NO_VTABLE FileWriterI : public WriterOpenI, public CloserI, public FlusherI, public WriterSeekerI
 	{
 	};
 
