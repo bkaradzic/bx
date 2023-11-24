@@ -27,6 +27,8 @@
 #	error "Must be included from bx/uint32_t.h"
 #endif // BX_UINT32_T_H_HEADER_GUARD
 
+#include <bx/bx.h>
+
 namespace bx
 {
 	inline BX_CONSTEXPR_FUNC uint32_t uint32_li(uint32_t _a)
@@ -649,15 +651,15 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC bool isAligned(Ty* _ptr, int32_t _align)
 	{
-		union { const void* ptr; uintptr_t addr; } un = { _ptr };
-		return isAligned(un.addr, _align);
+		uintptr_t addr = reinterpret_cast<uintptr_t>(reinterpret_cast<void*>(_ptr));
+		return isAligned(addr, _align);
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC bool isAligned(const Ty* _ptr, int32_t _align)
 	{
-		union { const void* ptr; uintptr_t addr; } un = { _ptr };
-		return isAligned(un.addr, _align);
+		uintptr_t addr = reinterpret_cast<uintptr_t>(reinterpret_cast<const void*>(_ptr));
+		return isAligned(addr, _align);
 	}
 
 	template<typename Ty>
@@ -670,17 +672,17 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, int32_t _align)
 	{
-		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
-		un.addr = alignDown(un.addr, _align);
-		return un.ptr;
+		uintptr_t addr = reinterpret_cast<uintptr_t>(_ptr);
+		addr = alignDown(addr, _align);
+		return reinterpret_cast<Ty*>(addr);
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, int32_t _align)
 	{
-		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
-		un.addr = alignDown(un.addr, _align);
-		return un.ptr;
+		uintptr_t addr = reinterpret_cast<uintptr_t>(_ptr);
+		addr = alignDown(addr, _align);
+		return reinterpret_cast<const Ty*>(addr);
 	}
 
 	template<typename Ty>
@@ -693,23 +695,22 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, int32_t _align)
 	{
-		union { Ty* ptr; uintptr_t addr; } un = { _ptr };
-		un.addr = alignUp(un.addr, _align);
-		return un.ptr;
+		uintptr_t addr = reinterpret_cast<uintptr_t>(_ptr);
+		addr = alignUp(addr, _align);
+		return reinterpret_cast<Ty*>(addr);
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, int32_t _align)
 	{
-		union { const Ty* ptr; uintptr_t addr; } un = { _ptr };
-		un.addr = alignUp(un.addr, _align);
-		return un.ptr;
+		uintptr_t addr = reinterpret_cast<uintptr_t>(_ptr);
+		addr = alignUp(addr, _align);
+		return reinterpret_cast<const Ty*>(addr);
 	}
 
 	inline BX_CONST_FUNC uint16_t halfFromFloat(float _a)
 	{
-		union { uint32_t ui; float flt; } ftou;
-		ftou.flt = _a;
+		uint32_t ui = bit_cast<uint32_t>(_a);
 
 		const uint32_t one                       = uint32_li(0x00000001);
 		const uint32_t f_s_mask                  = uint32_li(kFloatSignMask);
@@ -728,13 +729,13 @@ namespace bx
 		const uint32_t f_h_m_pos_offset          = uint32_li(0x0000000d);
 		const uint32_t h_nan_min                 = uint32_li(0x00007c01);
 		const uint32_t f_h_e_biased_flag         = uint32_li(0x0000008f);
-		const uint32_t f_s                       = uint32_and(ftou.ui, f_s_mask);
-		const uint32_t f_e                       = uint32_and(ftou.ui, f_e_mask);
+		const uint32_t f_s                       = uint32_and(ui, f_s_mask);
+		const uint32_t f_e                       = uint32_and(ui, f_e_mask);
 		const uint16_t h_s                       = (uint16_t)uint32_srl(f_s, f_h_s_pos_offset);
-		const uint32_t f_m                       = uint32_and(ftou.ui, f_m_mask);
+		const uint32_t f_m                       = uint32_and(ui, f_m_mask);
 		const uint16_t f_e_amount                = (uint16_t)uint32_srl(f_e, f_e_pos);
 		const uint32_t f_e_half_bias             = uint32_sub(f_e_amount, f_h_bias_offset);
-		const uint32_t f_snan                    = uint32_and(ftou.ui, f_snan_mask);
+		const uint32_t f_snan                    = uint32_and(ui, f_snan_mask);
 		const uint32_t f_m_round_mask            = uint32_and(f_m, f_m_round_bit);
 		const uint32_t f_m_round_offset          = uint32_sll(f_m_round_mask, one);
 		const uint32_t f_m_rounded               = uint32_add(f_m, f_m_round_offset);
@@ -817,9 +818,7 @@ namespace bx
 		const uint32_t f_nan_result         = uint32_sels(is_nan_msb, f_em_nan, f_inf_result);
 		const uint32_t f_result             = uint32_or(f_s, f_nan_result);
 
-		union { uint32_t ui; float flt; } utof;
-		utof.ui = f_result;
-		return utof.flt;
+		return bit_cast<float>(f_result);
 	}
 
 } // namespace bx

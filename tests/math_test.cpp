@@ -15,20 +15,20 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
-		union { uint32_t ui; float f; } u = { uint32_t(ii) };
+		const float f = bx::bit_cast<float>(uint32_t(ii));
 
 #if BX_PLATFORM_OSX
-		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
-		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
-		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
+		REQUIRE(::__isnanf(u.f)    == bx::isNan(f) );
+		REQUIRE(::__isfinitef(u.f) == bx::isFinite(f) );
+		REQUIRE(::__isinff(u.f)    == bx::isInfinite(f) );
 #elif BX_COMPILER_MSVC
-		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f));
-		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f));
-		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f));
+		REQUIRE(!!::isnan(f)    == bx::isNan(f) );
+		REQUIRE(!!::isfinite(f) == bx::isFinite(f) );
+		REQUIRE(!!::isinf(f)    == bx::isInfinite(f) );
 #else
-		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
-		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
-		REQUIRE(::isinff(u.f)  == bx::isInfinite(u.f) );
+		REQUIRE(::isnanf(f)  == bx::isNan(f) );
+		REQUIRE(::finitef(f) == bx::isFinite(f) );
+		REQUIRE(::isinff(f)  == bx::isInfinite(f) );
 #endif // BX_PLATFORM_OSX
 	}
 }

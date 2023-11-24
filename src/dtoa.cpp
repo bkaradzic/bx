@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
+#include <bx/bx.h>
 #include <bx/cpu.h>
 #include <bx/math.h>
 #include <bx/string.h>
@@ -51,14 +52,10 @@ namespace bx
 
 		DiyFp(double d)
 		{
-			union
-			{
-				double d;
-				uint64_t u64;
-			} u = { d };
+			uint64_t u64 = bit_cast<uint64_t>(d);
 
-			int32_t biased_e = (u.u64 & kDpExponentMask) >> kDpSignificandSize;
-			uint64_t significand = (u.u64 & kDpSignificandMask);
+			int32_t biased_e = (u64 & kDpExponentMask) >> kDpSignificandSize;
+			uint64_t significand = (u64 & kDpSignificandMask);
 			if (biased_e != 0)
 			{
 				f = significand + kDpHiddenBit;
@@ -617,12 +614,6 @@ namespace bx
 #define DOUBLE_PLUS_INFINITY  UINT64_C(0x7ff0000000000000)
 #define DOUBLE_MINUS_INFINITY UINT64_C(0xfff0000000000000)
 
-	union HexDouble
-	{
-		double d;
-		uint64_t u;
-	};
-
 #define lsr96(s2, s1, s0, d2, d1, d0)      \
 	d0 = ( (s0) >> 1) | ( ( (s1) & 1) << 31); \
 	d1 = ( (s1) >> 1) | ( ( (s2) & 1) << 31); \
@@ -943,13 +934,12 @@ namespace bx
 	static double converter(PrepNumber* _pn)
 	{
 		int binexp = 92;
-		HexDouble hd;
 		uint32_t s2, s1, s0; /* 96-bit precision integer */
 		uint32_t q2, q1, q0; /* 96-bit precision integer */
 		uint32_t r2, r1, r0; /* 96-bit precision integer */
 		uint32_t mask28 = UINT32_C(0xf) << 28;
 
-		hd.u = 0;
+		uint64_t hdu = 0;
 
 		s0 = (uint32_t)(_pn->mantissa & UINT32_MAX);
 		s1 = (uint32_t)(_pn->mantissa >> 32);
@@ -1022,18 +1012,18 @@ namespace bx
 		{
 			if (_pn->negative)
 			{
-				hd.u = DOUBLE_MINUS_INFINITY;
+				hdu = DOUBLE_MINUS_INFINITY;
 			}
 			else
 			{
-				hd.u = DOUBLE_PLUS_INFINITY;
+				hdu = DOUBLE_PLUS_INFINITY;
 			}
 		}
 		else if (binexp < 1)
 		{
 			if (_pn->negative)
 			{
-				hd.u = DOUBLE_MINUS_ZERO;
+				hdu = DOUBLE_MINUS_ZERO;
 			}
 		}
 		else if (s2)
@@ -1050,10 +1040,10 @@ namespace bx
 				q |= (1ULL << 63);
 			}
 
-			hd.u = q;
+			hdu = q;
 		}
 
-		return hd.d;
+		return bit_cast<double>(hdu);
 	}
 
 	int32_t toString(char* _out, int32_t _max, bool _value)
@@ -1085,9 +1075,6 @@ namespace bx
 		pn.negative = 0;
 		pn.exponent = 0;
 
-		HexDouble hd;
-		hd.u = DOUBLE_PLUS_ZERO;
-
 		switch (parser(_str.getPtr(), _str.getTerm(), &pn) )
 		{
 		case PARSER_OK:
@@ -1095,22 +1082,19 @@ namespace bx
 			break;
 
 		case PARSER_PZERO:
-			*_out = hd.d;
+			*_out = bit_cast<double, uint64_t>(DOUBLE_PLUS_ZERO);
 			break;
 
-		case PARSER_MZERO:
-			hd.u = DOUBLE_MINUS_ZERO;
-			*_out = hd.d;
+		case PARSER_MZERO:;
+			*_out = bit_cast<double, uint64_t>(DOUBLE_MINUS_ZERO);
 			break;
 
 		case PARSER_PINF:
-			hd.u = DOUBLE_PLUS_INFINITY;
-			*_out = hd.d;
+			*_out = bit_cast<double, uint64_t>(DOUBLE_PLUS_INFINITY);
 			break;
 
 		case PARSER_MINF:
-			hd.u = DOUBLE_MINUS_INFINITY;
-			*_out = hd.d;
+			*_out = bit_cast<double, uint64_t>(DOUBLE_MINUS_INFINITY);
 			break;
 		}
 

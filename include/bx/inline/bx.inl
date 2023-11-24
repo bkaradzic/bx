@@ -7,6 +7,10 @@
 #	error "Must be included from bx/bx.h!"
 #endif // BX_H_HEADER_GUARD
 
+#if __cplusplus >= BX_LANGUAGE_CPP20 && !BX_CRT_NONE
+#	include <bit>
+#endif
+
 namespace bx
 {
 	// Reference(S):
@@ -145,6 +149,21 @@ namespace bx
 	inline constexpr bool isPowerOf2(Ty _a)
 	{
 		return _a && !(_a & (_a - 1) );
+	}
+
+	template <typename To, typename From>
+	inline constexpr To bit_cast(const From& value) noexcept
+	{
+#if __cplusplus >= BX_LANGUAGE_CPP20 && !BX_CRT_NONE
+		return std::bit_cast<To, From>(value);
+#else
+		BX_STATIC_ASSERT(sizeof(To) == sizeof(From), "To and From must be the same size.");
+		BX_STATIC_ASSERT(isTriviallyConstructible<To>(), "Destination target must be trivially constructible.");
+		To result;
+		bx::memCopy(&result, &value, sizeof(To));
+		return result;
+#endif
+
 	}
 
 } // namespace bx

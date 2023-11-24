@@ -24,12 +24,9 @@ namespace bx
 
 	inline void* alignPtr(void* _ptr, size_t _extra, size_t _align)
 	{
-		union { void* ptr; uintptr_t addr; } un;
-		un.ptr = _ptr;
-		uintptr_t unaligned = un.addr + _extra; // space for header
+		uintptr_t unaligned = reinterpret_cast<uintptr_t>(_ptr) + _extra; // space for header
 		uintptr_t aligned = bx::alignUp(unaligned, int32_t(_align) );
-		un.addr = aligned;
-		return un.ptr;
+		return reinterpret_cast<void*>(aligned);
 	}
 
 	inline void* alloc(AllocatorI* _allocator, size_t _size, size_t _align, const Location& _location)

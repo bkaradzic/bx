@@ -7,6 +7,8 @@
 #	error "Must be included from bx/pixelformat.h"
 #endif // BX_PIXEL_FORMAT_H_HEADER_GUARD
 
+#include <bx/bx.h>
+
 namespace bx
 {
 	inline uint32_t toUnorm(float _value, float _scale)
@@ -735,8 +737,9 @@ namespace bx
 		const float gg = clamp(_src[1], 0.0f, sharedExpMax);
 		const float bb = clamp(_src[2], 0.0f, sharedExpMax);
 		const float mm = max(rr, gg, bb);
-		union { float ff; uint32_t ui; } cast = { mm };
-		int32_t expShared = int32_t(uint32_imax(uint32_t(-expBias-1), ( ( (cast.ui>>23) & 0xff) - 127) ) ) + 1 + expBias;
+
+		uint32_t ui = bit_cast<uint32_t, float>(mm);
+		int32_t expShared = int32_t(uint32_imax(uint32_t(-expBias-1), ( ( (ui>>23) & 0xff) - 127) ) ) + 1 + expBias;
 		float denom = pow(2.0f, float(expShared - expBias - MantissaBits) );
 
 		if ( (1<<MantissaBits) == int32_t(round(mm/denom) ) )

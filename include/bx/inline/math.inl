@@ -9,6 +9,7 @@
 #	error "Must be included from bx/math.h!"
 #endif // BX_MATH_H_HEADER_GUARD
 
+#include <bx/bx.h>
 #include <bx/simd_t.h>
 #include <bx/uint32_t.h>
 
@@ -26,26 +27,22 @@ namespace bx
 
 	inline BX_CONST_FUNC uint32_t floatToBits(float _a)
 	{
-		union { float f; uint32_t ui; } u = { _a };
-		return u.ui;
+		return bit_cast<uint32_t>(_a);
 	}
 
 	inline BX_CONST_FUNC float bitsToFloat(uint32_t _a)
 	{
-		union { uint32_t ui; float f; } u = { _a };
-		return u.f;
+		return bit_cast<float>(_a);
 	}
 
 	inline BX_CONST_FUNC uint64_t doubleToBits(double _a)
 	{
-		union { double f; uint64_t ui; } u = { _a };
-		return u.ui;
+		return bit_cast<uint64_t>(_a);
 	}
 
 	inline BX_CONST_FUNC double bitsToDouble(uint64_t _a)
 	{
-		union { uint64_t ui; double f; } u = { _a };
-		return u.f;
+		return bit_cast<double>(_a);
 	}
 
 	inline BX_CONST_FUNC uint32_t floatFlip(uint32_t _value)

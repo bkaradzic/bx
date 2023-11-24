@@ -3,6 +3,7 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
+#include <bx/bx.h>
 #include <bx/os.h>
 #include <bx/thread.h>
 
@@ -82,13 +83,7 @@ namespace bx
 	void* ThreadInternal::threadFunc(void* _arg)
 	{
 		Thread* thread = (Thread*)_arg;
-		union
-		{
-			void* ptr;
-			int32_t i;
-		} cast;
-		cast.i = thread->entry();
-		return cast.ptr;
+		return reinterpret_cast<void*>((intptr_t)thread->entry());
 	}
 #endif // BX_PLATFORM_
 
@@ -213,13 +208,9 @@ namespace bx
 		CloseHandle(ti->m_handle);
 		ti->m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_POSIX
-		union
-		{
-			void* ptr;
-			int32_t i;
-		} cast;
-		pthread_join(ti->m_handle, &cast.ptr);
-		m_exitCode = cast.i;
+		void* ptr;
+		pthread_join(ti->m_handle, &ptr);
+		m_exitCode = (int32_t)reinterpret_cast<intptr_t>(ptr);
 		ti->m_handle = 0;
 #endif // BX_PLATFORM_
 

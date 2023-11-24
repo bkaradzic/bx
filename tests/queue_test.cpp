@@ -9,14 +9,12 @@
 
 void* bitsToPtr(uintptr_t _ui)
 {
-	union { uintptr_t ui; void* ptr; } cast = { _ui };
-	return cast.ptr;
+	return reinterpret_cast<void*>(_ui);
 }
 
 uintptr_t ptrToBits(void* _ptr)
 {
-	union { void* ptr; uintptr_t ui; } cast = { _ptr };
-	return cast.ui;
+	return reinterpret_cast<uintptr_t>(_ptr);
 }
 
 TEST_CASE("SpSc", "")
