@@ -131,6 +131,15 @@ namespace bx
 		m_userData = _userData;
 		m_stackSize = _stackSize;
 
+        if (NULL != _name)
+        {
+            strCopy(m_name, sizeof(m_name), _name);
+        }
+        else
+        {
+            m_name[0] = '\0';
+        }
+
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
 		ti->m_handle = crt0::threadCreate(&ti->threadFunc, _userData, m_stackSize, _name);
@@ -188,11 +197,6 @@ namespace bx
 
 		m_running = true;
 		m_sem.wait();
-
-		if (NULL != _name)
-		{
-			setThreadName(_name);
-		}
 
 		return true;
 	}
@@ -314,6 +318,7 @@ namespace bx
 #endif // BX_PLATFORM_WINDOWS
 
 		m_sem.post();
+		setThreadName(m_name);
 		int32_t result = m_fn(this, m_userData);
 		return result;
 	}
