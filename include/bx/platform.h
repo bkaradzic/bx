@@ -445,7 +445,7 @@
 #endif // BX_ARCH_
 
 #if defined(__cplusplus)
-#	if defined(_MSVC_LANG) && _MSVC_LANG != __cplusplus
+#	if defined(_MSVC_LANG) && !BX_COMPILER_CLANG && _MSVC_LANG != __cplusplus
 #			error "When using MSVC you must set /Zc:__cplusplus compiler option."
 #	endif // defined(_MSVC_LANG) && _MSVC_LANG != __cplusplus
 
