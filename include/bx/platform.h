@@ -6,6 +6,10 @@
 #ifndef BX_PLATFORM_H_HEADER_GUARD
 #define BX_PLATFORM_H_HEADER_GUARD
 
+#ifdef __APPLE__
+#include <TargetConditionals.h>
+#endif
+
 // Architecture
 #define BX_ARCH_32BIT 0
 #define BX_ARCH_64BIT 0
@@ -53,6 +57,7 @@
 #define BX_PLATFORM_HAIKU      0
 #define BX_PLATFORM_HURD       0
 #define BX_PLATFORM_IOS        0
+#define BX_PLATFORM_VISIONOS   0
 #define BX_PLATFORM_LINUX      0
 #define BX_PLATFORM_NX         0
 #define BX_PLATFORM_OSX        0
@@ -196,6 +201,9 @@
 	|| defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_IOS
 #	define BX_PLATFORM_IOS 1
+#elif TARGET_OS_VISION
+#  undef  BX_PLATFORM_VISIONOS
+#  define BX_PLATFORM_VISIONOS 1
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
@@ -275,6 +283,7 @@
 	||  BX_PLATFORM_PS4        \
 	||  BX_PLATFORM_PS5        \
 	||  BX_PLATFORM_RPI        \
+	||  BX_PLATFORM_VISIONOS   \
 	)
 
 ///
@@ -291,6 +300,7 @@
 	||  BX_PLATFORM_PS4        \
 	||  BX_PLATFORM_PS5        \
 	||  BX_PLATFORM_RPI        \
+	||  BX_PLATFORM_VISIONOS   \
 	||  BX_PLATFORM_WINDOWS    \
 	||  BX_PLATFORM_WINRT      \
 	||  BX_PLATFORM_XBOXONE    \
@@ -380,6 +390,8 @@
 #	define BX_PLATFORM_NAME "Hurd"
 #elif BX_PLATFORM_IOS
 #	define BX_PLATFORM_NAME "iOS"
+#elif BX_PLATFORM_VISIONOS
+#  define BX_PLATFORM_NAME "visionOS"
 #elif BX_PLATFORM_LINUX
 #	define BX_PLATFORM_NAME "Linux"
 #elif BX_PLATFORM_NONE
