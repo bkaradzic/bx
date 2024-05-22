@@ -17,6 +17,7 @@
 	|| BX_PLATFORM_PS4     \
 	|| BX_PLATFORM_RPI	   \
 	|| BX_PLATFORM_NX      \
+	|| BX_PLATFORM_CHEERP  \
 	|| BX_PLATFORM_VISIONOS
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \

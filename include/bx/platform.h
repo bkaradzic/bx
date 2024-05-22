@@ -50,6 +50,7 @@
 #define BX_PLATFORM_ANDROID    0
 #define BX_PLATFORM_BSD        0
 #define BX_PLATFORM_EMSCRIPTEN 0
+#define BX_PLATFORM_CHEERP     0
 #define BX_PLATFORM_HAIKU      0
 #define BX_PLATFORM_HURD       0
 #define BX_PLATFORM_IOS        0
@@ -203,6 +204,9 @@
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
+#elif defined(__CHEERP__)
+#   undef BX_PLATFORM_CHEERP
+#   define BX_PLATFORM_CHEERP 1
 #elif defined(__EMSCRIPTEN__)
 #	include <emscripten/version.h>
 #	undef  BX_PLATFORM_EMSCRIPTEN
@@ -270,6 +274,7 @@
 	||  BX_PLATFORM_ANDROID    \
 	||  BX_PLATFORM_BSD        \
 	||  BX_PLATFORM_EMSCRIPTEN \
+	||  BX_PLATFORM_CHEERP     \
 	||  BX_PLATFORM_HAIKU      \
 	||  BX_PLATFORM_HURD       \
 	||  BX_PLATFORM_IOS        \

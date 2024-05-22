@@ -69,6 +69,8 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_ReadBarrier();
+#elif BX_PLATFORM_CHEERP
+		__sync_synchronize();
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER_*
@@ -78,6 +80,8 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_WriteBarrier();
+#elif BX_PLATFORM_CHEERP
+		__sync_synchronize();
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER_*
@@ -87,6 +91,8 @@ namespace bx
 	{
 #if BX_COMPILER_MSVC
 		_ReadWriteBarrier();
+#elif BX_PLATFORM_CHEERP
+		__sync_synchronize();
 #else
 		asm volatile("":::"memory");
 #endif // BX_COMPILER_*

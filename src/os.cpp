@@ -21,6 +21,7 @@
 #	include <psapi.h>
 #elif  BX_PLATFORM_ANDROID    \
 	|| BX_PLATFORM_EMSCRIPTEN \
+	|| BX_PLATFORM_CHEERP     \
 	|| BX_PLATFORM_IOS        \
 	|| BX_PLATFORM_LINUX      \
 	|| BX_PLATFORM_NX         \
