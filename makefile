@@ -3,6 +3,8 @@
 # License: https://github.com/bkaradzic/bx/blob/master/LICENSE
 #
 
+HOST != sh build-aux/config.guess
+
 GENIE=../bx/tools/bin/$(OS)/genie
 
 all:
@@ -140,30 +142,31 @@ clean:
 
 SILENT ?= @
 
-UNAME := $(shell uname)
-ifeq ($(UNAME),$(filter $(UNAME),Linux GNU Darwin Haiku))
-ifeq ($(UNAME),$(filter $(UNAME),Darwin Haiku))
-ifeq ($(UNAME),$(filter $(UNAME),Darwin))
+ifneq ($(filter x86_64-apple-darwin%,$(HOST)),)
 OS=darwin
 BUILD_PROJECT_DIR=gmake-osx-x64
 BUILD_OUTPUT_DIR=osx-x64
 BUILD_TOOLS_CONFIG=release
 EXE=
-else
+endif
+
+ifneq ($(filter %-haiku,$(HOST)),)
 OS=haiku
 BUILD_PROJECT_DIR=gmake-haiku
 BUILD_OUTPUT_DIR=haiku64_gcc
 BUILD_TOOLS_CONFIG=release64
 EXE=
 endif
-else
+
+ifneq ($(filter x86_64-pc-linux-%,$(HOST)),)
 OS=linux
 BUILD_PROJECT_DIR=gmake-linux
 BUILD_OUTPUT_DIR=linux64_gcc
 BUILD_TOOLS_CONFIG=release64
 EXE=
 endif
-else
+
+ifneq ($(filter %-pc-mingw32,$(HOST)),)
 OS=windows
 BUILD_PROJECT_DIR=gmake-mingw-gcc
 BUILD_OUTPUT_DIR=win32_mingw-gcc
