@@ -174,6 +174,11 @@ BUILD_TOOLS_CONFIG=release64
 EXE=.exe
 endif
 
+ifneq ($(filter %-musl,$(HOST)),)
+CXXFLAGS += -DBX_CRT_MUSL
+export CXXFLAGS
+endif
+
 # bin2c
 .build/osx-x64/bin/bin2cRelease: .build/projects/gmake-osx-x64
 	$(SILENT) make -C .build/projects/gmake-osx-x64 bin2c config=$(BUILD_TOOLS_CONFIG)

@@ -3,6 +3,8 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
+#define _LARGEFILE64_SOURCE // for fseeko64 & ftello64
+
 #include <bx/file.h>
 
 #ifndef BX_CONFIG_CRT_FILE_READER_WRITER

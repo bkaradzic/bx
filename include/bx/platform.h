@@ -36,6 +36,10 @@
 #define BX_CRT_MSVC   0
 #define BX_CRT_NEWLIB 0
 
+#ifndef BX_CRT_MUSL
+#define BX_CRT_MUSL   0
+#endif
+
 #ifndef BX_CRT_NONE
 #	define BX_CRT_NONE 0
 #endif // BX_CRT_NONE
@@ -429,6 +433,8 @@
 #	define BX_CRT_NAME "Newlib"
 #elif BX_CRT_NONE
 #	define BX_CRT_NAME "None"
+#elif BX_CRT_MUSL
+#	define BX_CRT_NAME "musl C Library"
 #else
 #	define BX_CRT_NAME "Unknown CRT"
 #endif // BX_CRT_
