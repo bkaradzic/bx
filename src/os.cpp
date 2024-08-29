@@ -23,6 +23,7 @@
 	|| BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_IOS        \
 	|| BX_PLATFORM_LINUX      \
+	|| BX_PLATFORM_BSD		  \
 	|| BX_PLATFORM_NX         \
 	|| BX_PLATFORM_OSX        \
 	|| BX_PLATFORM_PS4        \
