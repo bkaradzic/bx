@@ -276,7 +276,7 @@ namespace bx
 	inline int32_t read(ReaderI* _reader, Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		return _reader->read(&_value, sizeof(Ty), _err);
 	}
 
@@ -284,7 +284,7 @@ namespace bx
 	inline int32_t readHE(ReaderI* _reader, Ty& _value, bool _fromLittleEndian, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		Ty value;
 		int32_t result = _reader->read(&value, sizeof(Ty), _err);
 		_value = toHostEndian(value, _fromLittleEndian);
@@ -322,7 +322,7 @@ namespace bx
 	inline int32_t write(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		return _writer->write(&_value, sizeof(Ty), _err);
 	}
 
@@ -347,7 +347,7 @@ namespace bx
 	inline int32_t writeLE(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		Ty value = toLittleEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty), _err);
 		return result;
@@ -363,7 +363,7 @@ namespace bx
 	inline int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		Ty value = toBigEndian(_value);
 		int32_t result = _writer->write(&value, sizeof(Ty), _err);
 		return result;
@@ -414,7 +414,7 @@ namespace bx
 	inline int32_t peek(ReaderSeekerI* _reader, Ty& _value, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
-		BX_STATIC_ASSERT(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>() );
 		return peek(_reader, &_value, sizeof(Ty), _err);
 	}
 

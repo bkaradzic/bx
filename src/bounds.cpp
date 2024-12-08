@@ -627,7 +627,7 @@ namespace bx
 
 	bool intersect(const Ray& _ray, const Capsule& _capsule, Hit* _hit)
 	{
-		BX_STATIC_ASSERT(sizeof(Capsule) == sizeof(Cylinder) );
+		static_assert(sizeof(Capsule) == sizeof(Cylinder) );
 		return intersect(_ray, *( (const Cylinder*)&_capsule), true, _hit);
 	}
 

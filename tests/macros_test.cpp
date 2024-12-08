@@ -7,7 +7,7 @@
 #include <bx/bx.h>
 #include <bx/string.h>
 
-BX_STATIC_ASSERT(false
+static_assert(false
 	|| BX_CRT_BIONIC
 	|| BX_CRT_GLIBC
 	|| BX_CRT_LIBCXX
@@ -17,12 +17,12 @@ BX_STATIC_ASSERT(false
 	|| BX_CRT_NONE
 	);
 
-BX_STATIC_ASSERT(1 == BX_VA_ARGS_COUNT(1) );
-BX_STATIC_ASSERT(2 == BX_VA_ARGS_COUNT(1, 2) );
-BX_STATIC_ASSERT(3 == BX_VA_ARGS_COUNT(1, 2, 3) );
-BX_STATIC_ASSERT(4 == BX_VA_ARGS_COUNT(1, 2, 3, 4) );
-BX_STATIC_ASSERT(5 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5) );
-BX_STATIC_ASSERT(6 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
+static_assert(1 == BX_VA_ARGS_COUNT(1) );
+static_assert(2 == BX_VA_ARGS_COUNT(1, 2) );
+static_assert(3 == BX_VA_ARGS_COUNT(1, 2, 3) );
+static_assert(4 == BX_VA_ARGS_COUNT(1, 2, 3, 4) );
+static_assert(5 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5) );
+static_assert(6 == BX_VA_ARGS_COUNT(1, 2, 3, 4, 5, 6) );
 
 BX_NO_INLINE void unusedFunction()
 {

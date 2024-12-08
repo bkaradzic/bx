@@ -591,7 +591,7 @@ namespace bx
 	template<typename Ty>
 	inline constexpr Ty&& forward(RemoveReferenceType<Ty>&& _a)
 	{
-		BX_STATIC_ASSERT(!isLvalueReference<Ty>(), "Can not forward an Rvalue as an Lvalue.");
+		static_assert(!isLvalueReference<Ty>(), "Can not forward an Rvalue as an Lvalue.");
 		return static_cast<Ty&&>(_a);
 	}
 

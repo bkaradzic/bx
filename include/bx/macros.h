@@ -89,9 +89,6 @@
 #define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
 
 ///
-#define BX_STATIC_ASSERT(_condition, ...) static_assert(_condition, "" __VA_ARGS__)
-
-///
 #define BX_ALIGN_DECL_16(_decl) BX_ALIGN_DECL(16, _decl)
 #define BX_ALIGN_DECL_256(_decl) BX_ALIGN_DECL(256, _decl)
 #define BX_ALIGN_DECL_CACHE_LINE(_decl) BX_ALIGN_DECL(BX_CACHE_LINE_SIZE, _decl)

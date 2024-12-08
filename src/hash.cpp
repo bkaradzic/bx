@@ -43,7 +43,7 @@ static const uint32_t s_crcTableIeee[] =
 	0xbdbdf21c, 0xcabac28a, 0x53b39330, 0x24b4a3a6, 0xbad03605, 0xcdd70693, 0x54de5729, 0x23d967bf,
 	0xb3667a2e, 0xc4614ab8, 0x5d681b02, 0x2a6f2b94, 0xb40bbe37, 0xc30c8ea1, 0x5a05df1b, 0x2d02ef8d,
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_crcTableIeee) == 256);
+static_assert(BX_COUNTOF(s_crcTableIeee) == 256);
 
 static const uint32_t s_crcTableCastagnoli[] =
 {
@@ -80,7 +80,7 @@ static const uint32_t s_crcTableCastagnoli[] =
 	0xf36e6f75, 0x0105ec76, 0x12551f82, 0xe03e9c81, 0x34f4f86a, 0xc69f7b69, 0xd5cf889d, 0x27a40b9e,
 	0x79b737ba, 0x8bdcb4b9, 0x988c474d, 0x6ae7c44e, 0xbe2da0a5, 0x4c4623a6, 0x5f16d052, 0xad7d5351,
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_crcTableCastagnoli) == 256);
+static_assert(BX_COUNTOF(s_crcTableCastagnoli) == 256);
 
 static const uint32_t s_crcTableKoopman[] =
 {
@@ -117,7 +117,7 @@ static const uint32_t s_crcTableKoopman[] =
 	0xcc9b9520, 0x5a0e51ea, 0x37d3ace9, 0xa1466823, 0xec6856ef, 0x7afd9225, 0x17206f26, 0x81b5abec,
 	0x8d7c12be, 0x1be9d674, 0x76342b77, 0xe0a1efbd, 0xad8fd171, 0x3b1a15bb, 0x56c7e8b8, 0xc0522c72,
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_crcTableKoopman) == 256);
+static_assert(BX_COUNTOF(s_crcTableKoopman) == 256);
 
 static const uint32_t* s_crcTable[] =
 {
@@ -125,7 +125,7 @@ static const uint32_t* s_crcTable[] =
 	s_crcTableCastagnoli,
 	s_crcTableKoopman,
 };
-BX_STATIC_ASSERT(BX_COUNTOF(s_crcTable) == HashCrc32::Count);
+static_assert(BX_COUNTOF(s_crcTable) == HashCrc32::Count);
 
 void HashCrc32::begin(Enum _type)
 {
@@ -270,7 +270,7 @@ struct HashMurmur2APod
 		m_hash ^= m_hash >> 15;
 	}
 };
-BX_STATIC_ASSERT(sizeof(HashMurmur2A) == sizeof(HashMurmur2APod) );
+static_assert(sizeof(HashMurmur2A) == sizeof(HashMurmur2APod) );
 
 void HashMurmur2A::add(const void* _data, int32_t _len)
 {
@@ -334,7 +334,7 @@ struct HashMurmur3Pod
 		m_hash ^= m_hash >> 16;
 	}
 };
-BX_STATIC_ASSERT(sizeof(HashMurmur3) == sizeof(HashMurmur3Pod) );
+static_assert(sizeof(HashMurmur3) == sizeof(HashMurmur3Pod) );
 
 void HashMurmur3::add(const void* _data, int32_t _len)
 {

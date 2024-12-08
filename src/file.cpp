@@ -494,7 +494,7 @@ namespace bx
 
 	FileReader::FileReader()
 	{
-		BX_STATIC_ASSERT(sizeof(FileReaderImpl) <= sizeof(m_internal) );
+		static_assert(sizeof(FileReaderImpl) <= sizeof(m_internal) );
 		BX_PLACEMENT_NEW(m_internal, FileReaderImpl)(NULL);
 	}
 
@@ -530,7 +530,7 @@ namespace bx
 
 	FileWriter::FileWriter()
 	{
-		BX_STATIC_ASSERT(sizeof(FileWriterImpl) <= sizeof(m_internal) );
+		static_assert(sizeof(FileWriterImpl) <= sizeof(m_internal) );
 		BX_PLACEMENT_NEW(m_internal, FileWriterImpl)(NULL);
 	}
 
@@ -711,7 +711,7 @@ namespace bx
 
 	DirectoryReader::DirectoryReader()
 	{
-		BX_STATIC_ASSERT(sizeof(DirectoryReaderImpl) <= sizeof(m_internal) );
+		static_assert(sizeof(DirectoryReaderImpl) <= sizeof(m_internal) );
 		BX_PLACEMENT_NEW(m_internal, DirectoryReaderImpl);
 	}
 

@@ -96,7 +96,7 @@ namespace bx
 		, m_exitCode(kExitSuccess)
 		, m_running(false)
 	{
-		BX_STATIC_ASSERT(sizeof(ThreadInternal) <= sizeof(m_internal) );
+		static_assert(sizeof(ThreadInternal) <= sizeof(m_internal) );
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
@@ -330,7 +330,7 @@ namespace bx
 #if BX_CRT_NONE
 	TlsData::TlsData()
 	{
-		BX_STATIC_ASSERT(sizeof(TlsDataInternal) <= sizeof(m_internal) );
+		static_assert(sizeof(TlsDataInternal) <= sizeof(m_internal) );
 
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		BX_UNUSED(ti);
@@ -357,7 +357,7 @@ namespace bx
 #elif BX_PLATFORM_WINDOWS
 	TlsData::TlsData()
 	{
-		BX_STATIC_ASSERT(sizeof(TlsDataInternal) <= sizeof(m_internal) );
+		static_assert(sizeof(TlsDataInternal) <= sizeof(m_internal) );
 
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		ti->m_id = TlsAlloc();
@@ -387,7 +387,7 @@ namespace bx
 
 	TlsData::TlsData()
 	{
-		BX_STATIC_ASSERT(sizeof(TlsDataInternal) <= sizeof(m_internal) );
+		static_assert(sizeof(TlsDataInternal) <= sizeof(m_internal) );
 
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		int result = pthread_key_create(&ti->m_id, NULL);

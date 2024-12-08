@@ -207,7 +207,7 @@ TEST_CASE("strCmpV sort", "[string][sort]")
 		"test_100.txt",
 	};
 
-	BX_STATIC_ASSERT(BX_COUNTOF(test) == BX_COUNTOF(expected) );
+	static_assert(BX_COUNTOF(test) == BX_COUNTOF(expected) );
 
 	bx::quickSort(test, BX_COUNTOF(test), sizeof(const char*), strCmpV);
 

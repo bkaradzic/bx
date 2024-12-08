@@ -668,28 +668,28 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t findFirstSet(Ty _val)
 	{
-		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		static_assert(isInteger<Ty>(), "Type Ty must be of integer type!");
 		return Ty(0) == _val ? uint8_t(0) : countTrailingZeros<Ty>(_val) + 1;
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t findLastSet(Ty _val)
 	{
-		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		static_assert(isInteger<Ty>(), "Type Ty must be of integer type!");
 		return Ty(0) == _val ? uint8_t(0) : sizeof(Ty)*8 - countLeadingZeros<Ty>(_val);
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t ceilLog2(Ty _a)
 	{
-		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		static_assert(isInteger<Ty>(), "Type Ty must be of integer type!");
 		return Ty(_a) < Ty(1) ? Ty(0) : sizeof(Ty)*8 - countLeadingZeros<Ty>(_a - 1);
 	}
 
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC uint8_t floorLog2(Ty _a)
 	{
-		BX_STATIC_ASSERT(isInteger<Ty>(), "Type Ty must be of integer type!");
+		static_assert(isInteger<Ty>(), "Type Ty must be of integer type!");
 		return Ty(_a) < Ty(1) ? Ty(0) : sizeof(Ty)*8 - 1 - countLeadingZeros<Ty>(_a);
 	}
 
