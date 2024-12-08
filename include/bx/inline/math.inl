@@ -402,6 +402,16 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float log(float _a)
 	{
+		if (_a < 0.0f)
+		{
+			return bitsToFloat(kFloatSignMask | kFloatExponentMask | kFloatMantissaMask);
+		}
+
+		if (_a == 0.0f)
+		{
+			return -kFloatInfinity;
+		}
+
 		const uint32_t ftob     = floatToBits(_a);
 
 		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
@@ -461,6 +471,11 @@ namespace bx
 		constexpr float expMin = log(kFloatSmallest);
 
 		if (_a <= expMin)
+		{
+			return 0.0f;
+		}
+
+		if (isInfinite(_a) && _a < 0.0f)
 		{
 			return 0.0f;
 		}
