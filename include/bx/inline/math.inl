@@ -213,16 +213,6 @@ namespace bx
 		return mul(_a, rcpSafe(_b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC float ceilDiv(float _a, float _b)
-	{
-		return div(_a + _b - 1, _b);
-	}
-
-	inline BX_CONSTEXPR_FUNC float ceilDivSafe(float _a, float _b)
-	{
-		return divSafe(_a + _b - 1, _b);
-	}
-
 	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
 	{
 		return _a - _b * floor(div(_a, _b) );

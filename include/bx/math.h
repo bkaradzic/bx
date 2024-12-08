@@ -372,14 +372,6 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float divSafe(float _a, float _b);
 
-	/// Returns result of division (_a / _b), and rounds upwards.
-	///
-	BX_CONSTEXPR_FUNC float ceilDiv(float _a, float _b);
-
-	/// Returns result of division (_a / _b), and rounds upwards. Avoids divide by zero.
-	///
-	BX_CONSTEXPR_FUNC float ceilDivSafe(float _a, float _b);
-
 	/// Returns the floating-point remainder of the division operation _a/_b.
 	///
 	BX_CONSTEXPR_FUNC float mod(float _a, float _b);
