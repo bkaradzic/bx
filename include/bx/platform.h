@@ -464,9 +464,9 @@ static_assert(!BX_COMPILER_CLANG || BX_COMPILER_CLANG >= 110000, "\n\n"
 	"\t\n");
 
 // https://gcc.gnu.org/releases.html
-static_assert(!BX_COMPILER_GCC || BX_COMPILER_GCC >= 80400, "\n\n"
+static_assert(!BX_COMPILER_GCC || BX_COMPILER_GCC >= 110000, "\n\n"
 	"\t** IMPORTANT! **\n\n"
-	"\tMinimum supported GCC version is 8.4 (March 4, 2020).\n"
+	"\tMinimum supported GCC version is 11.0 (April 27, 2021).\n"
 	"\t\n");
 
 // https://learn.microsoft.com/en-us/visualstudio/releases/2019/history
