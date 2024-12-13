@@ -62,10 +62,10 @@ int runAllTests(int32_t _argc, const char* _argv[])
 
 	for (int32_t ii = 0; ii < _argc; ++ii)
 	{
-		bx::printf("\t%2d: \"%s\"", ii, _argv[ii]);
+		bx::printf("\t%2d: \"%s\"\n", ii, _argv[ii]);
 	}
 
-	bx::printf("\n\n");
+	bx::printf("\n");
 
 	using namespace Catch;
 
