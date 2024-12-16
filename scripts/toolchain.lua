@@ -78,7 +78,6 @@ function toolchain(_buildDir, _libDir)
 			{ "linux-ppc64le-gcc",  "Linux (PPC64LE, GCC compiler)"  },
 			{ "linux-ppc64le-clang",  "Linux (PPC64LE, Clang compiler)"  },
 			{ "linux-riscv64-gcc",  "Linux (RISC-V 64, GCC compiler)"  },
-			{ "ios-arm",         "iOS - ARM"                  },
 			{ "ios-arm64",       "iOS - ARM64"                },
 			{ "ios-simulator",   "iOS - Simulator"            },
 			{ "tvos-arm64",      "tvOS - ARM64"               },
@@ -257,8 +256,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.namestyle = "Emscripten"
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "ios-arm"   == _OPTIONS["gcc"]
-			or "ios-arm64" == _OPTIONS["gcc"] then
+		elseif "ios-arm64" == _OPTIONS["gcc"] then
 			premake.gcc.cc  = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang"
 			premake.gcc.cxx = "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++"
 			premake.gcc.ar  = "ar"
@@ -458,7 +456,7 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
 
 		elseif "ios" == _OPTIONS["xcode"] then
-			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "13.0")
+			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "16.0")
 			premake.xcode.toolset = "iphoneos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 
@@ -963,54 +961,30 @@ function toolchain(_buildDir, _libDir)
 		}
 		includedirs { path.join(bxDir, "include/compat/osx") }
 
-	configuration { "ios*" }
-		linkoptions {
-			"-lc++",
-		}
-		buildoptions {
-			"-Wfatal-errors",
-			"-Wunused-value",
-			"-Wundef",
---			"-mios-version-min=16.0",
-		}
-		includedirs { path.join(bxDir, "include/compat/ios") }
-
 	configuration { "xcode*", "ios*" }
 		targetdir (path.join(_buildDir, "ios-arm/bin"))
 		objdir (path.join(_buildDir, "ios-arm/obj"))
-
-	configuration { "ios-arm" }
-		targetdir (path.join(_buildDir, "ios-arm/bin"))
-		objdir (path.join(_buildDir, "ios-arm/obj"))
-		libdirs { path.join(_libDir, "lib/ios-arm") }
-		linkoptions {
-			"-arch armv7",
-		}
-		buildoptions {
-			"-arch armv7",
-		}
 
 	configuration { "ios-arm64" }
 		targetdir (path.join(_buildDir, "ios-arm64/bin"))
 		objdir (path.join(_buildDir, "ios-arm64/obj"))
 		libdirs { path.join(_libDir, "lib/ios-arm64") }
-		linkoptions {
-			"-arch arm64",
-		}
+		includedirs { path.join(bxDir, "include/compat/ios") }
 		buildoptions {
 			"-arch arm64",
-		}
+			"-mios-version-min=16.0",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 
-	configuration { "ios-arm*" }
-		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
-		}
-		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
 			"-fembed-bitcode",
+			"-Wfatal-errors",
+			"-Wunused-value",
+			"-Wundef",
+		}
+		linkoptions {
+			"-arch arm64",
+			"-mios-version-min=16.0",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
 		}
 
 	configuration { "xros*" }

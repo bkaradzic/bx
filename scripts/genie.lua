@@ -82,6 +82,12 @@ project "bx.test"
 			"pthread",
 		}
 
+	configuration { "ios*" }
+		linkoptions {
+			"-framework CoreFoundation",
+			"-framework Foundation",
+		}
+
 	configuration { "osx*" }
 		links {
 			"Cocoa.framework",

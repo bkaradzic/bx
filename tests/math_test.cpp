@@ -21,7 +21,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
 
-#if BX_PLATFORM_OSX
+#if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
 		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
 		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
