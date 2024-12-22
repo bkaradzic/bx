@@ -201,7 +201,7 @@ namespace bx
 	void* dlsym(void* _handle, const StringView& _symbol)
 	{
 		const int32_t symbolMax = _symbol.getLength()+1;
-		char* symbol = (char*)alloca(symbolMax);
+		char* symbol = (char*)BX_STACK_ALLOC(symbolMax);
 		strCopy(symbol, symbolMax, _symbol);
 
 #if BX_PLATFORM_WINDOWS
@@ -222,7 +222,7 @@ namespace bx
 	bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name)
 	{
 		const int32_t nameMax = _name.getLength()+1;
-		char* name = (char*)alloca(nameMax);
+		char* name = (char*)BX_STACK_ALLOC(nameMax);
 		strCopy(name, nameMax, _name);
 
 #if BX_PLATFORM_WINDOWS
@@ -261,14 +261,14 @@ namespace bx
 	void setEnv(const StringView& _name, const StringView& _value)
 	{
 		const int32_t nameMax = _name.getLength()+1;
-		char* name = (char*)alloca(nameMax);
+		char* name = (char*)BX_STACK_ALLOC(nameMax);
 		strCopy(name, nameMax, _name);
 
 		char* value = NULL;
 		if (!_value.isEmpty() )
 		{
 			int32_t valueMax = _value.getLength()+1;
-			value = (char*)alloca(valueMax);
+			value = (char*)BX_STACK_ALLOC(valueMax);
 			strCopy(value, valueMax, _value);
 		}
 
@@ -335,7 +335,7 @@ namespace bx
 			total += (int32_t)strLen(_argv[ii]) + 1;
 		}
 
-		char* temp = (char*)alloca(total);
+		char* temp = (char*)BX_STACK_ALLOC(total);
 		int32_t len = 0;
 		for(uint32_t ii = 0; NULL != _argv[ii]; ++ii)
 		{

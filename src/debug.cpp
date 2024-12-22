@@ -130,7 +130,7 @@ namespace bx
 		int32_t len = vsnprintf(out, sizeof(temp), _format, _argList);
 		if ( (int32_t)sizeof(temp) < len)
 		{
-			out = (char*)alloca(len+1);
+			out = (char*)BX_STACK_ALLOC(len+1);
 			len = vsnprintf(out, len, _format, _argList);
 		}
 		out[len] = '\0';
@@ -217,7 +217,7 @@ namespace bx
 	uint32_t getCallStack(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
 	{
 		const uint32_t max = _skip+_max+1;
-		void** tmp = (void**)alloca(sizeof(uintptr_t)*max);
+		void** tmp = (void**)BX_STACK_ALLOC(sizeof(uintptr_t)*max);
 
 		const uint32_t numFull = backtrace(tmp, max);
 		const uint32_t skip    = min(_skip + 1 /* skip self */, numFull);

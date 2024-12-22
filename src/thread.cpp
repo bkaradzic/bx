@@ -256,7 +256,7 @@ namespace bx
 		{
 			uint32_t length = (uint32_t)strLen(_name)+1;
 			uint32_t size = length*sizeof(wchar_t);
-			wchar_t* name = (wchar_t*)alloca(size);
+			wchar_t* name = (wchar_t*)BX_STACK_ALLOC(size);
 			mbstowcs(name, _name, size-2);
 			SetThreadDescription(ti->m_handle, name);
 		}

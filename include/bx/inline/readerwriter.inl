@@ -304,7 +304,7 @@ namespace bx
 		const uint32_t tmp0      = uint32_sels(64   - _size,   64, _size);
 		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
 		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
-		uint8_t* temp = (uint8_t*)alloca(blockSize);
+		uint8_t* temp = (uint8_t*)BX_STACK_ALLOC(blockSize);
 		memSet(temp, _byte, blockSize);
 
 		int32_t size = 0;

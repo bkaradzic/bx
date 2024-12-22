@@ -22,7 +22,7 @@ namespace bx
 		int32_t len = vsnprintf(out, sizeof(temp), _format, _argList);
 		if (int32_t(sizeof(temp) ) < len)
 		{
-			out = (char*)alloca(len);
+			out = (char*)BX_STACK_ALLOC(len);
 			len = vsnprintf(out, len, _format, _argList);
 		}
 		_out.append(out, out+len);

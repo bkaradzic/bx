@@ -61,7 +61,7 @@ static bool test(const char* _expected, const char* _format, va_list _argList)
 {
 	const int32_t expectedLen = bx::strLen(_expected);
 	int32_t max = expectedLen + 1024;
-	char* bxTemp = (char*)alloca(max);
+	char* bxTemp = (char*)BX_STACK_ALLOC(max);
 
 	va_list argList;
 	va_copy(argList, _argList);
@@ -83,7 +83,7 @@ static bool test(const char* _expected, const char* _format, va_list _argList)
 			  "Use `testNotStdCompliant` string testing method."
 			);
 
-		crtTemp = (char*)alloca(max);
+		crtTemp = (char*)BX_STACK_ALLOC(max);
 
 		va_copy(argList, _argList);
 		crtLen = ::vsnprintf(crtTemp, max, _format, argList);
