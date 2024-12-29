@@ -640,35 +640,28 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC bool isAligned(Ty _a, int32_t _align)
+	inline BX_CONSTEXPR_FUNC bool isAligned(Ty _a, size_t _align)
 	{
-		const Ty mask = Ty(max(1, _align) - 1);
-		return 0 == (_a & mask);
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return 0 == (size_t(_a) & mask);
 	}
 
-	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC bool isAligned(Ty* _ptr, int32_t _align)
-	{
-		const uintptr_t addr = bitCast<uintptr_t>(_ptr);
-		return isAligned(addr, _align);
-	}
-
-	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC bool isAligned(const Ty* _ptr, int32_t _align)
+	template<>
+	inline BX_CONSTEXPR_FUNC bool isAligned(const void* _ptr, size_t _align)
 	{
 		const uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		return isAligned(addr, _align);
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC Ty alignDown(Ty _a, int32_t _align)
+	inline BX_CONSTEXPR_FUNC Ty alignDown(Ty _a, size_t _align)
 	{
-		const Ty mask = Ty(max(1, _align) - 1);
-		return Ty(_a & ~mask);
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return Ty(size_t(_a) & ~mask);
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, int32_t _align)
+	inline BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, size_t _align)
 	{
 		uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		addr = alignDown(addr, _align);
@@ -676,7 +669,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, int32_t _align)
+	inline BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, size_t _align)
 	{
 		uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		addr = alignDown(addr, _align);
@@ -684,14 +677,14 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, int32_t _align)
+	inline BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, size_t _align)
 	{
-		const Ty mask = Ty(max(1, _align) - 1);
-		return Ty( (_a + mask) & ~mask);
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return Ty( (size_t(_a) + mask) & ~mask);
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, int32_t _align)
+	inline BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, size_t _align)
 	{
 		uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		addr = alignUp(addr, _align);
@@ -699,7 +692,7 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, int32_t _align)
+	inline BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, size_t _align)
 	{
 		uintptr_t addr = bitCast<uintptr_t>(_ptr);
 		addr = alignUp(addr, _align);

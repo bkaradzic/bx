@@ -284,7 +284,7 @@ TEST_CASE("Format %d, %i, %o, %u, %x", "[string][printf]")
 	REQUIRE(test("-001", "%04i", -1) );
 	REQUIRE(test("+001", "%+04i", 1) );
 
-	if (sizeof(intmax_t) == 4)
+	if constexpr (sizeof(intmax_t) == 4)
 	{
 		REQUIRE(test("2147483647", "%jd", INTMAX_MAX) );
 	}
@@ -333,7 +333,7 @@ TEST_CASE("Format %td", "[string][printf]")
 
 	REQUIRE(test("-1", "%td", size) );
 
-	if (4 == sizeof(ptrdiff_t) )
+	if constexpr (4 == sizeof(ptrdiff_t) )
 	{
 		REQUIRE(test("-1073741824", "%td", ptrdiff_t(3221225472) ) );
 	}
