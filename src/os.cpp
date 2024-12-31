@@ -10,7 +10,7 @@
 #if BX_CRT_MSVC
 #	include <direct.h>
 #else
-#	include <unistd.h>
+#	include <unistd.h> // syscall, _SC_PAGESIZE
 #endif // BX_CRT_MSVC
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
@@ -43,13 +43,14 @@
 
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo
-#	elif   BX_PLATFORM_LINUX     \
+#	elif   BX_PLATFORM_LINUX \
 		|| BX_PLATFORM_RPI
 #		include <stdio.h>  // fopen
-#		include <unistd.h> // syscall
+#		include <sys/mman.h>
 #		include <sys/syscall.h>
 #	elif BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
+#		include <sys/mman.h>
 #	endif // BX_PLATFORM_ANDROID
 #endif // BX_PLATFORM_
 
@@ -371,6 +372,86 @@ namespace bx
 	void exit(int32_t _exitCode)
 	{
 		::exit(_exitCode);
+	}
+
+	void* memoryMap(void* _address, size_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+#if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+		constexpr int32_t flags = 0
+			| MAP_ANON
+			| MAP_PRIVATE
+			;
+
+		void* result = mmap(_address, _size, PROT_READ | PROT_WRITE, flags, -1 /*fd*/, 0 /*offset*/);
+
+		if (MAP_FAILED == result)
+		{
+			BX_ERROR_SET(
+				  _err
+				, kErrorMemoryMapFailed
+				, "kErrorMemoryMapFailed"
+				);
+
+			return NULL;
+		}
+
+		return result;
+#elif BX_PLATFORM_WINDOWS
+		void* result = VirtualAlloc(_address, _size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+
+		return result;
+#else
+		BX_UNUSED(_address, _size);
+		BX_ERROR_SET(_err, kErrorMemoryMapFailed, "Not implemented!");
+		return NULL;
+#endif // BX_PLATFORM_*
+	}
+
+	void memoryUnmap(void* _address, size_t _size, Error* _err)
+	{
+		BX_ERROR_SCOPE(_err);
+
+#if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+		int32_t result = munmap(_address, _size);
+
+		if (-1 == result)
+		{
+			BX_ERROR_SET(
+				  _err
+				, kErrorMemoryUnmapFailed
+				, "kErrorMemoryUnmapFailed"
+				);
+		}
+#elif BX_PLATFORM_WINDOWS
+		if (!VirtualFree(_address, _size, MEM_RELEASE) )
+		{
+			BX_ERROR_SET(
+				  _err
+				, kErrorMemoryUnmapFailed
+				, "kErrorMemoryUnmapFailed"
+				);
+		}
+#else
+		BX_UNUSED(_address, _size);
+		BX_ERROR_SET(_err, kErrorMemoryUnmapFailed, "Not implemented!");
+#endif // BX_PLATFORM_*
+	}
+
+	size_t memoryPageSize()
+	{
+		size_t pageSize;
+#if BX_PLATFORM_WINDOWS
+		SYSTEM_INFO si; //SystemInfo si;
+		memSet(&si, 0, sizeof(si) );
+		::GetSystemInfo(&si);
+		pageSize = si.dwAllocationGranularity;
+#else
+		pageSize = sysconf(_SC_PAGESIZE);
+#endif // BX_PLATFORM_WINDOWS
+
+		return pageSize;
 	}
 
 } // namespace bx
