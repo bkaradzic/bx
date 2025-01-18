@@ -311,8 +311,10 @@ TEST_CASE("toString intXX_t/uintXX_t", "[string]")
 {
 	REQUIRE(testToStringS(0,          "0") );
 	REQUIRE(testToStringS(-256,       "-256") );
+	REQUIRE(testToStringS(INT32_MIN,  "-2147483648") );
 	REQUIRE(testToStringS(INT32_MAX,  "2147483647") );
 	REQUIRE(testToStringS(UINT32_MAX, "4294967295") );
+	REQUIRE(testToStringS(INT64_MIN,  "-9223372036854775808") );
 	REQUIRE(testToStringS(INT64_MAX,  "9223372036854775807") );
 	REQUIRE(testToStringS(UINT64_MAX, "18446744073709551615") );
 
