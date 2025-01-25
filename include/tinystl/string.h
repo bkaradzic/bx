@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012 Matthew Endsley
+ * Copyright 2012-2018 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,34 +27,37 @@
 #ifndef TINYSTL_STRING_H
 #define TINYSTL_STRING_H
 
-#include <string.h> // strlen
-#include "stddef.h"
-#include "hash.h"
+#include <tinystl/allocator.h>
+#include <tinystl/stddef.h>
+#include <tinystl/hash.h>
 
 namespace tinystl {
 
-	template<typename Alloc>
-	class stringT {
+	template<typename Allocator>
+	class basic_string {
 	public:
-		stringT();
-		stringT(const stringT<Alloc>& other);
-		stringT(const char* sz);
-		stringT(const char* sz, size_t len);
-		~stringT();
+		basic_string();
+		basic_string(const basic_string& other);
+		basic_string(basic_string&& other);
+		basic_string(const char* sz);
+		basic_string(const char* sz, size_t len);
+		~basic_string();
 
-		stringT<Alloc>& operator=(const stringT<Alloc>& other);
+		basic_string& operator=(const basic_string& other);
+		basic_string& operator=(basic_string&& other);
 
 		const char* c_str() const;
 		size_t size() const;
-		bool empty() const;
 
-		void reserve(size_t _size);
-		void resize(size_t _size);
+		void reserve(size_t size);
+		void resize(size_t size);
 
+		void clear();
 		void append(const char* first, const char* last);
-		void append(const char* str);
+		void assign(const char* s, size_t n);
 
-		void swap(stringT<Alloc>& other);
+		void shrink_to_fit();
+		void swap(basic_string& other);
 
 	private:
 		typedef char* pointer;
@@ -66,10 +69,8 @@ namespace tinystl {
 		char m_buffer[12];
 	};
 
-	typedef stringT<TINYSTL_ALLOCATOR> string;
-
-	template<typename Alloc>
-	inline stringT<Alloc>::stringT()
+	template<typename allocator>
+	inline basic_string<allocator>::basic_string()
 		: m_first(m_buffer)
 		, m_last(m_buffer)
 		, m_capacity(m_buffer + c_nbuffer)
@@ -77,8 +78,8 @@ namespace tinystl {
 		resize(0);
 	}
 
-	template<typename Alloc>
-	inline stringT<Alloc>::stringT(const stringT<Alloc>& other)
+	template<typename allocator>
+	inline basic_string<allocator>::basic_string(const basic_string& other)
 		: m_first(m_buffer)
 		, m_last(m_buffer)
 		, m_capacity(m_buffer + c_nbuffer)
@@ -87,8 +88,27 @@ namespace tinystl {
 		append(other.m_first, other.m_last);
 	}
 
-	template<typename Alloc>
-	inline stringT<Alloc>::stringT(const char* sz)
+	template<typename allocator>
+	inline basic_string<allocator>::basic_string(basic_string&& other)
+	{
+		if (other.m_first == other.m_buffer) {
+			m_first = m_buffer;
+			m_last = m_buffer;
+			m_capacity = m_buffer + c_nbuffer;
+			reserve(other.size());
+			append(other.m_first, other.m_last);
+		} else {
+			m_first = other.m_first;
+			m_last = other.m_last;
+			m_capacity = other.m_capacity;
+		}
+		other.m_first = other.m_last = other.m_buffer;
+		other.m_capacity = other.m_buffer + c_nbuffer;
+		other.resize(0);
+	}
+
+	template<typename allocator>
+	inline basic_string<allocator>::basic_string(const char* sz)
 		: m_first(m_buffer)
 		, m_last(m_buffer)
 		, m_capacity(m_buffer + c_nbuffer)
@@ -101,8 +121,8 @@ namespace tinystl {
 		append(sz, sz + len);
 	}
 
-	template<typename Alloc>
-	inline stringT<Alloc>::stringT(const char* sz, size_t len)
+	template<typename allocator>
+	inline basic_string<allocator>::basic_string(const char* sz, size_t len)
 		: m_first(m_buffer)
 		, m_last(m_buffer)
 		, m_capacity(m_buffer + c_nbuffer)
@@ -111,68 +131,73 @@ namespace tinystl {
 		append(sz, sz + len);
 	}
 
-	template<typename Alloc>
-	inline stringT<Alloc>::~stringT() {
+	template<typename allocator>
+	inline basic_string<allocator>::~basic_string() {
 		if (m_first != m_buffer)
-			Alloc::static_deallocate(m_first, m_capacity - m_first);
+			allocator::static_deallocate(m_first, m_capacity - m_first);
 	}
 
-	template<typename Alloc>
-	inline stringT<Alloc>& stringT<Alloc>::operator=(const stringT<Alloc>& other) {
-		stringT<Alloc>(other).swap(*this);
+	template<typename allocator>
+	inline basic_string<allocator>& basic_string<allocator>::operator=(const basic_string& other) {
+		basic_string(other).swap(*this);
 		return *this;
 	}
 
-	template<typename Alloc>
-	inline const char* stringT<Alloc>::c_str() const {
+	template<typename allocator>
+	inline basic_string<allocator>& basic_string<allocator>::operator=(basic_string&& other) {
+		basic_string(static_cast<basic_string&&>(other)).swap(*this);
+		return *this;
+	}
+
+	template<typename allocator>
+	inline const char* basic_string<allocator>::c_str() const {
 		return m_first;
 	}
 
-	template<typename Alloc>
-	inline size_t stringT<Alloc>::size() const
+	template<typename allocator>
+	inline size_t basic_string<allocator>::size() const
 	{
 		return (size_t)(m_last - m_first);
 	}
 
-	template<typename Alloc>
-	inline bool stringT<Alloc>::empty() const
-	{
-		return 0 == size();
-	}
-
-	template<typename Alloc>
-	inline void stringT<Alloc>::reserve(size_t capacity) {
-		if (m_first + capacity + 1 <= m_capacity) {
+	template<typename allocator>
+	inline void basic_string<allocator>::reserve(size_t capacity) {
+		if (m_first + capacity + 1 <= m_capacity)
 			return;
-		}
 
-		const size_t _size = (size_t)(m_last - m_first);
+		const size_t size = (size_t)(m_last - m_first);
 
-		pointer newfirst = (pointer)Alloc::static_allocate(capacity + 1);
-		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit) {
+		pointer newfirst = (pointer)allocator::static_allocate(capacity + 1);
+		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
 			*newit = *it;
-		}
-
-		if (m_first != m_buffer) {
-			Alloc::static_deallocate(m_first, m_capacity - m_first);
-		}
+		if (m_first != m_buffer)
+			allocator::static_deallocate(m_first, m_capacity - m_first);
 
 		m_first = newfirst;
-		m_last = newfirst + _size;
+		m_last = newfirst + size;
 		m_capacity = m_first + capacity;
 	}
 
-	template<typename Alloc>
-	inline void stringT<Alloc>::resize(size_t _size) {
-		reserve(_size);
-		for (pointer it = m_last, end = m_first + _size + 1; it < end; ++it)
-			*it = 0;
+	template<typename allocator>
+	inline void basic_string<allocator>::resize(size_t size) {
+		const size_t prevSize = m_last-m_first;
+		reserve(size);
+		if (size > prevSize)
+			for (pointer it = m_last, end = m_first + size + 1; it < end; ++it)
+				*it = 0;
+		else if (m_last != m_first)
+			m_first[size] = 0;
 
-		m_last += _size;
+		m_last = m_first + size;
 	}
 
-	template<typename Alloc>
-	inline void stringT<Alloc>::append(const char* first, const char* last) {
+	template<typename allocator>
+	inline void basic_string<allocator>::clear() {
+		resize(0);
+	}
+
+	template<typename allocator>
+	inline void basic_string<allocator>::append(const char* first, const char* last) {
 		const size_t newsize = (size_t)((m_last - m_first) + (last - first) + 1);
 		if (m_first + newsize > m_capacity)
 			reserve((newsize * 3) / 2);
@@ -182,13 +207,35 @@ namespace tinystl {
 		*m_last = 0;
 	}
 
-	template<typename Alloc>
-	inline void stringT<Alloc>::append(const char* str) {
-		append(str, str + strlen(str) );
+	template<typename allocator>
+	inline void basic_string<allocator>::assign(const char* sz, size_t n) {
+		clear();
+		append(sz, sz+n);
 	}
 
-	template<typename Alloc>
-	inline void stringT<Alloc>::swap(stringT<Alloc>& other) {
+	template<typename allocator>
+	inline void basic_string<allocator>::shrink_to_fit() {
+		if (m_first == m_buffer) {
+		} else if (m_last == m_first) {
+			const size_t capacity = (size_t)(m_capacity - m_first);
+			if (capacity)
+				allocator::static_deallocate(m_first, capacity+1);
+			m_capacity = m_first;
+		} else if (m_capacity != m_last) {
+			const size_t size = (size_t)(m_last - m_first);
+			char* newfirst = (pointer)allocator::static_allocate(size+1);
+			for (pointer in = m_first, out = newfirst; in != m_last + 1; ++in, ++out)
+				*out = *in;
+			if (m_first != m_capacity)
+				allocator::static_deallocate(m_first, m_capacity+1-m_first);
+			m_first = newfirst;
+			m_last = newfirst+size;
+			m_capacity = m_last;
+		}
+	}
+
+	template<typename allocator>
+	inline void basic_string<allocator>::swap(basic_string& other) {
 		const pointer tfirst = m_first, tlast = m_last, tcapacity = m_capacity;
 		m_first = other.m_first, m_last = other.m_last, m_capacity = other.m_capacity;
 		other.m_first = tfirst, other.m_last = tlast, other.m_capacity = tcapacity;
@@ -220,8 +267,8 @@ namespace tinystl {
 		}
 	}
 
-	template<typename Alloc>
-	inline bool operator==(const stringT<Alloc>& lhs, const stringT<Alloc>& rhs) {
+	template<typename allocatorl, typename allocatorr>
+	inline bool operator==(const basic_string<allocatorl>& lhs, const basic_string<allocatorr>& rhs) {
 		typedef const char* pointer;
 
 		const size_t lsize = lhs.size(), rsize = rhs.size();
@@ -237,10 +284,12 @@ namespace tinystl {
 		return true;
 	}
 
-	template<typename Alloc>
-	static inline size_t hash(const stringT<Alloc>& value) {
+	template<typename allocator>
+	static inline size_t hash(const basic_string<allocator>& value) {
 		return hash_string(value.c_str(), value.size());
 	}
+
+	typedef basic_string<TINYSTL_ALLOCATOR> string;
 }
 
 #endif
