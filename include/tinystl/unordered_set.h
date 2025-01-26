@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012-2018 Matthew Endsley
+ * Copyright 2012 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,9 @@
 #ifndef TINYSTL_UNORDERED_SET_H
 #define TINYSTL_UNORDERED_SET_H
 
-#include <tinystl/allocator.h>
-#include <tinystl/buffer.h>
-#include <tinystl/hash.h>
-#include <tinystl/hash_base.h>
+#include "buffer.h"
+#include "hash.h"
+#include "hash_base.h"
 
 namespace tinystl {
 
@@ -39,11 +38,9 @@ namespace tinystl {
 	public:
 		unordered_set();
 		unordered_set(const unordered_set& other);
-		unordered_set(unordered_set&& other);
 		~unordered_set();
 
 		unordered_set& operator=(const unordered_set& other);
-		unordered_set& operator=(unordered_set&& other);
 
 		typedef unordered_hash_iterator<const unordered_hash_node<Key, void> > const_iterator;
 		typedef const_iterator iterator;
@@ -57,7 +54,6 @@ namespace tinystl {
 
 		iterator find(const Key& key) const;
 		pair<iterator, bool> insert(const Key& key);
-		pair<iterator, bool> emplace(Key&& key);
 		void erase(iterator where);
 		size_t erase(const Key& key);
 
@@ -65,16 +61,14 @@ namespace tinystl {
 
 	private:
 
-		void rehash(size_t nbuckets);
-
 		typedef unordered_hash_node<Key, void>* pointer;
 
 		size_t m_size;
-		tinystl::buffer<pointer, Alloc> m_buckets;
+		buffer<pointer, Alloc> m_buckets;
 	};
 
 	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>::unordered_set()
+	unordered_set<Key, Alloc>::unordered_set()
 		: m_size(0)
 	{
 		buffer_init<pointer, Alloc>(&m_buckets);
@@ -82,7 +76,7 @@ namespace tinystl {
 	}
 
 	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>::unordered_set(const unordered_set& other)
+	unordered_set<Key, Alloc>::unordered_set(const unordered_set& other)
 		: m_size(other.m_size)
 	{
 		const size_t nbuckets = (size_t)(other.m_buckets.last - other.m_buckets.first);
@@ -97,29 +91,14 @@ namespace tinystl {
 	}
 
 	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>::unordered_set(unordered_set&& other)
-		: m_size(other.m_size)
-	{
-		buffer_move(&m_buckets, &other.m_buckets);
-		other.m_size = 0;
-	}
-
-	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>::~unordered_set() {
-		if (m_buckets.first != m_buckets.last)
-			clear();
+	unordered_set<Key, Alloc>::~unordered_set() {
+		clear();
 		buffer_destroy<pointer, Alloc>(&m_buckets);
 	}
 
 	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>& unordered_set<Key, Alloc>::operator=(const unordered_set<Key, Alloc>& other) {
+	unordered_set<Key, Alloc>& unordered_set<Key, Alloc>::operator=(const unordered_set<Key, Alloc>& other) {
 		unordered_set<Key, Alloc>(other).swap(*this);
-		return *this;
-	}
-
-	template<typename Key, typename Alloc>
-	inline unordered_set<Key, Alloc>& unordered_set<Key, Alloc>::operator=(unordered_set&& other) {
-		unordered_set(static_cast<unordered_set&&>(other)).swap(*this);
 		return *this;
 	}
 
@@ -171,25 +150,6 @@ namespace tinystl {
 	}
 
 	template<typename Key, typename Alloc>
-	inline void unordered_set<Key, Alloc>::rehash(size_t nbuckets) {
-		if (m_size + 1 > 4 * nbuckets) {
-			pointer root = *m_buckets.first;
-
-			const size_t newnbuckets = ((size_t)(m_buckets.last - m_buckets.first) - 1) * 8;
-			m_buckets.last = m_buckets.first;
-			buffer_resize<pointer, Alloc>(&m_buckets, newnbuckets + 1, 0);
-			unordered_hash_node<Key, void>** buckets = m_buckets.first;
-
-			while (root) {
-				const pointer next = root->next;
-				root->next = root->prev = 0;
-				unordered_hash_node_insert(root, hash(root->first), buckets, newnbuckets);
-				root = next;
-			}
-		}
-	}
-
-	template<typename Key, typename Alloc>
 	inline pair<typename unordered_set<Key, Alloc>::iterator, bool> unordered_set<Key, Alloc>::insert(const Key& key) {
 		pair<iterator, bool> result;
 		result.second = false;
@@ -205,31 +165,21 @@ namespace tinystl {
 		unordered_hash_node_insert(newnode, hash(key), m_buckets.first, nbuckets - 1);
 
 		++m_size;
-		rehash(nbuckets);
+		if (m_size + 1 > 4 * nbuckets) {
+			pointer root = *m_buckets.first;
 
-		result.first.node = newnode;
-		result.second = true;
-		return result;
-	}
+			const size_t newnbuckets = ((size_t)(m_buckets.last - m_buckets.first) - 1) * 8;
+			m_buckets.last = m_buckets.first;
+			buffer_resize<pointer, Alloc>(&m_buckets, newnbuckets + 1, 0);
+			unordered_hash_node<Key, void>** buckets = m_buckets.first;
 
-	template<typename Key, typename Alloc>
-	inline pair<typename unordered_set<Key, Alloc>::iterator, bool> unordered_set<Key, Alloc>::emplace(Key&& key) {
-				pair<iterator, bool> result;
-		result.second = false;
-
-		result.first = find(key);
-		if (result.first.node != 0)
-			return result;
-
-		const size_t keyhash = hash(key);
-		unordered_hash_node<Key, void>* newnode = new(placeholder(), Alloc::static_allocate(sizeof(unordered_hash_node<Key, void>))) unordered_hash_node<Key, void>(static_cast<Key&&>(key));
-		newnode->next = newnode->prev = 0;
-
-		const size_t nbuckets = (size_t)(m_buckets.last - m_buckets.first);
-		unordered_hash_node_insert(newnode, keyhash, m_buckets.first, nbuckets - 1);
-
-		++m_size;
-		rehash(nbuckets);
+			while (root) {
+				const pointer next = root->next;
+				root->next = root->prev = 0;
+				unordered_hash_node_insert(root, hash(root->first), buckets, newnbuckets);
+				root = next;
+			}
+		}
 
 		result.first.node = newnode;
 		result.second = true;

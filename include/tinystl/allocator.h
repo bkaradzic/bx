@@ -1,5 +1,5 @@
 /*-
- * Copyright 2012-2018 Matthew Endsley
+ * Copyright 2012 Matthew Endsley
  * All rights reserved
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,9 @@
 #ifndef TINYSTL_ALLOCATOR_H
 #define TINYSTL_ALLOCATOR_H
 
-#include <tinystl/stddef.h>
+#include "stddef.h"
+
+#ifndef TINYSTL_ALLOCATOR
 
 namespace tinystl {
 
@@ -42,8 +44,7 @@ namespace tinystl {
 	};
 }
 
-#ifndef TINYSTL_ALLOCATOR
 #	define TINYSTL_ALLOCATOR ::tinystl::allocator
-#endif
+#endif // TINYSTL_ALLOCATOR
 
 #endif
