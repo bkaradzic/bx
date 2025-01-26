@@ -442,13 +442,15 @@ namespace bx
 	size_t memoryPageSize()
 	{
 		size_t pageSize;
-#if BX_PLATFORM_WINDOWS
-		SYSTEM_INFO si; //SystemInfo si;
+#if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+		pageSize = sysconf(_SC_PAGESIZE);
+#elif BX_PLATFORM_WINDOWS
+		SYSTEM_INFO si;
 		memSet(&si, 0, sizeof(si) );
 		::GetSystemInfo(&si);
 		pageSize = si.dwAllocationGranularity;
 #else
-		pageSize = sysconf(_SC_PAGESIZE);
+		pageSize = 16<<10;
 #endif // BX_PLATFORM_WINDOWS
 
 		return pageSize;
