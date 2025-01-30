@@ -185,7 +185,7 @@ TEST(uoset_iterate) {
 			}
 			CHECK( count == i );
 
-			s.insert(17 * i);
+			s.insert(int(17 * i));
 		}
 	}
 }
