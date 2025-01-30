@@ -9,7 +9,6 @@
 #include <bx/handlealloc.h>
 #include <bx/sort.h>
 #include <string>
-#include <tinystl/string.h>
 
 bx::AllocatorI* g_allocator;
 
@@ -637,94 +636,4 @@ TEST_CASE("0terminated", "[string]")
 	st = strTrimSuffix(t0, "89");
 	REQUIRE(2 == st.getLength() );
 	REQUIRE(st.is0Terminated() );
-}
-
-TEST(tinystl_string_constructor) {
-	using tinystl::string;
-	{
-		string s;
-		CHECK( s.size() == 0 );
-	}
-	{
-		string s("hello");
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-	}
-	{
-		string s("hello world", 5);
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-	}
-	{
-		const string other("hello");
-		string s = other;
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-	}
-	{
-		string other("hello");
-		string s = std::move(other);
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-		CHECK( other.size() == 0 );
-	}
-}
-
-TEST(tinystl_string_assign) {
-	using tinystl::string;
-	{
-		const string other("hello");
-		string s("new");
-		s = other;
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-	}
-	{
-		string other("hello");
-		string s("new");
-		s = std::move(other);
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "hello") );
-		CHECK( other.size() == 0 );
-	}
-
-	{
-		const string other("hello longer string here");
-		string s("short");
-		s = other;
-
-		CHECK( s.size() == 24 );
-		CHECK( 0 == strcmp(s.c_str(), "hello longer string here") );
-	}
-	{
-		string other("hello longer string here");
-		string s("short");
-		s = std::move(other);
-
-		CHECK( s.size() == 24 );
-		CHECK( 0 == strcmp(s.c_str(), "hello longer string here") );
-		CHECK( other.size() == 0 );
-	}
-
-	{
-		const string other("short");
-		string s("hello longer string here");
-		s = other;
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "short") );
-	}
-	{
-		string other("short");
-		string s("hello longer string here");
-		s = std::move(other);
-
-		CHECK( s.size() == 5 );
-		CHECK( 0 == strcmp(s.c_str(), "short") );
-		CHECK( other.size() == 0 );
-	}
 }
