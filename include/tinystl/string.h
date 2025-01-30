@@ -248,13 +248,13 @@ namespace tinystl {
 			other.m_buffer[i] = temp;
 		}
 		if (m_first == other.m_buffer) {
-			int len = m_last - m_first;
+			size_t len = (size_t)(m_last - m_first);
 			m_first = m_buffer;
 			m_last = m_buffer + len;
 			m_capacity = m_buffer + c_nbuffer;
 		}
 		if (other.m_first == m_buffer) {
-			int len = other.m_last - other.m_first;
+			size_t len = (size_t)(other.m_last - other.m_first);
 			other.m_first = other.m_buffer;
 			other.m_last = other.m_buffer + len;
 			other.m_capacity = other.m_buffer + c_nbuffer;
