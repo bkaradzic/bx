@@ -20,6 +20,7 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
+		BX_UNUSED(u);
 
 #if BX_PLATFORM_OSX || BX_PLATFORM_IOS
 		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
