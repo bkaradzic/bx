@@ -157,7 +157,8 @@ namespace tinystl {
 	template<typename allocator>
 	inline size_t basic_string<allocator>::size() const
 	{
-		return (size_t)(m_last - m_first);
+		ptrdiff_t size = m_last - m_first;
+		return (size_t)size;
 	}
 
 	template<typename allocator>
@@ -165,7 +166,7 @@ namespace tinystl {
 		if (m_first + capacity + 1 <= m_capacity)
 			return;
 
-		const size_t size = (size_t)(m_last - m_first);
+		const ptrdiff_t size = m_last - m_first;
 
 		pointer newfirst = (pointer)allocator::static_allocate(capacity + 1);
 		for (pointer it = m_first, newit = newfirst, end = m_last; it != end; ++it, ++newit)
@@ -180,9 +181,9 @@ namespace tinystl {
 
 	template<typename allocator>
 	inline void basic_string<allocator>::resize(size_t size) {
-		const size_t prevSize = m_last-m_first;
+		const ptrdiff_t prevSize = m_last-m_first;
 		reserve(size);
-		if (size > prevSize)
+		if (size > (size_t)prevSize)
 			for (pointer it = m_last, end = m_first + size + 1; it < end; ++it)
 				*it = 0;
 		else if (m_last != m_first)
@@ -198,7 +199,7 @@ namespace tinystl {
 
 	template<typename allocator>
 	inline void basic_string<allocator>::append(const char* first, const char* last) {
-		const size_t newsize = (size_t)((m_last - m_first) + (last - first) + 1);
+		const ptrdiff_t newsize = ((m_last - m_first) + (last - first) + 1);
 		if (m_first + newsize > m_capacity)
 			reserve((newsize * 3) / 2);
 
@@ -217,12 +218,12 @@ namespace tinystl {
 	inline void basic_string<allocator>::shrink_to_fit() {
 		if (m_first == m_buffer) {
 		} else if (m_last == m_first) {
-			const size_t capacity = (size_t)(m_capacity - m_first);
+			const ptrdiff_t capacity = m_capacity - m_first;
 			if (capacity)
 				allocator::static_deallocate(m_first, capacity+1);
 			m_capacity = m_first;
 		} else if (m_capacity != m_last) {
-			const size_t size = (size_t)(m_last - m_first);
+			const ptrdiff_t size = m_last - m_first;
 			char* newfirst = (pointer)allocator::static_allocate(size+1);
 			for (pointer in = m_first, out = newfirst; in != m_last + 1; ++in, ++out)
 				*out = *in;
@@ -248,13 +249,13 @@ namespace tinystl {
 			other.m_buffer[i] = temp;
 		}
 		if (m_first == other.m_buffer) {
-			size_t len = (size_t)(m_last - m_first);
+			ptrdiff_t len = m_last - m_first;
 			m_first = m_buffer;
 			m_last = m_buffer + len;
 			m_capacity = m_buffer + c_nbuffer;
 		}
 		if (other.m_first == m_buffer) {
-			size_t len = (size_t)(other.m_last - other.m_first);
+			ptrdiff_t len = other.m_last - other.m_first;
 			other.m_first = other.m_buffer;
 			other.m_last = other.m_buffer + len;
 			other.m_capacity = other.m_buffer + c_nbuffer;
