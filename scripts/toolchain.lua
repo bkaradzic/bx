@@ -219,7 +219,7 @@ function toolchain(_buildDir, _libDir)
 	end
 
 	flags {
-		"Cpp17",
+		"Cpp20",
 		"ExtraWarnings",
 		"FloatFast",
 	}
