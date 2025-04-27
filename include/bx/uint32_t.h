@@ -103,6 +103,10 @@ namespace bx
 	BX_CONSTEXPR_FUNC uint32_t uint32_setnz(uint32_t _a);
 
 	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint32_t uint32_splat(Ty _val);
+
+	///
 	BX_CONSTEXPR_FUNC uint32_t uint32_satadd(uint32_t _a, uint32_t _b);
 
 	///
@@ -234,6 +238,10 @@ namespace bx
 
 	///
 	BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b);
+
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC uint64_t uint64_splat(Ty _val);
 
 	///
 	BX_CONSTEXPR_FUNC uint64_t uint64_cntbits(uint64_t _val);

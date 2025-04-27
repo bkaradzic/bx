@@ -34,6 +34,21 @@ TEST_CASE("uint32_part", "[uint32_t]")
 	REQUIRE(UINT32_C(0x09249249) == bx::uint32_part1by2(0x3ff) );
 }
 
+TEST_CASE("uint32_splat", "[uint32_t]")
+{
+	REQUIRE(UINT32_C(0x01010101) == bx::uint32_splat<uint8_t>(0x01) );
+	REQUIRE(UINT32_C(0x55555555) == bx::uint32_splat<uint8_t>(0x55) );
+	REQUIRE(UINT32_C(0x13891389) == bx::uint32_splat<uint16_t>(0x1389) );
+}
+
+TEST_CASE("uint64_splat", "[uint32_t]")
+{
+	REQUIRE(UINT64_C(0x0101010101010101) == bx::uint64_splat<uint8_t>(0x01) );
+	REQUIRE(UINT64_C(0x5555555555555555) == bx::uint64_splat<uint8_t>(0x55) );
+	REQUIRE(UINT32_C(0x1389138913891389) == bx::uint64_splat<uint16_t>(0x1389) );
+	REQUIRE(UINT32_C(0x1506138915061389) == bx::uint64_splat<uint32_t>(0x15061389) );
+}
+
 TEST_CASE("uint32_gcd", "[uint32_t]")
 {
 	REQUIRE(1 == bx::uint32_gcd(13, 89) );

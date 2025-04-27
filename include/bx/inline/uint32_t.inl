@@ -184,6 +184,26 @@ namespace bx
 		return -!!_a;
 	}
 
+	template<>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_splat(uint8_t _val)
+	{
+		const uint32_t tmp0   = uint32_sll(_val, 8);
+		const uint32_t tmp1   = uint32_or(tmp0, _val);
+		const uint32_t tmp2   = uint32_sll(tmp1, 16);
+		const uint32_t result = uint32_or(tmp2, tmp1);
+
+		return result;
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint32_t uint32_splat(uint16_t _val)
+	{
+		const uint32_t tmp    = uint32_sll(_val, 16);
+		const uint32_t result = uint32_or(tmp, _val);
+
+		return result;
+	}
+
 	inline BX_CONSTEXPR_FUNC uint32_t uint32_satadd(uint32_t _a, uint32_t _b)
 	{
 		const uint32_t add    = uint32_add(_a, _b);
@@ -557,6 +577,39 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC uint64_t uint64_mul(uint64_t _a, uint64_t _b)
 	{
 		return _a * _b;
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_splat(uint8_t _val)
+	{
+		const uint64_t tmp0   = uint64_sll(_val, 8);
+		const uint64_t tmp1   = uint64_or(tmp0, _val);
+		const uint64_t tmp2   = uint64_sll(tmp1, 16);
+		const uint64_t tmp3   = uint64_or(tmp2, tmp1);
+		const uint64_t tmp4   = uint64_sll(tmp3, 32);
+		const uint64_t result = uint64_or(tmp4, tmp3);
+
+		return result;
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_splat(uint16_t _val)
+	{
+		const uint64_t tmp0   = uint64_sll(_val, 16);
+		const uint64_t tmp1   = uint64_or(tmp0, _val);
+		const uint64_t tmp2   = uint64_sll(tmp1, 32);
+		const uint64_t result = uint64_or(tmp2, tmp1);
+
+		return result;
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC uint64_t uint64_splat(uint32_t _val)
+	{
+		const uint64_t tmp    = uint64_sll(_val, 32);
+		const uint64_t result = uint64_or(tmp, _val);
+
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC uint64_t uint64_cntbits(uint64_t _val)
