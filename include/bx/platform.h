@@ -469,10 +469,10 @@ static_assert(!BX_COMPILER_GCC || BX_COMPILER_GCC >= 110000, "\n\n"
 	"\tMinimum supported GCC version is 11.0 (April 27, 2021).\n"
 	"\t\n");
 
-// https://learn.microsoft.com/en-us/visualstudio/releases/2019/history
-static_assert(!BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1927, "\n\n"
+// https://learn.microsoft.com/en-us/cpp/overview/compiler-versions
+static_assert(!BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1935, "\n\n"
 	"\t** IMPORTANT! **\n\n"
-	"\tMinimum supported MSVC 19.27 / Visual Studio 2019 version 16.7 (August 5, 2020).\n"
+	"\tMinimum supported MSVC 19.35 / Visual Studio 2022 version 17.5 (February 21, 2023).\n"
 	"\t\n");
 
 static_assert(!BX_CPU_ENDIAN_BIG, "\n\n"
