@@ -469,6 +469,12 @@ static_assert(!BX_COMPILER_GCC || BX_COMPILER_GCC >= 110000, "\n\n"
 	"\tMinimum supported GCC version is 11.0 (April 27, 2021).\n"
 	"\t\n");
 
+// https://www.sourceware.org/glibc/wiki/Glibc%20Timeline
+static_assert(!BX_CRT_GLIBC || BX_CRT_GLIBC >= 23100, "\n\n"
+	"\t** IMPORTANT! **\n\n"
+	"\tMinimum supported GLIBC version is 2.31.0 (February 1, 2020).\n"
+	"\t\n");
+
 // https://learn.microsoft.com/en-us/cpp/overview/compiler-versions
 static_assert(!BX_COMPILER_MSVC || BX_COMPILER_MSVC >= 1935, "\n\n"
 	"\t** IMPORTANT! **\n\n"
