@@ -10,14 +10,7 @@
 #if BX_CRT_NONE
 #	include <bx/cpu.h>
 #	include <bx/crt0.h>
-#elif  BX_PLATFORM_ANDROID \
-	|| BX_PLATFORM_LINUX   \
-	|| BX_PLATFORM_IOS     \
-	|| BX_PLATFORM_OSX     \
-	|| BX_PLATFORM_PS4     \
-	|| BX_PLATFORM_RPI	   \
-	|| BX_PLATFORM_NX      \
-	|| BX_PLATFORM_VISIONOS
+#elif  BX_PLATFORM_POSIX
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
