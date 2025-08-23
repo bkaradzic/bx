@@ -361,9 +361,18 @@ namespace bx
 #endif // BX_PLATFORM_LINUX
 	}
 
-	void exit(int32_t _exitCode)
+	void exit(int32_t _exitCode, bool _cleanup)
 	{
-		::exit(_exitCode);
+		if (_cleanup)
+		{
+			::exit(_exitCode);
+		}
+
+#if BX_PLATFORM_WINDOWS
+		TerminateProcess(GetCurrentProcess(), _exitCode);
+#else
+		_Exit(_exitCode);
+#endif // BX_PLATFORM_*
 	}
 
 	void* memoryMap(void* _address, size_t _size, Error* _err)

@@ -5,6 +5,7 @@
 
 #include <bx/debug.h>
 #include <bx/readerwriter.h>
+#include <bx/os.h>
 
 #if !BX_CRT_NONE
 #	include <string.h> // memcpy, memmove, memset
@@ -22,7 +23,7 @@ namespace bx
 		return LocationFull(_function, _filePath, _line);
 	}
 
-	static bool defaultAssertHandler(const Location& _location, const char* _format, va_list _argList)
+	static bool defaultAssertHandler(const Location& _location, uint32_t _skip, const char* _format, va_list _argList)
 	{
 		char    temp[8192];
 		int32_t total = 0;
@@ -41,7 +42,7 @@ namespace bx
 		total += write(&smb, "\n\n", &err);
 
 		uintptr_t stack[32];
-		const uint32_t num = getCallStack(2 /* skip self */, BX_COUNTOF(stack), stack);
+		const uint32_t num = getCallStack(2 /* skip self */ + _skip, BX_COUNTOF(stack), stack);
 		total += writeCallstack(&smb, stack, num, &err);
 
 		total += write(&smb, &err,
@@ -80,11 +81,11 @@ namespace bx
 		}
 	}
 
-	bool assertFunction(const Location& _location, const char* _format, ...)
+	bool assertFunction(const Location& _location, uint32_t _skip, const char* _format, ...)
 	{
 		va_list argList;
 		va_start(argList, _format);
-		const bool result = s_assertHandler(_location, _format, argList);
+		const bool result = s_assertHandler(_location, _skip, _format, argList);
 		va_end(argList);
 
 		return result;

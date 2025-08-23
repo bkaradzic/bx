@@ -59,7 +59,7 @@ namespace bx
 	void* exec(const char* const* _argv);
 
 	///
-	[[noreturn]] void exit(int32_t _exitCode);
+	[[noreturn]] void exit(int32_t _exitCode, bool _cleanup = true);
 
 	///
 	void* memoryMap(void* _address, size_t _size, Error* _err);

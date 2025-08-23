@@ -22,6 +22,15 @@
 #	include <cxxabi.h>    // abi::__cxa_demangle
 #endif // BX_CONFIG_CALLSTACK_*
 
+#ifndef BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+#	define BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS 0 \
+		| (BX_PLATFORM_LINUX && !BX_CRT_NONE)
+#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+
+#if BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+#	include <signal.h>
+#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+
 #if BX_CRT_NONE
 #	include <bx/crt0.h>
 #elif BX_PLATFORM_ANDROID
@@ -283,6 +292,9 @@ namespace bx
 
 		int32_t total = write(_writer, _err, "Callstack (%d):\n", _num);
 
+		constexpr uint32_t kWidth = 40;
+		total += write(_writer, _err, "\t #: %-*s  Line: PC ---     Function ---\n", kWidth, "File ---");
+
 		CallbackData cbData;
 
 		for (uint32_t ii = 0; ii < _num && _err->isOk(); ++ii)
@@ -311,13 +323,12 @@ namespace bx
 				demangledName = "???";
 			}
 
-			constexpr uint32_t width = 40;
-			const StringView fn = strTail(cbData.fileName, width);
+			const StringView fn = strTail(cbData.fileName, kWidth);
 
 			total += write(_writer, _err
 				, "\t%2d: %-*S % 5d: %p %S\n"
 				, ii
-				, width
+				, kWidth
 				, &fn
 				, cbData.line
 				, _stack[ii]
@@ -362,5 +373,90 @@ namespace bx
 		const uint32_t num = getCallStack(_skip + 1 /* skip self */, BX_COUNTOF(stack), stack);
 		writeCallstack(getDebugOut(), stack, num, ErrorIgnore{});
 	}
+
+#if BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+	struct Signal
+	{
+		int32_t signalId;
+		const char* name;
+	};
+
+	static const Signal s_signal[] =
+	{   // Linux
+		{ /*  4 */ SIGILL,  "SIGILL - Illegal instruction signal."     },
+		{ /*  6 */ SIGABRT, "SIGABRT - Abort signal."                  },
+		{ /*  8 */ SIGFPE,  "SIGFPE - Floating point error signal."    },
+		{ /* 11 */ SIGSEGV, "SIGSEGV - Segmentation violation signal." },
+	};
+
+	class ExceptionHandler
+	{
+	public:
+		ExceptionHandler()
+		{
+			stack_t stack;
+			stack.ss_sp    = s_stack;
+			stack.ss_size  = sizeof(s_stack);
+			stack.ss_flags = 0;
+			sigaltstack(&stack, &m_oldStack);
+
+			struct sigaction sa;
+			sa.sa_handler   = NULL;
+			sa.sa_sigaction = signalActionHandler;
+			sa.sa_mask      = { 0 };
+			sa.sa_flags     = SA_ONSTACK | SA_SIGINFO;
+			sa.sa_restorer  = NULL;
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signal); ++ii)
+			{
+				sigaction(s_signal[ii].signalId, &sa, &m_oldSignalAction[ii]);
+			}
+		}
+
+		~ExceptionHandler()
+		{
+		}
+
+		static void signalActionHandler(int32_t _signalId, siginfo_t* _info, void* _context)
+		{
+			BX_UNUSED(_context);
+
+			const char* name = "Unknown signal?";
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signal); ++ii)
+			{
+				const Signal& signal = s_signal[ii];
+
+				if (signal.signalId == _signalId)
+				{
+					name = signal.name;
+					break;
+				}
+			}
+
+			if (assertFunction(Location("Exception Handler", -1), 2
+				, "%s SIGNAL %d, ERRNO %d, CODE %d"
+				, name
+				, _info->si_signo
+				, _info->si_errno
+				, _info->si_code
+				) )
+			{
+				exit(kExitFailure, false);
+			}
+		}
+
+		static constexpr uint32_t kExceptionStackSize = 64<<10;
+
+		static char s_stack[kExceptionStackSize];
+
+		stack_t m_oldStack;
+		struct sigaction m_oldSignalAction[BX_COUNTOF(s_signal)];
+	};
+
+	char ExceptionHandler::s_stack[kExceptionStackSize];
+
+	static ExceptionHandler s_exceptionHandler;
+#endif // BX_PLATFORM_LINUX
 
 } // namespace bx

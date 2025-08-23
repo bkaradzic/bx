@@ -115,12 +115,13 @@ namespace bx
 	/// Assert handler function.
 	///
 	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _skip Skip top N stack frames.
 	/// @param[in] _format Printf style format.
 	/// @param[in] _argList Arguments for `_format` specification.
 	///
 	/// @returns True if assert should stop code execution, otherwise returns false.
 	///
-	typedef bool (*AssertHandlerFn)(const Location& _location, const char* _format, va_list _argList);
+	typedef bool (*AssertHandlerFn)(const Location& _location, uint32_t _skip, const char* _format, va_list _argList);
 
 	/// Set assert handler function.
 	///
@@ -133,12 +134,13 @@ namespace bx
 	/// Assert function calls AssertHandlerFn.
 	///
 	/// @param[in] _location Source code location where function is called.
+	/// @param[in] _skip Skip top N stack frames.
 	/// @param[in] _format Printf style format.
 	/// @param[in] ... Arguments for `_format` specification.
 	///
 	/// @returns True if assert should stop code execution, otherwise returns false.
 	///
-	bool assertFunction(const Location& _location, const char* _format, ...);
+	bool assertFunction(const Location& _location, uint32_t _skip, const char* _format, ...);
 
 	/// Arithmetic type `Ty` limits.
 	template<typename Ty, bool SignT = isSigned<Ty>()>

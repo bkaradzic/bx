@@ -260,22 +260,22 @@ extern "C" void* __cdecl _alloca(size_t _size);
 		bx::debugPrintf("%s(%d): BX " _format "\n", _location.filePath, _location.line, ##__VA_ARGS__); \
 	BX_MACRO_BLOCK_END
 
-#define _BX_ASSERT(_condition, _format, ...)                                                                   \
-	BX_MACRO_BLOCK_BEGIN                                                                                       \
-		if (!BX_IGNORE_C4127(_condition)                                                                       \
-		&&  bx::assertFunction(bx::Location::current(), "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
-		{                                                                                                      \
-			bx::debugBreak();                                                                                  \
-		}                                                                                                      \
+#define _BX_ASSERT(_condition, _format, ...)                                                                      \
+	BX_MACRO_BLOCK_BEGIN                                                                                          \
+		if (!BX_IGNORE_C4127(_condition)                                                                          \
+		&&  bx::assertFunction(bx::Location::current(), 0, "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
+		{                                                                                                         \
+			bx::debugBreak();                                                                                     \
+		}                                                                                                         \
 	BX_MACRO_BLOCK_END
 
-#define _BX_ASSERT_LOC(_location, _condition, _format, ...)                                       \
-	BX_MACRO_BLOCK_BEGIN                                                                          \
-		if  (!BX_IGNORE_C4127(_condition)                                                         \
-		&&   bx::assertFunction(_location, "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
-		{                                                                                         \
-			bx::debugBreak();                                                                     \
-		}                                                                                         \
+#define _BX_ASSERT_LOC(_location, _condition, _format, ...)                                          \
+	BX_MACRO_BLOCK_BEGIN                                                                             \
+		if  (!BX_IGNORE_C4127(_condition)                                                            \
+		&&   bx::assertFunction(_location, 0, "ASSERT %s -> " _format, #_condition, ##__VA_ARGS__) ) \
+		{                                                                                            \
+			bx::debugBreak();                                                                        \
+		}                                                                                            \
 	BX_MACRO_BLOCK_END
 
 #define _BX_WARN(_condition, _format, ...)            \

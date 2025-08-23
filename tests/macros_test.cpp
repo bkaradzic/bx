@@ -31,7 +31,12 @@ BX_NO_INLINE void unusedFunction()
 
 void testAssert()
 {
+BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4804); // warning C4804: '%': unsafe use of type 'bool' in operation)
+
 	BX_ASSERT(false % 1, "Assert works!");
+
+BX_PRAGMA_DIAGNOSTIC_POP();
 }
 
 TEST_CASE("Macros", "")
