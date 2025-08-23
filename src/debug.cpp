@@ -6,6 +6,8 @@
 #include <bx/debug.h>
 #include <bx/string.h>       // isPrint
 #include <bx/readerwriter.h> // WriterI
+#include <bx/os.h>           // exit
+
 #include <inttypes.h>        // PRIx*
 
 #ifndef BX_CONFIG_CALLSTACK_USE_LIB_BACKTRACE
