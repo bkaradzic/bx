@@ -24,14 +24,41 @@
 #	include <cxxabi.h>    // abi::__cxa_demangle
 #endif // BX_CONFIG_CALLSTACK_*
 
-#ifndef BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
-#	define BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS 0 \
-		| (BX_PLATFORM_LINUX && !BX_CRT_NONE)
-#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+#ifndef BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
+#	define BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH BX_PLATFORM_WINDOWS
+#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
 
-#if BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+#ifndef BX_CONFIG_EXCEPTION_HANDLING_USE_POSIX_SIGNALS
+#	define BX_CONFIG_EXCEPTION_HANDLING_USE_POSIX_SIGNALS 0 \
+		| (BX_PLATFORM_LINUX && !BX_CRT_NONE)
+#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_POSIX_SIGNALS
+
+#if BX_CONFIG_EXCEPTION_HANDLING_USE_POSIX_SIGNALS
 #	include <signal.h>
-#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
+#elif BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
+
+struct ExceptionRecord
+{
+    uint32_t exceptionCode;
+    uint32_t exceptionFlags;
+
+    ExceptionRecord* exceptionRecord;
+
+    uintptr_t exceptionAddress;
+    uint32_t  numberParameters;
+    uintptr_t exceptionInformation[15];
+};
+
+struct ExceptionPointers
+{
+    ExceptionRecord* exceptionRecord;
+    void* contextRecord;
+};
+
+typedef uint32_t (__stdcall* TopLevelExceptionFilterFn)(ExceptionPointers* _exceptionInfo);
+
+extern "C" __declspec(dllimport) TopLevelExceptionFilterFn __stdcall SetUnhandledExceptionFilter(TopLevelExceptionFilterFn _topLevelExceptionFilter);
+#endif // BX_CONFIG_EXCEPTION_HANDLING_*
 
 #if BX_CRT_NONE
 #	include <bx/crt0.h>
@@ -376,14 +403,14 @@ namespace bx
 		writeCallstack(getDebugOut(), stack, num, ErrorIgnore{});
 	}
 
-#if BX_CONFIG_EXCEPTION_HANDLING_USE_SIGNALS
-	struct Signal
+#if BX_CONFIG_EXCEPTION_HANDLING_USE_POSIX_SIGNALS
+	struct SignalInfo
 	{
 		int32_t signalId;
 		const char* name;
 	};
 
-	static const Signal s_signal[] =
+	static const SignalInfo s_signalInfo[] =
 	{   // Linux
 		{ /*  4 */ SIGILL,  "SIGILL - Illegal instruction signal."     },
 		{ /*  6 */ SIGABRT, "SIGABRT - Abort signal."                  },
@@ -391,11 +418,12 @@ namespace bx
 		{ /* 11 */ SIGSEGV, "SIGSEGV - Segmentation violation signal." },
 	};
 
-	class ExceptionHandler
+	struct ExceptionHandler
 	{
-	public:
 		ExceptionHandler()
 		{
+			BX_TRACE("ExceptionHandler - POSIX");
+
 			stack_t stack;
 			stack.ss_sp    = s_stack;
 			stack.ss_size  = sizeof(s_stack);
@@ -409,9 +437,9 @@ namespace bx
 			sa.sa_flags     = SA_ONSTACK | SA_SIGINFO;
 			sa.sa_restorer  = NULL;
 
-			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signal); ++ii)
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_exceptionInfo); ++ii)
 			{
-				sigaction(s_signal[ii].signalId, &sa, &m_oldSignalAction[ii]);
+				sigaction(s_exceptionInfo[ii].exceptionCode, &sa, &m_oldSignalAction[ii]);
 			}
 		}
 
@@ -425,18 +453,18 @@ namespace bx
 
 			const char* name = "Unknown signal?";
 
-			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signal); ++ii)
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signalInfo); ++ii)
 			{
-				const Signal& signal = s_signal[ii];
+				const SignalInfo& signalInfo = s_signalInfo[ii];
 
-				if (signal.signalId == _signalId)
+				if (signalInfo.signalId == _signalId)
 				{
-					name = signal.name;
+					name = signalInfo.name;
 					break;
 				}
 			}
 
-			if (assertFunction(Location("Exception Handler", -1), 2
+			if (assertFunction(Location("Exception Handler", UINT32_MAX), 2
 				, "%s SIGNAL %d, ERRNO %d, CODE %d"
 				, name
 				, _info->si_signo
@@ -458,7 +486,72 @@ namespace bx
 
 	char ExceptionHandler::s_stack[kExceptionStackSize];
 
-	static ExceptionHandler s_exceptionHandler;
-#endif // BX_PLATFORM_LINUX
+#elif BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
+
+	struct ExceptionInfo
+	{
+		uint32_t exceptionCode;
+		const char* name;
+	};
+
+	static const ExceptionInfo s_exceptionInfo[] =
+	{   // Windows
+		{ /* EXCEPTION_ACCESS_VIOLATION    */ 0xc0000005u, "Access violation."    },
+		{ /* EXCEPTION_ILLEGAL_INSTRUCTION */ 0xc000001du, "Illegal instruction." },
+		{ /* EXCEPTION_STACK_OVERFLOW      */ 0xc00000fdu, "Stack overflow."      },
+	};
+
+	struct ExceptionHandler
+	{
+		ExceptionHandler()
+		{
+			BX_TRACE("ExceptionHandler - Windows SEH");
+			SetUnhandledExceptionFilter(topLevelExceptionFilter);
+		}
+
+		static uint32_t __stdcall topLevelExceptionFilter(ExceptionPointers* _info)
+		{
+			const char* name = "Unknown signal?";
+
+			const uint32_t exceptionCode = _info->exceptionRecord->exceptionCode;
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_exceptionInfo); ++ii)
+			{
+				const ExceptionInfo& signal = s_exceptionInfo[ii];
+
+				if (signal.exceptionCode == exceptionCode)
+				{
+					name = signal.name;
+					break;
+				}
+			}
+
+			if (assertFunction(Location("Exception Handler", UINT32_MAX), 2
+				, "%s Exception Code %x"
+				, name
+				, _info->exceptionRecord->exceptionCode
+				) )
+			{
+				exit(kExitFailure, false);
+			}
+
+			return 0 /* EXCEPTION_CONTINUE_SEARCH */;
+		}
+	};
+
+#else // Noop exception handler
+
+	class ExceptionHandler
+	{
+	public:
+		ExceptionHandler()
+		{
+			BX_TRACE("ExceptionHandler - Noop");
+		}
+	};
+
+#endif // BX_CONFIG_EXCEPTION_HANDLING_*
+
+	ExceptionHandler s_exceptionHandler;
 
 } // namespace bx
