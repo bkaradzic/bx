@@ -437,9 +437,9 @@ namespace bx
 			sa.sa_flags     = SA_ONSTACK | SA_SIGINFO;
 			sa.sa_restorer  = NULL;
 
-			for (uint32_t ii = 0; ii < BX_COUNTOF(s_exceptionInfo); ++ii)
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_signalInfo); ++ii)
 			{
-				sigaction(s_exceptionInfo[ii].exceptionCode, &sa, &m_oldSignalAction[ii]);
+				sigaction(s_signalInfo[ii].signalId, &sa, &m_oldSignalAction[ii]);
 			}
 		}
 
@@ -481,7 +481,7 @@ namespace bx
 		static char s_stack[kExceptionStackSize];
 
 		stack_t m_oldStack;
-		struct sigaction m_oldSignalAction[BX_COUNTOF(s_signal)];
+		struct sigaction m_oldSignalAction[BX_COUNTOF(s_signalInfo)];
 	};
 
 	char ExceptionHandler::s_stack[kExceptionStackSize];
