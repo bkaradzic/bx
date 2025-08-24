@@ -552,6 +552,16 @@ namespace bx
 
 #endif // BX_CONFIG_EXCEPTION_HANDLING_*
 
-	ExceptionHandler s_exceptionHandler;
+	void installExceptionHandler()
+	{
+		static bool s_installed = false;
+
+		if (!s_installed)
+		{
+			s_installed = true;
+
+			static ExceptionHandler s_exceptionHandler;
+		}
+	}
 
 } // namespace bx

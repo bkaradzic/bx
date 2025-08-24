@@ -76,6 +76,9 @@ namespace bx
 	///
 	void debugOutputCallstack(uint32_t _skip);
 
+	/// Install BX exception handler.
+	void installExceptionHandler();
+
 } // namespace bx
 
 #endif // BX_DEBUG_H_HEADER_GUARD
