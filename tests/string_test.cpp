@@ -649,7 +649,7 @@ TEST_CASE("FixedStringT", "[string]")
 	REQUIRE(8 == fs64.getLength() );
 
 	REQUIRE(0 != strCmp(fs64, fs256) );
-	REQUIRE(0 != strCmp(fs64, "13899831") );
+	REQUIRE(0 == strCmp(fs64, "13899831") );
 }
 
 TEST(tinystl_string_constructor)
