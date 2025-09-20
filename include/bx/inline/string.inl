@@ -187,17 +187,93 @@ namespace bx
 		return m_0terminated;
 	}
 
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::FixedStringT()
+		: m_len(0)
+	{
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::FixedStringT(const char* _str)
+		: FixedStringT<MaxCapacityT>()
+	{
+		set(_str);
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::FixedStringT(const StringView& _str)
+		: FixedStringT<MaxCapacityT>()
+	{
+		set(_str);
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::~FixedStringT()
+	{
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline void FixedStringT<MaxCapacityT>::set(const char* _str)
+	{
+		set(StringView(_str) );
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline void FixedStringT<MaxCapacityT>::set(const StringView& _str)
+	{
+		int32_t copied = strCopy(m_storage, MaxCapacityT, _str);
+		m_len = copied;
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline void FixedStringT<MaxCapacityT>::append(const StringView& _str)
+	{
+		m_len += strCopy(&m_storage[m_len], MaxCapacityT-m_len, _str);
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline void FixedStringT<MaxCapacityT>::clear()
+	{
+		m_len = 0;
+		m_storage[0] = '\0';
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline bool FixedStringT<MaxCapacityT>::isEmpty() const
+	{
+		return 0 == m_len;
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline int32_t FixedStringT<MaxCapacityT>::getLength() const
+	{
+		return m_len;
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline const char* FixedStringT<MaxCapacityT>::getCPtr() const
+	{
+		return m_storage;
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::operator StringView() const
+	{
+		return StringView(m_storage, m_len);
+	}
+
 	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT()
-		: StringView()
+		: m_ptr("")
+		, m_len(0)
 		, m_capacity(0)
 	{
-		clear();
 	}
 
 	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringT<AllocatorT>& _rhs)
-		: StringView()
+		: m_ptr("")
+		, m_len(0)
 		, m_capacity(0)
 	{
 		set(_rhs);
@@ -205,7 +281,8 @@ namespace bx
 
 	template<AllocatorI** AllocatorT>
 	inline StringT<AllocatorT>::StringT(const StringView& _rhs)
-		: StringView()
+		: m_ptr("")
+		, m_len(0)
 		, m_capacity(0)
 	{
 		set(_rhs);
@@ -264,21 +341,38 @@ namespace bx
 	template<AllocatorI** AllocatorT>
 	inline void StringT<AllocatorT>::clear()
 	{
-		m_0terminated = true;
-
 		if (0 != m_capacity)
 		{
 			free(*AllocatorT, const_cast<char*>(m_ptr) );
 
-			StringView::clear();
+			m_ptr = "";
+			m_len = 0;
 			m_capacity = 0;
 		}
 	}
 
 	template<AllocatorI** AllocatorT>
+	inline bool StringT<AllocatorT>::isEmpty() const
+	{
+		return 0 == m_len;
+	}
+
+	template<AllocatorI** AllocatorT>
+	inline int32_t StringT<AllocatorT>::getLength() const
+	{
+		return m_len;
+	}
+
+	template<AllocatorI** AllocatorT>
 	inline const char* StringT<AllocatorT>::getCPtr() const
 	{
-		return getPtr();
+		return m_ptr;
+	}
+
+	template<AllocatorI** AllocatorT>
+	inline StringT<AllocatorT>::operator StringView() const
+	{
+		return StringView(m_ptr, m_len);
 	}
 
 	inline StringView strSubstr(const StringView& _str, int32_t _start, int32_t _len)

@@ -137,9 +137,66 @@ namespace bx
 		bool        m_0terminated;
 	};
 
-	/// ASCII string
+	/// Fixed capacity string.
+	///
+	template<uint16_t MaxCapacityT>
+	class FixedStringT
+	{
+	public:
+		///
+		FixedStringT();
+
+		///
+		FixedStringT(const char* _str);
+
+		///
+		FixedStringT(const StringView& _str);
+
+		///
+		~FixedStringT();
+
+		///
+		void set(const char* _str);
+
+		///
+		void set(const StringView& _str);
+
+		///
+		void append(const StringView& _str);
+
+		///
+		void clear();
+
+		/// Returns `true` if string is empty.
+		///
+		bool isEmpty() const;
+
+		/// Returns string length.
+		///
+		int32_t getLength() const;
+
+		/// Returns zero-terminated C string pointer.
+		///
+		const char* getCPtr() const;
+
+		/// Implicitly converts FixedStringT to StringView.
+		///
+		operator StringView() const;
+
+	private:
+		char    m_storage[MaxCapacityT];
+		int32_t m_len;
+	};
+
+	///
+	using FixedString64   = FixedStringT<64>;
+	using FixedString256  = FixedStringT<256>;
+	using FixedString1024 = FixedStringT<1024>;
+
+	/// Dynamic string
+	///
 	template<AllocatorI** AllocatorT>
-	class StringT : public StringView
+	class StringT
 	{
 	public:
 		///
@@ -169,12 +226,26 @@ namespace bx
 		///
 		void clear();
 
+		/// Returns `true` if string is empty.
+		///
+		bool isEmpty() const;
+
+		/// Returns string length.
+		///
+		int32_t getLength() const;
+
 		/// Returns zero-terminated C string pointer.
 		///
 		const char* getCPtr() const;
 
+		/// Implicitly converts StringT to StringView.
+		///
+		operator StringView() const;
+
 	protected:
-		int32_t m_capacity;
+		const char* m_ptr;
+		int32_t     m_len;
+		int32_t     m_capacity;
 	};
 
 	/// Returns true if character is part of white space set.

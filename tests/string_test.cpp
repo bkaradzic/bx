@@ -498,7 +498,7 @@ TEST_CASE("StringView", "[string]")
 	st.append(bx::StringView("test", 2) );
 	REQUIRE(10 == st.getLength() );
 
-	REQUIRE(0 == bx::strCmp(st.getPtr(), "testtestte") );
+	REQUIRE(0 == bx::strCmp(st.getCPtr(), "testtestte") );
 
 	st.clear();
 	REQUIRE(0 == st.getLength() );
@@ -628,18 +628,32 @@ TEST_CASE("0terminated", "[string]")
 	typedef bx::StringT<&g_allocator> String;
 
 	String st;
-	REQUIRE(st.is0Terminated() );
 
 	st = strTrimPrefix(t0, "13");
 	REQUIRE(2 == st.getLength() );
-	REQUIRE(st.is0Terminated() );
 
 	st = strTrimSuffix(t0, "89");
 	REQUIRE(2 == st.getLength() );
-	REQUIRE(st.is0Terminated() );
 }
 
-TEST(tinystl_string_constructor) {
+TEST_CASE("FixedStringT", "[string]")
+{
+	bx::FixedString64 fs64("1389");
+	bx::FixedString256 fs256(fs64);
+
+	REQUIRE(0 == strCmp(fs64, fs256) );
+	REQUIRE(0 == strCmp(fs64, "1389") );
+	REQUIRE(0 == strCmp(fs256, "1389") );
+
+	fs64.append("9831");
+	REQUIRE(8 == fs64.getLength() );
+
+	REQUIRE(0 != strCmp(fs64, fs256) );
+	REQUIRE(0 != strCmp(fs64, "13899831") );
+}
+
+TEST(tinystl_string_constructor)
+{
 	using tinystl::string;
 	{
 		string s;
@@ -672,7 +686,8 @@ TEST(tinystl_string_constructor) {
 	}
 }
 
-TEST(tinystl_string_assign) {
+TEST(tinystl_string_assign)
+{
 	using tinystl::string;
 	{
 		const string other("hello");
