@@ -490,7 +490,7 @@ function toolchain(_buildDir, _libDir)
 		"NoRTTI",
 		"NoExceptions",
 		"NoEditAndContinue",
-		"NoFramePointer",
+--		"NoFramePointer",
 		"Symbols",
 	}
 
