@@ -61,6 +61,8 @@ namespace bx
 	template<typename Ty>
 	inline void HashCrc32::add(const Ty& _data)
 	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
 		add(&_data, sizeof(Ty) );
 	}
 
@@ -91,6 +93,8 @@ namespace bx
 	template<typename Ty>
 	inline void HashMurmur2A::add(const Ty& _data)
 	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
 		add(&_data, sizeof(Ty) );
 	}
 
@@ -115,6 +119,8 @@ namespace bx
 	template<typename Ty>
 	inline void HashMurmur3::add(const Ty& _data)
 	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
 		add(&_data, sizeof(Ty) );
 	}
 
@@ -142,7 +148,7 @@ namespace bx
 	template<typename HashT, typename Ty>
 	inline uint32_t hash(const Ty& _data)
 	{
-		static_assert(isTriviallyCopyable<Ty>() );
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
 		return hash<HashT>(&_data, sizeof(Ty) );
 	}
 
