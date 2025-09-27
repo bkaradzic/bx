@@ -49,7 +49,7 @@ namespace bx
 	///
 	WriterI* getDebugOut();
 
-	/// Capture current callstack.
+	/// Capture current callstack fast.
 	///
 	/// @param[in]  _skip Skip top N stack frames.
 	/// @param[in]  _max Maximum frame to capture.
@@ -57,7 +57,17 @@ namespace bx
 	///
 	/// @returns Number of stack frames captured.
 	///
-	uint32_t getCallStack(uint32_t _skip, uint32_t _max, uintptr_t* _outStack);
+	uint32_t getCallStackFast(uint32_t _skip, uint32_t _max, uintptr_t* _outStack);
+
+	/// Capture current callstack with slower but more accurate method.
+	///
+	/// @param[in]  _skip Skip top N stack frames.
+	/// @param[in]  _max Maximum frame to capture.
+	/// @param[out] _outStack Stack frames array. Must be at least `_max` elements.
+	///
+	/// @returns Number of stack frames captured.
+	///
+	uint32_t getCallStackExact(uint32_t _skip, uint32_t _max, uintptr_t* _outStack);
 
 	/// Write callstack.
 	///
@@ -68,9 +78,9 @@ namespace bx
 	///
 	/// @returns Number of bytes writen to `_writer`.
 	///
-	int32_t writeCallstack(WriterI* _writer, uintptr_t* _stack, uint32_t _num, Error* _err);
+	int32_t writeCallstack(WriterI* _writer, const uintptr_t* _stack, uint32_t _num, Error* _err);
 
-	/// Capture call stack, and write it to debug output.
+	/// Capture call stack with `bx::getCallStackExact`, and write it to debug output.
 	///
 	/// @param[in] _skip Skip top N stack frames.
 	///

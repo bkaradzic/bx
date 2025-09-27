@@ -187,6 +187,25 @@ namespace bx
 		return m_0terminated;
 	}
 
+	inline bool operator==(const StringView& _lhs, const StringView& _rhs)
+	{
+		return 0 == strCmp(_lhs, _rhs);
+	}
+
+	inline bool overlap(const StringView& _a, const StringView& _b)
+	{
+		return _a.getTerm() > _b.getPtr()
+			&& _b.getTerm() > _a.getPtr()
+			;
+	}
+
+	inline bool contain(const StringView& _a, const StringView& _b)
+	{
+		return _a.getPtr()  <= _b.getPtr()
+			&& _a.getTerm() >= _b.getTerm()
+			;
+	}
+
 	template<uint16_t MaxCapacityT>
 	inline FixedStringT<MaxCapacityT>::FixedStringT()
 		: m_len(0)

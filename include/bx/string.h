@@ -137,6 +137,15 @@ namespace bx
 		bool        m_0terminated;
 	};
 
+	/// Compare two string views.
+	bool operator==(const StringView& _lhs, const StringView& _rhs);
+
+	/// Returns true if two string views overlap.
+	bool overlap(const StringView& _a, const StringView& _b);
+
+	/// Returns true if string view `_a` contains string view `_b`.
+	bool contain(const StringView& _a, const StringView& _b);
+
 	/// Fixed capacity string.
 	///
 	template<uint16_t MaxCapacityT>

@@ -62,6 +62,10 @@ namespace bx
 
 		/// Assign file path from string.
 		///
+		FilePath& operator=(const char* _rhs);
+
+		/// Assign file path from string.
+		///
 		FilePath& operator=(const StringView& _rhs);
 
 		/// Clear file path.

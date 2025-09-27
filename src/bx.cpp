@@ -42,7 +42,7 @@ namespace bx
 		total += write(&smb, "\n\n", &err);
 
 		uintptr_t stack[32];
-		const uint32_t num = getCallStack(2 /* skip self */ + _skip, BX_COUNTOF(stack), stack);
+		const uint32_t num = getCallStackExact(2 /* skip self */ + _skip, BX_COUNTOF(stack), stack);
 		total += writeCallstack(&smb, stack, num, &err);
 
 		total += write(&smb, &err,

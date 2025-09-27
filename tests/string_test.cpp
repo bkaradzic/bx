@@ -45,7 +45,7 @@ TEST_CASE("StringLiteral", "[string]")
 
 	REQUIRE(5 == sv.getLength() );
 	REQUIRE(5 == bx::strLen(sv) );
-	REQUIRE(0 == bx::strCmp("abvgd", sv) );
+	REQUIRE("abvgd" == sv);
 }
 
 TEST_CASE("stringPrintfTy", "[string]")
@@ -216,6 +216,19 @@ TEST_CASE("strCmpV sort", "[string][sort]")
 	{
 		REQUIRE(0 == bx::strCmp(test[ii], expected[ii]) );
 	}
+}
+
+TEST_CASE("overlap", "[string]")
+{
+	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
+
+	const bx::StringView quick = bx::strFind(test, "Quick");
+
+	REQUIRE(bx::overlap(quick, test) );
+
+	const bx::StringView empty;
+	REQUIRE(!bx::overlap(quick, empty) );
+	REQUIRE(!bx::overlap(test, empty) );
 }
 
 TEST_CASE("strRFind", "[string]")

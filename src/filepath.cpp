@@ -303,6 +303,12 @@ namespace bx
 		set(_filePath);
 	}
 
+	FilePath& FilePath::operator=(const char* _rhs)
+	{
+		set(_rhs);
+		return *this;
+	}
+
 	FilePath& FilePath::operator=(const StringView& _rhs)
 	{
 		set(_rhs);

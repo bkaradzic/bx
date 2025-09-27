@@ -19,7 +19,7 @@ bool testAssertHandler(const bx::Location& _location, uint32_t _skip, const char
 	bx::printf("\n");
 
 	uintptr_t stack[32];
-	const uint32_t num = bx::getCallStack(2 /* skip self */ + _skip, BX_COUNTOF(stack), stack);
+	const uint32_t num = bx::getCallStackExact(2 /* skip self */ + _skip, BX_COUNTOF(stack), stack);
 	bx::writeCallstack(bx::getStdOut(), stack, num, bx::ErrorIgnore{});
 
 	// Throwing exceptions is required for testing asserts being trigged.
