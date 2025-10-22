@@ -85,7 +85,7 @@ namespace bx
 	{
 		va_list argList;
 		va_start(argList, _format);
-		const bool result = s_assertHandler(_location, _skip, _format, argList);
+		const bool result = s_assertHandler(_location, _skip + 1 /* skip self */, _format, argList);
 		va_end(argList);
 
 		return result;

@@ -100,8 +100,8 @@ extern "C" void* __cdecl _alloca(size_t _size);
 #define BX_ALIGN_DECL_CACHE_LINE(_decl) BX_ALIGN_DECL(BX_CACHE_LINE_SIZE, _decl)
 
 ///
-#define BX_MACRO_BLOCK_BEGIN for(;;) {
-#define BX_MACRO_BLOCK_END break; }
+#define BX_MACRO_BLOCK_BEGIN do {
+#define BX_MACRO_BLOCK_END } while (false)
 #define BX_NOOP(...) BX_MACRO_BLOCK_BEGIN BX_MACRO_BLOCK_END
 
 ///
