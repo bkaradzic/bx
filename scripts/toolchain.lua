@@ -109,10 +109,10 @@ function toolchain(_buildDir, _libDir)
 
 	newoption {
 		trigger = "xcode",
-		value = "xcode_target",
-		description = "Choose XCode target",
+		value = "target",
+		description = "Choose XCode target; one of:",
 		allowed = {
-			{ "osx", "OSX" },
+			{ "osx", "macOS" },
 			{ "ios", "iOS" },
 			{ "tvos", "tvOS" },
 			{ "xros", "visionOS" },
@@ -186,22 +186,40 @@ function toolchain(_buildDir, _libDir)
 		androidApiLevel = _OPTIONS["with-android"]
 	end
 
-	local iosPlatform = ""
+	local iosPlatform = "8.0"
 	if _OPTIONS["with-ios"] then
 		iosPlatform = _OPTIONS["with-ios"]
+	elseif _ACTION == "xcode11" then
+		iosPlatform = "8.0"
+	elseif _ACTION == "xcode14" then
+		iosPlatform = "11.0"
+	elseif _ACTION == "xcode15" then
+		iosPlatform = "12.0"
 	end
 
-	local macosPlatform = ""
-	if _OPTIONS["with-macos"] then
-		macosPlatform = _OPTIONS["with-macos"]
-	end
-
-	local tvosPlatform = ""
+	local tvosPlatform = "9.0"
 	if _OPTIONS["with-tvos"] then
 		tvosPlatform = _OPTIONS["with-tvos"]
+	elseif _ACTION == "xcode11" then
+		tvosPlatform = "9.0"
+	elseif _ACTION == "xcode14" then
+		tvosPlatform = "11.0"
+	elseif _ACTION == "xcode15" then
+		tvosPlatform = "12.0"
 	end
 
-	local xrosPlatform = ""
+	local macosPlatform = "10.13.6"
+	if _OPTIONS["with-macos"] then
+		macosPlatform = _OPTIONS["with-macos"]
+	elseif _ACTION == "xcode11" then
+		macosPlatform = "10.14.4"
+	elseif _ACTION == "xcode14" then
+		macosPlatform = "12.5"
+	elseif _ACTION == "xcode15" then
+		macosPlatform = "13.5"
+	end
+
+	local xrosPlatform = "1.0"
 	if _OPTIONS["with-xros"] then
 		xrosPlatform = _OPTIONS["with-xros"]
 	end
@@ -450,23 +468,23 @@ function toolchain(_buildDir, _libDir)
 			return #str > 0 and str or def
 		end
 
-		if "osx" == _OPTIONS["xcode"] then
-			action.xcode.macOSTargetPlatformVersion = str_or(macosPlatform, "13.0")
+		if "macos" == _OPTIONS["xcode"] then
+			action.xcode.macOSTargetPlatformVersion = macosPlatform
 			premake.xcode.toolset = "macosx"
-			location (path.join(_buildDir, "projects", _ACTION .. "-osx"))
+			location (path.join(_buildDir, "projects", _ACTION .. "-macos"))
 
 		elseif "ios" == _OPTIONS["xcode"] then
-			action.xcode.iOSTargetPlatformVersion = str_or(iosPlatform, "16.0")
+			action.xcode.iOSTargetPlatformVersion = iosPlatform
 			premake.xcode.toolset = "iphoneos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-ios"))
 
 		elseif "tvos" == _OPTIONS["xcode"] then
-			action.xcode.tvOSTargetPlatformVersion = str_or(tvosPlatform, "13.0")
+			action.xcode.tvOSTargetPlatformVersion = tvosPlatform
 			premake.xcode.toolset = "appletvos"
 			location (path.join(_buildDir, "projects", _ACTION .. "-tvos"))
 
 		elseif "xros" == _OPTIONS["xcode"] then
-			action.xcode.visionOSTargetPlatformVersion = str_or(xrosPlatform, "1.0")
+			action.xcode.visionOSTargetPlatformVersion = xrosPlatform
 			premake.xcode.toolset = "xros"
 			location (path.join(_buildDir, "projects", _ACTION .. "-xros"))
 		end
