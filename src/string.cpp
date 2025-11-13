@@ -165,7 +165,7 @@ namespace bx
 
 	typedef char (*CharFn)(char _ch);
 
-	inline char toNoop(char _ch)
+	inline constexpr char toNoop(char _ch)
 	{
 		return _ch;
 	}
@@ -288,18 +288,6 @@ namespace bx
 			, _rhs.getPtr()
 			, min(_rhs.getLength(), _max)
 			);
-	}
-
-	int32_t strLen(const char* _str, int32_t _max)
-	{
-		if (NULL == _str)
-		{
-			return 0;
-		}
-
-		const char* ptr = _str;
-		for (; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
-		return int32_t(ptr - _str);
 	}
 
 	inline int32_t strCopy(char* _dst, int32_t _dstSize, const char* _src, int32_t _num)

@@ -13,41 +13,6 @@
 
 bx::AllocatorI* g_allocator;
 
-TEST_CASE("StringLiteral", "[string]")
-{
-	constexpr bx::StringLiteral tmp[] = { "1389", "abvgd", "mac", "pod" };
-
-	REQUIRE(bx::isSorted(tmp, BX_COUNTOF(tmp) ) );
-
-	STATIC_REQUIRE(4 == tmp[0].getLength() );
-	REQUIRE(4 == bx::strLen(tmp[0]) );
-	REQUIRE(0 == bx::strCmp("1389", tmp[0]) );
-
-	STATIC_REQUIRE(5 == tmp[1].getLength() );
-	REQUIRE(5 == bx::strLen(tmp[1]) );
-	REQUIRE(0 == bx::strCmp("abvgd", tmp[1]) );
-
-	STATIC_REQUIRE(3 == tmp[2].getLength() );
-	REQUIRE(3 == bx::strLen(tmp[2]) );
-	REQUIRE(0 == bx::strCmp("mac", tmp[2]) );
-
-	STATIC_REQUIRE(3 == tmp[3].getLength() );
-	REQUIRE(3 == bx::strLen(tmp[3]) );
-	REQUIRE(0 == bx::strCmp("pod", tmp[3]) );
-
-	constexpr bx::StringLiteral copy(tmp[0]);
-
-	STATIC_REQUIRE(4 == copy.getLength() );
-	REQUIRE(4 == bx::strLen(copy) );
-	REQUIRE(0 == bx::strCmp("1389", copy) );
-
-	constexpr bx::StringView sv(tmp[1]);
-
-	REQUIRE(5 == sv.getLength() );
-	REQUIRE(5 == bx::strLen(sv) );
-	REQUIRE("abvgd" == sv);
-}
-
 TEST_CASE("stringPrintfTy", "[string]")
 {
 	std::string test;
@@ -490,6 +455,47 @@ TEST_CASE("fromString int32_t", "[string]")
 	REQUIRE(testFromString(-1389,  " -1389") );
 	REQUIRE(testFromString(555333, "555333") );
 	REQUIRE(testFromString(-21,    "-021") );
+}
+
+TEST_CASE("StringLiteral", "[string]")
+{
+	constexpr bx::StringLiteral tmp[] = { "1389", "abvgd", "mac", "pod" };
+
+	REQUIRE(bx::isSorted(tmp, BX_COUNTOF(tmp) ) );
+
+	STATIC_REQUIRE(4 == tmp[0].getLength() );
+	STATIC_REQUIRE(4 == bx::strLen(tmp[0]) );
+	REQUIRE(0 == bx::strCmp("1389", tmp[0]) );
+
+	STATIC_REQUIRE(5 == tmp[1].getLength() );
+	STATIC_REQUIRE(5 == bx::strLen(tmp[1]) );
+	REQUIRE(0 == bx::strCmp("abvgd", tmp[1]) );
+
+	STATIC_REQUIRE(3 == tmp[2].getLength() );
+	STATIC_REQUIRE(3 == bx::strLen(tmp[2]) );
+	REQUIRE(0 == bx::strCmp("mac", tmp[2]) );
+
+	STATIC_REQUIRE(3 == tmp[3].getLength() );
+	STATIC_REQUIRE(3 == bx::strLen(tmp[3]) );
+	REQUIRE(0 == bx::strCmp("pod", tmp[3]) );
+
+	constexpr bx::StringLiteral copy(tmp[0]);
+	STATIC_REQUIRE(4 == copy.getLength() );
+	REQUIRE(4 == bx::strLen(copy) );
+	REQUIRE(0 == bx::strCmp("1389", copy) );
+
+	constexpr bx::StringView sv(tmp[1]);
+	STATIC_REQUIRE(5 == sv.getLength() );
+	STATIC_REQUIRE(5 == bx::strLen(sv) );
+	STATIC_REQUIRE("abvgd" == sv);
+}
+
+TEST_CASE("StringView constexpr", "[string]")
+{
+	constexpr bx::StringView sv("1389");
+
+	STATIC_REQUIRE(sv == "1389");
+	STATIC_REQUIRE(4  == bx::strLen(sv) );
 }
 
 TEST_CASE("StringView", "[string]")
