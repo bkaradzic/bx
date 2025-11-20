@@ -21,11 +21,6 @@ namespace bx
 	{
 	}
 
-	inline uint32_t RingBufferControl::available() const
-	{
-		return distance(m_read, m_current);
-	}
-
 	inline bool RingBufferControl::isEmpty() const
 	{
 		return m_read == m_write;
@@ -119,7 +114,7 @@ namespace bx
 	}
 
 	inline SpScRingBufferControl::SpScRingBufferControl(uint32_t _size)
-		: m_size(_size)
+		: m_size(max(_size, 2) )
 		, m_current(0)
 		, m_write(0)
 		, m_read(0)
@@ -130,9 +125,43 @@ namespace bx
 	{
 	}
 
-	inline uint32_t SpScRingBufferControl::available() const
+	inline bool SpScRingBufferControl::isEmpty() const
+	{
+		return m_read == m_write;
+	}
+
+	inline uint32_t SpScRingBufferControl::getSize() const
+	{
+		return m_size;
+	}
+
+	inline uint32_t SpScRingBufferControl::getNumEmpty() const
+	{
+		return m_size - distance(m_read, m_write) - 1;
+	}
+
+	inline uint32_t SpScRingBufferControl::getNumUsed() const
 	{
 		return distance(m_read, m_current);
+	}
+
+	inline uint32_t SpScRingBufferControl::getNumReserved() const
+	{
+		return distance(m_current, m_write);
+	}
+
+	inline void SpScRingBufferControl::resize(int32_t _size)
+	{
+		_size = 0 > _size
+			// can shrink only by number of empty slots.
+			? bx::max(_size, -int32_t(getNumEmpty() ) )
+			: _size
+			;
+
+		m_size += _size;
+
+		m_current += m_current >= m_write ? _size : 0;
+		m_read    += m_read    >= m_write ? _size : 0;
 	}
 
 	inline uint32_t SpScRingBufferControl::consume(uint32_t _size)
@@ -147,13 +176,13 @@ namespace bx
 		return size;
 	}
 
-	inline uint32_t SpScRingBufferControl::reserve(uint32_t _size)
+	inline uint32_t SpScRingBufferControl::reserve(uint32_t _size, bool _mustSucceed)
 	{
 		const uint32_t dist       = distance(m_write, m_read)-1;
 		const uint32_t maxSize    = uint32_sels(dist, m_size-1, dist);
 		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
 		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, maxSize);
+		const uint32_t size       = uint32_sels(test, _size, _mustSucceed ? 0 : maxSize);
 		const uint32_t advance    = uint32_add(m_write, size);
 		const uint32_t write      = uint32_mod(advance, m_size);
 		m_write = write;
@@ -200,7 +229,7 @@ namespace bx
 		, m_size(_size)
 		, m_buffer(_buffer)
 	{
-		BX_ASSERT(_control.available() >= _size, "%d >= %d", _control.available(), _size);
+		BX_ASSERT(_control.getNumUsed() >= _size, "%d >= %d", _control.getNumUsed(), _size);
 	}
 
 	template <typename ControlT>
