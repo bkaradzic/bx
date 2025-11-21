@@ -14,11 +14,13 @@ jobs:
       fail-fast: true
       matrix:
         include: [
-          { config: Debug, platform: x64, bindir: 'win64_vs2022' },
-          { config: Release, platform: x64, bindir: 'win64_vs2022' },
+          { config: Debug,   platform: x64, bindir: 'win64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
+          { config: Release, platform: x64, bindir: 'win64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
+#          { config: Debug,   platform: x64, bindir: 'win64_vs2026', genie-action: 'vs2026', solution-ext: 'slnx' },
+#          { config: Release, platform: x64, bindir: 'win64_vs2026', genie-action: 'vs2026', solution-ext: 'slnx' },
         ]
     name: msvc-${{ matrix.config }}-${{ matrix.platform }}
-    runs-on: windows-2022
+    runs-on: windows-latest
     steps:
       - name: Checkout bx
         uses: actions/checkout@v4
@@ -31,8 +33,8 @@ jobs:
         shell: cmd
         run: |
           cd bx
-          tools\bin\windows\genie.exe vs2022
-          msbuild ".build/projects/vs2022/bx.sln" /m /v:minimal /p:Configuration=${{ matrix.config }} /p:Platform=${{ matrix.platform }}
+          tools\bin\windows\genie.exe ${{ matrix.genie-action }}
+          msbuild ".build/projects/${{ matrix.genie-action }}/bx.${{ matrix.solution-ext }}" /m /v:minimal /p:Configuration=${{ matrix.config }} /p:Platform=${{ matrix.platform }}
       - name: Check
         shell: cmd
         run: |
