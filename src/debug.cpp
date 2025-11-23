@@ -735,21 +735,21 @@ namespace bx
 
 			if (NULL != m_imageHlpDll)
 			{
-				m_symInitialize      = dlsym<SymInitializeFn     >(m_imageHlpDll, "SymInitialize");
-				m_symCleanup         = dlsym<SymCleanupFn        >(m_imageHlpDll, "SymCleanup");
-				m_symFromAddr        = dlsym<SymFromAddrFn       >(m_imageHlpDll, "SymFromAddr");
-				m_symSetOptions      = dlsym<SymSetOptionsFn     >(m_imageHlpDll, "SymSetOptions");
-				m_symGetLineFromAddr = dlsym<SymGetLineFromAddrFn>(m_imageHlpDll, BX_ARCH_32BIT ? "SymGetLineFromAddr" : "SymGetLineFromAddr64");
+				auto symInitialize      = dlsym<SymInitializeFn     >(m_imageHlpDll, "SymInitialize");
+				auto symSetOptions      = dlsym<SymSetOptionsFn     >(m_imageHlpDll, "SymSetOptions");
+				auto symCleanup         = dlsym<SymCleanupFn        >(m_imageHlpDll, "SymCleanup");
+				auto symFromAddr        = dlsym<SymFromAddrFn       >(m_imageHlpDll, "SymFromAddr");
+				auto symGetLineFromAddr = dlsym<SymGetLineFromAddrFn>(m_imageHlpDll, BX_ARCH_32BIT ? "SymGetLineFromAddr" : "SymGetLineFromAddr64");
 
 				if (true
-				&& NULL != m_symInitialize
-				&& NULL != m_symCleanup
-				&& NULL != m_symFromAddr
-				&& NULL != m_symSetOptions
-				&& NULL != m_symGetLineFromAddr
+				&& NULL != symInitialize
+				&& NULL != symSetOptions
+				&& NULL != symCleanup
+				&& NULL != symFromAddr
+				&& NULL != symGetLineFromAddr
 				   )
 				{
-					m_symSetOptions(kSymOptUndName | kSymOptDeferredLoads | kSymOptLoadLines);
+					symSetOptions(kSymOptUndName | kSymOptDeferredLoads | kSymOptLoadLines);
 
 					char symCache[1024] = "SRV*";
 					uint32_t len = BX_COUNTOF(symCache) - 4;
@@ -763,10 +763,22 @@ namespace bx
 						symCache[0] = '\0';
 					}
 
-					if (!m_symInitialize(kCurrentProcess, symCache, true) )
+					if (symInitialize(kCurrentProcess, symCache, true) )
 					{
+						m_symCleanup         = symCleanup;
+						m_symFromAddr        = symFromAddr;
+						m_symGetLineFromAddr = symGetLineFromAddr;
+					}
+					else
+					{
+						BX_TRACE("Failed to initialize debug symbols!");
 						cleanup();
 					}
+				}
+				else
+				{
+					BX_TRACE("Failed to obtain debug symbols functions!");
+					cleanup();
 				}
 			}
 		}
@@ -812,28 +824,26 @@ namespace bx
 
 		void cleanup()
 		{
-			if(NULL != m_symCleanup)
+			if (NULL != m_imageHlpDll)
 			{
-				m_symCleanup(kCurrentProcess);
+				if (NULL != m_symCleanup)
+				{
+					m_symCleanup(kCurrentProcess);
+				}
+
+				m_symCleanup         = NULL;
+				m_symFromAddr        = NULL;
+				m_symGetLineFromAddr = NULL;
+
+				dlclose(m_imageHlpDll);
+				m_imageHlpDll = NULL;
 			}
-
-			m_symInitialize = NULL;
-			m_symCleanup    = NULL;
-			m_symFromAddr   = NULL;
-			m_symSetOptions = NULL;
-			m_symGetLineFromAddr = NULL;
-
-			dlclose(m_imageHlpDll);
-
-			m_imageHlpDll = NULL;
 		}
 
 		void* m_imageHlpDll = NULL;
 
-		SymInitializeFn      m_symInitialize      = NULL;
 		SymCleanupFn         m_symCleanup         = NULL;
 		SymFromAddrFn        m_symFromAddr        = NULL;
-		SymSetOptionsFn      m_symSetOptions      = NULL;
 		SymGetLineFromAddrFn m_symGetLineFromAddr = NULL;
 	};
 
