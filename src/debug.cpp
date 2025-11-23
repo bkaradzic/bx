@@ -812,7 +812,10 @@ namespace bx
 
 		void cleanup()
 		{
-			m_symCleanup(kCurrentProcess);
+			if(NULL != m_symCleanup)
+			{
+				m_symCleanup(kCurrentProcess);
+			}
 
 			m_symInitialize = NULL;
 			m_symCleanup    = NULL;
