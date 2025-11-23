@@ -452,9 +452,9 @@
 
 #if defined(__cplusplus)
 
-static_assert(__cplusplus >= BX_LANGUAGE_CPP17, "\n\n"
+static_assert(__cplusplus >= BX_LANGUAGE_CPP20, "\n\n"
 	"\t** IMPORTANT! **\n\n"
-	"\tC++17 standard support is required to build.\n"
+	"\tC++20 standard support is required to build.\n"
 	"\t\n");
 
 // https://releases.llvm.org/

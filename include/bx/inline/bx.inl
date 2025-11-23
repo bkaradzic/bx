@@ -172,6 +172,13 @@ namespace bx
 	}
 
 	template<typename Ty, typename FromT>
+	inline constexpr bool narrowCastTest(Ty* _out, const FromT& _from)
+	{
+		*_out = static_cast<Ty>(_from);
+		return static_cast<FromT>(*_out) == _from;
+	}
+
+	template<typename Ty, typename FromT>
 	inline Ty narrowCast(const FromT& _from, Location _location)
 	{
 		Ty to = static_cast<Ty>(_from);

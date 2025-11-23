@@ -282,6 +282,14 @@ namespace bx
 	/// Write C string.
 	int32_t write(WriterI* _writer, const char* _str, Error* _err);
 
+	///
+	template<typename Ty>
+	inline int32_t write(WriterI* _writer, const Ty& _value, Error* _err);
+
+	///
+	template<>
+	int32_t write(WriterI* _writer, const StringView& _str, Error* _err);
+
 	/// Write formatted string.
 	int32_t write(WriterI* _writer, const StringView& _format, va_list _argList, Error* _err);
 
