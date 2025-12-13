@@ -238,6 +238,7 @@ namespace bx
 		BX_ASSERT_LOC(_location, result
 			, "bx::narrowCast failed! Value is truncated!"
 			);
+		BX_UNUSED(result);
 		return to;
 	}
 
