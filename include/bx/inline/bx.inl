@@ -172,17 +172,70 @@ namespace bx
 	}
 
 	template<typename Ty, typename FromT>
+	inline constexpr Ty saturateCast(const FromT& _from)
+	{
+		if constexpr (isSame<Ty, FromT>() )
+		{
+			return _from;
+		}
+
+		constexpr Ty mx = max<Ty>();
+
+		if constexpr (isSigned<Ty>() && isSigned<FromT>() )
+		{
+			if constexpr (sizeof(Ty) < sizeof(FromT) )
+			{
+				constexpr FromT mn = min<Ty>();
+
+				if (_from < mn)
+				{
+					return mn;
+				}
+				else if (_from > mx)
+				{
+					return mx;
+				}
+			}
+		}
+		else if constexpr (isSigned<FromT>() )
+		{
+			if (_from < FromT(0) )
+			{
+				return Ty(0);
+			}
+			else if (asUnsigned<FromT>(_from) > mx)
+			{
+				return mx;
+			}
+		}
+		else if (_from > asUnsigned<Ty>(max<Ty>() ) )
+		{
+			return mx;
+		}
+
+		return static_cast<Ty>(_from);
+	}
+
+	template<typename Ty, typename FromT>
 	inline constexpr bool narrowCastTest(Ty* _out, const FromT& _from)
 	{
-		*_out = static_cast<Ty>(_from);
+		if constexpr (isSame<Ty, FromT>() )
+		{
+			*_out = _from;
+			return true;
+		}
+
+		*_out = saturateCast<Ty>(_from);
 		return static_cast<FromT>(*_out) == _from;
 	}
 
 	template<typename Ty, typename FromT>
 	inline Ty narrowCast(const FromT& _from, Location _location)
 	{
-		Ty to = static_cast<Ty>(_from);
-		BX_ASSERT_LOC(_location, static_cast<FromT>(to) == _from
+		Ty to;
+		const bool result = narrowCastTest(&to, _from);
+
+		BX_ASSERT_LOC(_location, result
 			, "bx::narrowCast failed! Value is truncated!"
 			);
 		return to;

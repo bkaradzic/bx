@@ -224,6 +224,16 @@ namespace bx
 	template <typename Ty, typename FromT>
 	constexpr Ty bitCast(const FromT& _from);
 
+	/// Performs `static_cast` of value `_from`, and if value doesn't fit result type `Ty` it clamps
+	/// the value to `Ty` min/max.
+	template<typename Ty, typename FromT>
+	constexpr Ty saturateCast(const FromT& _from);
+
+	/// Performs `static_cast` of value `_from`, and returns true if the value `_from` is
+	/// representable as `Ty`.
+	template<typename Ty, typename FromT>
+	constexpr bool narrowCastTest(Ty* _out, const FromT& _from);
+
 	/// Performs `static_cast` of value `_from`, and in debug build runtime verifies/asserts
 	/// that the value didn't change.
 	template<typename Ty, typename FromT>
