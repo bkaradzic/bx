@@ -172,6 +172,8 @@ namespace bx
 	}
 
 	template<typename Ty, typename FromT>
+	requires (isInteger<   Ty>() || isFloatingPoint<   Ty>() )
+		  && (isInteger<FromT>() || isFloatingPoint<FromT>() )
 	inline constexpr Ty saturateCast(const FromT& _from)
 	{
 		if constexpr (isSame<Ty, FromT>() )
@@ -225,7 +227,7 @@ namespace bx
 			return true;
 		}
 
-		*_out = saturateCast<Ty>(_from);
+		*_out = static_cast<Ty>(_from);
 		return static_cast<FromT>(*_out) == _from;
 	}
 
