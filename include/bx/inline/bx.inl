@@ -174,9 +174,9 @@ namespace bx
 	template<typename Ty, typename FromT>
 	requires (isInteger<   Ty>() || isFloatingPoint<   Ty>() )
 		  && (isInteger<FromT>() || isFloatingPoint<FromT>() )
-	inline constexpr Ty saturateCast(const FromT& _from)
+	inline constexpr Ty saturateCast(FromT _from)
 	{
-		if constexpr (isSame<Ty, FromT>() )
+		if constexpr (isSame<RemoveCvType<Ty>, RemoveCvType<FromT> >() )
 		{
 			return _from;
 		}

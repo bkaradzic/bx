@@ -227,7 +227,7 @@ namespace bx
 	/// Performs `static_cast` of value `_from`, and if value doesn't fit result type `Ty` it clamps
 	/// the value to `Ty` min/max.
 	template<typename Ty, typename FromT>
-	constexpr Ty saturateCast(const FromT& _from);
+	constexpr Ty saturateCast(FromT _from);
 
 	/// Performs `static_cast` of value `_from`, and returns true if the value `_from` is
 	/// representable as `Ty`.
