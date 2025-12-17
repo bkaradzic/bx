@@ -109,23 +109,14 @@ namespace bx
 		}
 	}
 
-	bool Thread::init(ThreadFn _fn, void* _userData, uint32_t _stackSize, const char* _name)
+	bool Thread::init(ThreadFn _fn, void* _userData, uint32_t _stackSize, const StringView& _name)
 	{
 		BX_ASSERT(!m_running, "Already running!");
 
-		m_fn = _fn;
-		m_userData = _userData;
+		m_fn        = _fn;
+		m_userData  = _userData;
 		m_stackSize = _stackSize;
-
-		if (NULL != _name)
-		{
-			BX_WARN(strLen(_name) < int32_t(BX_COUNTOF(m_name) )-1, "Truncating thread name.");
-			strCopy(m_name, BX_COUNTOF(m_name), _name);
-		}
-		else
-		{
-			m_name[0] = '\0';
-		}
+		m_name      = _name;
 
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
@@ -223,40 +214,40 @@ namespace bx
 		return m_exitCode;
 	}
 
-	void Thread::setThreadName(const char* _name)
+	void Thread::setThreadName(const StringView& _name)
 	{
-		if (NULL == _name
-		||  0 == strLen(_name) )
+		if (_name.isEmpty() )
 		{
 			return;
 		}
 
+		m_name = _name;
+
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 		BX_UNUSED(ti);
-#if BX_CRT_NONE
-		BX_UNUSED(_name);
-#elif  BX_PLATFORM_OSX \
-	|| BX_PLATFORM_IOS   \
+#if  BX_PLATFORM_OSX   \
+	|| BX_PLATFORM_IOS \
 	|| BX_PLATFORM_VISIONOS
-		pthread_setname_np(_name);
+		pthread_setname_np(m_name.getCPtr() );
 #elif BX_CRT_GLIBC
-		pthread_setname_np(ti->m_handle, _name);
+		pthread_setname_np(ti->m_handle, m_name.getCPtr() );
 #elif BX_PLATFORM_LINUX
-		prctl(PR_SET_NAME,_name, 0, 0, 0);
+		prctl(PR_SET_NAME, m_name.getCPtr(), 0, 0, 0);
 #elif BX_PLATFORM_WINDOWS
-		// Try to use the new thread naming API from Win10 Creators update onwards if we have it
 		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
-		SetThreadDescriptionProc SetThreadDescription = dlsym<SetThreadDescriptionProc>((void*)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
+		SetThreadDescriptionProc SetThreadDescription = dlsym<SetThreadDescriptionProc>( (void*)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
 
 		if (NULL != SetThreadDescription)
 		{
-			uint32_t length = (uint32_t)strLen(_name)+1;
-			uint32_t size = length*sizeof(wchar_t);
-			wchar_t* name = (wchar_t*)BX_STACK_ALLOC(size);
-			mbstowcs(name, _name, size-2);
-			name[size-2] = 0;
+			const uint32_t length = m_name.getLength();
+			const uint32_t max    = (length+1)*sizeof(wchar_t);
+			wchar_t* name = (wchar_t*)BX_STACK_ALLOC(max);
+			mbstowcs(name, m_name.getCPtr(), length);
+			name[length] = 0;
 			SetThreadDescription(ti->m_handle, name);
 		}
+		else
+		{
 #	if BX_COMPILER_MSVC
 #		pragma pack(push, 8)
 			struct ThreadName
@@ -269,24 +260,23 @@ namespace bx
 #		pragma pack(pop)
 			ThreadName tn;
 			tn.type  = 0x1000;
-			tn.name  = _name;
+			tn.name  = m_name.getCPtr();
 			tn.id    = ti->m_threadId;
 			tn.flags = 0;
 
 			__try
 			{
 				RaiseException(0x406d1388
-						, 0
-						, sizeof(tn)/4
-						, reinterpret_cast<ULONG_PTR*>(&tn)
-						);
+					, 0
+					, sizeof(tn)/4
+					, reinterpret_cast<ULONG_PTR*>(&tn)
+					);
 			}
 			__except(EXCEPTION_EXECUTE_HANDLER)
 			{
 			}
 #	endif // BX_COMPILER_MSVC
-#else
-		BX_UNUSED(_name);
+		}
 #endif // BX_PLATFORM_
 	}
 
