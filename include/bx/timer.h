@@ -34,21 +34,32 @@ namespace bx
 		/// Initialize to specific time in ticks.
 		explicit constexpr Ticks(int64_t _ticks);
 
-		/// Binary arithmetic operators.
-		constexpr Ticks  operator+ (Ticks  _rhs) const;
-		constexpr Ticks  operator- (Ticks  _rhs) const;
-		constexpr Ticks  operator* (float _rhs) const;
-		constexpr Ticks& operator+=(Ticks  _rhs);
-		constexpr Ticks& operator-=(Ticks  _rhs);
-		constexpr Ticks& operator*=(float _rhs);
+		/// Copy constructor.
+		constexpr Ticks(const Ticks& other) = default;
 
+		/// Copy assignment operator.
+		constexpr Ticks& operator=(const Ticks& other) = default;
+
+		/// Move constructor.
+		Ticks(Ticks&& other) noexcept = default;
+
+		/// Move assignment operator.
+		Ticks& operator=(Ticks&& other) noexcept = default;
+
+		/// Binary arithmetic operators.
+		constexpr Ticks  operator+ (const Ticks& _rhs) const;
+		constexpr Ticks  operator- (const Ticks& _rhs) const;
+		constexpr Ticks  operator* (float _rhs) const;
+		constexpr Ticks& operator+=(const Ticks& _rhs);
+		constexpr Ticks& operator-=(const Ticks& _rhs);
+		constexpr Ticks& operator*=(float _rhs);
 		/// Comparison operators.
-		constexpr bool   operator==(Ticks  _rhs) const;
-		constexpr bool   operator!=(Ticks  _rhs) const;
-		constexpr bool   operator< (Ticks  _rhs) const;
-		constexpr bool   operator<=(Ticks  _rhs) const;
-		constexpr bool   operator> (Ticks  _rhs) const;
-		constexpr bool   operator>=(Ticks  _rhs) const;
+		constexpr bool   operator==(const Ticks& _rhs) const;
+		constexpr bool   operator!=(const Ticks& _rhs) const;
+		constexpr bool   operator< (const Ticks& _rhs) const;
+		constexpr bool   operator<=(const Ticks& _rhs) const;
+		constexpr bool   operator> (const Ticks& _rhs) const;
+		constexpr bool   operator>=(const Ticks& _rhs) const;
 
 		static const Ticks  s_kStartup; //!< App start time.
 		static const Ticks  s_kFreq;    //!< Frequency, ticks per second.
@@ -69,7 +80,7 @@ namespace bx
 
 	/// Returns time in milliseconds.
 	template<typename Ty>
-	constexpr Ty toMilliseconds(const Ticks& _time); 
+	constexpr Ty toMilliseconds(const Ticks& _time);
 
 } // namespace bx
 

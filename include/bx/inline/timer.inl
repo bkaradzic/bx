@@ -19,7 +19,7 @@ namespace bx
 	}
 
 	inline Ticks::Ticks(InitIdentityTag)
-		: Ticks(getHPCounter() )
+		: Ticks(getHPCounter())
 	{
 	}
 
@@ -28,39 +28,52 @@ namespace bx
 	{
 	}
 
-	inline constexpr Ticks  Ticks::operator+ (Ticks  _rhs) const { return Ticks(ticks + _rhs.ticks);                      }
-	inline constexpr Ticks  Ticks::operator- (Ticks  _rhs) const { return Ticks(ticks - _rhs.ticks);                      }
-	inline constexpr Ticks  Ticks::operator* (float  _rhs) const { return Ticks(int64_t(double(ticks * _rhs) ) );         }
-	inline constexpr Ticks& Ticks::operator+=(Ticks  _rhs)       { ticks += _rhs.ticks;                     return *this; }
-	inline constexpr Ticks& Ticks::operator-=(Ticks  _rhs)       { ticks -= _rhs.ticks;                     return *this; }
-	inline constexpr Ticks& Ticks::operator*=(float  _rhs)       { ticks  = int64_t(double(ticks * _rhs) ); return *this; }
-	inline constexpr bool   Ticks::operator==(Ticks  _rhs) const { return ticks == _rhs.ticks;                            }
-	inline constexpr bool   Ticks::operator!=(Ticks  _rhs) const { return ticks != _rhs.ticks;                            }
-	inline constexpr bool   Ticks::operator< (Ticks  _rhs) const { return ticks <  _rhs.ticks;                            }
-	inline constexpr bool   Ticks::operator<=(Ticks  _rhs) const { return ticks <= _rhs.ticks;                            }
-	inline constexpr bool   Ticks::operator> (Ticks  _rhs) const { return ticks >  _rhs.ticks;                            }
-	inline constexpr bool   Ticks::operator>=(Ticks  _rhs) const { return ticks >= _rhs.ticks;                            }
+	inline constexpr Ticks Ticks::operator+(const Ticks &_rhs) const noexcept { return Ticks(ticks + _rhs.ticks); 							}
+	inline constexpr Ticks Ticks::operator-(const Ticks &_rhs) const noexcept { return Ticks(ticks - _rhs.ticks); 							}
+	inline constexpr Ticks Ticks::operator*(float _rhs) const noexcept { return Ticks(int64_t(double(ticks) * _rhs)); 						}
+	inline constexpr Ticks &Ticks::operator+=(const Ticks &_rhs) noexcept { ticks += _rhs.ticks; return *this;							 	}
+	inline constexpr Ticks &Ticks::operator-=(const Ticks &_rhs) noexcept { ticks -= _rhs.ticks; return *this; 							 	}
+	inline constexpr Ticks &Ticks::operator*=(float _rhs) noexcept { ticks = int64_t(double(ticks) * _rhs); return *this; 					}
+	inline constexpr bool Ticks::operator==(const Ticks &_rhs) const noexcept { return ticks == _rhs.ticks; 							 	}
+	inline constexpr bool Ticks::operator!=(const Ticks &_rhs) const noexcept { return ticks != _rhs.ticks; 							 	}
+	inline constexpr bool Ticks::operator<(const Ticks &_rhs) const noexcept { return ticks < _rhs.ticks; 							 		}
+	inline constexpr bool Ticks::operator<=(const Ticks &_rhs) const noexcept { return ticks <= _rhs.ticks; 							 	}
+	inline constexpr bool Ticks::operator>(const Ticks &_rhs) const noexcept { return ticks > _rhs.ticks; 									}
+	inline constexpr bool Ticks::operator>=(const Ticks &_rhs) const noexcept { return ticks >= _rhs.ticks; 							 	}
+
+	inline constexpr Ticks operator+(int64_t ticks, const Ticks &_rhs) noexcept { return Ticks(ticks + _rhs.ticks); 						}
+	inline constexpr Ticks operator-(int64_t ticks, const Ticks &_rhs) noexcept { return Ticks(ticks - _rhs.ticks); 						}
+	inline constexpr Ticks operator*(float ticks, const Ticks &_rhs) noexcept { return Ticks(int64_t(double(ticks * _rhs.ticks))); 			}
+	inline constexpr Ticks &operator+=(int64_t ticks, Ticks &_rhs) noexcept { _rhs.ticks += ticks; return _rhs; 							}
+	inline constexpr Ticks &operator-=(int64_t ticks, Ticks &_rhs) noexcept { _rhs.ticks -= ticks; return _rhs; 							}
+	inline constexpr Ticks &operator*=(float ticks, Ticks &_rhs) noexcept { _rhs.ticks = int64_t(double(ticks * _rhs.ticks)); return _rhs;  }
+	inline constexpr bool operator==(int64_t ticks, const Ticks &_rhs) noexcept { return ticks == _rhs.ticks; 							 	}
+	inline constexpr bool operator!=(int64_t ticks, const Ticks &_rhs) noexcept { return ticks != _rhs.ticks; 							 	}
+	inline constexpr bool operator<(int64_t ticks, const Ticks &_rhs) noexcept { return ticks < _rhs.ticks; 							 	}
+	inline constexpr bool operator<=(int64_t ticks, const Ticks &_rhs) noexcept { return ticks <= _rhs.ticks; 							 	}
+	inline constexpr bool operator>(int64_t ticks, const Ticks &_rhs) noexcept { return ticks > _rhs.ticks; 							 	}
+	inline constexpr bool operator>=(int64_t ticks, const Ticks &_rhs) noexcept { return ticks >= _rhs.ticks; 							 	}
 
 	inline Ticks getNow()
 	{
-		return Ticks(getHPCounter() );
+		return Ticks(getHPCounter());
 	}
 
 	inline Ticks getTicksSinceStartup()
 	{
-		return Ticks(getNow() - Ticks::s_kStartup);
+		return getNow() - Ticks::s_kStartup;
 	}
 
-	template<typename Ty>
-	inline constexpr Ty toSeconds(const Ticks& _ticks)
+	template <typename Ty>
+	inline constexpr Ty toSeconds(const Ticks &_ticks)
 	{
-		return Ty(double(_ticks.ticks * Ticks::s_kInvFreq) );
+		return Ty(double(_ticks.ticks * Ticks::s_kInvFreq));
 	}
 
-	template<typename Ty>
-	inline constexpr Ty toMilliseconds(const Ticks& _ticks)
+	template <typename Ty>
+	inline constexpr Ty toMilliseconds(const Ticks &_ticks)
 	{
-		return Ty(double(_ticks.ticks * 1000 * Ticks::s_kInvFreq) );
+		return Ty(double(_ticks.ticks * 1000 * Ticks::s_kInvFreq));
 	}
 
 } // namespace bx
