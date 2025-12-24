@@ -68,4 +68,8 @@ namespace bx
 #endif // BX_PLATFORM_
 	}
 
+	const Ticks  Ticks::s_kStartup = getNow();
+	const Ticks  Ticks::s_kFreq    = Ticks(getHPFrequency() );
+	const double Ticks::s_kInvFreq = 1.0/double(Ticks::s_kFreq.ticks); 
+
 } // namespace bx
