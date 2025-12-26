@@ -242,6 +242,7 @@ namespace bx
 	inline constexpr FixedStringT<MaxCapacityT>::FixedStringT()
 		: m_len(0)
 	{
+		m_storage[0] = '\0';
 	}
 
 	template<uint16_t MaxCapacityT>
