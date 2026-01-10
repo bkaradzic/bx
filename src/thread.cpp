@@ -234,17 +234,17 @@ namespace bx
 #elif BX_PLATFORM_LINUX
 		prctl(PR_SET_NAME, m_name.getCPtr(), 0, 0, 0);
 #elif BX_PLATFORM_WINDOWS
-		typedef HRESULT (WINAPI *SetThreadDescriptionProc)(HANDLE, PCWSTR);
-		SetThreadDescriptionProc SetThreadDescription = dlsym<SetThreadDescriptionProc>( (void*)GetModuleHandleA("Kernel32.dll"), "SetThreadDescription");
+		typedef HRESULT (WINAPI *SetThreadDescriptionFn)(HANDLE, PCWSTR);
+		SetThreadDescriptionFn setThreadDescription = dlsym<SetThreadDescriptionFn>( (void*)GetModuleHandleA("kernel32.dll"), "SetThreadDescription");
 
-		if (NULL != SetThreadDescription)
+		if (NULL != setThreadDescription)
 		{
 			const uint32_t length = m_name.getLength();
 			const uint32_t max    = (length+1)*sizeof(wchar_t);
 			wchar_t* name = (wchar_t*)BX_STACK_ALLOC(max);
 			mbstowcs(name, m_name.getCPtr(), length);
 			name[length] = 0;
-			SetThreadDescription(ti->m_handle, name);
+			setThreadDescription(ti->m_handle, name);
 		}
 		else
 		{
