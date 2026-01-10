@@ -1289,15 +1289,26 @@ namespace bx
 	};
 
 	typedef uint32_t (__stdcall* TopLevelExceptionFilterFn)(ExceptionPointers* _exceptionInfo);
-
-	extern "C" __declspec(dllimport) TopLevelExceptionFilterFn __stdcall SetUnhandledExceptionFilter(TopLevelExceptionFilterFn _topLevelExceptionFilter);
+	typedef TopLevelExceptionFilterFn (__stdcall* SetUnhandledExceptionFilterFn)(TopLevelExceptionFilterFn _topLevelExceptionFilter);
 
 	struct ExceptionHandler
 	{
 		ExceptionHandler()
 		{
-			BX_TRACE("ExceptionHandler - Windows SEH");
-			SetUnhandledExceptionFilter(topLevelExceptionFilter);
+			void* kernel32Dll = bx::dlopen("kernel32.dll");
+
+			if (NULL != kernel32Dll)
+			{
+				SetUnhandledExceptionFilterFn setUnhandledExceptionFilter = bx::dlsym<SetUnhandledExceptionFilterFn>(kernel32Dll, "SetUnhandledExceptionFilter");
+
+				if (NULL != setUnhandledExceptionFilter)
+				{
+					BX_TRACE("ExceptionHandler - Windows SEH");
+					setUnhandledExceptionFilter(topLevelExceptionFilter);
+				}
+
+				bx::dlclose(kernel32Dll);
+			}
 		}
 
 		static uint32_t __stdcall topLevelExceptionFilter(ExceptionPointers* _info)
