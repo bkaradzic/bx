@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2025 Branimir Karadzic. All rights reserved.
+ * Copyright 2012-2026 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
