@@ -397,13 +397,13 @@ namespace bx
 		bottom.normal.z = zw - zy;
 		bottom.dist     = ww - wy;
 
-		Plane* plane = _result;
 		for (uint32_t ii = 0; ii < 6; ++ii)
 		{
-			const float invLen = 1.0f/length(plane->normal);
-			plane->normal = normalize(plane->normal);
-			plane->dist  *= invLen;
-			++plane;
+			Plane& plane = _result[ii];
+
+			const float invLen = divSafe(1.0f, length(plane.normal) );
+			plane.normal = mul(plane.normal, invLen);
+			plane.dist  *= invLen;
 		}
 	}
 
