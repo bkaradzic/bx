@@ -33,19 +33,20 @@ struct HashTest
 	uint32_t adler32;
 	uint32_t murmur2a;
 	uint32_t murmur3;
+	uint64_t murmur3_64;
 	const char* input;
 };
 
 const HashTest s_hashTest[] =
 {
-	//  Crc32                               | Adler32   | Murmur2A  | Murmur3   |  Input
+	//  Crc32                               | Adler32   | Murmur2A  | Murmur3   | Murmur3-64        | Input
 	//  Ieee        Castagnoli  Koopman     |           |           |           |
-	{ { 0,          0,          0          }, 1,          0,                   0,  ""       },
-	{ { 0xe8b7be43, 0xc1d04330, 0x0da2aa8a }, 0x00620062, 0x0803888b, 0x3c2569b2,  "a"      },
-	{ { 0x9e83486d, 0xe2a22936, 0x31ec935a }, 0x012600c4, 0x618515af, 0x9bbfd75f,  "ab"     },
-	{ { 0xc340daab, 0x49e1b6e3, 0x945a1e78 }, 0x06060205, 0x94e3dc4d, 0x1e661875,  "abvgd"  },
-	{ { 0x07642fe2, 0x45a04162, 0x3d4bf72d }, 0x020a00d6, 0xe602fc07, 0x7af40d31,  "1389"   },
-	{ { 0x26d75737, 0xb73d7b80, 0xd524eb40 }, 0x04530139, 0x58d37863, 0x0c090160,  "555333" },
+	{ { 0,          0,          0          }, 1,          0,                   0,                  0, ""       },
+	{ { 0xe8b7be43, 0xc1d04330, 0x0da2aa8a }, 0x00620062, 0x0803888b, 0x3c2569b2, 0x85555565f6597889, "a"      },
+	{ { 0x9e83486d, 0xe2a22936, 0x31ec935a }, 0x012600c4, 0x618515af, 0x9bbfd75f, 0x938b11ea16ed1b2e, "ab"     },
+	{ { 0xc340daab, 0x49e1b6e3, 0x945a1e78 }, 0x06060205, 0x94e3dc4d, 0x1e661875, 0xdb87036d085a1fce, "abvgd"  },
+	{ { 0x07642fe2, 0x45a04162, 0x3d4bf72d }, 0x020a00d6, 0xe602fc07, 0x7af40d31, 0x2b40ab25c1822a45, "1389"   },
+	{ { 0x26d75737, 0xb73d7b80, 0xd524eb40 }, 0x04530139, 0x58d37863, 0x0c090160, 0x90db44bd78197df0, "555333" },
 };
 
 TEST_CASE("HashCrc32", "[hash]")
@@ -275,4 +276,32 @@ TEST_CASE("HashMurmur3-Separate-Add", "[hash]")
 	hash.add("1389");
 	hash.add("555333");
 	REQUIRE(MurmurHash3_x86_32("0123456789abvgd0123451389555333", 31, 0) == hash.end() );
+}
+
+TEST_CASE("HashMurmur3_64", "[hash]")
+{
+	uint64_t seed = 0;
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(s_hashTest); ++ii)
+	{
+		const HashTest& test = s_hashTest[ii];
+
+		bx::HashMurmur3_64 hash;
+		hash.begin(seed);
+		hash.add(test.input, bx::strLen(test.input) );
+		const uint64_t result = hash.end();
+
+		REQUIRE(test.murmur3_64 == result);
+	}
+}
+
+TEST_CASE("HashMurmur3_64-Separate-Add", "[hash]")
+{
+	bx::HashMurmur3_64 hash;
+	hash.begin();
+	hash.add("0123456789");
+	hash.add("abvgd012345");
+	hash.add("1389");
+	hash.add("555333");
+	REQUIRE(0x548456b99626b0e9 == hash.end() );
 }
