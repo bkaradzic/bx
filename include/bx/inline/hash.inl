@@ -124,6 +124,33 @@ namespace bx
 		add(&_data, sizeof(Ty) );
 	}
 
+	inline void HashMurmur3_64::begin(uint64_t _seed)
+	{
+		BX_UNUSED(m_tail);
+		m_hash[0] = _seed;
+		m_hash[1] = _seed;
+		m_size    = 0;
+		m_count   = 0;
+	}
+
+	inline void HashMurmur3_64::add(const char* _data)
+	{
+		return add(StringView(_data) );
+	}
+
+	inline void HashMurmur3_64::add(const StringView& _data)
+	{
+		return add(_data.getPtr(), _data.getLength() );
+	}
+
+	template<typename Ty>
+	inline void HashMurmur3_64::add(const Ty& _data)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+		add(&_data, sizeof(Ty) );
+	}
+
 	template<typename HashT>
 	inline uint32_t hash(const void* _data, uint32_t _size)
 	{

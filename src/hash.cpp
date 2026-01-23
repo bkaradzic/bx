@@ -147,18 +147,37 @@ void HashCrc32::add(const void* _data, int32_t _len)
 	m_hash = hash;
 }
 
-BX_FORCE_INLINE uint32_t readAligned(const uint8_t* _data)
+BX_FORCE_INLINE uint32_t readAligned32(const uint8_t* _data)
 {
 	return *(uint32_t*)_data;
 }
 
-BX_FORCE_INLINE uint32_t readUnaligned(const uint8_t* _data)
+BX_FORCE_INLINE uint32_t readUnaligned32(const uint8_t* _data)
 {
 	return 0
-		| _data[3]<<24
-		| _data[2]<<16
-		| _data[1]<<8
-		| _data[0]
+		| uint32_t(_data[3])<<24
+		| uint32_t(_data[2])<<16
+		| uint32_t(_data[1])<<8
+		| uint32_t(_data[0])
+		;
+}
+
+BX_FORCE_INLINE uint64_t readAligned64(const uint8_t* _data)
+{
+	return *(uint64_t*)_data;
+}
+
+BX_FORCE_INLINE uint64_t readUnaligned64(const uint8_t* _data)
+{
+	return 0
+		| uint64_t(_data[7])<<56
+		| uint64_t(_data[6])<<48
+		| uint64_t(_data[5])<<40
+		| uint64_t(_data[4])<<32
+		| uint64_t(_data[3])<<24
+		| uint64_t(_data[2])<<16
+		| uint64_t(_data[1])<<8
+		| uint64_t(_data[0])
 		;
 }
 
@@ -166,7 +185,7 @@ namespace
 {
 
 template<typename Ty>
-void mixTail(Ty& _self, const uint8_t*& _data, int32_t& _len)
+void mixTail32(Ty& _self, const uint8_t*& _data, int32_t& _len)
 {
 	while (0 != _len
 	&&    (0 < _self.m_count || 4 > _len) )
@@ -183,10 +202,10 @@ void mixTail(Ty& _self, const uint8_t*& _data, int32_t& _len)
 	}
 }
 
-typedef uint32_t (*ReadDataFn)(const uint8_t* _data);
+typedef uint32_t (*ReadData32Fn)(const uint8_t* _data);
 
-template<typename Ty, ReadDataFn FnT>
-void addData(Ty& _self, const uint8_t* _data, int32_t _len)
+template<typename Ty, ReadData32Fn FnT>
+void addData32(Ty& _self, const uint8_t* _data, int32_t _len)
 {
 	while (_len >= 4)
 	{
@@ -198,35 +217,83 @@ void addData(Ty& _self, const uint8_t* _data, int32_t _len)
 		_len  -= 4;
 	}
 
-	mixTail(_self, _data, _len);
+	mixTail32(_self, _data, _len);
 }
 
 template<typename SelfT, typename ThisT>
-void addData(ThisT* _this, const void* _data, int32_t _len)
+void addData32(ThisT* _this, const void* _data, int32_t _len)
 {
 	SelfT& self = *(SelfT*)_this;
 
 	const uint8_t* data = (const uint8_t*)_data;
 
 	self.m_size += _len;
-	mixTail(self, data, _len);
+	mixTail32(self, data, _len);
 
 	if (BX_UNLIKELY(!isAligned(data, 4) ) )
 	{
-		addData<SelfT, readUnaligned>(self, data, _len);
+		addData32<SelfT, readUnaligned32>(self, data, _len);
 		return;
 	}
 
-	addData<SelfT, readAligned>(self, data, _len);
+	addData32<SelfT, readAligned32>(self, data, _len);
+}
+
+template<typename Ty>
+void mixTail128(Ty& _self, const uint8_t*& _data, int32_t& _len)
+{
+	while (0 != _len
+	&&    (0 < _self.m_count || 16 > _len) )
+	{
+		_self.m_tail[_self.m_count++] = *_data++;
+		_len--;
+
+		if (16 == _self.m_count)
+		{
+			const uint64_t kk1 = *( (uint64_t*)&_self.m_tail[0]);
+			const uint64_t kk2 = *( (uint64_t*)&_self.m_tail[8]);
+			_self.mix(kk1, kk2);
+			_self.m_count = 0;
+		}
+	}
+}
+
+typedef uint64_t (*ReadData64Fn)(const uint8_t* _data);
+
+template<typename Ty, ReadData64Fn FnT>
+void addData128(Ty& _self, const uint8_t* _data, int32_t _len)
+{
+	while (_len >= 16)
+	{
+		uint64_t kk1 = FnT(_data);
+		uint64_t kk2 = FnT(_data + 8);
+
+		_self.mix(kk1, kk2);
+
+		_data += 16;
+		_len  -= 16;
+	}
+
+	mixTail128(_self, _data, _len);
 }
 
 template<typename SelfT, typename ThisT>
-uint32_t finalize(ThisT* _this)
+void addData128(ThisT* _this, const void* _data, int32_t _len)
 {
 	SelfT& self = *(SelfT*)_this;
-	self.finalize();
 
-	return self.m_hash;
+	const uint8_t* data = (const uint8_t*)_data;
+
+	self.m_size += _len;
+	mixTail128(self, data, _len);
+
+	if (BX_UNLIKELY(!isAligned(data, 8) ) )
+	{
+		addData128<SelfT, readUnaligned64>(self, data, _len);
+		return;
+	}
+
+	addData128<SelfT, readAligned64>(self, data, _len);
 }
 
 } // namespace
@@ -274,12 +341,14 @@ static_assert(sizeof(HashMurmur2A) == sizeof(HashMurmur2APod) );
 
 void HashMurmur2A::add(const void* _data, int32_t _len)
 {
-	addData<HashMurmur2APod>(this, _data, _len);
+	addData32<HashMurmur2APod>(this, _data, _len);
 }
 
 uint32_t HashMurmur2A::end()
 {
-	return finalize<HashMurmur2APod>(this);
+	HashMurmur2APod& hash = *(HashMurmur2APod*)this;
+	hash.finalize();
+	return hash.m_hash;
 }
 
 struct HashMurmur3Pod
@@ -312,6 +381,17 @@ struct HashMurmur3Pod
 		m_hash = m_hash*5 + kMurmur3Add;
 	}
 
+	static BX_FORCE_INLINE uint32_t fmix32(uint32_t _hash)
+	{
+		_hash ^= _hash >> 16;
+		_hash *= kMurmur3Mul3;
+		_hash ^= _hash >> 13;
+		_hash *= kMurmur3Mul4;
+		_hash ^= _hash >> 16;
+
+		return _hash;
+	}
+
 	void finalize()
 	{
 		uint32_t kk = 0;
@@ -327,23 +407,135 @@ struct HashMurmur3Pod
 
 		m_hash ^= m_size;
 
-		m_hash ^= m_hash >> 16;
-		m_hash *= kMurmur3Mul3;
-		m_hash ^= m_hash >> 13;
-		m_hash *= kMurmur3Mul4;
-		m_hash ^= m_hash >> 16;
+		m_hash = fmix32(m_hash);
 	}
 };
 static_assert(sizeof(HashMurmur3) == sizeof(HashMurmur3Pod) );
 
 void HashMurmur3::add(const void* _data, int32_t _len)
 {
-	addData<HashMurmur3Pod>(this, _data, _len);
+	addData32<HashMurmur3Pod>(this, _data, _len);
 }
 
 uint32_t HashMurmur3::end()
 {
-	return finalize<HashMurmur3Pod>(this);
+	HashMurmur3Pod& hash = *(HashMurmur3Pod*)this;
+	hash.finalize();
+	return hash.m_hash;
+}
+
+struct HashMurmur3_64Pod
+{
+	uint64_t m_hash[2];
+	uint32_t m_size;
+	uint8_t  m_tail[16];
+	uint8_t  m_count;
+
+	static constexpr uint64_t kMurmur3Mul1 = 0x87c37b91114253d5ull;
+	static constexpr uint64_t kMurmur3Mul2 = 0x4cf5ad432745937full;
+	static constexpr uint64_t kMurmur3Mul3 = 0xff51afd7ed558ccdull;
+	static constexpr uint64_t kMurmur3Mul4 = 0xc4ceb9fe1a85ec53ull;
+	static constexpr uint64_t kMurmur3Add1 = 0x52dce729ull;
+	static constexpr uint64_t kMurmur3Add2 = 0x38495ab5ull;
+
+	BX_FORCE_INLINE void mix1(uint64_t _k)
+	{
+		_k *= kMurmur3Mul1;
+		_k  = uint64_rol(_k, 31);
+		_k *= kMurmur3Mul2;
+
+		m_hash[0] ^= _k;
+	}
+
+	BX_FORCE_INLINE void mix2(uint64_t _k)
+	{
+		_k *= kMurmur3Mul2;
+		_k  = uint64_rol(_k, 33);
+		_k *= kMurmur3Mul1;
+
+		m_hash[1] ^= _k;
+	}
+
+	BX_FORCE_INLINE void mix(uint64_t _k1, uint64_t _k2)
+	{
+		mix1(_k1);
+
+		m_hash[0]  = uint64_rol(m_hash[0], 27);
+		m_hash[0] += m_hash[1];
+		m_hash[0]  = m_hash[0]*5 + kMurmur3Add1;
+
+		mix2(_k2);
+
+		m_hash[1]  = uint64_rol(m_hash[1], 31);
+		m_hash[1] += m_hash[0];
+		m_hash[1]  = m_hash[1]*5 + kMurmur3Add2;
+	}
+
+	static BX_FORCE_INLINE uint64_t fmix64(uint64_t _hash)
+	{
+		_hash ^= _hash >> 33;
+		_hash *= kMurmur3Mul3;
+		_hash ^= _hash >> 33;
+		_hash *= kMurmur3Mul4;
+		_hash ^= _hash >> 33;
+
+		return _hash;
+	}
+
+	void finalize()
+	{
+		uint64_t kk[2] = { 0, 0 };
+
+		switch (m_count)
+		{
+			case 15: kk[1] ^= uint64_t(m_tail[14]) << 48; [[fallthrough]];
+			case 14: kk[1] ^= uint64_t(m_tail[13]) << 40; [[fallthrough]];
+			case 13: kk[1] ^= uint64_t(m_tail[12]) << 32; [[fallthrough]];
+			case 12: kk[1] ^= uint64_t(m_tail[11]) << 24; [[fallthrough]];
+			case 11: kk[1] ^= uint64_t(m_tail[10]) << 16; [[fallthrough]];
+			case 10: kk[1] ^= uint64_t(m_tail[ 9]) <<  8; [[fallthrough]];
+			case  9: kk[1] ^= uint64_t(m_tail[ 8]); mix2(kk[1]);
+				[[fallthrough]];
+
+			case  8: kk[0] ^= uint64_t(m_tail[ 7]) << 56; [[fallthrough]];
+			case  7: kk[0] ^= uint64_t(m_tail[ 6]) << 48; [[fallthrough]];
+			case  6: kk[0] ^= uint64_t(m_tail[ 5]) << 40; [[fallthrough]];
+			case  5: kk[0] ^= uint64_t(m_tail[ 4]) << 32; [[fallthrough]];
+			case  4: kk[0] ^= uint64_t(m_tail[ 3]) << 24; [[fallthrough]];
+			case  3: kk[0] ^= uint64_t(m_tail[ 2]) << 16; [[fallthrough]];
+			case  2: kk[0] ^= uint64_t(m_tail[ 1]) <<  8; [[fallthrough]];
+			case  1: kk[0] ^= uint64_t(m_tail[ 0]); mix1(kk[0]);
+				break;
+
+			case  0: break;
+			default: BX_ASSERT(false, "Bug, m_count can't be %d (expected < 16).", m_count); BX_UNREACHABLE;
+		}
+
+		m_hash[0] ^= m_size;
+		m_hash[1] ^= m_size;
+
+		m_hash[0] += m_hash[1];
+		m_hash[1] += m_hash[0];
+
+		m_hash[0] = fmix64(m_hash[0]);
+		m_hash[1] = fmix64(m_hash[1]);
+
+		m_hash[0] += m_hash[1];
+		m_hash[1] += m_hash[0];
+	}
+};
+static_assert(sizeof(HashMurmur3_64) == sizeof(HashMurmur3_64Pod) );
+
+void HashMurmur3_64::add(const void* _data, int32_t _len)
+{
+	addData128<HashMurmur3_64Pod>(this, _data, _len);
+}
+
+uint64_t HashMurmur3_64::end()
+{
+	HashMurmur3_64Pod& hash = *(HashMurmur3_64Pod*)this;
+	hash.finalize();
+	return hash.m_hash[0];
 }
 
 } // namespace bx
