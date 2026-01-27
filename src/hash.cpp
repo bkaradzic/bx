@@ -147,40 +147,6 @@ void HashCrc32::add(const void* _data, int32_t _len)
 	m_hash = hash;
 }
 
-BX_FORCE_INLINE uint32_t readAligned32(const uint8_t* _data)
-{
-	return *(uint32_t*)_data;
-}
-
-BX_FORCE_INLINE uint32_t readUnaligned32(const uint8_t* _data)
-{
-	return 0
-		| uint32_t(_data[3])<<24
-		| uint32_t(_data[2])<<16
-		| uint32_t(_data[1])<<8
-		| uint32_t(_data[0])
-		;
-}
-
-BX_FORCE_INLINE uint64_t readAligned64(const uint8_t* _data)
-{
-	return *(uint64_t*)_data;
-}
-
-BX_FORCE_INLINE uint64_t readUnaligned64(const uint8_t* _data)
-{
-	return 0
-		| uint64_t(_data[7])<<56
-		| uint64_t(_data[6])<<48
-		| uint64_t(_data[5])<<40
-		| uint64_t(_data[4])<<32
-		| uint64_t(_data[3])<<24
-		| uint64_t(_data[2])<<16
-		| uint64_t(_data[1])<<8
-		| uint64_t(_data[0])
-		;
-}
-
 namespace
 {
 
@@ -202,9 +168,9 @@ void mixTail32(Ty& _self, const uint8_t*& _data, int32_t& _len)
 	}
 }
 
-typedef uint32_t (*ReadData32Fn)(const uint8_t* _data);
+typedef uint32_t (*LoadData32Fn)(const void* _data);
 
-template<typename Ty, ReadData32Fn FnT>
+template<typename Ty, LoadData32Fn FnT>
 void addData32(Ty& _self, const uint8_t* _data, int32_t _len)
 {
 	while (_len >= 4)
@@ -232,11 +198,11 @@ void addData32(ThisT* _this, const void* _data, int32_t _len)
 
 	if (BX_UNLIKELY(!isAligned(data, 4) ) )
 	{
-		addData32<SelfT, readUnaligned32>(self, data, _len);
+		addData32<SelfT, loadUnaligned<uint32_t>>(self, data, _len);
 		return;
 	}
 
-	addData32<SelfT, readAligned32>(self, data, _len);
+	addData32<SelfT, loadAligned<uint32_t>>(self, data, _len);
 }
 
 template<typename Ty>
@@ -258,9 +224,9 @@ void mixTail128(Ty& _self, const uint8_t*& _data, int32_t& _len)
 	}
 }
 
-typedef uint64_t (*ReadData64Fn)(const uint8_t* _data);
+typedef uint64_t (*LoadData64Fn)(const void* _data);
 
-template<typename Ty, ReadData64Fn FnT>
+template<typename Ty, LoadData64Fn FnT>
 void addData128(Ty& _self, const uint8_t* _data, int32_t _len)
 {
 	while (_len >= 16)
@@ -289,11 +255,11 @@ void addData128(ThisT* _this, const void* _data, int32_t _len)
 
 	if (BX_UNLIKELY(!isAligned(data, 8) ) )
 	{
-		addData128<SelfT, readUnaligned64>(self, data, _len);
+		addData128<SelfT, loadUnaligned<uint64_t>>(self, data, _len);
 		return;
 	}
 
-	addData128<SelfT, readAligned64>(self, data, _len);
+	addData128<SelfT, loadAligned<uint64_t>>(self, data, _len);
 }
 
 } // namespace
@@ -488,23 +454,23 @@ struct HashMurmur3_64Pod
 
 		switch (m_count)
 		{
-			case 15: kk[1] ^= uint64_t(m_tail[14]) << 48; [[fallthrough]];
-			case 14: kk[1] ^= uint64_t(m_tail[13]) << 40; [[fallthrough]];
-			case 13: kk[1] ^= uint64_t(m_tail[12]) << 32; [[fallthrough]];
-			case 12: kk[1] ^= uint64_t(m_tail[11]) << 24; [[fallthrough]];
-			case 11: kk[1] ^= uint64_t(m_tail[10]) << 16; [[fallthrough]];
-			case 10: kk[1] ^= uint64_t(m_tail[ 9]) <<  8; [[fallthrough]];
-			case  9: kk[1] ^= uint64_t(m_tail[ 8]); mix2(kk[1]);
+			case 15: kk[1] |= uint64_t(m_tail[14]) << 48; [[fallthrough]];
+			case 14: kk[1] |= uint64_t(m_tail[13]) << 40; [[fallthrough]];
+			case 13: kk[1] |= uint64_t(m_tail[12]) << 32; [[fallthrough]];
+			case 12: kk[1] |= uint64_t(m_tail[11]) << 24; [[fallthrough]];
+			case 11: kk[1] |= uint64_t(m_tail[10]) << 16; [[fallthrough]];
+			case 10: kk[1] |= uint64_t(m_tail[ 9]) <<  8; [[fallthrough]];
+			case  9: kk[1] |= uint64_t(m_tail[ 8]); mix2(kk[1]);
 				[[fallthrough]];
 
-			case  8: kk[0] ^= uint64_t(m_tail[ 7]) << 56; [[fallthrough]];
-			case  7: kk[0] ^= uint64_t(m_tail[ 6]) << 48; [[fallthrough]];
-			case  6: kk[0] ^= uint64_t(m_tail[ 5]) << 40; [[fallthrough]];
-			case  5: kk[0] ^= uint64_t(m_tail[ 4]) << 32; [[fallthrough]];
-			case  4: kk[0] ^= uint64_t(m_tail[ 3]) << 24; [[fallthrough]];
-			case  3: kk[0] ^= uint64_t(m_tail[ 2]) << 16; [[fallthrough]];
-			case  2: kk[0] ^= uint64_t(m_tail[ 1]) <<  8; [[fallthrough]];
-			case  1: kk[0] ^= uint64_t(m_tail[ 0]); mix1(kk[0]);
+			case  8: kk[0] |= uint64_t(m_tail[ 7]) << 56; [[fallthrough]];
+			case  7: kk[0] |= uint64_t(m_tail[ 6]) << 48; [[fallthrough]];
+			case  6: kk[0] |= uint64_t(m_tail[ 5]) << 40; [[fallthrough]];
+			case  5: kk[0] |= uint64_t(m_tail[ 4]) << 32; [[fallthrough]];
+			case  4: kk[0] |= uint64_t(m_tail[ 3]) << 24; [[fallthrough]];
+			case  3: kk[0] |= uint64_t(m_tail[ 2]) << 16; [[fallthrough]];
+			case  2: kk[0] |= uint64_t(m_tail[ 1]) <<  8; [[fallthrough]];
+			case  1: kk[0] |= uint64_t(m_tail[ 0]); mix1(kk[0]);
 				break;
 
 			case  0: break;

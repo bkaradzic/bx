@@ -174,6 +174,38 @@ namespace bx
 	template<typename Ty>
 	const Ty* addressOf(const void* _ptr, ptrdiff_t _offsetInBytes = 0);
 
+	/// Loads a value of type Ty from an naturally aligned memory location.
+	///
+	/// @param[in] _ptr Pointer to the memory location.
+	/// @returns The loaded value of type Ty.
+	///
+	template<typename Ty>
+	inline Ty loadAligned(const void* _ptr);
+
+	/// Loads a value of type Ty from a potentially unaligned memory location.
+	///
+	/// @param[in] _ptr Pointer to the memory location.
+	/// @returns The loaded value of type Ty.
+	///
+	template<typename Ty>
+	inline Ty loadUnaligned(const void* _ptr);
+
+	/// Stores a value of type Ty to an naturally aligned memory location.
+	///
+	/// @param[out] _ptr Pointer to the destination memory.
+	/// @param[in] _value The value to store.
+	///
+	template<typename Ty>
+	inline void storeAligned(void* _outPtr, const Ty& _value);
+
+	/// Stores a value of type Ty to a potentially unaligned memory location.
+	///
+	/// @param[out] _ptr Pointer to the destination memory.
+	/// @param[in] _value The value to store.
+	///
+	template<typename Ty>
+	inline void storeUnaligned(void* _outPtr, const Ty& _value);
+
 	/// Swap two values.
 	template<typename Ty>
 	void swap(Ty& _a, Ty& _b);

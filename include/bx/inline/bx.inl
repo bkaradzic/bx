@@ -60,6 +60,81 @@ namespace bx
 	}
 
 	template<typename Ty>
+	inline Ty loadAligned(const void* _ptr)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+		return *(const Ty*)_ptr;
+	}
+
+	template<typename Ty>
+	inline Ty loadUnaligned(const void* _ptr)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
+		return *(UnalignedTy*)_ptr;
+#else
+		Ty value;
+		memCopy(&value, _ptr, sizeof(Ty) );
+
+		return value;
+#endif // BX_COMPILER_*
+	}
+
+	template<>
+	inline uint32_t loadUnaligned(const void* _ptr)
+	{
+		const uint8_t* data = (const uint8_t*)_ptr;
+
+		return 0
+			| uint32_t(data[3])<<24
+			| uint32_t(data[2])<<16
+			| uint32_t(data[1])<<8
+			| uint32_t(data[0])
+			;
+	}
+
+	template<>
+	inline uint64_t loadUnaligned(const void* _ptr)
+	{
+		const uint8_t* data = (const uint8_t*)_ptr;
+
+		return 0
+			| uint64_t(data[7])<<56
+			| uint64_t(data[6])<<48
+			| uint64_t(data[5])<<40
+			| uint64_t(data[4])<<32
+			| uint64_t(data[3])<<24
+			| uint64_t(data[2])<<16
+			| uint64_t(data[1])<<8
+			| uint64_t(data[0])
+			;
+	}
+
+	template<typename Ty>
+	inline void storeAligned(void* _ptr, const Ty& _value)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+		*(Ty*)_ptr = _value;
+	}
+
+	template<typename Ty>
+	inline void storeUnaligned(void* _ptr, const Ty& _value)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
+		*(UnalignedTy*)_ptr = _value;
+#else
+		memCopy(_ptr, &_value, sizeof(Ty) );
+#endif // BX_COMPILER_*
+	}
+
+	template<typename Ty>
 	inline void swap(Ty& _a, Ty& _b)
 	{
 		Ty tmp = move(_a); _a = move(_b); _b = move(tmp);
