@@ -385,7 +385,18 @@ function toolchain(_buildDir, _libDir)
 					print("Set OSXCROSS environment variable.")
 				end
 
-				local osxToolchain = "x86_64-apple-darwin15-"
+				-- Autodetct OSXCROSS darwin version
+				-- Do this by using compgen to get clang install. This is a part of bash and always present
+				local handle = io.popen("compgen -c x86_64-apple-darwin | grep \"clang$\"")
+				local osxToolchain = handle:read("*a")
+				handle:close()
+				if (not osxToolchain or osxToolchain == "") then
+					print("Warning: Could not autodetect x86_64-apple-apple-darwin toolchain! Check that your $PATH variable includes $OSXCROSS/target/bin/ !")
+					osxToolchain = "x86_64-apple-darwin15-"	-- Default to this if not found
+				else
+					osxToolchain = osxToolchain:sub(1,osxToolchain:len()-6)   --Get rid of the --clang to get the common part
+				end
+				
 				premake.gcc.cc  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang"
 				premake.gcc.cxx = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "clang++"
 				premake.gcc.ar  = "$(OSXCROSS)/target/bin/" .. osxToolchain .. "ar"
