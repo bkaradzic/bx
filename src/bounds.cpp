@@ -1109,10 +1109,10 @@ namespace bx
 			return false;
 		}
 
-		return 0.0f >= ta
-			&& 1.0f <= ta
-			&& 0.0f >= tb
-			&& 1.0f <= tb
+		return 0.0f <= ta
+			&& 1.0f >= ta
+			&& 0.0f <= tb
+			&& 1.0f >= tb
 			;
 	}
 
