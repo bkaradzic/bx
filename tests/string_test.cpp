@@ -24,10 +24,10 @@ TEST_CASE("prettify", "[string]")
 {
 	char tmp[1024];
 	prettify(tmp, BX_COUNTOF(tmp), 4000, bx::Units::Kilo);
-	REQUIRE(0 == bx::strCmp(tmp, "4.00 kB") );
+	REQUIRE(0 == bx::strCmp(tmp, "4 kB") );
 
 	prettify(tmp, BX_COUNTOF(tmp), 4096, bx::Units::Kibi);
-	REQUIRE(0 == bx::strCmp(tmp, "4.00 KiB") );
+	REQUIRE(0 == bx::strCmp(tmp, "4 KiB") );
 }
 
 TEST_CASE("chars", "[string]")
@@ -761,4 +761,38 @@ TEST(tinystl_string_assign)
 		CHECK( 0 == strcmp(s.c_str(), "short") );
 		CHECK( other.size() == 0 );
 	}
+}
+
+bool testFormatHumanNumber(bx::StringView _expected, double _value, int32_t _numFrac, int32_t _bufferSize = 32)
+{
+	char* tmp = (char*)BX_STACK_ALLOC(_bufferSize);
+	int32_t total = bx::formatHumanNumber(tmp, _bufferSize, _value, _numFrac);
+
+	bx::StringView human(tmp, total);
+
+	const bool result = 0 == bx::strCmp(human, _expected);
+
+	if (!result)
+	{
+		DBG(
+			  "expected: '%S' (len: %d), human: '%S' (len: %d)"
+			, &_expected
+			, _expected.getLength()
+			, &human
+			, human.getLength()
+			);
+	}
+
+	return result;
+}
+
+TEST_CASE("formatHumanNumber", "[string]")
+{
+	REQUIRE(testFormatHumanNumber("1,389,983,113.89", 1389983113.891389, 2) );
+	REQUIRE(testFormatHumanNumber("13,899,831.1389", 13899831.1389, 4) );
+	REQUIRE(testFormatHumanNumber("1,389.10", 1389.1, 2) );
+	REQUIRE(testFormatHumanNumber("1,389", 1389.0, 8) );
+	REQUIRE(testFormatHumanNumber("0", 0.0, 2) );
+
+	REQUIRE(testFormatHumanNumber("", 1389983113.891389, 2, 4) );
 }
