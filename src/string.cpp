@@ -1280,6 +1280,70 @@ namespace bx
 		return total;
 	}
 
+	int32_t formatHumanNumber(char* _out, int32_t _count, double _value, int32_t _numFrac)
+	{
+		char temp[64];
+		int32_t len = snprintf(temp, sizeof(temp), "%.*f", _numFrac, _value);
+		int32_t intPartLen = len;
+
+		if (len >= _numFrac+1
+		&&  '.' == temp[len-_numFrac-1])
+		{
+			intPartLen = len-_numFrac-1;
+
+			bool zero = true;
+
+			for (int32_t ii = _numFrac; 0 < ii && zero; --ii)
+			{
+				zero &= temp[len-ii] == '0';
+			}
+
+			if (zero)
+			{
+				temp[len-_numFrac-1] = '\0';
+				len = intPartLen;
+			}
+		}
+
+		const int32_t fracPartLen = len - intPartLen;
+		const int32_t commas      = (intPartLen > 3) ? (intPartLen - 1) / 3 : 0;
+		const int32_t total       = intPartLen + fracPartLen + commas;
+
+		if (_count < total)
+		{
+			if (0 < _count)
+			{
+				_out[0] = '\0';
+			}
+
+			return 0;
+		}
+
+		char* out = _out + total;
+		*out = '\0';
+
+		if (0 != fracPartLen)
+		{
+			out -= fracPartLen;
+			memCopy(out, &temp[intPartLen], fracPartLen);
+		}
+
+		int32_t group = 0;
+		for (int32_t ii = intPartLen - 1; ii >= 0; --ii)
+		{
+			*--out = temp[ii];
+
+			if (3 == ++group
+			&&  0  < ii)
+			{
+				*--out = ',';
+				group = 0;
+			}
+		}
+
+		return total;
+	}
+
 	static const char s_units[] = { 'B', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
 
 	template<uint32_t Kilo, char KiloCh0, char KiloCh1, CharFn fn>
@@ -1295,7 +1359,10 @@ namespace bx
 			++idx;
 		}
 
-		return snprintf(_out, _count, "%0.2f %c%c%c", value
+		char human[32];
+		formatHumanNumber(human, sizeof(human), value, 2);
+
+		return snprintf(_out, _count, "%s %c%c%c", human
 			, fn(s_units[idx])
 			, idx > 0 ? KiloCh0 : '\0'
 			, KiloCh1
