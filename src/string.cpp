@@ -1280,7 +1280,7 @@ namespace bx
 		return total;
 	}
 
-	int32_t formatHumanNumber(char* _out, int32_t _count, double _value, int32_t _numFrac)
+	int32_t formatHumanNumber(char* _out, uint32_t _count, double _value, uint8_t _numFrac, const StringView& _unit, char _prefix)
 	{
 		char temp[64];
 		int32_t len = snprintf(temp, sizeof(temp), "%.*f", _numFrac, _value);
@@ -1309,7 +1309,7 @@ namespace bx
 		const int32_t commas      = (intPartLen > 3) ? (intPartLen - 1) / 3 : 0;
 		const int32_t total       = intPartLen + fracPartLen + commas;
 
-		if (_count < total)
+		if (_count < uint32_t(total) )
 		{
 			if (0 < _count)
 			{
@@ -1320,7 +1320,15 @@ namespace bx
 		}
 
 		char* out = _out + total;
-		*out = '\0';
+		if (_unit.isEmpty()
+		&&  ' ' == _prefix)
+		{
+			*out = '\0';
+		}
+		else
+		{
+			snprintf(out, _count - total, " %c%S", _prefix, &_unit);
+		}
 
 		if (0 != fracPartLen)
 		{
@@ -1344,39 +1352,41 @@ namespace bx
 		return total;
 	}
 
-	static const char s_units[] = { 'B', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y' };
-
-	template<uint32_t Kilo, char KiloCh0, char KiloCh1, CharFn fn>
-	inline int32_t prettify(char* _out, int32_t _count, uint64_t _value)
+	int32_t formatHumanNumber(char* _out, uint32_t _count, double _value, uint8_t _numFrac, double _unitStep, const StringView& _unit, const StringView& _prefix, uint8_t _basePrefix)
 	{
-		uint8_t idx = 0;
+		uint8_t idx = _basePrefix;
 		double value = double(_value);
-		while (_value != (_value&0x7ff)
-		&&     idx < BX_COUNTOF(s_units) )
+		const double invUnitStep = 1.0/double(_unitStep);
+		const uint8_t numPrefixes = narrowCast<uint8_t>(_prefix.getLength() );
+
+		if (0.0 != _value)
 		{
-			_value /= Kilo;
-			value  *= 1.0/double(Kilo);
-			++idx;
+			while (value >= _unitStep
+				&& idx < numPrefixes)
+			{
+				value *= invUnitStep;
+				++idx;
+			}
+
+			while (value < 1.0
+				&& idx > 0)
+			{
+				value *= _unitStep;
+				--idx;
+			}
 		}
 
-		char human[32];
-		formatHumanNumber(human, sizeof(human), value, 2);
-
-		return snprintf(_out, _count, "%s %c%c%c", human
-			, fn(s_units[idx])
-			, idx > 0 ? KiloCh0 : '\0'
-			, KiloCh1
-			);
+		return formatHumanNumber(_out, _count, value, _numFrac, 0 == idx ? "" : _unit, _prefix.getPtr()[idx]);
 	}
 
 	int32_t prettify(char* _out, int32_t _count, uint64_t _value, Units::Enum _units)
 	{
 		if (Units::Kilo == _units)
 		{
-			return prettify<1000, 'B', '\0', toNoop>(_out, _count, _value);
+			return formatHumanNumber(_out, _count, double(_value), 0, 1000.0, "B", "BkMGTPEZY");
 		}
 
-		return prettify<1024, 'i', 'B', toUpper>(_out, _count, _value);
+		return formatHumanNumber(_out, _count, double(_value), 0, 1024.0, "iB", "BKMGTPEZY");
 	}
 
 } // namespace bx

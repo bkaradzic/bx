@@ -26,7 +26,7 @@ TEST_CASE("prettify", "[string]")
 	prettify(tmp, BX_COUNTOF(tmp), 4000, bx::Units::Kilo);
 	REQUIRE(0 == bx::strCmp(tmp, "4 kB") );
 
-	prettify(tmp, BX_COUNTOF(tmp), 4096, bx::Units::Kibi);
+	prettify(tmp, BX_COUNTOF(tmp), 4096, bx::Units::KibiByte);
 	REQUIRE(0 == bx::strCmp(tmp, "4 KiB") );
 }
 

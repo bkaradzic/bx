@@ -240,9 +240,8 @@ namespace bx
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr FixedStringT<MaxCapacityT>::FixedStringT()
-		: m_len(0)
+		: m_pod{ .storage = { '\0' }, .len = 0 }
 	{
-		m_storage[0] = '\0';
 	}
 
 	template<uint16_t MaxCapacityT>
@@ -273,45 +272,51 @@ namespace bx
 	template<uint16_t MaxCapacityT>
 	inline constexpr void FixedStringT<MaxCapacityT>::set(const StringView& _str)
 	{
-		int32_t copied = strCopy(m_storage, MaxCapacityT, _str);
-		m_len = copied;
+		int32_t copied = strCopy(m_pod.storage, MaxCapacityT, _str);
+		m_pod.len = copied;
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr void FixedStringT<MaxCapacityT>::append(const StringView& _str)
 	{
-		m_len += strCopy(&m_storage[m_len], MaxCapacityT-m_len, _str);
+		m_pod.len += strCopy(&m_pod.storage[m_pod.len], MaxCapacityT-m_pod.len, _str);
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr void FixedStringT<MaxCapacityT>::clear()
 	{
-		m_len = 0;
-		m_storage[0] = '\0';
+		m_pod.len = 0;
+		m_pod.storage[0] = '\0';
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr bool FixedStringT<MaxCapacityT>::isEmpty() const
 	{
-		return 0 == m_len;
+		return 0 == m_pod.len;
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr int32_t FixedStringT<MaxCapacityT>::getLength() const
 	{
-		return m_len;
+		return m_pod.len;
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr const char* FixedStringT<MaxCapacityT>::getCPtr() const
 	{
-		return m_storage;
+		return m_pod.storage;
 	}
 
 	template<uint16_t MaxCapacityT>
 	inline constexpr FixedStringT<MaxCapacityT>::operator StringView() const
 	{
-		return StringView(m_storage, m_len);
+		return StringView(m_pod.storage, m_pod.len);
+	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT>::Pod& FixedStringT<MaxCapacityT>::asPod()
+	{
+		return m_pod;
 	}
 
 	template<AllocatorI** AllocatorT>
@@ -595,5 +600,53 @@ namespace bx
 
 		return narrowCastTest(_out, tmp);
 	}
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT> toHuman(uint64_t _value)
+	{
+		FixedStringT<MaxCapacityT> result;
+		auto& pod = result.asPod();
+
+		pod.len = formatHumanNumber(pod.storage, MaxCapacityT, double(_value), 0);
+
+		return result;
+	};
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT> toHuman(uint64_t _value, Units::Enum _units, uint8_t _numFrac)
+	{
+		FixedStringT<MaxCapacityT> result;
+		auto& pod = result.asPod();
+
+		switch (_units)
+		{
+		case Units::Kilo:
+			pod.len = formatHumanNumber(pod.storage, MaxCapacityT, double(_value), _numFrac, 1000.0, "", " KMGTPEZY");
+			break;
+
+		case Units::KiloByte:
+			pod.len = formatHumanNumber(pod.storage, MaxCapacityT, double(_value), _numFrac, 1000.0, "B", "BkMGTPEZY");
+			break;
+
+		case Units::KibiByte:
+		default:
+			pod.len = formatHumanNumber(pod.storage, MaxCapacityT, double(_value), _numFrac, 1024.0, "iB", "BKMGTPEZY");
+			break;
+		}
+
+		return result;
+	};
+
+	template<uint16_t MaxCapacityT>
+	inline FixedStringT<MaxCapacityT> toHuman(Ticks _value, uint8_t _numFrac)
+	{
+		FixedStringT<MaxCapacityT> result;
+		auto& pod = result.asPod();
+
+		const double value = toSeconds<double>(_value);
+		pod.len = formatHumanNumber(pod.storage, MaxCapacityT, value, _numFrac, 1000.0, "s", "pnum ", 4);
+
+		return result;
+	};
 
 } // namespace bx

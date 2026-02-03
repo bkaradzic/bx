@@ -29,6 +29,7 @@ namespace bx
 	}
 
 	inline constexpr Ticks  Ticks::operator+ (Ticks  _rhs) const { return Ticks(ticks + _rhs.ticks);                      }
+	inline constexpr Ticks  Ticks::operator- (           ) const { return Ticks(-ticks);                                  }
 	inline constexpr Ticks  Ticks::operator- (Ticks  _rhs) const { return Ticks(ticks - _rhs.ticks);                      }
 	inline constexpr Ticks  Ticks::operator* (float  _rhs) const { return Ticks(int64_t(double(ticks * _rhs) ) );         }
 	inline constexpr Ticks& Ticks::operator+=(Ticks  _rhs)       { ticks += _rhs.ticks;                     return *this; }
