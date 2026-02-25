@@ -11,7 +11,7 @@
 #elif  BX_PLATFORM_OSX \
 	|| BX_PLATFORM_IOS   \
 	|| BX_PLATFORM_VISIONOS
-#	include <dispatch/dispatch.h>
+#	include <CoreFoundation/CoreFoundation.h>
 #elif BX_PLATFORM_POSIX
 #	include <errno.h>
 #	include <pthread.h>
@@ -104,10 +104,31 @@ namespace bx
 	{
 		SemaphoreInternal* si = (SemaphoreInternal*)m_internal;
 
-		dispatch_time_t dt = 0 > _msecs
-			? DISPATCH_TIME_FOREVER
-			: dispatch_time(DISPATCH_TIME_NOW, int64_t(_msecs)*1000000)
-			;
+		static constexpr int64_t kNanosecondsInMilisecond = 1000000;
+
+		if (0 > _msecs)
+		{
+			while (true)
+			{
+				const dispatch_time_t dt = dispatch_time(
+					  DISPATCH_TIME_NOW
+					, 300*kNanosecondsInMilisecond
+					);
+				if (0 == dispatch_semaphore_wait(si->m_handle, dt) )
+				{
+					return true;
+				}
+
+				CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true);
+			}
+
+			BX_UNREACHABLE;
+		}
+
+		const dispatch_time_t dt = dispatch_time(
+			  DISPATCH_TIME_NOW
+			, int64_t(_msecs)*kNanosecondsInMilisecond
+			);
 		return !dispatch_semaphore_wait(si->m_handle, dt);
 	}
 
