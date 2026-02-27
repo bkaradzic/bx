@@ -36,6 +36,7 @@ namespace bx
 
 		/// Binary arithmetic operators.
 		constexpr Ticks  operator+ (Ticks  _rhs) const;
+		constexpr Ticks  operator- () const;
 		constexpr Ticks  operator- (Ticks  _rhs) const;
 		constexpr Ticks  operator* (float _rhs) const;
 		constexpr Ticks& operator+=(Ticks  _rhs);
