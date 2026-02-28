@@ -314,7 +314,7 @@ namespace bx
 	}
 
 	template<uint16_t MaxCapacityT>
-	inline FixedStringT<MaxCapacityT>::Pod& FixedStringT<MaxCapacityT>::asPod()
+	inline typename FixedStringT<MaxCapacityT>::Pod& FixedStringT<MaxCapacityT>::asPod()
 	{
 		return m_pod;
 	}
