@@ -79,11 +79,13 @@ int runAllTests(int32_t _argc, const char* _argv[])
 	ConfigData config;
 	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN
 		? ColourMode::None
-		: ColourMode::PlatformDefault
+		: ColourMode::PlatformDefault 
 		;
 	config.showDurations = ShowDurations::Always;
 
 	session.useConfigData(config);
 
-	return session.run(_argc, _argv);
+	const int32_t result = session.run(_argc, _argv);
+
+	return result;
 }

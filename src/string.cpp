@@ -722,11 +722,13 @@ namespace bx
 				, base(10)
 				, prec(INT32_MAX)
 				, fill(' ')
+				, fmt('f')
 				, bits(0)
 				, left(false)
 				, upper(false)
 				, spec(false)
 				, sign(false)
+				, space(false)
 			{
 			}
 
@@ -734,11 +736,13 @@ namespace bx
 			int32_t base;
 			int32_t prec;
 			char    fill;
+			char    fmt;
 			uint8_t bits;
 			bool    left;
 			bool    upper;
 			bool    spec;
 			bool    sign;
+			bool    space;
 		};
 
 		static int32_t write(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
@@ -746,14 +750,12 @@ namespace bx
 			int32_t size = 0;
 			int32_t len = (int32_t)strLen(_str, _len);
 
-			if (_param.width > 0)
-			{
-				len = min(_param.width, len);
-			}
-
 			const bool hasMinus = (NULL != _str && '-' == _str[0]);
-			const bool hasSign = _param.sign || hasMinus;
-			char sign = hasSign ? hasMinus ? '-' : '+' : '\0';
+			const bool hasSign = _param.sign || _param.space || hasMinus;
+			char sign = '\0';
+			if      (hasMinus)     { sign = '-'; }
+			else if (_param.sign)  { sign = '+'; }
+			else if (_param.space) { sign = ' '; }
 
 			const char* str = _str;
 			if (hasMinus)
@@ -837,6 +839,64 @@ namespace bx
 			return write(_writer, _str.getPtr(), min(_param.prec, _str.getLength() ), _param, _err);
 		}
 
+		static int32_t writeInteger(WriterI* _writer, const char* _str, int32_t _len, const Param& _param, Error* _err)
+		{
+			Param param = _param;
+
+			char str[64];
+			memCopy(str, _str, _len + 1);
+
+			int32_t len = _len;
+
+			if (param.prec != INT32_MAX)
+			{
+				param.fill = ' ';
+
+				const int32_t signLen = (len > 0 && '-' == str[0]) ? 1 : 0;
+				const int32_t digitLen = len - signLen;
+
+				if (param.prec > digitLen)
+				{
+					const int32_t zeros = min(param.prec - digitLen, int32_t(sizeof(str)) - len - 1);
+					memMove(&str[signLen + zeros], &str[signLen], digitLen + 1);
+
+					for (int32_t ii = 0; ii < zeros; ++ii)
+					{
+						str[signLen + ii] = '0';
+					}
+
+					len += zeros;
+				}
+
+				param.prec = INT32_MAX;
+			}
+
+			if (param.spec
+			&&  0 < len)
+			{
+				if (8 == param.base)
+				{
+					if (str[0] != '0')
+					{
+						memMove(&str[1], &str[0], len + 1);
+						str[0] = '0';
+						len++;
+					}
+				}
+				else if (16 == param.base)
+				{
+					memMove(&str[2], &str[0], len + 1);
+					str[0] = '0';
+					str[1] = param.upper ? 'X' : 'x';
+					len += 2;
+				}
+
+				param.spec = false;
+			}
+
+			return write(_writer, str, len, param, _err);
+		}
+
 		static int32_t write(WriterI* _writer, int32_t _i, const Param& _param, Error* _err)
 		{
 			char str[33];
@@ -847,7 +907,14 @@ namespace bx
 				return 0;
 			}
 
-			return write(_writer, str, len, _param, _err);
+			if (0 == _param.prec
+			&&  0 == _i)
+			{
+				str[0] = '\0';
+				len = 0;
+			}
+
+			return writeInteger(_writer, str, len, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, int64_t _i, const Param& _param, Error* _err)
@@ -860,7 +927,14 @@ namespace bx
 				return 0;
 			}
 
-			return write(_writer, str, len, _param, _err);
+			if (0 == _param.prec
+			&&  0 == _i)
+			{
+				str[0] = '\0';
+				len = 0;
+			}
+
+			return writeInteger(_writer, str, len, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, uint32_t _u, const Param& _param, Error* _err)
@@ -873,7 +947,14 @@ namespace bx
 				return 0;
 			}
 
-			return write(_writer, str, len, _param, _err);
+			if (0 == _param.prec
+			&&  0 == _u)
+			{
+				str[0] = '\0';
+				len = 0;
+			}
+
+			return writeInteger(_writer, str, len, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, uint64_t _u, const Param& _param, Error* _err)
@@ -886,7 +967,14 @@ namespace bx
 				return 0;
 			}
 
-			return write(_writer, str, len, _param, _err);
+			if (0 == _param.prec
+			&&  0 == _u)
+			{
+				str[0] = '\0';
+				len = 0;
+			}
+
+			return writeInteger(_writer, str, len, _param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, double _d, const Param& _param, Error* _err)
@@ -902,7 +990,9 @@ namespace bx
 			const char* dot = strFind(str, INT32_MAX, '.');
 			if (NULL != dot)
 			{
-				const int32_t prec   = INT32_MAX == _param.prec ? 6 : _param.prec;
+				const int32_t defaultPrec = ('g' == _param.fmt) ? 6 : 6;
+				int32_t prec = INT32_MAX == _param.prec ? defaultPrec : _param.prec;
+
 				const char* strEnd   = str + len;
 				const char* exponent = strFind(str, INT32_MAX, 'e');
 				const char* fracEnd  = NULL != exponent ? exponent : strEnd;
@@ -992,11 +1082,11 @@ namespace bx
 					switch (ch)
 					{
 						default:
-						case ' ': param.fill = ' ';  break;
-						case '-': param.left = true; break;
-						case '+': param.sign = true; break;
-						case '0': param.fill = '0';  break;
-						case '#': param.spec = true; break;
+						case ' ': param.space = true; break;
+						case '-': param.left  = true; break;
+						case '+': param.sign  = true; break;
+						case '0': param.fill  = '0';  break;
+						case '#': param.spec  = true; break;
 					}
 
 					read(&reader, ch, &err);
@@ -1043,7 +1133,8 @@ namespace bx
 					if ('*' == ch)
 					{
 						read(&reader, ch, &err);
-						param.prec = va_arg(_argList, int32_t);
+						int32_t prec = va_arg(_argList, int32_t);
+						param.prec = prec >= 0 ? prec : INT32_MAX;
 					}
 					else
 					{
@@ -1150,10 +1241,11 @@ namespace bx
 						};
 						break;
 
-					case 'e': case 'E':
+						case 'e': case 'E':
 					case 'f': case 'F':
 					case 'g': case 'G':
 						param.upper = isUpper(ch);
+						param.fmt = toLower(ch);
 						size += write(_writer, va_arg(_argList, double), param, _err);
 						break;
 
