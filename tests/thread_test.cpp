@@ -60,16 +60,16 @@ TEST_CASE("Thread", "")
 
 	REQUIRE(!th.isRunning() );
 	REQUIRE(th.getExitCode() == 1);
-}
 
-TEST_CASE("MpScUnboundedBlockingQueue", "")
-{
-	void* p0 = s_mpsc.pop();
-	void* p1 = s_mpsc.pop();
+	SECTION("MpScUnboundedBlockingQueue")
+	{
+		void* p0 = s_mpsc.pop();
+		void* p1 = s_mpsc.pop();
 
-	uintptr_t result = uintptr_t(p0) | uintptr_t(p1);
+		uintptr_t result = uintptr_t(p0) | uintptr_t(p1);
 
-	REQUIRE(result == 0x1389);
+		REQUIRE(result == 0x1389);
+	}
 }
 
 #endif // BX_CONFIG_SUPPORTS_THREADING
