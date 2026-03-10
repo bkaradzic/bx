@@ -141,6 +141,8 @@ jobs:
           repository: bkaradzic/bx
           path: bx
       - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 5.0.2
       - uses: browser-actions/setup-chrome@v1
       - name: Build
         run: |

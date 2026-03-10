@@ -205,7 +205,7 @@
 #elif defined(__EMSCRIPTEN__)
 #	include <emscripten/version.h>
 #	undef  BX_PLATFORM_EMSCRIPTEN
-#	define BX_PLATFORM_EMSCRIPTEN (__EMSCRIPTEN_major__ * 10000 + __EMSCRIPTEN_minor__ * 100 + __EMSCRIPTEN_tiny__)
+#	define BX_PLATFORM_EMSCRIPTEN (__EMSCRIPTEN_MAJOR__ * 10000 + __EMSCRIPTEN_MINOR__ * 100 + __EMSCRIPTEN_TINY__)
 #elif defined(__ORBIS__)
 #	undef  BX_PLATFORM_PS4
 #	define BX_PLATFORM_PS4 1
@@ -354,9 +354,9 @@
 #	define BX_PLATFORM_NAME "BSD"
 #elif BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_NAME "Emscripten "      \
-		BX_STRINGIZE(__EMSCRIPTEN_major__) "." \
-		BX_STRINGIZE(__EMSCRIPTEN_minor__) "." \
-		BX_STRINGIZE(__EMSCRIPTEN_tiny__)
+		BX_STRINGIZE(__EMSCRIPTEN_MAJOR__) "." \
+		BX_STRINGIZE(__EMSCRIPTEN_MINOR__) "." \
+		BX_STRINGIZE(__EMSCRIPTEN_TINY__)
 #elif BX_PLATFORM_HAIKU
 #	define BX_PLATFORM_NAME "Haiku"
 #elif BX_PLATFORM_HURD
