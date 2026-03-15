@@ -416,6 +416,10 @@ function toolchain(_buildDir, _libDir)
 			location (path.join(_buildDir, "projects", _ACTION .. "-riscv"))
 
 		end
+	elseif _ACTION == "cmake"
+		then
+		location (path.join(_buildDir, "projects", _ACTION))
+
 	elseif _ACTION == "vs2017"
 		or _ACTION == "vs2019"
 		or _ACTION == "vs2022"
