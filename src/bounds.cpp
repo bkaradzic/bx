@@ -72,7 +72,7 @@ namespace bx
 		const Vec3 nsq = mul(_disk.normal, _disk.normal);
 		const Vec3 one = { 1.0f, 1.0f, 1.0f };
 		const Vec3 tmp = sub(one, nsq);
-		const float inv = 1.0f / (tmp.x*tmp.y*tmp.z);
+		const float inv = rcpSafe(tmp.x*tmp.y*tmp.z);
 
 		const Vec3 extent =
 		{
@@ -425,7 +425,7 @@ namespace bx
 
 	bool intersect(const Ray& _ray, const Aabb& _aabb, Hit* _hit)
 	{
-		const Vec3 invDir = rcp(_ray.dir);
+		const Vec3 invDir = rcpSafe(_ray.dir);
 		const Vec3 tmp0   = sub(_aabb.min, _ray.pos);
 		const Vec3 t0     = mul(tmp0, invDir);
 		const Vec3 tmp1   = sub(_aabb.max, _ray.pos);
@@ -933,7 +933,7 @@ namespace bx
 			sqrt(zx*zx + zy*zy + zz*zz),
 		};
 
-		const Vec3 invScale = rcp(result.scale);
+		const Vec3 invScale = rcpSafe(result.scale);
 
 		xx *= invScale.x;
 		xy *= invScale.x;
@@ -1008,16 +1008,6 @@ namespace bx
 		store<Vec3>(&_outMtx[8], mul(load<Vec3>(&_outMtx[8]), _srt.scale.z) );
 
 		store<Vec3>(&_outMtx[12], _srt.translation);
-	}
-
-	bool isNearZero(float _v)
-	{
-		return isEqual(_v, 0.0f, 0.00001f);
-	}
-
-	bool isNearZero(const Vec3& _v)
-	{
-		return isNearZero(dot(_v, _v) );
 	}
 
 	bool intersect(Line& _outLine, const Plane& _planeA, const Plane& _planeB)
@@ -1158,7 +1148,7 @@ namespace bx
 	{
 		const Vec3  axis     = sub(_line.end, _line.pos);
 		const float lengthSq = dot(axis, axis);
-		const float tt       = clamp(projectToAxis(axis, sub(_point, _line.pos) ) / lengthSq, 0.0f, 1.0f);
+		const float tt       = clamp(divSafe(projectToAxis(axis, sub(_point, _line.pos) ), lengthSq), 0.0f, 1.0f);
 		_outT = tt;
 		return mad(axis, tt, _line.pos);
 	}
@@ -1167,6 +1157,59 @@ namespace bx
 	{
 		float ignored;
 		return closestPoint(_line, _point, ignored);
+	}
+
+	void closestPoint(const LineSegment& _a, const LineSegment& _b, float& _outS, float& _outT)
+	{
+		const Vec3  d1 = sub(_a.end, _a.pos);
+		const Vec3  d2 = sub(_b.end, _b.pos);
+		const Vec3  r  = sub(_a.pos, _b.pos);
+
+		const float a = dot(d1, d1);
+		const float e = dot(d2, d2);
+		const float f = dot(d2, r);
+
+		if (a <= kFloatSmallest && e <= kFloatSmallest)
+		{
+			_outS = _outT = 0.0f;
+			return;
+		}
+
+		if (a <= kFloatSmallest)
+		{
+			_outS = 0.0f;
+			_outT = clamp(divSafe(f, e), 0.0f, 1.0f);
+			return;
+		}
+
+		const float c = dot(d1, r);
+		if (e <= kFloatSmallest)
+		{
+			_outT = 0.0f;
+			_outS = clamp(divSafe(-c, a), 0.0f, 1.0f);
+			return;
+		}
+
+		const float b     = dot(d1, d2);
+		const float denom = a * e - b * b;
+
+		_outS = (denom > kFloatSmallest)
+			? clamp(divSafe(b * f - c * e, denom), 0.0f, 1.0f)
+			: 0.0f
+			;
+
+		_outT = divSafe(b * _outS + f, e);
+
+		if (_outT < 0.0f)
+		{
+			_outT = 0.0f;
+			_outS = clamp(divSafe(-c, a), 0.0f, 1.0f);
+		}
+		else if (_outT > 1.0f)
+		{
+			_outT = 1.0f;
+			_outS = clamp(divSafe(b - c, a), 0.0f, 1.0f);
+		}
 	}
 
 	Vec3 closestPoint(const Plane& _plane, const Vec3& _point)
@@ -1187,11 +1230,21 @@ namespace bx
 		Aabb aabb;
 		toAabb(aabb, srt.scale);
 
-		const Quaternion invRotation = invert(srt.rotation);
-		const Vec3 obbSpacePos = mul(sub(_point, srt.translation), srt.rotation);
+		const Vec3 obbSpacePos = mul(sub(_point, srt.translation), conjugate(srt.rotation) );
 		const Vec3 pos = closestPoint(aabb, obbSpacePos);
 
-		return add(mul(pos, invRotation), srt.translation);
+		return add(mul(pos, srt.rotation), srt.translation);
+	}
+
+	Vec3 closestPoint(const Vec3& _center, const Vec3& _halfExtents, const Quaternion& _rotation, const Vec3& _point)
+	{
+		const Vec3 local = mul(sub(_point, _center), conjugate(_rotation) );
+		const Vec3 clamped = {
+			clamp(local.x, -_halfExtents.x, _halfExtents.x),
+			clamp(local.y, -_halfExtents.y, _halfExtents.y),
+			clamp(local.z, -_halfExtents.z, _halfExtents.z),
+		};
+		return add(_center, mul(clamped, _rotation) );
 	}
 
 	Vec3 closestPoint(const Triangle& _triangle, const Vec3& _point)
@@ -1465,32 +1518,89 @@ namespace bx
 
 	bool overlap(const Cone& _cone, const Cylinder& _cylinder)
 	{
-		BX_UNUSED(_cone, _cylinder);
-		return false;
+		float ta, tb;
+		if (!intersect(ta, tb, {_cone.pos, _cone.end}, {_cylinder.pos, _cylinder.end}) )
+		{
+			return false;
+		}
+
+		ta = clamp(ta, 0.0f, 1.0f);
+		tb = clamp(tb, 0.0f, 1.0f);
+
+		const Vec3 coneAxis = sub(_cone.end, _cone.pos);
+		const Vec3 cylAxis  = sub(_cylinder.end, _cylinder.pos);
+		const Vec3 pa = mad(coneAxis, ta, _cone.pos);
+		const Vec3 pb = mad(cylAxis,  tb, _cylinder.pos);
+
+		const float dist = distance(pa, pb);
+		return dist <= lerp(_cone.radius, 0.0f, ta) + _cylinder.radius;
 	}
 
 	bool overlap(const Cone& _cone, const Capsule& _capsule)
 	{
-		BX_UNUSED(_cone, _capsule);
-		return false;
+		float ta, tb;
+		if (!intersect(ta, tb, {_cone.pos, _cone.end}, {_capsule.pos, _capsule.end}) )
+		{
+			return false;
+		}
+
+		ta = clamp(ta, 0.0f, 1.0f);
+		tb = clamp(tb, 0.0f, 1.0f);
+
+		const Vec3 coneAxis = sub(_cone.end, _cone.pos);
+		const Vec3 capAxis  = sub(_capsule.end, _capsule.pos);
+		const Vec3 pa = mad(coneAxis, ta, _cone.pos);
+		const Vec3 pb = mad(capAxis,  tb, _capsule.pos);
+
+		const float dist = distance(pa, pb);
+		return dist <= lerp(_cone.radius, 0.0f, ta) + _capsule.radius;
 	}
 
 	bool overlap(const Cone& _coneA, const Cone& _coneB)
 	{
-		BX_UNUSED(_coneA, _coneB);
-		return false;
+		float ta, tb;
+		if (!intersect(ta, tb, {_coneA.pos, _coneA.end}, {_coneB.pos, _coneB.end}) )
+		{
+			return false;
+		}
+
+		ta = clamp(ta, 0.0f, 1.0f);
+		tb = clamp(tb, 0.0f, 1.0f);
+
+		const Vec3 axisA = sub(_coneA.end, _coneA.pos);
+		const Vec3 axisB = sub(_coneB.end, _coneB.pos);
+		const Vec3 pa = mad(axisA, ta, _coneA.pos);
+		const Vec3 pb = mad(axisB, tb, _coneB.pos);
+
+		const float dist = distance(pa, pb);
+		return dist <= lerp(_coneA.radius, 0.0f, ta) + lerp(_coneB.radius, 0.0f, tb);
 	}
 
 	bool overlap(const Cone& _cone, const Disk& _disk)
 	{
-		BX_UNUSED(_cone, _disk);
-		return false;
+		float tt;
+		const Vec3 pos = closestPoint(LineSegment{_cone.pos, _cone.end}, _disk.center, tt);
+		const float coneRadius = lerp(_cone.radius, 0.0f, tt);
+		return overlap(Disk{pos, normalize(sub(_cone.end, _cone.pos) ), coneRadius}, _disk);
 	}
 
 	bool overlap(const Cone& _cone, const Obb& _obb)
 	{
-		BX_UNUSED(_cone, _obb);
-		return false;
+		const Srt srt = toSrt(_obb.mtx);
+
+		Aabb aabb;
+		toAabb(aabb, srt.scale);
+
+		const Quaternion invRotation = conjugate(srt.rotation);
+
+		const Cone cone =
+		{
+			mul(sub(_cone.pos, srt.translation), invRotation),
+			mul(sub(_cone.end, srt.translation), invRotation),
+			_cone.radius,
+		};
+
+		return overlap(aabb, cone);
 	}
 
 	bool overlap(const Cylinder& _cylinder, const Vec3& _pos)
@@ -1513,32 +1623,86 @@ namespace bx
 
 	bool overlap(const Cylinder& _cylinder, const Plane& _plane)
 	{
-		BX_UNUSED(_cylinder, _plane);
-		return false;
+		const float distPos = distance(_plane, _cylinder.pos);
+		const float distEnd = distance(_plane, _cylinder.end);
+
+		if (distPos * distEnd < 0.0f)
+		{
+			return true;
+		}
+
+		const Vec3  axis    = sub(_cylinder.end, _cylinder.pos);
+		const float lenSq   = dot(axis, axis);
+		const float cosA    = (lenSq > 0.0f) ? dot(axis, _plane.normal) / sqrt(lenSq) : 0.0f;
+		const float sinA    = sqrt(max(0.0f, 1.0f - cosA * cosA) );
+		const float diskExt = _cylinder.radius * sinA;
+
+		return min(abs(distPos), abs(distEnd) ) <= diskExt;
 	}
 
 	bool overlap(const Cylinder& _cylinderA, const Cylinder& _cylinderB)
 	{
-		BX_UNUSED(_cylinderA, _cylinderB);
-		return false;
+		float ta, tb;
+		if (!intersect(ta, tb, {_cylinderA.pos, _cylinderA.end}, {_cylinderB.pos, _cylinderB.end}) )
+		{
+			return false;
+		}
+
+		ta = clamp(ta, 0.0f, 1.0f);
+		tb = clamp(tb, 0.0f, 1.0f);
+
+		const Vec3 axisA = sub(_cylinderA.end, _cylinderA.pos);
+		const Vec3 axisB = sub(_cylinderB.end, _cylinderB.pos);
+		const Vec3 pa = mad(axisA, ta, _cylinderA.pos);
+		const Vec3 pb = mad(axisB, tb, _cylinderB.pos);
+
+		const float dist = distance(pa, pb);
+		return dist <= _cylinderA.radius + _cylinderB.radius;
 	}
 
 	bool overlap(const Cylinder& _cylinder, const Capsule& _capsule)
 	{
-		BX_UNUSED(_cylinder, _capsule);
-		return false;
+		float ta, tb;
+		if (!intersect(ta, tb, {_cylinder.pos, _cylinder.end}, {_capsule.pos, _capsule.end}) )
+		{
+			return false;
+		}
+
+		ta = clamp(ta, 0.0f, 1.0f);
+		tb = clamp(tb, 0.0f, 1.0f);
+
+		const Vec3 cylAxis = sub(_cylinder.end, _cylinder.pos);
+		const Vec3 capAxis = sub(_capsule.end, _capsule.pos);
+		const Vec3 pa = mad(cylAxis, ta, _cylinder.pos);
+		const Vec3 pb = mad(capAxis, tb, _capsule.pos);
+
+		const float dist = distance(pa, pb);
+		return dist <= _cylinder.radius + _capsule.radius;
 	}
 
 	bool overlap(const Cylinder& _cylinder, const Disk& _disk)
 	{
-		BX_UNUSED(_cylinder, _disk);
-		return false;
+		const Vec3 pos = closestPoint(LineSegment{_cylinder.pos, _cylinder.end}, _disk.center);
+		return overlap(Disk{pos, normalize(sub(_cylinder.end, _cylinder.pos) ), _cylinder.radius}, _disk);
 	}
 
 	bool overlap(const Cylinder& _cylinder, const Obb& _obb)
 	{
-		BX_UNUSED(_cylinder, _obb);
-		return false;
+		const Srt srt = toSrt(_obb.mtx);
+
+		Aabb aabb;
+		toAabb(aabb, srt.scale);
+
+		const Quaternion invRotation = conjugate(srt.rotation);
+
+		const Cylinder cylinder =
+		{
+			mul(sub(_cylinder.pos, srt.translation), invRotation),
+			mul(sub(_cylinder.end, srt.translation), invRotation),
+			_cylinder.radius,
+		};
+
+		return overlap(cylinder, aabb);
 	}
 
 	bool overlap(const Disk& _disk, const Vec3& _pos)
@@ -1622,27 +1786,30 @@ namespace bx
 
 	bool overlap(const Obb& _obb, const Vec3& _pos)
 	{
-		const Srt srt = toSrt(_obb.mtx);
+		const float* mtx = _obb.mtx;
 
-		Aabb aabb;
-		toAabb(aabb, srt.scale);
+		const Vec3 center = { mtx[12], mtx[13], mtx[14] };
+		const Vec3 d = sub(_pos, center);
 
-		const Quaternion invRotation = invert(srt.rotation);
-		const Vec3 pos = mul(sub(_pos, srt.translation), invRotation);
+		const Vec3 ax = { mtx[ 0], mtx[ 1], mtx[ 2] };
+		const Vec3 ay = { mtx[ 4], mtx[ 5], mtx[ 6] };
+		const Vec3 az = { mtx[ 8], mtx[ 9], mtx[10] };
 
-		return overlap(aabb, pos);
+		return abs(dot(d, ax) ) <= dot(ax, ax)
+			&& abs(dot(d, ay) ) <= dot(ay, ay)
+			&& abs(dot(d, az) ) <= dot(az, az)
+			;
 	}
 
 	bool overlap(const Obb& _obb, const Plane& _plane)
 	{
 		const Srt srt = toSrt(_obb.mtx);
 
-		const Quaternion invRotation = invert(srt.rotation);
 		const Vec3 axis =
 		{
-			projectToAxis(_plane.normal, mul(Vec3{1.0f, 0.0f, 0.0f}, invRotation) ),
-			projectToAxis(_plane.normal, mul(Vec3{0.0f, 1.0f, 0.0f}, invRotation) ),
-			projectToAxis(_plane.normal, mul(Vec3{0.0f, 0.0f, 1.0f}, invRotation) ),
+			projectToAxis(_plane.normal, mul(Vec3{1.0f, 0.0f, 0.0f}, srt.rotation) ),
+			projectToAxis(_plane.normal, mul(Vec3{0.0f, 1.0f, 0.0f}, srt.rotation) ),
+			projectToAxis(_plane.normal, mul(Vec3{0.0f, 0.0f, 1.0f}, srt.rotation) ),
 		};
 
 		const float dist   = abs(distance(_plane, srt.translation) );
@@ -1658,7 +1825,7 @@ namespace bx
 		Aabb aabb;
 		toAabb(aabb, srt.scale);
 
-		const Quaternion invRotation = invert(srt.rotation);
+		const Quaternion invRotation = conjugate(srt.rotation);
 
 		const Capsule capsule =
 		{
@@ -1926,7 +2093,8 @@ namespace bx
 		{
 			return overlap(_ty, pa0);
 		}
-		else if (d1 <= d2)
+
+		if (d1 <= d2)
 		{
 			return overlap(_ty, pa1);
 		}
@@ -1946,62 +2114,47 @@ namespace bx
 
 	bool overlap(const Triangle& _triangle, const Cone& _cone)
 	{
-		const LineSegment ab = LineSegment{_triangle.v0, _triangle.v1};
-		const LineSegment bc = LineSegment{_triangle.v1, _triangle.v2};
-		const LineSegment ca = LineSegment{_triangle.v2, _triangle.v0};
-
-		const LineSegment line =
+		if (overlap(_cone, _triangle.v0)
+		||  overlap(_cone, _triangle.v1)
+		||  overlap(_cone, _triangle.v2) )
 		{
-			_cone.pos,
-			_cone.end,
+			return true;
+		}
+
+		const LineSegment axis = { _cone.pos, _cone.end };
+		const LineSegment edges[3] =
+		{
+			{ _triangle.v0, _triangle.v1 },
+			{ _triangle.v1, _triangle.v2 },
+			{ _triangle.v2, _triangle.v0 },
 		};
 
-		float ta0 = 0.0f, tb0 = 0.0f;
-		const bool i0 = intersect(ta0, tb0, ab, line);
-
-		float ta1, tb1;
-		const bool i1 = intersect(ta1, tb1, bc, line);
-
-		float ta2, tb2;
-		const bool i2 = intersect(ta2, tb2, ca, line);
-
-		if (!i0
-		||  !i1
-		||  !i2)
+		for (uint32_t ii = 0; ii < 3; ++ii)
 		{
-			return false;
+			float sa, sb;
+			closestPoint(edges[ii], axis, sa, sb);
+
+			const Vec3 pa = getPointAt(edges[ii], sa);
+			if (overlap(_cone, pa) )
+			{
+				return true;
+			}
 		}
 
-		ta0 = clamp(ta0, 0.0f, 1.0f);
-		ta1 = clamp(ta1, 0.0f, 1.0f);
-		ta2 = clamp(ta2, 0.0f, 1.0f);
-		tb0 = clamp(tb0, 0.0f, 1.0f);
-		tb1 = clamp(tb1, 0.0f, 1.0f);
-		tb2 = clamp(tb2, 0.0f, 1.0f);
+		const Vec3 cp = closestPoint(_triangle, _cone.pos);
 
-		const Vec3 pa0 = getPointAt(ab, ta0);
-		const Vec3 pa1 = getPointAt(bc, ta1);
-		const Vec3 pa2 = getPointAt(ca, ta2);
-
-		const Vec3 pb0 = getPointAt(line, tb0);
-		const Vec3 pb1 = getPointAt(line, tb1);
-		const Vec3 pb2 = getPointAt(line, tb2);
-
-		const float d0 = distanceSq(pa0, pb0);
-		const float d1 = distanceSq(pa1, pb1);
-		const float d2 = distanceSq(pa2, pb2);
-
-		if (d0 <= d1
-		&&  d0 <= d2)
+		if (overlap(_cone, cp) )
 		{
-			return overlap(_cone, pa0);
-		}
-		else if (d1 <= d2)
-		{
-			return overlap(_cone, pa1);
+			return true;
 		}
 
-		return overlap(_cone, pa2);
+		const Vec3 ce = closestPoint(_triangle, _cone.end);
+		if (overlap(_cone, ce) )
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	bool overlap(const Triangle& _triangle, const Disk& _disk)
@@ -2024,7 +2177,7 @@ namespace bx
 		Aabb aabb;
 		toAabb(aabb, srt.scale);
 
-		const Quaternion invRotation = invert(srt.rotation);
+		const Quaternion invRotation = conjugate(srt.rotation);
 
 		const Triangle triangle =
 		{
