@@ -273,8 +273,8 @@ namespace bx
 
 		memSet(_result, 0, sizeof(float)*16);
 		_result[ 0] = cy*cz;
-		_result[ 1] = cz*sx*sy-cx*sz;
-		_result[ 2] = cx*cz*sy+sx*sz;
+		_result[ 1] = cz*sx*sy - cx*sz;
+		_result[ 2] = cx*cz*sy + sx*sz;
 		_result[ 4] = cy*sz;
 		_result[ 5] = cx*cz + sx*sy*sz;
 		_result[ 6] = -cz*sx + cx*sy*sz;
@@ -293,21 +293,18 @@ namespace bx
 		const float sz = sin(_az);
 		const float cz = cos(_az);
 
-		const float sxsz = sx*sz;
-		const float cycz = cy*cz;
-
-		_result[ 0] = _sx * (cycz - sxsz*sy);
-		_result[ 1] = _sx * -cx*sz;
-		_result[ 2] = _sx * (cz*sy + cy*sxsz);
+		_result[ 0] = _sx * cy*cz;
+		_result[ 1] = _sx * (cz*sx*sy - cx*sz);
+		_result[ 2] = _sx * (cx*cz*sy + sx*sz);
 		_result[ 3] = 0.0f;
 
-		_result[ 4] = _sy * (cz*sx*sy + cy*sz);
-		_result[ 5] = _sy * cx*cz;
-		_result[ 6] = _sy * (sy*sz -cycz*sx);
+		_result[ 4] = _sy * cy*sz;
+		_result[ 5] = _sy * (cx*cz + sx*sy*sz);
+		_result[ 6] = _sy * (-cz*sx + cx*sy*sz);
 		_result[ 7] = 0.0f;
 
-		_result[ 8] = _sz * -cx*sy;
-		_result[ 9] = _sz * sx;
+		_result[ 8] = _sz * -sy;
+		_result[ 9] = _sz * cy*sx;
 		_result[10] = _sz * cx*cy;
 		_result[11] = 0.0f;
 

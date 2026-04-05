@@ -814,6 +814,11 @@ namespace bx
 		return result;
 	}
 
+	inline BX_CONSTEXPR_FUNC bool isNearZero(float _v)
+	{
+		return isEqual(_v, 0.0f, 0.00001f);
+	}
+
 	inline BX_CONSTEXPR_FUNC float wrap(float _a, float _wrap)
 	{
 		const float tmp0   = mod(_a, _wrap);
@@ -969,7 +974,7 @@ namespace bx
 	{
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 round(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 round(const Vec3& _a)
 	{
 		return
 		{
@@ -979,7 +984,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 abs(const Vec3& _a)
 	{
 		return
 		{
@@ -989,7 +994,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 neg(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 neg(const Vec3& _a)
 	{
 		return
 		{
@@ -999,7 +1004,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1009,7 +1014,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3 _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 add(const Vec3& _a, float _b)
 	{
 		return
 		{
@@ -1019,7 +1024,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1029,7 +1034,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3 _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 sub(const Vec3& _a, float _b)
 	{
 		return
 		{
@@ -1039,7 +1044,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1049,7 +1054,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3& _a, float _b)
 	{
 		return
 		{
@@ -1059,52 +1064,52 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3& _a, const Vec3& _b)
 	{
 		return mul(_a, rcp(_b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3& _a, const Vec3& _b)
 	{
 		return mul(_a, rcpSafe(_b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3 _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 div(const Vec3& _a, float _b)
 	{
 		return mul(_a, rcp(_b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3 _a, float _b)
+	inline BX_CONSTEXPR_FUNC Vec3 divSafe(const Vec3& _a, float _b)
 	{
 		return mul(_a, rcpSafe(_b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const float _b, const Vec3 _c)
+	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3& _a, const float _b, const Vec3& _c)
 	{
 		return sub(_c, mul(_a, _b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3 _a, const Vec3 _b, const Vec3 _c)
+	inline BX_CONSTEXPR_FUNC Vec3 nms(const Vec3& _a, const Vec3& _b, const Vec3& _c)
 	{
 		return sub(_c, mul(_a, _b) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const float _b, const Vec3 _c)
+	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const float _b, const Vec3& _c)
 	{
 		return add(mul(_a, _b), _c);
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3 _a, const Vec3 _b, const Vec3 _c)
+	inline BX_CONSTEXPR_FUNC Vec3 mad(const Vec3& _a, const Vec3& _b, const Vec3& _c)
 	{
 		return add(mul(_a, _b), _c);
 	}
 
-	inline BX_CONSTEXPR_FUNC float dot(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC float dot(const Vec3& _a, const Vec3& _b)
 	{
 		return _a.x*_b.x + _a.y*_b.y + _a.z*_b.z;
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 cross(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 cross(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1114,23 +1119,23 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC float length(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC float length(const Vec3& _a)
 	{
 		return sqrt(dot(_a, _a) );
 	}
 
-	inline BX_CONSTEXPR_FUNC float distanceSq(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC float distanceSq(const Vec3& _a, const Vec3& _b)
 	{
 		const Vec3 ba = sub(_b, _a);
 		return dot(ba, ba);
 	}
 
-	inline BX_CONSTEXPR_FUNC float distance(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC float distance(const Vec3& _a, const Vec3& _b)
 	{
 		return length(sub(_b, _a) );
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, float _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3& _a, const Vec3& _b, float _t)
 	{
 		return
 		{
@@ -1140,7 +1145,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3 _a, const Vec3 _b, const Vec3 _t)
+	inline BX_CONSTEXPR_FUNC Vec3 lerp(const Vec3& _a, const Vec3& _b, const Vec3& _t)
 	{
 		return
 		{
@@ -1150,14 +1155,14 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 normalize(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 normalize(const Vec3& _a)
 	{
 		const float len   = length(_a);
 		const Vec3 result = divSafe(_a, len);
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 min(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 min(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1167,7 +1172,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 max(const Vec3 _a, const Vec3 _b)
+	inline BX_CONSTEXPR_FUNC Vec3 max(const Vec3& _a, const Vec3& _b)
 	{
 		return
 		{
@@ -1177,7 +1182,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 rcp(const Vec3& _a)
 	{
 		return
 		{
@@ -1187,7 +1192,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 rcpSafe(const Vec3 _a)
+	inline BX_CONSTEXPR_FUNC Vec3 rcpSafe(const Vec3& _a)
 	{
 		return
 		{
@@ -1197,7 +1202,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC bool isEqual(const Vec3 _a, const Vec3 _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool isEqual(const Vec3& _a, const Vec3& _b, float _epsilon)
 	{
 		return isEqual(_a.x, _b.x, _epsilon)
 			&& isEqual(_a.y, _b.y, _epsilon)
@@ -1205,7 +1210,12 @@ namespace bx
 			;
 	}
 
-	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n)
+	inline BX_CONSTEXPR_FUNC bool isNearZero(const Vec3& _v)
+	{
+		return isNearZero(dot(_v, _v) );
+	}
+
+	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n)
 	{
 		const float nx = _n.x;
 		const float ny = _n.y;
@@ -1229,7 +1239,7 @@ namespace bx
 		_outB = cross(_n, _outT);
 	}
 
-	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3 _n, float _angle)
+	inline void calcTangentFrame(Vec3& _outT, Vec3& _outB, const Vec3& _n, float _angle)
 	{
 		calcTangentFrame(_outT, _outB, _n);
 
@@ -1261,7 +1271,7 @@ namespace bx
 		};
 	}
 
-	inline void toLatLong(float* _outU, float* _outV, const Vec3 _dir)
+	inline void toLatLong(float* _outU, float* _outV, const Vec3& _dir)
 	{
 		const float phi   = atan2(_dir.x, _dir.z);
 		const float theta = acos(_dir.y);
@@ -1270,7 +1280,18 @@ namespace bx
 		*_outV = theta*kInvPi;
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion invert(const Quaternion _a)
+	inline BX_CONSTEXPR_FUNC Quaternion neg(const Quaternion& _a)
+	{
+		return
+		{
+			-_a.x,
+			-_a.y,
+			-_a.z,
+			-_a.w,
+		};
+	}
+
+	inline BX_CONSTEXPR_FUNC Quaternion conjugate(const Quaternion& _a)
 	{
 		return
 		{
@@ -1281,7 +1302,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mulXyz(const Quaternion _a, const Quaternion _b)
+	inline BX_CONSTEXPR_FUNC Vec3 mulXyz(const Quaternion& _a, const Quaternion& _b)
 	{
 		const float ax = _a.x;
 		const float ay = _a.y;
@@ -1301,7 +1322,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion add(const Quaternion _a, const Quaternion _b)
+	inline BX_CONSTEXPR_FUNC Quaternion add(const Quaternion& _a, const Quaternion& _b)
 	{
 		return
 		{
@@ -1312,7 +1333,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion sub(const Quaternion _a, const Quaternion _b)
+	inline BX_CONSTEXPR_FUNC Quaternion sub(const Quaternion& _a, const Quaternion& _b)
 	{
 		return
 		{
@@ -1323,7 +1344,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, float _b)
+	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion& _a, float _b)
 	{
 		return
 		{
@@ -1334,7 +1355,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion _a, const Quaternion _b)
+	inline BX_CONSTEXPR_FUNC Quaternion mul(const Quaternion& _a, const Quaternion& _b)
 	{
 		const float ax = _a.x;
 		const float ay = _a.y;
@@ -1355,17 +1376,16 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3 _v, const Quaternion _q)
+	inline BX_CONSTEXPR_FUNC Vec3 mul(const Vec3& _v, const Quaternion& _q)
 	{
-		const Quaternion tmp0 = invert(_q);
 		const Quaternion qv   = { _v.x, _v.y, _v.z, 0.0f };
-		const Quaternion tmp1 = mul(tmp0, qv);
-		const Vec3 result     = mulXyz(tmp1, _q);
+		const Quaternion tmp0 = mul(_q, qv);
+		const Vec3 result     = mulXyz(tmp0, conjugate(_q) );
 
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float dot(const Quaternion _a, const Quaternion _b)
+	inline BX_CONSTEXPR_FUNC float dot(const Quaternion& _a, const Quaternion& _b)
 	{
 		return
 			  _a.x * _b.x
@@ -1375,7 +1395,7 @@ namespace bx
 			;
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion normalize(const Quaternion _a)
+	inline BX_CONSTEXPR_FUNC Quaternion normalize(const Quaternion& _a)
 	{
 		const float norm = dot(_a, _a);
 		if (0.0f < norm)
@@ -1394,7 +1414,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC Quaternion lerp(const Quaternion _a, const Quaternion _b, float _t)
+	inline BX_CONSTEXPR_FUNC Quaternion lerp(const Quaternion& _a, const Quaternion& _b, float _t)
 	{
 		const float sa    = 1.0f - _t;
 		const float adotb = dot(_a, _b);
@@ -1407,7 +1427,37 @@ namespace bx
 		return normalize(qq);
 	}
 
-	inline BX_CONST_FUNC Quaternion fromEuler(const Vec3 _euler)
+	inline BX_CONST_FUNC Quaternion slerp(const Quaternion& _a, const Quaternion& _b, float _t)
+	{
+		float cosTheta = dot(_a, _b);
+
+		Quaternion bb = _b;
+		if (cosTheta < 0.0f)
+		{
+			cosTheta = -cosTheta;
+			bb = neg(_b);
+		}
+
+		if (cosTheta > 0.9995f)
+		{
+			return lerp(_a, bb, _t);
+		}
+
+		const float theta  = acos(cosTheta);
+		const float invSin = rcp(sin(theta) );
+		const float sa     = sin( (1.0f - _t) * theta) * invSin;
+		const float sb     = sin(_t * theta)           * invSin;
+
+		return
+		{
+			_a.x * sa + bb.x * sb,
+			_a.y * sa + bb.y * sb,
+			_a.z * sa + bb.z * sb,
+			_a.w * sa + bb.w * sb,
+		};
+	}
+
+	inline BX_CONST_FUNC Quaternion fromEuler(const Vec3& _euler)
 	{
 		const float sx = sin(_euler.x * 0.5f);
 		const float cx = cos(_euler.x * 0.5f);
@@ -1425,7 +1475,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 toEuler(const Quaternion _a)
+	inline BX_CONST_FUNC Vec3 toEuler(const Quaternion& _a)
 	{
 		const float xx  = _a.x;
 		const float yy  = _a.y;
@@ -1443,7 +1493,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 toXAxis(const Quaternion _a)
+	inline BX_CONST_FUNC Vec3 toXAxis(const Quaternion& _a)
 	{
 		const float xx  = _a.x;
 		const float yy  = _a.y;
@@ -1460,7 +1510,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 toYAxis(const Quaternion _a)
+	inline BX_CONST_FUNC Vec3 toYAxis(const Quaternion& _a)
 	{
 		const float xx  = _a.x;
 		const float yy  = _a.y;
@@ -1477,7 +1527,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Vec3 toZAxis(const Quaternion _a)
+	inline BX_CONST_FUNC Vec3 toZAxis(const Quaternion& _a)
 	{
 		const float xx  = _a.x;
 		const float yy  = _a.y;
@@ -1494,7 +1544,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONST_FUNC Quaternion fromAxisAngle(const Vec3 _axis, float _angle)
+	inline BX_CONST_FUNC Quaternion fromAxisAngle(const Vec3& _axis, float _angle)
 	{
 		const float ha = _angle * 0.5f;
 		const float sa = sin(ha);
@@ -1508,7 +1558,7 @@ namespace bx
 		};
 	}
 
-	inline void toAxisAngle(Vec3& _outAxis, float& _outAngle, const Quaternion _a)
+	inline void toAxisAngle(Vec3& _outAxis, float& _outAngle, const Quaternion& _a)
 	{
 		const float ww = _a.w;
 		const float sa = sqrt(1.0f - square(ww) );
@@ -1565,7 +1615,7 @@ namespace bx
 		};
 	}
 
-	inline BX_CONSTEXPR_FUNC bool isEqual(const Quaternion _a, const Quaternion _b, float _epsilon)
+	inline BX_CONSTEXPR_FUNC bool isEqual(const Quaternion& _a, const Quaternion& _b, float _epsilon)
 	{
 		return isEqual(_a.x, _b.x, _epsilon)
 			&& isEqual(_a.y, _b.y, _epsilon)
