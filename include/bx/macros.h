@@ -90,6 +90,12 @@ extern "C" void* __cdecl _alloca(size_t _size);
 #	error "Unknown BX_COMPILER_?"
 #endif
 
+#if BX_COMPILER_CLANG
+#	define BX_REQUIRE_CONSTANT(_x) BX_ATTRIBUTE(__diagnose_if__(!__builtin_constant_p(_x), #_x " must be constant!", "error") )
+#else
+#	define BX_REQUIRE_CONSTANT(_x)
+#endif // if BX_COMPILER_CLANG
+
 /// The return value of the function is solely a function of the arguments.
 ///
 #define BX_CONSTEXPR_FUNC constexpr BX_CONST_FUNC
