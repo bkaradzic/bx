@@ -29,7 +29,7 @@
 #include <tinystl/allocator.h>
 #include <tinystl/unordered_set.h>
 
-TEST(uoset_copyctor) {
+TEST_CASE("uoset_copyctor", "") {
 
 	// verify this compiles
 	typedef tinystl::unordered_set<unsigned int> set;

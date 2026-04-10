@@ -42,7 +42,7 @@ static void comparemaps(const tinystl::unordered_map<K, V>& m, const tinystl::un
 	}
 }
 
-TEST(uomap_constructor) {
+TEST_CASE("uomap_constructor", "[tinystl]") {
 	typedef tinystl::unordered_map<int, int> unordered_map;
 	using tinystl::make_pair;
 
@@ -79,7 +79,7 @@ TEST(uomap_constructor) {
 	}
 }
 
-TEST(uomap_assign) {
+TEST_CASE("uomap_assign", "[tinystl]") {
 	typedef tinystl::unordered_map<int, int> unordered_map;
 	using tinystl::make_pair;
 
@@ -132,7 +132,7 @@ TEST(uomap_assign) {
 	}
 }
 
-TEST(uomap_insert) {
+TEST_CASE("uomap_insert", "[tinystl]") {
 	using tinystl::string;
 	using tinystl::pair;
 	typedef tinystl::unordered_map<string, string> unordered_map;
@@ -187,7 +187,7 @@ TEST(uomap_insert) {
 	}
 }
 
-TEST(uomap_iterate) {
+TEST_CASE("uomap_iterate", "[tinystl]") {
 	typedef tinystl::unordered_map<size_t, size_t> unordered_map;
 	{
 		unordered_map m;

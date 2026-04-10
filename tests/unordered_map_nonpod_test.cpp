@@ -33,7 +33,7 @@ namespace {
 	struct Foo { int bar; };
 }
 
-TEST(uomap_nonpod_compiles) {
+TEST_CASE("uomap_nonpod_compiles", "[tinystl]") {
 
 	// verify this compiles
 	typedef tinystl::unordered_map<int, Foo> map;

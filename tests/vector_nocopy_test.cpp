@@ -64,7 +64,7 @@ static inline bool operator==(const nocopy& lhs, const nocopy& rhs) {
 	return false;
 }
 
-TEST(vector_nocopy_constructor) {
+TEST_CASE("vector_nocopy_constructor", "[tinystl]") {
 	typedef tinystl::vector<nocopy> vector;
 
 	{
@@ -81,7 +81,7 @@ TEST(vector_nocopy_constructor) {
 	}
 }
 
-TEST(vector_nocopy_pushback) {
+TEST_CASE("vector_nocopy_pushback", "[tinystl]") {
 	tinystl::vector<nocopy> v;
 	v.emplace_back("42");
 	v.emplace_back();
@@ -92,7 +92,7 @@ TEST(vector_nocopy_pushback) {
 	CHECK( v[1] == "24" );
 }
 
-TEST(vector_nocopy_vector) {
+TEST_CASE("vector_nocopy_vector", "[tinystl]") {
 	tinystl::vector< tinystl::vector<nocopy> > v(10);
 
 	tinystl::vector< tinystl::vector<nocopy> >::iterator it = v.begin(), end = v.end();
@@ -103,7 +103,7 @@ TEST(vector_nocopy_vector) {
 	}
 }
 
-TEST(vector_nocopy_swap) {
+TEST_CASE("vector_nocopy_swap", "[tinystl]") {
 	tinystl::vector<nocopy> v1;
 	v1.emplace_back("12");
 	v1.emplace_back("20");
@@ -120,7 +120,7 @@ TEST(vector_nocopy_swap) {
 	CHECK(v2[1] == "20");
 }
 
-TEST(vector_nocopy_popback) {
+TEST_CASE("vector_nocopy_popback", "[tinystl]") {
 	tinystl::vector<nocopy> v;
 	v.emplace_back("12");
 	v.emplace_back("24");
@@ -133,7 +133,7 @@ TEST(vector_nocopy_popback) {
 	CHECK(v.size() == 1);
 }
 
-TEST(vector_nocopy_erase) {
+TEST_CASE("vector_nocopy_erase", "[tinystl]") {
 	tinystl::vector<nocopy> v;
 	v.emplace_back("1");
 	v.emplace_back("2");
@@ -155,7 +155,7 @@ TEST(vector_nocopy_erase) {
 	CHECK(v[1] == "4");
 }
 
-TEST(vector_nocopy_erase_unordered) {
+TEST_CASE("vector_nocopy_erase_unordered", "[tinystl]") {
 	typedef tinystl::vector<nocopy> vector;
 	vector v;
 	v.emplace_back("1");
@@ -190,7 +190,7 @@ TEST(vector_nocopy_erase_unordered) {
 	CHECK( std::count(v.begin(), v.end(), last) == 1 );
 }
 
-TEST(vector_nocopy_insert) {
+TEST_CASE("vector_nocopy_insert", "[tinystl]") {
 	tinystl::vector<nocopy> v;
 	v.emplace_back("1");
 	v.emplace_back("2");
@@ -210,7 +210,7 @@ TEST(vector_nocopy_insert) {
 	CHECK( v.back() == "6" );
 }
 
-TEST(vector_nocopy_iterator) {
+TEST_CASE("vector_nocopy_iterator", "[tinystl]") {
 	tinystl::vector<nocopy> v(5);
 	v[0].reset("1");
 	v[1].reset("2");
