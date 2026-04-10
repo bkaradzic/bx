@@ -29,7 +29,7 @@
 #include <tinystl/allocator.h>
 #include <tinystl/unordered_set.h>
 
-TEST(uoset_pod_compiles) {
+TEST_CASE("uoset_pod_compiles", "") {
 
 	// verify this compiles
 	tinystl::unordered_set<unsigned int> s;

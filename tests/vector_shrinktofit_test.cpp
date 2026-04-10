@@ -29,7 +29,7 @@
 #include <tinystl/allocator.h>
 #include <tinystl/vector.h>
 
-TEST(vector_shrinktofit) {
+TEST_CASE("vector_shrinktofit", "[tinystl]") {
 	typedef tinystl::vector<int> vector;
 
 	{

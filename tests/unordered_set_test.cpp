@@ -40,7 +40,7 @@ static void comparesets(const tinystl::unordered_set<T>& s, const tinystl::unord
 	}
 }
 
-TEST(uoset_constructor) {
+TEST_CASE("uoset_constructor", "[tinystl]") {
 	typedef tinystl::unordered_set<int> unordered_set;
 
 	unordered_set baseline;
@@ -74,7 +74,7 @@ TEST(uoset_constructor) {
 	}
 }
 
-TEST(uoset_assign) {
+TEST_CASE("uoset_assign", "[tinystl]") {
 	typedef tinystl::unordered_set<int> unordered_set;
 
 	unordered_set baseline;
@@ -124,7 +124,7 @@ TEST(uoset_assign) {
 	}
 }
 
-TEST(uoset_insert) {
+TEST_CASE("uoset_insert", "[tinystl]") {
 	typedef tinystl::unordered_set<tinystl::string> unordered_set;
 	typedef tinystl::pair<unordered_set::iterator, bool> pair;
 
@@ -173,7 +173,7 @@ TEST(uoset_insert) {
 	}
 }
 
-TEST(uoset_iterate) {
+TEST_CASE("uoset_iterate", "[tinystl]") {
 	typedef tinystl::unordered_set<int> unordered_set;
 	{
 		unordered_set s;

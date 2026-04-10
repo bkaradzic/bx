@@ -671,7 +671,7 @@ TEST_CASE("FixedStringT", "[string]")
 	REQUIRE(0 == strCmp(fs64, "13899831") );
 }
 
-TEST(tinystl_string_constructor)
+TEST_CASE("tinystl_string_constructor", "[tinystl]")
 {
 	using tinystl::string;
 	{
@@ -705,7 +705,7 @@ TEST(tinystl_string_constructor)
 	}
 }
 
-TEST(tinystl_string_assign)
+TEST_CASE("tinystl_string_assign", "[tinystl]")
 {
 	using tinystl::string;
 	{
@@ -763,7 +763,7 @@ TEST(tinystl_string_assign)
 	}
 }
 
-bool testFormatHumanNumber(bx::StringView _expected, double _value, int32_t _numFrac, int32_t _bufferSize = 32)
+bool testFormatHumanNumber(bx::StringView _expected, double _value, uint8_t _numFrac, int32_t _bufferSize = 32)
 {
 	char* tmp = (char*)BX_STACK_ALLOC(_bufferSize);
 	int32_t total = bx::formatHumanNumber(tmp, _bufferSize, _value, _numFrac);

@@ -58,7 +58,7 @@ static inline bool operator==(const complex& lhs, const complex& rhs) {
 	return false;
 }
 
-TEST(vector_complex_constructor) {
+TEST_CASE("vector_complex_constructor", "[tinystl]") {
 	typedef tinystl::vector<complex> vector;
 
 	{
@@ -103,7 +103,7 @@ TEST(vector_complex_constructor) {
 	}
 }
 
-TEST(vector_complex_assignment) {
+TEST_CASE("vector_complex_assignment", "[tinystl]") {
 	typedef tinystl::vector<complex> vector;
 
 	{
@@ -120,7 +120,7 @@ TEST(vector_complex_assignment) {
 	}
 }
 
-TEST(vector_complex_pushback) {
+TEST_CASE("vector_complex_pushback", "[tinystl]") {
 	tinystl::vector<complex> v;
 	v.push_back("42");
 
@@ -128,7 +128,7 @@ TEST(vector_complex_pushback) {
 	CHECK(v[0] == "42");
 }
 
-TEST(vector_complex_vector) {
+TEST_CASE("vector_complex_vector", "[tinystl]") {
 	tinystl::vector< tinystl::vector<complex> > v(10, tinystl::vector<complex>());
 
 	tinystl::vector< tinystl::vector<complex> >::iterator it = v.begin(), end = v.end();
@@ -139,7 +139,7 @@ TEST(vector_complex_vector) {
 	}
 }
 
-TEST(vector_complex_swap) {
+TEST_CASE("vector_complex_swap", "[tinystl]") {
 	tinystl::vector<complex> v1;
 	v1.push_back("12");
 	v1.push_back("20");
@@ -156,7 +156,7 @@ TEST(vector_complex_swap) {
 	CHECK(v2[1] == "20");
 }
 
-TEST(vector_complex_popback) {
+TEST_CASE("vector_complex_popback", "[tinystl]") {
 	tinystl::vector<complex> v;
 	v.push_back("12");
 	v.push_back("24");
@@ -169,7 +169,7 @@ TEST(vector_complex_popback) {
 	CHECK(v.size() == 1);
 }
 
-TEST(vector_complex_assign) {
+TEST_CASE("vector_complex_assign", "[tinystl]") {
 	tinystl::vector<complex> v;
 
 	CHECK(v.size() == 0);
@@ -180,7 +180,7 @@ TEST(vector_complex_assign) {
 	CHECK( std::equal(v.begin(), v.end(), array) );
 }
 
-TEST(vector_complex_erase) {
+TEST_CASE("vector_complex_erase", "[tinystl]") {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<complex> v(array, array + 10);
 
@@ -200,7 +200,7 @@ TEST(vector_complex_erase) {
 	CHECK(v[1] == "9");
 }
 
-TEST(vector_complex_erase_unordered) {
+TEST_CASE("vector_complex_erase_unordered", "[tinystl]") {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	typedef tinystl::vector<complex> vector;
 	vector v(array, array + 10);
@@ -231,7 +231,7 @@ TEST(vector_complex_erase_unordered) {
 	CHECK( std::count(v.begin(), v.end(), last) == 1 );
 }
 
-TEST(vector_complex_insert) {
+TEST_CASE("vector_complex_insert", "[tinystl]") {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<complex> v(array, array + 10);
 
@@ -253,7 +253,7 @@ TEST(vector_complex_insert) {
 	CHECK( std::equal(v.begin(), v.end(), finalarray) );
 }
 
-TEST(vector_complex_iterator) {
+TEST_CASE("vector_complex_iterator", "[tinystl]") {
 	const complex array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
 	tinystl::vector<complex> v(array, array + 10);

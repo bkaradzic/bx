@@ -57,7 +57,7 @@ static inline bool operator==(const nodefault& lhs, const nodefault& rhs) {
 	return false;
 }
 
-TEST(vector_nodefault_constructor) {
+TEST_CASE("vector_nodefault_constructor", "[tinystl]") {
 	typedef tinystl::vector<nodefault> vector;
 
 	{
@@ -93,7 +93,7 @@ TEST(vector_nodefault_constructor) {
 	}
 }
 
-TEST(vector_nodefault_assignment) {
+TEST_CASE("vector_nodefault_assignment", "[tinystl]") {
 	typedef tinystl::vector<nodefault> vector;
 
 	{
@@ -110,7 +110,7 @@ TEST(vector_nodefault_assignment) {
 	}
 }
 
-TEST(vector_nodefault_pushback) {
+TEST_CASE("vector_nodefault_pushback", "[tinystl]") {
 	tinystl::vector<nodefault> v;
 	v.push_back("42");
 
@@ -118,7 +118,7 @@ TEST(vector_nodefault_pushback) {
 	CHECK(v[0] == "42");
 }
 
-TEST(vector_nodefault_vector) {
+TEST_CASE("vector_nodefault_vector", "[tinystl]") {
 	tinystl::vector< tinystl::vector<nodefault> > v(10, tinystl::vector<nodefault>());
 
 	tinystl::vector< tinystl::vector<nodefault> >::iterator it = v.begin(), end = v.end();
@@ -129,7 +129,7 @@ TEST(vector_nodefault_vector) {
 	}
 }
 
-TEST(vector_nodefault_swap) {
+TEST_CASE("vector_nodefault_swap", "[tinystl]") {
 	tinystl::vector<nodefault> v1;
 	v1.push_back("12");
 	v1.push_back("20");
@@ -146,7 +146,7 @@ TEST(vector_nodefault_swap) {
 	CHECK(v2[1] == "20");
 }
 
-TEST(vector_nodefault_popback) {
+TEST_CASE("vector_nodefault_popback", "[tinystl]") {
 	tinystl::vector<nodefault> v;
 	v.push_back("12");
 	v.push_back("24");
@@ -159,7 +159,7 @@ TEST(vector_nodefault_popback) {
 	CHECK(v.size() == 1);
 }
 
-TEST(vector_nodefault_assign) {
+TEST_CASE("vector_nodefault_assign", "[tinystl]") {
 	tinystl::vector<nodefault> v;
 
 	CHECK(v.size() == 0);
@@ -170,7 +170,7 @@ TEST(vector_nodefault_assign) {
 	CHECK( std::equal(v.begin(), v.end(), array) );
 }
 
-TEST(vector_nodefault_erase) {
+TEST_CASE("vector_nodefault_erase", "[tinystl]") {
 	const nodefault array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<nodefault> v(array, array + 10);
 
@@ -190,7 +190,7 @@ TEST(vector_nodefault_erase) {
 	CHECK(v[1] == "9");
 }
 
-TEST(vector_nodefault_erase_unordered) {
+TEST_CASE("vector_nodefault_erase_unordered", "[tinystl]") {
 	const nodefault array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	typedef tinystl::vector<nodefault> vector;
 	vector v(array, array + 10);
@@ -221,7 +221,7 @@ TEST(vector_nodefault_erase_unordered) {
 	CHECK( std::count(v.begin(), v.end(), last) == 1 );
 }
 
-TEST(vector_nodefault_insert) {
+TEST_CASE("vector_nodefault_insert", "[tinystl]") {
 	const nodefault array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 	tinystl::vector<nodefault> v(array, array + 10);
 
@@ -243,7 +243,7 @@ TEST(vector_nodefault_insert) {
 	CHECK( std::equal(v.begin(), v.end(), finalarray) );
 }
 
-TEST(vector_nodefault_iterator) {
+TEST_CASE("vector_nodefault_iterator", "[tinystl]") {
 	const nodefault array[10] = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
 
 	tinystl::vector<nodefault> v(array, array + 10);
