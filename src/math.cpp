@@ -4,23 +4,24 @@
  */
 
 #include <bx/math.h>
-#include <bx/uint32_t.h>
-
 #include <bx/string.h>
 
 namespace bx
 {
 	float frexp(float _a, int32_t* _outExp)
 	{
-		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
-		const uint32_t exp0     = uint32_srl(masked0, kFloatExponentBitShift);
+		const simd32_t expMask   = simd32_splat(kFloatExponentMask);
+		const simd32_t ftob      = simd32_splat(_a);
+		const simd32_t masked0   = simd_and(ftob, expMask);
+		const simd32_t exp0      = simd_x32_srl(masked0, kFloatExponentBitShift);
 
-		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
-		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
-		const float    result   = bitsToFloat(bits);
+		const simd32_t sMantMask = simd32_splat(kFloatSignMask | kFloatMantissaMask);
+		const simd32_t masked1   = simd_and(ftob, sMantMask);
+		const simd32_t half      = simd32_splat(0x3f000000u);
+		const simd32_t bits      = simd_or(masked1, half);
+		const float    result    = bitsToFloat(bits.u32);
 
-		*_outExp = int32_t(exp0 - 0x7e);
+		*_outExp = int32_t(exp0.u32 - 0x7e);
 
 		return result;
 	}

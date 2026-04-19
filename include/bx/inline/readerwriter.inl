@@ -128,7 +128,7 @@ namespace bx
 		}
 
 		int64_t remainder = m_top-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
+		int32_t size = int32_t(max<int64_t>(0, min<int64_t>(_size, remainder, INT32_MAX) ) );
 		m_pos += size;
 		if (size != _size)
 		{
@@ -173,7 +173,7 @@ namespace bx
 		BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 		int64_t remainder = m_top-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
+		int32_t size = int32_t(max<int64_t>(0, min<int64_t>(_size, remainder, INT32_MAX) ) );
 		memCopy(_data, &m_data[m_pos], size);
 		m_pos += size;
 		if (size != _size)
@@ -245,7 +245,7 @@ namespace bx
 		}
 
 		int64_t remainder = m_size-m_pos;
-		int32_t size = uint32_min(_size, uint32_t(min<int64_t>(remainder, INT32_MAX) ) );
+		int32_t size = int32_t(max<int64_t>(0, min<int64_t>(_size, remainder, INT32_MAX) ) );
 		memCopy(&m_data[m_pos], _data, size);
 		m_pos += size;
 		m_top = max(m_top, m_pos);
@@ -301,16 +301,16 @@ namespace bx
 	{
 		BX_ERROR_SCOPE(_err);
 
-		const uint32_t tmp0      = uint32_sels(64   - _size,   64, _size);
-		const uint32_t tmp1      = uint32_sels(256  - _size,  256, tmp0);
-		const uint32_t blockSize = uint32_sels(1024 - _size, 1024, tmp1);
+		const uint32_t tmp0      = simd32_sels(simd32_splat(64   - _size), simd32_splat(  64), simd32_splat(_size)).u32;
+		const uint32_t tmp1      = simd32_sels(simd32_splat(256  - _size), simd32_splat( 256), simd32_splat(tmp0 )).u32;
+		const uint32_t blockSize = simd32_sels(simd32_splat(1024 - _size), simd32_splat(1024), simd32_splat(tmp1 )).u32;
 		uint8_t* temp = (uint8_t*)BX_STACK_ALLOC(blockSize);
 		memSet(temp, _byte, blockSize);
 
 		int32_t size = 0;
 		while (0 < _size && _err->isOk() )
 		{
-			int32_t bytes = write(_writer, temp, uint32_min(blockSize, _size), _err);
+			int32_t bytes = write(_writer, temp, min(blockSize, _size), _err);
 			size  += bytes;
 			_size -= bytes;
 		}

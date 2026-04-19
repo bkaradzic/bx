@@ -4,6 +4,7 @@
  */
 
 #include <bx/hash.h>
+#include <bx/simd_t.h>
 
 namespace bx
 {
@@ -333,7 +334,7 @@ struct HashMurmur3Pod
 	BX_FORCE_INLINE void mix1(uint32_t _k)
 	{
 		_k *= kMurmur3Mul1;
-		_k  = uint32_rol(_k, 15);
+		_k  = simd32_x32_rol(simd32_splat(_k), 15).u32;
 		_k *= kMurmur3Mul2;
 
 		m_hash ^= _k;
@@ -343,7 +344,7 @@ struct HashMurmur3Pod
 	{
 		mix1(_k);
 
-		m_hash = uint32_rol(m_hash, 13);
+		m_hash = simd32_x32_rol(simd32_splat(m_hash), 13).u32;
 		m_hash = m_hash*5 + kMurmur3Add;
 	}
 
@@ -407,7 +408,7 @@ struct HashMurmur3_64Pod
 	BX_FORCE_INLINE void mix1(uint64_t _k)
 	{
 		_k *= kMurmur3Mul1;
-		_k  = uint64_rol(_k, 31);
+		_k  = simd64_x64_rol(simd64_splat(_k), 31).u64;
 		_k *= kMurmur3Mul2;
 
 		m_hash[0] ^= _k;
@@ -416,7 +417,7 @@ struct HashMurmur3_64Pod
 	BX_FORCE_INLINE void mix2(uint64_t _k)
 	{
 		_k *= kMurmur3Mul2;
-		_k  = uint64_rol(_k, 33);
+		_k  = simd64_x64_rol(simd64_splat(_k), 33).u64;
 		_k *= kMurmur3Mul1;
 
 		m_hash[1] ^= _k;
@@ -426,13 +427,13 @@ struct HashMurmur3_64Pod
 	{
 		mix1(_k1);
 
-		m_hash[0]  = uint64_rol(m_hash[0], 27);
+		m_hash[0]  = simd64_x64_rol(simd64_splat(m_hash[0]), 27).u64;
 		m_hash[0] += m_hash[1];
 		m_hash[0]  = m_hash[0]*5 + kMurmur3Add1;
 
 		mix2(_k2);
 
-		m_hash[1]  = uint64_rol(m_hash[1], 31);
+		m_hash[1]  = simd64_x64_rol(simd64_splat(m_hash[1]), 31).u64;
 		m_hash[1] += m_hash[0];
 		m_hash[1]  = m_hash[1]*5 + kMurmur3Add2;
 	}

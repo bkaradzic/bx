@@ -7,7 +7,6 @@
 #define BX_ALLOCATOR_H_HEADER_GUARD
 
 #include "bx.h"
-#include "uint32_t.h"
 
 #define BX_NEW(_allocator, _type)                 BX_PLACEMENT_NEW(bx::alloc(_allocator, sizeof(_type) ), _type)
 #define BX_ALIGNED_NEW(_allocator, _type, _align) BX_PLACEMENT_NEW(bx::alloc(_allocator, sizeof(_type), _align), _type)

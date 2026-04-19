@@ -8,7 +8,6 @@
 
 #include "bx.h"
 #include "math.h"
-#include "uint32_t.h"
 
 namespace bx
 {

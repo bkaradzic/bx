@@ -62,48 +62,67 @@ namespace bx
 
 	inline uint32_t RingBufferControl::consume(uint32_t _size)
 	{
-		const uint32_t maxSize    = distance(m_read, m_current);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, maxSize);
-		const uint32_t advance    = uint32_add(m_read, size);
-		const uint32_t read       = uint32_mod(advance, m_size);
-		m_read = read;
-		return size;
+		const simd32_t maxSize    = simd32_splat(distance(m_read, m_current) );
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t result     = simd32_sels(test, size, maxSize);
+		const simd32_t readVal    = simd32_splat(m_read);
+		const simd32_t advance    = simd32_u32_add(readVal, result);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t read       = simd32_u32_mod(advance, sizeVal);
+		m_read = read.u32;
+		return result.u32;
 	}
 
 	inline uint32_t RingBufferControl::reserve(uint32_t _size, bool _mustSucceed)
 	{
-		const uint32_t dist       = distance(m_write, m_read)-1;
-		const uint32_t maxSize    = uint32_sels(dist, m_size-1, dist);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, _mustSucceed ? 0 : maxSize);
-		const uint32_t advance    = uint32_add(m_write, size);
-		const uint32_t write      = uint32_mod(advance, m_size);
-		m_write = write;
-		return size;
+		const simd32_t distVal    = simd32_splat(distance(m_write, m_read) );
+		const simd32_t one        = simd32_splat(1u);
+		const simd32_t dist       = simd32_u32_sub(distVal, one);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t sizem1     = simd32_u32_sub(sizeVal, one);
+		const simd32_t maxSize    = simd32_sels(dist, sizem1, dist);
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t zero       = simd32_splat(0u);
+		const simd32_t fail       = _mustSucceed ? zero : maxSize;
+		const simd32_t result     = simd32_sels(test, size, fail);
+		const simd32_t writeVal   = simd32_splat(m_write);
+		const simd32_t advance    = simd32_u32_add(writeVal, result);
+		const simd32_t write      = simd32_u32_mod(advance, sizeVal);
+		m_write = write.u32;
+		return result.u32;
 	}
 
 	inline uint32_t RingBufferControl::commit(uint32_t _size)
 	{
-		const uint32_t maxSize    = distance(m_current, m_write);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, maxSize);
-		const uint32_t advance    = uint32_add(m_current, size);
-		const uint32_t current    = uint32_mod(advance, m_size);
-		m_current = current;
-		return size;
+		const simd32_t maxSize    = simd32_splat(distance(m_current, m_write) );
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t result     = simd32_sels(test, size, maxSize);
+		const simd32_t currentVal = simd32_splat(m_current);
+		const simd32_t advance    = simd32_u32_add(currentVal, result);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t current    = simd32_u32_mod(advance, sizeVal);
+		m_current = current.u32;
+		return result.u32;
 	}
 
 	inline uint32_t RingBufferControl::distance(uint32_t _from, uint32_t _to) const
 	{
-		const uint32_t diff   = uint32_sub(_to, _from);
-		const uint32_t le     = uint32_add(m_size, diff);
-		const uint32_t result = uint32_sels(diff, le, diff);
-
-		return result;
+		const simd32_t to      = simd32_splat(_to);
+		const simd32_t from    = simd32_splat(_from);
+		const simd32_t diff    = simd32_u32_sub(to, from);
+		const simd32_t sizeVal = simd32_splat(m_size);
+		const simd32_t le      = simd32_u32_add(sizeVal, diff);
+		const simd32_t result  = simd32_sels(diff, le, diff);
+		return result.u32;
 	}
 
 	inline void RingBufferControl::reset()
@@ -166,52 +185,71 @@ namespace bx
 
 	inline uint32_t SpScRingBufferControl::consume(uint32_t _size)
 	{
-		const uint32_t maxSize    = distance(m_read, m_current);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, maxSize);
-		const uint32_t advance    = uint32_add(m_read, size);
-		const uint32_t read       = uint32_mod(advance, m_size);
-		m_read = read;
-		return size;
+		const simd32_t maxSize    = simd32_splat(distance(m_read, m_current) );
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t result     = simd32_sels(test, size, maxSize);
+		const simd32_t readVal    = simd32_splat(m_read);
+		const simd32_t advance    = simd32_u32_add(readVal, result);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t read       = simd32_u32_mod(advance, sizeVal);
+		m_read = read.u32;
+		return result.u32;
 	}
 
 	inline uint32_t SpScRingBufferControl::reserve(uint32_t _size, bool _mustSucceed)
 	{
-		const uint32_t dist       = distance(m_write, m_read)-1;
-		const uint32_t maxSize    = uint32_sels(dist, m_size-1, dist);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, _mustSucceed ? 0 : maxSize);
-		const uint32_t advance    = uint32_add(m_write, size);
-		const uint32_t write      = uint32_mod(advance, m_size);
-		m_write = write;
-		return size;
+		const simd32_t distVal    = simd32_splat(distance(m_write, m_read) );
+		const simd32_t one        = simd32_splat(1u);
+		const simd32_t dist       = simd32_u32_sub(distVal, one);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t sizem1     = simd32_u32_sub(sizeVal, one);
+		const simd32_t maxSize    = simd32_sels(dist, sizem1, dist);
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t zero       = simd32_splat(0u);
+		const simd32_t fail       = _mustSucceed ? zero : maxSize;
+		const simd32_t result     = simd32_sels(test, size, fail);
+		const simd32_t writeVal   = simd32_splat(m_write);
+		const simd32_t advance    = simd32_u32_add(writeVal, result);
+		const simd32_t write      = simd32_u32_mod(advance, sizeVal);
+		m_write = write.u32;
+		return result.u32;
 	}
 
 	inline uint32_t SpScRingBufferControl::commit(uint32_t _size)
 	{
-		const uint32_t maxSize    = distance(m_current, m_write);
-		const uint32_t sizeNoSign = uint32_and(_size, 0x7fffffff);
-		const uint32_t test       = uint32_sub(sizeNoSign, maxSize);
-		const uint32_t size       = uint32_sels(test, _size, maxSize);
-		const uint32_t advance    = uint32_add(m_current, size);
-		const uint32_t current    = uint32_mod(advance, m_size);
+		const simd32_t maxSize    = simd32_splat(distance(m_current, m_write) );
+		const simd32_t size       = simd32_splat(_size);
+		const simd32_t signMask   = simd32_splat(0x7fffffffu);
+		const simd32_t sizeNoSign = simd32_and(size, signMask);
+		const simd32_t test       = simd32_u32_sub(sizeNoSign, maxSize);
+		const simd32_t result     = simd32_sels(test, size, maxSize);
+		const simd32_t currentVal = simd32_splat(m_current);
+		const simd32_t advance    = simd32_u32_add(currentVal, result);
+		const simd32_t sizeVal    = simd32_splat(m_size);
+		const simd32_t current    = simd32_u32_mod(advance, sizeVal);
 
 		// must commit all memory writes before moving m_current pointer
 		// once m_current pointer moves data is used by consumer thread
 		memoryBarrier();
-		m_current = current;
-		return size;
+		m_current = current.u32;
+		return result.u32;
 	}
 
 	inline uint32_t SpScRingBufferControl::distance(uint32_t _from, uint32_t _to) const
 	{
-		const uint32_t diff   = uint32_sub(_to, _from);
-		const uint32_t le     = uint32_add(m_size, diff);
-		const uint32_t result = uint32_sels(diff, le, diff);
-
-		return result;
+		const simd32_t to      = simd32_splat(_to);
+		const simd32_t from    = simd32_splat(_from);
+		const simd32_t diff    = simd32_u32_sub(to, from);
+		const simd32_t sizeVal = simd32_splat(m_size);
+		const simd32_t le      = simd32_u32_add(sizeVal, diff);
+		const simd32_t result  = simd32_sels(diff, le, diff);
+		return result.u32;
 	}
 
 	inline void SpScRingBufferControl::reset()

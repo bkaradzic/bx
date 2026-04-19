@@ -26,20 +26,20 @@ void simd_rsqrt_bench(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVer
 	for (uint32_t ii = 0, num = _numVertices/4; ii < num; ++ii)
 	{
 		bx::simd128_t* ptr = &_src[ii*4];
-		bx::simd128_t tmp0 = bx::simd_ld(ptr + 0);
-		bx::simd128_t tmp1 = bx::simd_ld(ptr + 1);
-		bx::simd128_t tmp2 = bx::simd_ld(ptr + 2);
-		bx::simd128_t tmp3 = bx::simd_ld(ptr + 3);
+		bx::simd128_t tmp0 = bx::simd128_ld(ptr + 0);
+		bx::simd128_t tmp1 = bx::simd128_ld(ptr + 1);
+		bx::simd128_t tmp2 = bx::simd128_ld(ptr + 2);
+		bx::simd128_t tmp3 = bx::simd128_ld(ptr + 3);
 		bx::simd128_t rsqrt0 = simdRsqrtFn(tmp0);
 		bx::simd128_t rsqrt1 = simdRsqrtFn(tmp1);
 		bx::simd128_t rsqrt2 = simdRsqrtFn(tmp2);
 		bx::simd128_t rsqrt3 = simdRsqrtFn(tmp3);
 
 		ptr = &_dst[ii*4];
-		bx::simd_st(ptr + 0, rsqrt0);
-		bx::simd_st(ptr + 1, rsqrt1);
-		bx::simd_st(ptr + 2, rsqrt2);
-		bx::simd_st(ptr + 3, rsqrt3);
+		bx::simd128_st(ptr + 0, rsqrt0);
+		bx::simd128_st(ptr + 1, rsqrt1);
+		bx::simd128_st(ptr + 2, rsqrt2);
+		bx::simd128_st(ptr + 3, rsqrt3);
 	}
 }
 
@@ -53,10 +53,10 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_est>(_dst, _src, _numVertices);
+			simd_rsqrt_bench<bx::simd128_f32_rsqrt_est>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
-		printf("    simd_rsqrt_est: %15f\n", double(elapsed) );
+		printf("    simd128_f32_rsqrt_est: %15f\n", double(elapsed) );
 	}
 
 	{
@@ -65,10 +65,10 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_nr>(_dst, _src, _numVertices);
+			simd_rsqrt_bench<bx::simd128_f32_rsqrt_nr>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
-		printf("     simd_rsqrt_nr: %15f\n", double(elapsed) );
+		printf("     simd128_f32_rsqrt_nr: %15f\n", double(elapsed) );
 	}
 
 	{
@@ -77,10 +77,10 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt_carmack>(_dst, _src, _numVertices);
+			simd_rsqrt_bench<bx::simd128_f32_rsqrt_carmack>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
-		printf("simd_rsqrt_carmack: %15f\n", double(elapsed) );
+		printf("simd128_f32_rsqrt_carmack: %15f\n", double(elapsed) );
 	}
 
 	{
@@ -89,10 +89,10 @@ void simd_bench_pass(bx::simd128_t* _dst, bx::simd128_t* _src, uint32_t _numVert
 		{
 			flushCache();
 			elapsed += -bx::getHPCounter();
-			simd_rsqrt_bench<bx::simd_rsqrt>(_dst, _src, _numVertices);
+			simd_rsqrt_bench<bx::simd128_f32_rsqrt>(_dst, _src, _numVertices);
 			elapsed += bx::getHPCounter();
 		}
-		printf("        simd_rsqrt: %15f\n", double(elapsed) );
+		printf("        simd128_f32_rsqrt: %15f\n", double(elapsed) );
 	}
 }
 

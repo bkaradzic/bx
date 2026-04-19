@@ -399,6 +399,53 @@ namespace bx
 		, uint32_t _numStrides
 		);
 
+	/// Greatest common divisor.
+	///
+	BX_CONSTEXPR_FUNC uint32_t gcd(uint32_t _a, uint32_t _b);
+
+	/// Least common multiple.
+	///
+	BX_CONSTEXPR_FUNC uint32_t lcm(uint32_t _a, uint32_t _b);
+
+	/// Align to arbitrary stride.
+	///
+	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
+
+	/// Align to arbitrary stride and Min bytes.
+	///
+	template<uint32_t Min>
+	BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride);
+
+	/// Returns true if value is aligned to _align boundary.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC bool isAligned(Ty _a, size_t _align);
+
+	template<>
+	BX_CONSTEXPR_FUNC bool isAligned(const void* _ptr, size_t _align);
+
+	/// Aligns _a down to nearest multiple of _align.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty alignDown(Ty _a, size_t _align);
+
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, size_t _align);
+
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, size_t _align);
+
+	/// Aligns _a up to nearest multiple of _align.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, size_t _align);
+
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, size_t _align);
+
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, size_t _align);
+
 } // namespace bx
 
 #include "inline/bx.inl"

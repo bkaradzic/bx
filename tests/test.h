@@ -14,8 +14,6 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' :
 #include <catch/catch_amalgamated.hpp>
 BX_PRAGMA_DIAGNOSTIC_POP();
 
-#define TEST(_x) TEST_CASE(#_x, "")
-
 #if BX_CONFIG_DEBUG
 #	define REQUIRE_ASSERTS(_x) REQUIRE_THROWS(_x)
 #else

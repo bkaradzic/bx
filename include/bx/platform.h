@@ -202,7 +202,7 @@
 #elif defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__)
 #	undef  BX_PLATFORM_OSX
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__wasm__)
 #	include <emscripten/version.h>
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN (__EMSCRIPTEN_MAJOR__ * 10000 + __EMSCRIPTEN_MINOR__ * 100 + __EMSCRIPTEN_TINY__)

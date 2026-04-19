@@ -5,7 +5,6 @@
 
 #include <bx/string.h>
 #include <bx/os.h>
-#include <bx/uint32_t.h>
 
 #if BX_CRT_MSVC
 #	include <direct.h>
@@ -332,7 +331,7 @@ namespace bx
 		int32_t len = 0;
 		for(uint32_t ii = 0; NULL != _argv[ii]; ++ii)
 		{
-			len += snprintf(&temp[len], uint32_imax(0, total-len)
+			len += snprintf(&temp[len], bx::max(0, total-len)
 				, "%s "
 				, _argv[ii]
 				);
