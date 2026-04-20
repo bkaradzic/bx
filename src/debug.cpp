@@ -46,6 +46,10 @@
 #	include <backtrace.h> // backtrace_syminfo
 #endif // BX_CONFIG_CALLSTACK_*
 
+#ifndef BX_CONFIG_CALLSTACK_USE_DBGHELP
+#	define BX_CONFIG_CALLSTACK_USE_DBGHELP BX_PLATFORM_WINDOWS
+#endif // BX_CONFIG_CALLSTACK_USE_DBGHELP
+
 #ifndef BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
 #	define BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH BX_PLATFORM_WINDOWS
 #endif // BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH
@@ -684,7 +688,7 @@ namespace bx
 		return total;
 	}
 
-#elif BX_PLATFORM_WINDOWS
+#elif BX_CONFIG_CALLSTACK_USE_DBGHELP
 
 	struct DbgHelpSymbolInfo
 	{
@@ -729,7 +733,7 @@ namespace bx
 
 	struct DbgHelpSymbolResolve
 	{
-		DbgHelpSymbolResolve()
+		void init()
 		{
 			m_imageHlpDll = dlopen("dbghelp.dll");
 
@@ -854,6 +858,15 @@ namespace bx
 		int32_t total = write(_writer, _err, "Callstack (%d):\n", _num);
 
 		total += write(_writer, _err, "\t #: %-*s  Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
+
+		static bool initCalled = false;
+
+		if (!initCalled)
+		{
+			initCalled = true;
+
+			s_dbgHelpSymbolResolve.init();
+		}
 
 		for (uint32_t ii = 0; ii < _num && _err->isOk(); ++ii)
 		{
