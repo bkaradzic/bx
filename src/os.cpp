@@ -375,37 +375,228 @@ namespace bx
 #endif // BX_PLATFORM_*
 	}
 
-	void* memoryMap(void* _address, size_t _size, Error* _err)
+	namespace
+	{
+#if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+		static int32_t toPosixProt(uint32_t _protect)
+		{
+			switch (_protect)
+			{
+			case Memory::ProtectRead:      return PROT_READ;
+			case Memory::ProtectReadWrite: return PROT_READ | PROT_WRITE;
+			case Memory::ProtectReadExec:  return PROT_READ | PROT_EXEC;
+			case Memory::ProtectNone:      // fall through
+			default:                       return PROT_NONE;
+			}
+		}
+
+		static int32_t toPosixAdvice(uint32_t _advise)
+		{
+			switch (_advise)
+			{
+			case Memory::Normal:           return MADV_NORMAL;
+			case Memory::SequentialAccess: return MADV_SEQUENTIAL;
+			case Memory::RandomAccess:     return MADV_RANDOM;
+			case Memory::Prefetch:         return MADV_WILLNEED;
+			case Memory::DontNeed:         return MADV_DONTNEED;
+			default:                       return -1;
+			}
+		}
+#elif BX_PLATFORM_WINDOWS
+		static DWORD toWinProtect(uint32_t _protect)
+		{
+			switch (_protect)
+			{
+			case Memory::ProtectRead:      return PAGE_READONLY;
+			case Memory::ProtectReadWrite: return PAGE_READWRITE;
+			case Memory::ProtectReadExec:  return PAGE_EXECUTE_READ;
+			case Memory::ProtectNone:      // fall through
+			default:                       return PAGE_NOACCESS;
+			}
+		}
+#endif // BX_PLATFORM_*
+	} // namespace
+
+	void* memoryMap(void* _address, size_t _size, size_t _alignment, uint32_t _flags, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
 
+		const uint32_t state   = _flags & Memory::StateMask;
+		const uint32_t protect = _flags & Memory::ProtectMask;
+		const uint32_t advise  = _flags & Memory::AdviseMask;
+		const uint32_t page    = _flags & Memory::PageMask;
+
+		const size_t pageSize = memoryPageSize();
+		BX_ASSERT(_alignment <= pageSize, "Alignments greater than the page size are not implemented (requested %zu, page %zu).", _alignment, pageSize);
+		BX_UNUSED(_alignment, pageSize);
+
 #if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
-		constexpr int32_t flags = 0
-			| MAP_ANON
-			| MAP_PRIVATE
-			;
-
-		void* result = mmap(_address, _size, PROT_READ | PROT_WRITE, flags, -1 /*fd*/, 0 /*offset*/);
-
-		if (MAP_FAILED == result)
+		if (NULL == _address)
 		{
-			BX_ERROR_SET(
-				  _err
-				, kErrorMemoryMapFailed
-				, "kErrorMemoryMapFailed"
-				);
+			if (0 == (state & Memory::Reserve) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: Memory::Reserve required for fresh allocation.");
+				return NULL;
+			}
 
-			return NULL;
+			uint32_t effectiveProtect = protect;
+			if (0 == effectiveProtect)
+			{
+				effectiveProtect = (Memory::Commit == (state & Memory::Commit) ) ? Memory::ProtectReadWrite : Memory::ProtectNone;
+			}
+
+			int32_t mmapFlags = MAP_ANON | MAP_PRIVATE;
+#	if BX_PLATFORM_LINUX
+			if (0 != (page & Memory::PageHuge) )
+			{
+				mmapFlags |= MAP_HUGETLB;
+#		ifdef MAP_HUGE_1GB
+				mmapFlags |= MAP_HUGE_1GB;
+#		endif // MAP_HUGE_1GB
+			}
+			else if (0 != (page & Memory::PageLarge) )
+			{
+				mmapFlags |= MAP_HUGETLB;
+#		ifdef MAP_HUGE_2MB
+				mmapFlags |= MAP_HUGE_2MB;
+#		endif // MAP_HUGE_2MB
+			}
+#	else
+			BX_UNUSED(page);
+#	endif // BX_PLATFORM_LINUX
+
+			void* result = mmap(_address, _size, toPosixProt(effectiveProtect), mmapFlags, -1 /*fd*/, 0 /*offset*/);
+
+			if (MAP_FAILED == result)
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: mmap failed.");
+				return NULL;
+			}
+
+			if (0 != advise)
+			{
+				const int32_t adv = toPosixAdvice(advise);
+				if (-1 != adv)
+				{
+					madvise(result, _size, adv);
+				}
+			}
+
+			return result;
 		}
 
-		return result;
-#elif BX_PLATFORM_WINDOWS
-		void* result = VirtualAlloc(_address, _size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+		// Reconfigure existing region.
+		if (0 != (state & Memory::Decommit) )
+		{
+			// Drop physical pages, then revoke access so use-after-free faults.
+			madvise(_address, _size, MADV_DONTNEED);
+			const int32_t prot = (0 != protect) ? toPosixProt(protect) : PROT_NONE;
+			if (0 != mprotect(_address, _size, prot) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: mprotect (decommit) failed.");
+				return NULL;
+			}
+		}
+		else if (Memory::Commit == (state & Memory::Commit) )
+		{
+			const uint32_t effectiveProtect = (0 != protect) ? protect : Memory::ProtectReadWrite;
+			if (0 != mprotect(_address, _size, toPosixProt(effectiveProtect) ) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: mprotect (commit) failed.");
+				return NULL;
+			}
+		}
+		else if (0 != protect)
+		{
+			if (0 != mprotect(_address, _size, toPosixProt(protect) ) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: mprotect failed.");
+				return NULL;
+			}
+		}
 
-		return result;
+		if (0 != advise)
+		{
+			const int32_t adv = toPosixAdvice(advise);
+			if (-1 != adv)
+			{
+				madvise(_address, _size, adv);
+			}
+		}
+
+		return _address;
+#elif BX_PLATFORM_WINDOWS
+		if (NULL == _address)
+		{
+			if (0 == (state & Memory::Reserve) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: Memory::Reserve required for fresh allocation.");
+				return NULL;
+			}
+
+			DWORD allocType = MEM_RESERVE;
+			DWORD winProtect = PAGE_NOACCESS;
+
+			if (Memory::Commit == (state & Memory::Commit) )
+			{
+				allocType |= MEM_COMMIT;
+				winProtect = toWinProtect( (0 != protect) ? protect : Memory::ProtectReadWrite);
+			}
+			else if (0 != protect)
+			{
+				winProtect = toWinProtect(protect);
+			}
+
+			if (0 != (page & (Memory::PageLarge | Memory::PageHuge) ) )
+			{
+				allocType |= MEM_LARGE_PAGES;
+			}
+
+			void* result = VirtualAlloc(_address, _size, allocType, winProtect);
+
+			if (NULL == result)
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: VirtualAlloc failed.");
+				return NULL;
+			}
+
+			BX_UNUSED(advise);
+			return result;
+		}
+
+		// Reconfigure existing region.
+		if (0 != (state & Memory::Decommit) )
+		{
+			if (!VirtualFree(_address, _size, MEM_DECOMMIT) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: VirtualFree(MEM_DECOMMIT) failed.");
+				return NULL;
+			}
+		}
+		else if (Memory::Commit == (state & Memory::Commit) )
+		{
+			const DWORD winProtect = toWinProtect( (0 != protect) ? protect : Memory::ProtectReadWrite);
+			if (NULL == VirtualAlloc(_address, _size, MEM_COMMIT, winProtect) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: VirtualAlloc(MEM_COMMIT) failed.");
+				return NULL;
+			}
+		}
+		else if (0 != protect)
+		{
+			DWORD oldProtect = 0;
+			if (!VirtualProtect(_address, _size, toWinProtect(protect), &oldProtect) )
+			{
+				BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: VirtualProtect failed.");
+				return NULL;
+			}
+		}
+
+		BX_UNUSED(advise);
+		return _address;
 #else
-		BX_UNUSED(_address, _size);
-		BX_ERROR_SET(_err, kErrorMemoryMapFailed, "Not implemented!");
+		BX_UNUSED(_address, _size, _alignment, _flags, state, protect, advise, page, pageSize);
+		BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: Not implemented!");
 		return NULL;
 #endif // BX_PLATFORM_*
 	}
@@ -426,7 +617,8 @@ namespace bx
 				);
 		}
 #elif BX_PLATFORM_WINDOWS
-		if (!VirtualFree(_address, _size, MEM_RELEASE) )
+		BX_UNUSED(_size);
+		if (!VirtualFree(_address, 0, MEM_RELEASE) )
 		{
 			BX_ERROR_SET(
 				  _err
@@ -440,21 +632,33 @@ namespace bx
 #endif // BX_PLATFORM_*
 	}
 
-	size_t memoryPageSize()
+	size_t memoryPageSize(uint32_t _flags)
 	{
-		size_t pageSize;
+		const uint32_t page = _flags & Memory::PageMask;
+
 #if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
-		pageSize = sysconf(_SC_PAGESIZE);
+		if (0 != (page & Memory::PageHuge) )
+		{
+			return 1ull << 30; // 1 GiB nominal
+		}
+		if (0 != (page & Memory::PageLarge) )
+		{
+			return 2ull << 20; // 2 MiB nominal
+		}
+		return sysconf(_SC_PAGESIZE);
 #elif BX_PLATFORM_WINDOWS
+		if (0 != (page & (Memory::PageLarge | Memory::PageHuge) ) )
+		{
+			return ::GetLargePageMinimum();
+		}
 		SYSTEM_INFO si;
 		memSet(&si, 0, sizeof(si) );
 		::GetSystemInfo(&si);
-		pageSize = si.dwAllocationGranularity;
+		return si.dwAllocationGranularity;
 #else
-		pageSize = 16<<10;
+		BX_UNUSED(page);
+		return 16<<10;
 #endif // BX_PLATFORM_WINDOWS
-
-		return pageSize;
 	}
 
 } // namespace bx
