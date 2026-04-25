@@ -12,6 +12,22 @@
 #include <bx/simd_t.h>
 #include <bx/uint32_t.h>
 
+#if BX_COMPILER_MSVC
+extern "C" unsigned char _BitScanReverse(unsigned long* _Index, unsigned long _Mask);
+#	pragma intrinsic(_BitScanReverse)
+
+extern "C" unsigned char _BitScanForward(unsigned long* _Index, unsigned long _Mask);
+#	pragma intrinsic(_BitScanForward)
+
+#	if BX_ARCH_64BIT
+extern "C" unsigned char _BitScanReverse64(unsigned long* _Index, unsigned __int64 _Mask);
+#		pragma intrinsic(_BitScanReverse64)
+
+extern "C" unsigned char _BitScanForward64(unsigned long* _Index, unsigned __int64 _Mask);
+#		pragma intrinsic(_BitScanForward64)
+#	endif // BX_ARCH_64BIT
+#endif // BX_COMPILER_MSVC
+
 namespace bx
 {
 	inline BX_CONSTEXPR_FUNC float toRad(float _deg)
@@ -581,6 +597,16 @@ namespace bx
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 32 : __builtin_clz(_val);
 #else
+#	if BX_COMPILER_MSVC
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index;
+			return 0 != _BitScanReverse(&index, (unsigned long)_val)
+				? uint8_t(31 - index)
+				: uint8_t(32)
+				;
+		}
+#	endif // BX_COMPILER_MSVC
 		const uint32_t tmp0   = uint32_srl(_val, 1);
 		const uint32_t tmp1   = uint32_or(tmp0, _val);
 		const uint32_t tmp2   = uint32_srl(tmp1, 2);
@@ -604,6 +630,16 @@ namespace bx
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 64 : __builtin_clzll(_val);
 #else
+#	if BX_COMPILER_MSVC && BX_ARCH_64BIT
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index;
+			return 0 != _BitScanReverse64(&index, (unsigned __int64)_val)
+				? uint8_t(63 - index)
+				: uint8_t(64)
+				;
+		}
+#	endif // BX_COMPILER_MSVC && BX_ARCH_64BIT
 		return _val & UINT64_C(0xffffffff00000000)
 			 ? countLeadingZeros<uint32_t>(uint32_t(_val>>32) )
 			 : countLeadingZeros<uint32_t>(uint32_t(_val) ) + 32
@@ -630,6 +666,16 @@ namespace bx
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 32 : __builtin_ctz(_val);
 #else
+#	if BX_COMPILER_MSVC
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index;
+			return 0 != _BitScanForward(&index, (unsigned long)_val)
+				? uint8_t(index)
+				: uint8_t(32)
+				;
+		}
+#	endif // BX_COMPILER_MSVC
 		const uint32_t tmp0   = uint32_not(_val);
 		const uint32_t tmp1   = uint32_dec(_val);
 		const uint32_t tmp2   = uint32_and(tmp0, tmp1);
@@ -645,6 +691,16 @@ namespace bx
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return 0 == _val ? 64 : __builtin_ctzll(_val);
 #else
+#	if BX_COMPILER_MSVC && BX_ARCH_64BIT
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index;
+			return 0 != _BitScanForward64(&index, (unsigned __int64)_val)
+				? uint8_t(index)
+				: uint8_t(64)
+				;
+		}
+#	endif // BX_COMPILER_MSVC && BX_ARCH_64BIT
 		return _val & UINT64_C(0xffffffff)
 			? countTrailingZeros<uint32_t>(uint32_t(_val) )
 			: countTrailingZeros<uint32_t>(uint32_t(_val>>32) ) + 32
