@@ -23,7 +23,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout bx
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: bkaradzic/bx
           path: bx
@@ -45,14 +45,14 @@ jobs:
       fail-fast: true
       matrix:
         include: [
-          { msystem: MINGW64, project: 'mingw-gcc', bindir: 'win64_mingw-gcc' },
-#          { msystem: CLANG64, project: 'mingw-clang', bindir: 'win64_mingw-clang' },
+          { msystem: MINGW64, project: 'mingw-gcc',   bindir: 'win64_mingw-gcc'   },
+          { msystem: CLANG64, project: 'mingw-clang', bindir: 'win64_mingw-clang' },
         ]
     name: mingw-${{ matrix.msystem }}
     runs-on: windows-2022
     steps:
       - name: Checkout bx
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: bkaradzic/bx
           path: bx
@@ -79,51 +79,84 @@ jobs:
       fail-fast: true
       matrix:
         include: [
-          { config: debug, binsuffix: Debug },
-          { config: release, binsuffix: Release },
+          { compiler: gcc,   genie: linux-gcc,   bindir: linux64_gcc,   config: debug,   binsuffix: Debug   },
+          { compiler: gcc,   genie: linux-gcc,   bindir: linux64_gcc,   config: release, binsuffix: Release },
+          { compiler: clang, genie: linux-clang, bindir: linux64_clang, config: debug,   binsuffix: Debug   },
+          { compiler: clang, genie: linux-clang, bindir: linux64_clang, config: release, binsuffix: Release },
         ]
-    name: linux-gcc-${{ matrix.config }}64
+    name: linux-${{ matrix.compiler }}-${{ matrix.config }}64
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout bx
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: bkaradzic/bx
           path: bx
       - name: Build
         run: |
           cd bx
-          tools/bin/linux/genie --gcc=linux-gcc gmake
-          make -R -C .build/projects/gmake-linux-gcc config=${{ matrix.config }}64 -j$(nproc)
+          tools/bin/linux/genie --gcc=${{ matrix.genie }} gmake
+          make -R -C .build/projects/gmake-${{ matrix.genie }} config=${{ matrix.config }}64 -j$(nproc)
       - name: Check
         run: |
           cd bx
-          ".build/linux64_gcc/bin/bx.test${{ matrix.binsuffix}}" -d yes
+          ".build/${{ matrix.bindir }}/bin/bx.test${{ matrix.binsuffix }}" -d yes
   osx:
     strategy:
       fail-fast: true
       matrix:
         include: [
-          { config: debug, binsuffix: Debug },
-          { config: release, binsuffix: Release },
+          { runs-on: macos-13, arch: osx-x64,   bindir: osx-x64,   config: debug,   binsuffix: Debug   },
+          { runs-on: macos-13, arch: osx-x64,   bindir: osx-x64,   config: release, binsuffix: Release },
+          { runs-on: macos-14, arch: osx-arm64, bindir: osx-arm64, config: debug,   binsuffix: Debug   },
+          { runs-on: macos-14, arch: osx-arm64, bindir: osx-arm64, config: release, binsuffix: Release },
         ]
-    name: osx-x64-${{ matrix.config }}
-    runs-on: macos-14
+    name: osx-${{ matrix.arch }}-${{ matrix.config }}
+    runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Checkout bx
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: bkaradzic/bx
           path: bx
       - name: Build
         run: |
           cd bx
-          tools/bin/darwin/genie --gcc=osx-x64 gmake
-          make -C .build/projects/gmake-osx-x64 config=${{ matrix.config }} -j$(sysctl -n hw.physicalcpu)
+          tools/bin/darwin/genie --gcc=${{ matrix.arch }} gmake
+          make -C .build/projects/gmake-${{ matrix.arch }} config=${{ matrix.config }} -j$(sysctl -n hw.physicalcpu)
       - name: Check
         run: |
           cd bx
-          ".build/osx-x64/bin/bx.test${{ matrix.binsuffix}}" -d yes
+          ".build/${{ matrix.bindir }}/bin/bx.test${{ matrix.binsuffix }}" -d yes
+  android:
+    strategy:
+      fail-fast: true
+      matrix:
+        include: [
+          { project: android-arm,   bindir: android-arm   },
+          { project: android-arm64, bindir: android-arm64 },
+        ]
+    name: ${{ matrix.project }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout bx
+        uses: actions/checkout@v6
+        with:
+          repository: bkaradzic/bx
+          path: bx
+      - uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r27c
+      - name: Build
+        env:
+          ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_NDK_ARM: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_NDK_ARM64: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          cd bx
+          tools/bin/linux/genie --gcc=${{ matrix.project }} gmake
+          make -R -C .build/projects/gmake-${{ matrix.project }} config=release -j$(nproc)
   emscripten:
     strategy:
       fail-fast: true
@@ -136,7 +169,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout bx
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: bkaradzic/bx
           path: bx
