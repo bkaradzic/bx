@@ -7,7 +7,6 @@
 #define BX_MATH_H_HEADER_GUARD
 
 #include "bx.h"
-#include "uint32_t.h"
 
 namespace bx
 {
@@ -594,6 +593,30 @@ namespace bx
 	/// @returns _a - _b.
 	///
 	BX_CONSTEXPR_FUNC float sub(float _a, float _b);
+
+	/// Saturating integer add. Clamps the result to the representable range
+	/// of `Ty` instead of wrapping around. Supports signed and unsigned
+	/// integer types.
+	///
+	/// @param[in] _a Left operand.
+	/// @param[in] _b Right operand.
+	///
+	/// @returns Sum clamped to `[LimitsT<Ty>::min, LimitsT<Ty>::max]`.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty satAdd(Ty _a, Ty _b);
+
+	/// Saturating integer subtract. Clamps the result to the representable
+	/// range of `Ty` instead of wrapping around. Supports signed and
+	/// unsigned integer types.
+	///
+	/// @param[in] _a Left operand.
+	/// @param[in] _b Right operand.
+	///
+	/// @returns Difference clamped to `[LimitsT<Ty>::min, LimitsT<Ty>::max]`.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty satSub(Ty _a, Ty _b);
 
 	/// Returns result of multiply (_a * _b).
 	///
@@ -1782,6 +1805,22 @@ namespace bx
 	/// @returns sRGB gamma value.
 	///
 	BX_CONSTEXPR_FUNC float toGamma(float _a);
+
+	/// Convert float to half-float.
+	///
+	/// @param[in] _a Float value.
+	///
+	/// @returns Half-float value.
+	///
+	BX_CONST_FUNC uint16_t halfFromFloat(float _a);
+
+	/// Convert half-float to float.
+	///
+	/// @param[in] _a Half-float value.
+	///
+	/// @returns Float value.
+	///
+	BX_CONST_FUNC float halfToFloat(uint16_t _a);
 
 } // namespace bx
 

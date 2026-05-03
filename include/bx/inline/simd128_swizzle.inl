@@ -3,9 +3,9 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#ifndef BX_SIMD_T_H_HEADER_GUARD
-#	error "xmacro file, must be included from simd_*.h"
-#endif // BX_FLOAT4_T_H_HEADER_GUARD
+#if !defined(BX_SIMD_T_H_HEADER_GUARD)
+#	error "xmacro file, must be included from simd_t.h"
+#endif // BX_SIMD_T_H_HEADER_GUARD
 
 // included from float4_t.h
 BX_SIMD128_IMPLEMENT_SWIZZLE(x, x, x, x)

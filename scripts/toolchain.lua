@@ -878,6 +878,10 @@ function toolchain(_buildDir, _libDir)
 			"-Wundef",
 		}
 
+		buildoptions {
+			"-msimd128",
+		}
+
 		linkoptions {
 			"-s MAX_WEBGL_VERSION=2",
 		}

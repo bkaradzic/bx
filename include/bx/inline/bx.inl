@@ -227,6 +227,9 @@ namespace bx
 		return __builtin_is_constant_evaluated();
 	}
 
+	BX_PRAGMA_DIAGNOSTIC_PUSH();
+	BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wpsabi");
+
 	template <typename Ty, typename FromT>
 	inline constexpr Ty bitCast(const FromT& _from)
 	{
@@ -245,6 +248,8 @@ namespace bx
 
 		return __builtin_bit_cast(Ty, _from);
 	}
+
+	BX_PRAGMA_DIAGNOSTIC_POP();
 
 	template<typename Ty, typename FromT>
 	requires (isInteger<   Ty>() || isFloatingPoint<   Ty>() )
@@ -321,5 +326,105 @@ namespace bx
 
 	constexpr float  kFloatInfinity  = bitCast<float>(kFloatExponentMask);
 	constexpr double kDoubleInfinity = bitCast<double>(kDoubleExponentMask);
+
+	inline BX_CONSTEXPR_FUNC uint32_t gcd(uint32_t _a, uint32_t _b)
+	{
+		do
+		{
+			const uint32_t tmp = _a % _b;
+			_a = _b;
+			_b = tmp;
+		}
+		while (_b);
+
+		return _a;
+	}
+
+	inline BX_CONSTEXPR_FUNC uint32_t lcm(uint32_t _a, uint32_t _b)
+	{
+		return _a * (_b / gcd(_a, _b) );
+	}
+
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
+	{
+		const uint32_t mod    = _offset % _stride;
+		const uint32_t add    = _stride - mod;
+		const uint32_t tmp    = (0 == mod) ? 0 : add;
+		const uint32_t result = _offset + tmp;
+
+		return result;
+	}
+
+	template<uint32_t Min>
+	inline BX_CONSTEXPR_FUNC uint32_t strideAlign(uint32_t _offset, uint32_t _stride)
+	{
+		const uint32_t align  = lcm(Min, _stride);
+		const uint32_t mod    = _offset % align;
+		const uint32_t tmp0   = (0 == mod) ? 0 : align;
+		const uint32_t tmp1   = _offset + tmp0;
+		const uint32_t result = tmp1 - mod;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC bool isAligned(Ty _a, size_t _align)
+	{
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return 0 == (size_t(_a) & mask);
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC bool isAligned(const void* _ptr, size_t _align)
+	{
+		const uintptr_t addr = bitCast<uintptr_t>(_ptr);
+		return isAligned(addr, _align);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty alignDown(Ty _a, size_t _align)
+	{
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return Ty(size_t(_a) & ~mask);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty* alignDown(Ty* _ptr, size_t _align)
+	{
+		uintptr_t addr = bitCast<uintptr_t>(_ptr);
+		addr = alignDown(addr, _align);
+		return bitCast<Ty*>(addr);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC const Ty* alignDown(const Ty* _ptr, size_t _align)
+	{
+		uintptr_t addr = bitCast<uintptr_t>(_ptr);
+		addr = alignDown(addr, _align);
+		return bitCast<const Ty*>(addr);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty alignUp(Ty _a, size_t _align)
+	{
+		const size_t mask = max<size_t>(1, _align) - 1;
+		return Ty( (size_t(_a) + mask) & ~mask);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty* alignUp(Ty* _ptr, size_t _align)
+	{
+		uintptr_t addr = bitCast<uintptr_t>(_ptr);
+		addr = alignUp(addr, _align);
+		return bitCast<Ty*>(addr);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, size_t _align)
+	{
+		uintptr_t addr = bitCast<uintptr_t>(_ptr);
+		addr = alignUp(addr, _align);
+		return bitCast<const Ty*>(addr);
+	}
 
 } // namespace bx

@@ -156,7 +156,7 @@ namespace bx
 		char temp[4096];
 		while (0 != size)
 		{
-			uint32_t len = uint32_min(sizeof(temp)-1, size);
+			uint32_t len = uint32_t(min(sizeof(temp)-1, size) );
 			memCopy(temp, data, len);
 			temp[len] = '\0';
 			data += len;

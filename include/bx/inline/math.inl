@@ -10,7 +10,6 @@
 #endif // BX_MATH_H_HEADER_GUARD
 
 #include <bx/simd_t.h>
-#include <bx/uint32_t.h>
 
 #if BX_COMPILER_MSVC
 extern "C" unsigned char _BitScanReverse(unsigned long* _Index, unsigned long _Mask);
@@ -65,11 +64,14 @@ namespace bx
 		// Reference(s):
 		// - http://archive.fo/2012.12.08-212402/http://stereopsis.com/radix.html
 		//
-		const uint32_t tmp0   = uint32_sra(_value, 31);
-		const uint32_t tmp1   = uint32_neg(tmp0);
-		const uint32_t mask   = uint32_or(tmp1, kFloatSignMask);
-		const uint32_t result = uint32_xor(_value, mask);
-		return result;
+		const simd32_t signMask = simd32_splat(kFloatSignMask);
+		const simd32_t value    = simd32_splat(_value);
+		const simd32_t tmp0     = simd32_x32_sra(value, 31);
+		const simd32_t tmp1     = simd32_i32_neg(tmp0);
+		const simd32_t mask     = simd32_or(tmp1, signMask);
+		const simd32_t result   = simd32_xor(value, mask);
+
+		return result.u32;
 	}
 
 	inline BX_CONSTEXPR_FUNC bool isNan(float _f)
@@ -197,6 +199,51 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC float sub(float _a, float _b)
 	{
 		return _a - _b;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty satAdd(Ty _a, Ty _b)
+	{
+		static_assert(isInteger<Ty>(), "Type Ty must be an integer type.");
+
+		using UTy = MakeUnsignedType<Ty>;
+
+		const UTy ua  = UTy(_a);
+		const UTy ub  = UTy(_b);
+		const UTy sum = UTy(ua + ub);
+
+		if constexpr (isSigned<Ty>() )
+		{
+			const UTy signBit  = UTy(UTy(1) << (sizeof(Ty)*8 - 1) );
+			const UTy overflow = UTy(~(ua ^ ub) & (ua ^ sum) & signBit);
+			const Ty  satVal   = (ua & signBit) ? LimitsT<Ty>::min : LimitsT<Ty>::max;
+			return 0 != overflow ? satVal : Ty(sum);
+		}
+
+		return sum < ua ? LimitsT<Ty>::max : Ty(sum);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty satSub(Ty _a, Ty _b)
+	{
+		static_assert(isInteger<Ty>(), "Type Ty must be an integer type.");
+
+		using UTy = MakeUnsignedType<Ty>;
+
+		const UTy ua   = UTy(_a);
+		const UTy ub   = UTy(_b);
+		const UTy diff = UTy(ua - ub);
+
+		if constexpr (isSigned<Ty>() )
+		{
+			const UTy signBit  = UTy(UTy(1) << (sizeof(Ty)*8 - 1) );
+			const UTy overflow = UTy( (ua ^ ub) & (ua ^ diff) & signBit);
+			const Ty  satVal   = (ua & signBit) ? LimitsT<Ty>::min : LimitsT<Ty>::max;
+
+			return 0 != overflow ? satVal : Ty(diff);
+		}
+
+		return ua > ub ? Ty(diff) : Ty(0);
 	}
 
 	inline BX_CONSTEXPR_FUNC float mul(float _a, float _b)
@@ -394,16 +441,18 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
 	{
-		const uint32_t ftob     = floatToBits(_a);
-		const uint32_t masked   = uint32_and(ftob, kFloatSignMask | kFloatExponentMask);
-		const uint32_t expsign0 = uint32_sra(masked, kFloatExponentBitShift);
-		const uint32_t tmp      = uint32_iadd(expsign0, _b);
-		const uint32_t expsign1 = uint32_sll(tmp, kFloatExponentBitShift);
-		const uint32_t mantissa = uint32_and(ftob, kFloatMantissaMask);
-		const uint32_t bits     = uint32_or(mantissa, expsign1);
-		const float    result   = bitsToFloat(bits);
+		const simd32_t ftob        = simd32_splat(floatToBits(_a));
+		const simd32_t signexpmask = simd32_splat(kFloatSignMask | kFloatExponentMask);
+		const simd32_t mantmask    = simd32_splat(kFloatMantissaMask);
+		const simd32_t b           = simd32_splat(_b);
+		const simd32_t masked      = simd32_and(ftob, signexpmask);
+		const simd32_t expsign0    = simd32_x32_sra(masked, kFloatExponentBitShift);
+		const simd32_t tmp         = simd32_i32_add(expsign0, b);
+		const simd32_t expsign1    = simd32_x32_sll(tmp, kFloatExponentBitShift);
+		const simd32_t mantissa    = simd32_and(ftob, mantmask);
+		const simd32_t bits        = simd32_or(mantissa, expsign1);
 
-		return result;
+		return bitsToFloat(bits.u32);
 	}
 
 	inline BX_CONSTEXPR_FUNC float log(float _a)
@@ -418,15 +467,19 @@ namespace bx
 			return -kFloatInfinity;
 		}
 
-		const uint32_t ftob     = floatToBits(_a);
+		const simd32_t ftob         = simd32_splat(floatToBits(_a));
+		const simd32_t expmask      = simd32_splat(kFloatExponentMask);
+		const simd32_t signmantmask = simd32_splat(kFloatSignMask | kFloatMantissaMask);
+		const simd32_t half         = simd32_splat(UINT32_C(0x3f000000));
 
-		const uint32_t masked0  = uint32_and(ftob, kFloatExponentMask);
-		const uint32_t exp0     = uint32_srl(masked0, kFloatExponentBitShift);
-		int32_t exp = int32_t(exp0 - 0x7e);
+		const simd32_t masked0  = simd32_and(ftob, expmask);
+		const simd32_t exp0     = simd32_x32_srl(masked0, kFloatExponentBitShift);
 
-		const uint32_t masked1  = uint32_and(ftob,   kFloatSignMask | kFloatMantissaMask);
-		const uint32_t bits     = uint32_or(masked1, UINT32_C(0x3f000000) );
-		float ff = bitsToFloat(bits);
+		int32_t exp = int32_t(exp0.u32) - 0x7e;
+
+		const simd32_t masked1  = simd32_and(ftob, signmantmask);
+		const simd32_t bits     = simd32_or(masked1, half);
+		float ff = bitsToFloat(bits.u32);
 
 		if (ff < kSqrt2*0.5f)
 		{
@@ -434,13 +487,13 @@ namespace bx
 			--exp;
 		}
 
-		constexpr float kLogC0 = 6.666666666666735130e-01f;
-		constexpr float kLogC1 = 3.999999999940941908e-01f;
-		constexpr float kLogC2 = 2.857142874366239149e-01f;
-		constexpr float kLogC3 = 2.222219843214978396e-01f;
-		constexpr float kLogC4 = 1.818357216161805012e-01f;
-		constexpr float kLogC5 = 1.531383769920937332e-01f;
-		constexpr float kLogC6 = 1.479819860511658591e-01f;
+		constexpr float kLogC0     = 6.666666666666735130e-01f;
+		constexpr float kLogC1     = 3.999999999940941908e-01f;
+		constexpr float kLogC2     = 2.857142874366239149e-01f;
+		constexpr float kLogC3     = 2.222219843214978396e-01f;
+		constexpr float kLogC4     = 1.818357216161805012e-01f;
+		constexpr float kLogC5     = 1.531383769920937332e-01f;
+		constexpr float kLogC6     = 1.479819860511658591e-01f;
 		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
 
 		ff -= 1.0f;
@@ -541,23 +594,23 @@ namespace bx
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcount(_val);
 #else
-		const uint32_t tmp0   = uint32_srl(_val, 1);
-		const uint32_t tmp1   = uint32_and(tmp0, 0x55555555);
-		const uint32_t tmp2   = uint32_sub(_val, tmp1);
-		const uint32_t tmp3   = uint32_and(tmp2, 0xc30c30c3);
-		const uint32_t tmp4   = uint32_srl(tmp2, 2);
-		const uint32_t tmp5   = uint32_and(tmp4, 0xc30c30c3);
-		const uint32_t tmp6   = uint32_srl(tmp2, 4);
-		const uint32_t tmp7   = uint32_and(tmp6, 0xc30c30c3);
-		const uint32_t tmp8   = uint32_add(tmp3, tmp5);
-		const uint32_t tmp9   = uint32_add(tmp7, tmp8);
-		const uint32_t tmpA   = uint32_srl(tmp9, 6);
-		const uint32_t tmpB   = uint32_add(tmp9, tmpA);
-		const uint32_t tmpC   = uint32_srl(tmpB, 12);
-		const uint32_t tmpD   = uint32_srl(tmpB, 24);
-		const uint32_t tmpE   = uint32_add(tmpB, tmpC);
-		const uint32_t tmpF   = uint32_add(tmpD, tmpE);
-		const uint32_t result = uint32_and(tmpF, 0x3f);
+		const uint32_t tmp0   = (_val >> 1);
+		const uint32_t tmp1   = (tmp0 & 0x55555555);
+		const uint32_t tmp2   = (_val - tmp1);
+		const uint32_t tmp3   = (tmp2 & 0xc30c30c3);
+		const uint32_t tmp4   = (tmp2 >> 2);
+		const uint32_t tmp5   = (tmp4 & 0xc30c30c3);
+		const uint32_t tmp6   = (tmp2 >> 4);
+		const uint32_t tmp7   = (tmp6 & 0xc30c30c3);
+		const uint32_t tmp8   = (tmp3 + tmp5);
+		const uint32_t tmp9   = (tmp7 + tmp8);
+		const uint32_t tmpA   = (tmp9 >> 6);
+		const uint32_t tmpB   = (tmp9 + tmpA);
+		const uint32_t tmpC   = (tmpB >> 12);
+		const uint32_t tmpD   = (tmpB >> 24);
+		const uint32_t tmpE   = (tmpB + tmpC);
+		const uint32_t tmpF   = (tmpD + tmpE);
+		const uint32_t result = (tmpF & 0x3f);
 
 		return uint8_t(result);
 #endif // BX_COMPILER_*
@@ -607,20 +660,21 @@ namespace bx
 				;
 		}
 #	endif // BX_COMPILER_MSVC
-		const uint32_t tmp0   = uint32_srl(_val, 1);
-		const uint32_t tmp1   = uint32_or(tmp0, _val);
-		const uint32_t tmp2   = uint32_srl(tmp1, 2);
-		const uint32_t tmp3   = uint32_or(tmp2, tmp1);
-		const uint32_t tmp4   = uint32_srl(tmp3, 4);
-		const uint32_t tmp5   = uint32_or(tmp4, tmp3);
-		const uint32_t tmp6   = uint32_srl(tmp5, 8);
-		const uint32_t tmp7   = uint32_or(tmp6, tmp5);
-		const uint32_t tmp8   = uint32_srl(tmp7, 16);
-		const uint32_t tmp9   = uint32_or(tmp8, tmp7);
-		const uint32_t tmpA   = uint32_not(tmp9);
-		const uint32_t result = uint32_cntbits(tmpA);
+		const simd32_t val    = simd32_splat(_val);
+		const simd32_t tmp0   = simd32_x32_srl(val, 1);
+		const simd32_t tmp1   = simd32_or(tmp0, val);
+		const simd32_t tmp2   = simd32_x32_srl(tmp1, 2);
+		const simd32_t tmp3   = simd32_or(tmp2, tmp1);
+		const simd32_t tmp4   = simd32_x32_srl(tmp3, 4);
+		const simd32_t tmp5   = simd32_or(tmp4, tmp3);
+		const simd32_t tmp6   = simd32_x32_srl(tmp5, 8);
+		const simd32_t tmp7   = simd32_or(tmp6, tmp5);
+		const simd32_t tmp8   = simd32_x32_srl(tmp7, 16);
+		const simd32_t tmp9   = simd32_or(tmp8, tmp7);
+		const simd32_t tmpA   = simd32_not(tmp9);
+		const simd32_t result = simd32_x32_cntbits(tmpA);
 
-		return uint8_t(result);
+		return uint8_t(result.u32);
 #endif // BX_COMPILER_*
 	}
 
@@ -676,12 +730,14 @@ namespace bx
 				;
 		}
 #	endif // BX_COMPILER_MSVC
-		const uint32_t tmp0   = uint32_not(_val);
-		const uint32_t tmp1   = uint32_dec(_val);
-		const uint32_t tmp2   = uint32_and(tmp0, tmp1);
-		const uint32_t result = uint32_cntbits(tmp2);
+		const simd32_t val    = simd32_splat(_val);
+		const simd32_t one    = simd32_splat(1);
+		const simd32_t tmp0   = simd32_not(val);
+		const simd32_t tmp1   = simd32_u32_sub(val, one);
+		const simd32_t tmp2   = simd32_and(tmp0, tmp1);
+		const simd32_t result = simd32_x32_cntbits(tmp2);
 
-		return uint8_t(result);
+		return uint8_t(result.u32);
 #endif // BX_COMPILER_*
 	}
 
@@ -778,15 +834,11 @@ namespace bx
 			return kFloatInfinity;
 		}
 
-		const simd128_t aa = simd_splat(_a);
-#if BX_SIMD_NEON
-		const simd128_t rsqrta = simd_rsqrt_nr(aa);
-#else
-		const simd128_t rsqrta = simd_rsqrt_ni(aa);
-#endif // BX_SIMD_NEON
+		const simd128_t aa     = simd_splat<simd128_t>(_a);
+		const simd128_t rsqrta = simd_f32_rsqrt<simd128_t>(aa);
 
 		float result = 0.0f;
-		simd_stx(&result, rsqrta);
+		simd_x32_st1<simd128_t>(&result, rsqrta);
 
 		return result;
 	}
@@ -812,11 +864,11 @@ namespace bx
 			return 0.0f;
 		}
 
-		const simd128_t aa   = simd_splat(_a);
-		const simd128_t sqrt = simd_sqrt(aa);
+		const simd128_t aa   = simd_splat<simd128_t>(_a);
+		const simd128_t sqrt = simd_f32_sqrt<simd128_t>(aa);
 
 		float result = 0.0f;
-		simd_stx(&result, sqrt);
+		simd_x32_st1<simd128_t>(&result, sqrt);
 
 		return result;
 	}
@@ -1912,6 +1964,20 @@ namespace bx
 		const float hi     = pow(abs(_a), 1.0f/2.4f) * 1.055f - 0.055f;
 		const float result = lerp(hi, lo, _a <= 0.0031308f);
 		return result;
+	}
+
+	inline BX_CONST_FUNC uint16_t halfFromFloat(float _a)
+	{
+		const simd32_t a      = { .u32 = bitCast<uint32_t>(_a) };
+		const simd32_t result = simd_f16_fromf32_ni(a);
+		return uint16_t(result.u32);
+	}
+
+	inline BX_CONST_FUNC float halfToFloat(uint16_t _a)
+	{
+		const simd32_t a      = simd32_splat(uint32_t(_a) );
+		const simd32_t result = simd_f16_tof32_ni(a);
+		return bitCast<float>(result.u32);
 	}
 
 } // namespace bx

@@ -17,10 +17,10 @@ namespace bx
 	};
 
 	/// Multiplies vector `_a` with matrix `_b` ignoring W component of vector `_a`.
-	simd128_t simd_mul_xyz1(simd128_t _a, const float4x4_t* _b);
+	simd128_t simd128_mul_xyz1(simd128_t _a, const float4x4_t* _b);
 
 	/// Multiplies vector `_a` with matrix `_b`.
-	simd128_t simd_mul(simd128_t _a, const float4x4_t* _b);
+	simd128_t simd128_mul(simd128_t _a, const float4x4_t* _b);
 
 	/// Multiplies two matrices.
 	void float4x4_mul(float4x4_t* _result, const float4x4_t* _a, const float4x4_t* _b);

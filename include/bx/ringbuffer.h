@@ -8,7 +8,7 @@
 
 #include "bx.h"
 #include "cpu.h"
-#include "uint32_t.h"
+#include "simd_t.h"
 
 namespace bx
 {
