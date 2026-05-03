@@ -30,6 +30,10 @@ TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
 		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
 		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
+#elif BX_PLATFORM_ANDROID
+		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
+		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
+		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
 #elif !BX_CRT_MINGW
 		REQUIRE(::isnanf(u.f)  == bx::isNan(u.f) );
 		REQUIRE(::finitef(u.f) == bx::isFinite(u.f) );
@@ -979,8 +983,8 @@ TEST_CASE("limits", "[math]")
 	STATIC_REQUIRE(bx::LimitsT<int8_t>::min == INT8_MIN);
 	STATIC_REQUIRE(bx::LimitsT<int8_t>::max == INT8_MAX);
 
-	STATIC_REQUIRE(bx::LimitsT<signed char>::min == CHAR_MIN);
-	STATIC_REQUIRE(bx::LimitsT<signed char>::max == CHAR_MAX);
+	STATIC_REQUIRE(bx::LimitsT<signed char>::min == SCHAR_MIN);
+	STATIC_REQUIRE(bx::LimitsT<signed char>::max == SCHAR_MAX);
 
 	STATIC_REQUIRE(bx::LimitsT<unsigned char>::min == 0);
 	STATIC_REQUIRE(bx::LimitsT<unsigned char>::max == UCHAR_MAX);
