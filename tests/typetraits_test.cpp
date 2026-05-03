@@ -247,7 +247,11 @@ TEST_CASE("type-traits isVolatile", "")
 TEST_CASE("type-traits isSigned", "")
 {
 	STATIC_REQUIRE(!bx::isSigned<bool                   >() );
+#if CHAR_MIN < 0
 	STATIC_REQUIRE( bx::isSigned<char                   >() );
+#else
+	STATIC_REQUIRE(!bx::isSigned<char                   >() );
+#endif // CHAR_MIN < 0
 	STATIC_REQUIRE( bx::isSigned<signed char            >() );
 	STATIC_REQUIRE(!bx::isSigned<unsigned char          >() );
 	STATIC_REQUIRE( bx::isSigned<short                  >() );
@@ -283,7 +287,11 @@ TEST_CASE("type-traits isSigned", "")
 TEST_CASE("type-traits isUnsigned", "")
 {
 	STATIC_REQUIRE( bx::isUnsigned<bool                   >() );
+#if CHAR_MIN < 0
 	STATIC_REQUIRE(!bx::isUnsigned<char                   >() );
+#else
+	STATIC_REQUIRE( bx::isUnsigned<char                   >() );
+#endif // CHAR_MIN < 0
 	STATIC_REQUIRE(!bx::isUnsigned<signed char            >() );
 	STATIC_REQUIRE( bx::isUnsigned<unsigned char          >() );
 	STATIC_REQUIRE(!bx::isUnsigned<short                  >() );
