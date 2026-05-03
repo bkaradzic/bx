@@ -287,8 +287,13 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_splat(double _a)
 	{
+#if BX_ARCH_64BIT
 		const float64x2_t tmp = vdupq_n_f64(_a);
 		return vreinterpretq_f32_f64(tmp);
+#else
+		const float val = float(_a);
+		return vdupq_n_f32(val);
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -393,6 +398,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_rsqrt_est(simd128_neon_t _a)
+	{
+		return vrsqrteq_f32(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_sqrt(simd128_neon_t _a)
 	{
 #if BX_ARCH_64BIT
@@ -400,13 +411,7 @@ namespace bx
 #else
 		const simd128_neon_t rsqrt = simd128_f32_rsqrt_est<simd128_neon_t>(_a);
 		return simd128_f32_mul<simd128_neon_t>(_a, rsqrt);
-#endif
-	}
-
-	template<>
-	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_rsqrt_est(simd128_neon_t _a)
-	{
-		return vrsqrteq_f32(_a);
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -842,19 +847,27 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_x8_shuffle(simd128_neon_t _a, simd128_neon_t _indices)
 	{
+#if BX_ARCH_64BIT
 		const uint8x16_t a       = vreinterpretq_u8_f32(_a);
 		const uint8x16_t indices = vreinterpretq_u8_f32(_indices);
 		const uint8x16_t result  = vqtbl1q_u8(a, indices);
 		return vreinterpretq_f32_u8(result);
+#else
+		return simd_x8_shuffle_ni(_a, _indices);
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_x8_shuffle(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _indices)
 	{
+#if BX_ARCH_64BIT
 		const uint8x16x2_t tbl     = { { vreinterpretq_u8_f32(_a), vreinterpretq_u8_f32(_b) } };
 		const uint8x16_t   indices = vreinterpretq_u8_f32(_indices);
 		const uint8x16_t   result  = vqtbl2q_u8(tbl, indices);
 		return vreinterpretq_f32_u8(result);
+#else
+		return simd_x8_shuffle_ni(_a, _b, _indices);
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
