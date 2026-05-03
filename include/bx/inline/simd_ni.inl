@@ -58,10 +58,9 @@ namespace bx
 	BX_SIMD_INLINE int simd_x32_signbitsmask_ni(Ty _a)
 	{
 		const Ty tmp0   = simd_x32_srl(_a, 31);
-		const Ty tmp1   = simd_f32_ftoi_trunc(tmp0);
 
 		int32_t  lane[4];
-		simd_st(&lane, tmp1);
+		simd_st(&lane, tmp0);
 
 		return (lane[0] & 1) | ((lane[1] & 1) << 1) | ((lane[2] & 1) << 2) | ((lane[3] & 1) << 3);
 	}
@@ -718,10 +717,9 @@ namespace bx
 		const Ty tmp2   = simd_or(tmp0, tmp1);
 		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp0);
 		const Ty tmp4   = simd_or(tmp2, tmp3);
-		const Ty itmp   = simd_f32_ftoi_trunc(tmp4);
 
 		int32_t  ii;
-		simd128_x32_st1(&ii, itmp);
+		simd128_x32_st1(&ii, tmp4);
 
 		return 0 != ii;
 	}
@@ -734,10 +732,9 @@ namespace bx
 		const Ty tmp2   = simd_and(tmp0, tmp1);
 		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp0);
 		const Ty tmp4   = simd_and(tmp2, tmp3);
-		const Ty itmp   = simd_f32_ftoi_trunc(tmp4);
 
 		int32_t  ii;
-		simd128_x32_st1(&ii, itmp);
+		simd128_x32_st1(&ii, tmp4);
 
 		return 0 != ii;
 	}
