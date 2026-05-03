@@ -1327,7 +1327,7 @@ namespace bx
 	{
 		double a[2], r[2];
 		vst1q_f32((float*)a, _a);
-		r[0] = (double)sqrt((float)a[0]); r[1] = (double)sqrt((float)a[1]);
+		r[0] = __builtin_sqrt(a[0]); r[1] = __builtin_sqrt(a[1]);
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1342,7 +1342,7 @@ namespace bx
 	{
 		double a[2], r[2];
 		vst1q_f32((float*)a, _a);
-		r[0] = (double)round((float)a[0]); r[1] = (double)round((float)a[1]);
+		r[0] = __builtin_round(a[0]); r[1] = __builtin_round(a[1]);
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1351,7 +1351,7 @@ namespace bx
 	{
 		double a[2], r[2];
 		vst1q_f32((float*)a, _a);
-		r[0] = (double)ceil((float)a[0]); r[1] = (double)ceil((float)a[1]);
+		r[0] = __builtin_ceil(a[0]); r[1] = __builtin_ceil(a[1]);
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1360,7 +1360,7 @@ namespace bx
 	{
 		double a[2], r[2];
 		vst1q_f32((float*)a, _a);
-		r[0] = (double)floor((float)a[0]); r[1] = (double)floor((float)a[1]);
+		r[0] = __builtin_floor(a[0]); r[1] = __builtin_floor(a[1]);
 		return vld1q_f32((const float*)r);
 	}
 
