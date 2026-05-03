@@ -258,7 +258,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_madd(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_madd(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
@@ -274,7 +274,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_msub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_msub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
@@ -290,7 +290,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_nmsub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_nmsub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
@@ -306,7 +306,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_neg(simd256_ref_t _a)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_neg(simd256_ref_t _a)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
@@ -351,7 +351,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_lerp(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _s)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_lerp(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _s)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a       = bitCast<simd256_f32_langext_t>(_a);
@@ -450,7 +450,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_cmpneq(simd256_ref_t _a, simd256_ref_t _b)
+	inline BX_CONST_FUNC simd256_ref_t simd256_f32_cmpneq(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
@@ -532,7 +532,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i32_neg(simd256_ref_t _a)
+	inline BX_CONST_FUNC simd256_ref_t simd256_i32_neg(simd256_ref_t _a)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_i32_langext_t a      = bitCast<simd256_i32_langext_t>(_a);
@@ -813,7 +813,7 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_andc(simd256_ref_t _a, simd256_ref_t _b)
+	inline BX_CONST_FUNC simd256_ref_t simd256_andc(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD_LANGEXT
 		const simd256_u32_langext_t a      = bitCast<simd256_u32_langext_t>(_a);
