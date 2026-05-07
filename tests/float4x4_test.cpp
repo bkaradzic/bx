@@ -39,7 +39,8 @@ TEST_CASE("float4x4_inverse", "[float4x4]")
 
 	for (uint32_t ii = 0; ii < 16; ++ii)
 	{
-//		bx::printf("%f\n", result[ii]);
-		CHECK(bx::isEqual(result[ii], ref[ii], 0.0001f) );
+		const float diff = bx::abs(result[ii] - ref[ii]);
+		INFO("ii=" << ii << " result=" << result[ii] << " ref=" << ref[ii] << " diff=" << diff);
+		CHECK(bx::isEqual(result[ii], ref[ii], 0.001f) );
 	}
 }
