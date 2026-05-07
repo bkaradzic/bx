@@ -41,6 +41,6 @@ TEST_CASE("float4x4_inverse", "[float4x4]")
 	{
 		const float diff = bx::abs(result[ii] - ref[ii]);
 		INFO("ii=" << ii << " result=" << result[ii] << " ref=" << ref[ii] << " diff=" << diff);
-		CHECK(bx::isEqual(result[ii], ref[ii], 0.001f) );
+		CHECK(bx::isEqual(result[ii], ref[ii], 0.0001f) );
 	}
 }

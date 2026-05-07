@@ -419,8 +419,8 @@ namespace bx
 		const Ty xyzw   = simd_f32_mul(_a, _b);
 		const Ty zwxy   = simd128_x32_swiz_zwxy(xyzw);
 		const Ty tmp0   = simd_f32_add(xyzw, zwxy);
-		const Ty yyyy   = simd128_x32_swiz_yyyy(tmp0);
-		const Ty result = simd_f32_add(tmp0, yyyy);
+		const Ty yxwz   = simd128_x32_swiz_yxwz(tmp0);
+		const Ty result = simd_f32_add(tmp0, yxwz);
 
 		return result;
 	}
