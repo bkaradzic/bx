@@ -841,7 +841,9 @@ TEST_CASE("simd128_f32_dot3", "[simd]")
 	const simd128_t b = simd128_ld<simd128_t>(4.0f, 5.0f, 6.0f, 0.0f);
 	// 1*4 + 2*5 + 3*6 = 32
 	const simd128_t d = simd128_f32_dot3(a, b);
-	REQUIRE(simd128_f32_x(d) == Catch::Approx(32.0f));
+	REQUIRE(simd128_f32_x(d) == Catch::Approx(32.0f) );
+	REQUIRE(simd128_f32_y(d) == Catch::Approx(32.0f) );
+	REQUIRE(simd128_f32_z(d) == Catch::Approx(32.0f) );
 }
 
 TEST_CASE("simd128_f32_dot", "[simd]")
@@ -850,7 +852,10 @@ TEST_CASE("simd128_f32_dot", "[simd]")
 	const simd128_t b = simd128_ld<simd128_t>(5.0f, 6.0f, 7.0f, 8.0f);
 	// 1*5 + 2*6 + 3*7 + 4*8 = 70
 	const simd128_t d = simd128_f32_dot(a, b);
-	REQUIRE(simd128_f32_x(d) == Catch::Approx(70.0f));
+	REQUIRE(simd128_f32_x(d) == Catch::Approx(70.0f) );
+	REQUIRE(simd128_f32_y(d) == Catch::Approx(70.0f) );
+	REQUIRE(simd128_f32_z(d) == Catch::Approx(70.0f) );
+	REQUIRE(simd128_f32_w(d) == Catch::Approx(70.0f) );
 }
 
 TEST_CASE("simd128_f32_cross3", "[simd]")
