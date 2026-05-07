@@ -824,11 +824,22 @@ TEST_CASE("simd128_test_any_all", "[simd]")
 	const simd128_t all_set  = simd128_ld<simd128_t>(0x80000000u, 0x80000000u, 0x80000000u, 0x80000000u);
 	const simd128_t none_set = simd128_zero<simd128_t>();
 	const simd128_t x_set    = simd128_ld<simd128_t>(0x80000000u, 0u, 0u, 0u);
+	const simd128_t y_set    = simd128_ld<simd128_t>(0u, 0x80000000u, 0u, 0u);
+	const simd128_t z_set    = simd128_ld<simd128_t>(0u, 0u, 0x80000000u, 0u);
+	const simd128_t w_set    = simd128_ld<simd128_t>(0u, 0u, 0u, 0x80000000u);
 
 	REQUIRE( simd128_test_any_xyzw(all_set));
 	REQUIRE( simd128_test_all_xyzw(all_set));
 	REQUIRE(!simd128_test_any_xyzw(none_set));
 	REQUIRE(!simd128_test_all_xyzw(none_set));
+	REQUIRE( simd128_test_any_xyzw(x_set));
+	REQUIRE( simd128_test_any_xyzw(y_set));
+	REQUIRE( simd128_test_any_xyzw(z_set));
+	REQUIRE( simd128_test_any_xyzw(w_set));
+	REQUIRE(!simd128_test_all_xyzw(x_set));
+	REQUIRE(!simd128_test_all_xyzw(y_set));
+	REQUIRE(!simd128_test_all_xyzw(z_set));
+	REQUIRE(!simd128_test_all_xyzw(w_set));
 	REQUIRE( simd128_test_any_x(x_set));
 	REQUIRE(!simd128_test_any_y(x_set));
 	REQUIRE( simd128_test_all_x(x_set));

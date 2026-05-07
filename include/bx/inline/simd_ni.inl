@@ -715,7 +715,7 @@ namespace bx
 		const Ty tmp0   = simd_x32_srl(_a, 31);
 		const Ty tmp1   = simd128_x32_swiz_yzwx(tmp0);
 		const Ty tmp2   = simd_or(tmp0, tmp1);
-		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp0);
+		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp2);
 		const Ty tmp4   = simd_or(tmp2, tmp3);
 
 		int32_t  ii;
@@ -730,7 +730,7 @@ namespace bx
 		const Ty tmp0   = simd_x32_srl(_a, 31);
 		const Ty tmp1   = simd128_x32_swiz_yzwx(tmp0);
 		const Ty tmp2   = simd_and(tmp0, tmp1);
-		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp0);
+		const Ty tmp3   = simd128_x32_swiz_zwxy(tmp2);
 		const Ty tmp4   = simd_and(tmp2, tmp3);
 
 		int32_t  ii;
