@@ -65,6 +65,12 @@
 #	include <signal.h>
 #endif // BX_CONFIG_EXCEPTION_HANDLING_*
 
+#if BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH && BX_CRT_MSVC
+#	include <stdlib.h> // _set_abort_behavior, _set_invalid_parameter_handler, _set_purecall_handler
+#	include <crtdbg.h> // _CrtSetReportMode, _CrtSetReportHook
+extern "C" __declspec(dllimport) unsigned int __stdcall SetErrorMode(unsigned int uMode);
+#endif // BX_CONFIG_EXCEPTION_HANDLING_USE_WINDOWS_SEH && BX_CRT_MSVC
+
 #if BX_CRT_NONE
 #	include <bx/crt0.h>
 #elif BX_PLATFORM_ANDROID
@@ -1304,6 +1310,96 @@ namespace bx
 	typedef uint32_t (__stdcall* TopLevelExceptionFilterFn)(ExceptionPointers* _exceptionInfo);
 	typedef TopLevelExceptionFilterFn (__stdcall* SetUnhandledExceptionFilterFn)(TopLevelExceptionFilterFn _topLevelExceptionFilter);
 
+#if BX_CRT_MSVC
+	template<uint16_t MaxCapacityT>
+	static void wcharToNarrow(FixedStringT<MaxCapacityT>& _dst, const wchar_t* _src)
+	{
+		if (NULL == _src)
+		{
+			_dst.set("<unknown>");
+			return;
+		}
+
+		typename FixedStringT<MaxCapacityT>::Pod& pod = _dst.asPod();
+		const uint32_t last = MaxCapacityT - 1;
+		uint32_t ii = 0;
+		for (; ii < last && _src[ii] != L'\0'; ++ii)
+		{
+			const wchar_t wc = _src[ii];
+			pod.storage[ii] = (wc >= 0x20 && wc < 0x7f) ? char(wc) : '?';
+		}
+		pod.storage[ii] = '\0';
+		pod.len = int32_t(ii);
+	}
+
+	static void invalidParameterHandler(const wchar_t* _expression, const wchar_t* _function, const wchar_t* _file, unsigned int _line, uintptr_t /*_reserved*/)
+	{
+		FixedString256 expression;
+		FixedString256 function;
+		FixedString1024 file;
+		wcharToNarrow(expression, _expression);
+		wcharToNarrow(function,   _function);
+		wcharToNarrow(file,       _file);
+
+		const StringView svExpression = expression;
+		const StringView svFunction   = function;
+		const StringView svFile       = file;
+
+		if (assertFunction(
+			  Location("MSVC CRT Debug Error", UINT32_MAX)
+			, 3
+			, "CRT Invalid parameter: %S (%S:%u) %S"
+			, &svFunction
+			, &svFile
+			, _line
+			, &svExpression
+			) )
+		{
+			exit(kExitFailure, false);
+		}
+	}
+
+	static void pureCallHandler()
+	{
+		if (assertFunction(Location("Exception Handler", UINT32_MAX), 1, "CRT Pure virtual function call.") )
+		{
+			exit(kExitFailure, false);
+		}
+	}
+
+#	if BX_CONFIG_DEBUG
+	static int __cdecl crtReportHook(int _reportType, char* _message, int* _returnValue)
+	{
+		const char* type = "Report";
+		switch (_reportType)
+		{
+		case 0 /*_CRT_WARN  */: type = "Warning"; break;
+		case 1 /*_CRT_ERROR */: type = "Error";   break;
+		case 2 /*_CRT_ASSERT*/: type = "Assert";  break;
+		default: break;
+		}
+
+		if (assertFunction(
+			  Location("MSVC CRT Debug Error", UINT32_MAX)
+			, 3
+			, "CRT %s: %s"
+			, type
+			, NULL != _message ? _message : "<unknown>"
+			) )
+		{
+			exit(kExitFailure, false);
+		}
+
+		if (NULL != _returnValue)
+		{
+			*_returnValue = 0;
+		}
+
+		return 1 /* TRUE: report handled, suppress dialog */;
+	}
+#	endif // BX_CONFIG_DEBUG
+#endif // BX_CRT_MSVC
+
 	struct ExceptionHandler
 	{
 		ExceptionHandler()
@@ -1322,6 +1418,30 @@ namespace bx
 
 				bx::dlclose(kernel32Dll);
 			}
+
+#if BX_CRT_MSVC
+			// Suppress Windows error mode dialogs ("application has stopped working").
+			SetErrorMode(0
+				| 0x0001 /* SEM_FAILCRITICALERRORS */
+				| 0x0002 /* SEM_NOGPFAULTERRORBOX  */
+				);
+
+			// Suppress the "abort() has been called" message box and Windows Error Reporting.
+			_set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+
+			// Route CRT invalid parameter and pure virtual call into bx assert handler.
+			_set_invalid_parameter_handler(invalidParameterHandler);
+			_set_thread_local_invalid_parameter_handler(invalidParameterHandler);
+			_set_purecall_handler(pureCallHandler);
+
+#	if BX_CONFIG_DEBUG
+			// Route _CrtDbgReport "Debug Error!" dialogs through bx assert handler.
+			_CrtSetReportMode(_CRT_WARN,   _CRTDBG_MODE_DEBUG);
+			_CrtSetReportMode(_CRT_ERROR,  _CRTDBG_MODE_DEBUG);
+			_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_DEBUG);
+			_CrtSetReportHook(crtReportHook);
+#	endif // BX_CONFIG_DEBUG
+#endif // BX_CRT_MSVC
 		}
 
 		static uint32_t __stdcall topLevelExceptionFilter(ExceptionPointers* _info)
