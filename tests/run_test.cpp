@@ -79,7 +79,7 @@ int runAllTests(int32_t _argc, const char* _argv[])
 	ConfigData config;
 	config.defaultColourMode = BX_PLATFORM_EMSCRIPTEN
 		? ColourMode::None
-		: ColourMode::PlatformDefault 
+		: ColourMode::PlatformDefault
 		;
 	config.showDurations = ShowDurations::Always;
 
