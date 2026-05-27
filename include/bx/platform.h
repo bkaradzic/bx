@@ -204,16 +204,6 @@
 #	define BX_PLATFORM_OSX __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__
 #elif defined(__wasm__)
 #	include <emscripten/version.h>
-   // emscripten <= 4.0.23 only defined the lowercase version macros
-   // (__EMSCRIPTEN_major__, _minor_, _tiny_); 4.0.24+ added uppercase as
-   // primary and kept lowercase as deprecated aliases. Bridge the older
-   // emsdk so bx (and downstream code that consumes BX_PLATFORM_EMSCRIPTEN)
-   // can rely on the uppercase form uniformly.
-#	if !defined(__EMSCRIPTEN_MAJOR__) && defined(__EMSCRIPTEN_major__)
-#		define __EMSCRIPTEN_MAJOR__ __EMSCRIPTEN_major__
-#		define __EMSCRIPTEN_MINOR__ __EMSCRIPTEN_minor__
-#		define __EMSCRIPTEN_TINY__  __EMSCRIPTEN_tiny__
-#	endif
 #	undef  BX_PLATFORM_EMSCRIPTEN
 #	define BX_PLATFORM_EMSCRIPTEN (__EMSCRIPTEN_MAJOR__ * 10000 + __EMSCRIPTEN_MINOR__ * 100 + __EMSCRIPTEN_TINY__)
 #elif defined(__ORBIS__)
