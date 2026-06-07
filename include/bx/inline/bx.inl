@@ -307,8 +307,11 @@ namespace bx
 			return true;
 		}
 
+BX_PRAGMA_DIAGNOSTIC_PUSH()
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702) // warning C4702: unreachable code
 		*_out = static_cast<Ty>(_from);
 		return static_cast<FromT>(*_out) == _from;
+BX_PRAGMA_DIAGNOSTIC_POP()
 	}
 
 	template<typename Ty, typename FromT>
