@@ -338,7 +338,7 @@ namespace bx
 		_sphere.radius = sqrt(maxDistSq);
 	}
 
-	void buildFrustumPlanes(Plane* _result, const float* _viewProj)
+	void buildFrustumPlanes(Plane* _result, const float* _viewProj, bool _homogeneousNdc)
 	{
 		const float xw = _viewProj[ 3];
 		const float yw = _viewProj[ 7];
@@ -366,6 +366,14 @@ namespace bx
 		far.normal.y = yw + yz;
 		far.normal.z = zw + zz;
 		far.dist     = ww + wz;
+
+		if (!_homogeneousNdc)
+		{
+			far.normal.x = xz;
+			far.normal.y = yz;
+			far.normal.z = zz;
+			far.dist     = wz;
+		}
 
 		const float xx = _viewProj[ 0];
 		const float yx = _viewProj[ 4];
