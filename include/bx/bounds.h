@@ -269,7 +269,8 @@ namespace bx
 	/// Returns 6 (near, far, left, right, top, bottom) planes representing frustum planes.
 	/// @param[out] _outPlanes Array of 6 frustum planes.
 	/// @param _viewProj 4x4 view-projection matrix.
-	void buildFrustumPlanes(Plane* _outPlanes, const float* _viewProj);
+	/// @param[in] _homogeneousNdc True for [-1,1] NDC (OpenGL), false for [0,1] (D3D).
+	void buildFrustumPlanes(Plane* _outPlanes, const float* _viewProj, bool _homogeneousNdc);
 
 	/// Returns point from 3 intersecting planes.
 	/// @param _pa First plane.
