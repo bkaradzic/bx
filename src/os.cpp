@@ -372,6 +372,8 @@ namespace bx
 #else
 		_Exit(_exitCode);
 #endif // BX_PLATFORM_*
+
+		BX_UNREACHABLE;
 	}
 
 	namespace
