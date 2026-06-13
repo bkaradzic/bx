@@ -2045,7 +2045,12 @@ namespace bx
 			return true;
 		}
 
-		const Vec3 pos = closestPoint(plane, hit.pos);
+		const Vec3 nearest = abs(distance(plane, line.pos) ) <= abs(distance(plane, line.end) )
+			? line.pos
+			: line.end
+			;
+
+		const Vec3 pos = closestPoint(plane, nearest);
 		const Vec3 uvw = barycentric(_triangle, pos);
 
 		const float nr = -_ty.radius;
