@@ -380,6 +380,10 @@ function toolchain(_buildDir, _libDir)
 		elseif "osx-x64"   == _OPTIONS["gcc"]
 			or "osx-arm64" == _OPTIONS["gcc"] then
 
+			premake.gcc.cc  = "clang"
+			premake.gcc.cxx = "clang++"
+			premake.gcc.ar  = "ar"
+
 			if os.is("linux") then
 				if not os.getenv("OSXCROSS") then
 					print("Set OSXCROSS environment variable.")
