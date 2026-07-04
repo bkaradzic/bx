@@ -78,7 +78,9 @@ extern "C" __declspec(dllimport) unsigned int __stdcall SetErrorMode(unsigned in
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
-extern "C" __declspec(dllimport) void __stdcall OutputDebugStringA(const char* _str);
+extern "C" __declspec(dllimport) void  __stdcall OutputDebugStringA(const char* _str);
+extern "C" __declspec(dllimport) void* __stdcall GetStdHandle(uint32_t _stdHandle);
+extern "C" __declspec(dllimport) int   __stdcall WriteFile(void* _file, const void* _buffer, uint32_t _sizeInBytes, uint32_t* _outNumberOfBytesWritten, void* _overapped);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_VISIONOS
 #	if defined(__OBJC__)
 #		import <Foundation/NSObjCRuntime.h>
@@ -122,6 +124,45 @@ namespace bx
 #endif // BX
 	}
 
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
+	typedef void (*DebugOutputFn)(const char*);
+
+	static void stubDebugOutput(const char* _out);
+
+	static void*  s_debugConsoleHandle = NULL;
+	static DebugOutputFn s_debugOutput = stubDebugOutput;
+
+	static void debugOutputDbg(const char* _out)
+	{
+		OutputDebugStringA(_out);
+	}
+
+	static void debugOutputDbgAndConsole(const char* _out)
+	{
+		OutputDebugStringA(_out);
+
+		uint32_t written;
+		WriteFile(s_debugConsoleHandle, _out, (uint32_t)strLen(_out), &written, NULL);
+	}
+
+	static void stubDebugOutput(const char* _out)
+	{
+		void* handle = GetStdHandle(uint32_t(-12) /*STD_ERROR_HANDLE*/);
+		s_debugConsoleHandle = (handle == (void*)-1)
+			? NULL
+			: handle
+			;
+
+		s_debugOutput = (NULL != s_debugConsoleHandle)
+			? debugOutputDbgAndConsole
+			: debugOutputDbg
+			;
+		s_debugOutput(_out);
+	}
+#endif // BX_PLATFORM_*
+
 	void debugOutput(const char* _out)
 	{
 #if BX_CRT_NONE
@@ -134,7 +175,7 @@ namespace bx
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
-		OutputDebugStringA(_out);
+		s_debugOutput(_out);
 #elif  BX_PLATFORM_IOS \
 	|| BX_PLATFORM_OSX   \
 	|| BX_PLATFORM_VISIONOS
