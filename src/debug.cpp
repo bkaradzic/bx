@@ -683,7 +683,7 @@ namespace bx
 
 		int32_t total = write(_writer, _err, "Callstack (%d):\n", _num);
 
-		total += write(_writer, _err, "\t #: %-*s  Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
+		total += write(_writer, _err, "\t #: %-*s   Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
 
 		CallbackData cbData;
 
@@ -709,7 +709,7 @@ namespace bx
 			const StringView fileName = strTail(cbData.fileName, kWidth);
 
 			total += write(_writer, _err
-				, "\t%2d: %-*S % 5d  %*p  %S\n"
+				, "\t%2d: %-*S % 6d  %*p  %S\n"
 				, ii
 				, kWidth
 				, &fileName
@@ -904,7 +904,7 @@ namespace bx
 	{
 		int32_t total = write(_writer, _err, "Callstack (%d):\n", _num);
 
-		total += write(_writer, _err, "\t #: %-*s  Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
+		total += write(_writer, _err, "\t #: %-*s   Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
 
 		static bool initCalled = false;
 
@@ -931,7 +931,7 @@ namespace bx
 			const StringView fileName = strTail(filePath, kWidth);
 
 			total += write(_writer, _err
-				, "\t%2d: %-*S % 5d  %*p  %s\n"
+				, "\t%2d: %-*S % 6d  %*p  %s\n"
 				, ii
 				, kWidth
 				, &fileName
@@ -1077,7 +1077,7 @@ namespace bx
 
 #	endif // BX_PLATFORM_*
 
-		total += write(_writer, _err, "\t #: %-*s  Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
+		total += write(_writer, _err, "\t #: %-*s   Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
 
 		for (uint32_t ii = 0; ii < _num && _err->isOk(); ++ii)
 		{
@@ -1175,7 +1175,7 @@ namespace bx
 			const StringView fileName = strTail(filePath, kWidth);
 
 			total += write(_writer, _err
-				, "\t%2d: %-*S % 5d  %*p  %s\n"
+				, "\t%2d: %-*S % 6d  %*p  %s\n"
 				, ii
 				, kWidth
 				, &fileName
@@ -1197,7 +1197,7 @@ namespace bx
 	{
 		int32_t total = write(_writer, _err, "Callstack (%d): - symbol resolve is not available\n", _num);
 
-		total += write(_writer, _err, "\t #: %-*s  Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
+		total += write(_writer, _err, "\t #: %-*s   Line  %-*s  Function ---\n", kWidth, "File ---", kWidthPc, "PC ---");
 
 		const StringView fileName      = "<unknown?>";
 		const StringView demangledName = "<unknown?>";
@@ -1205,7 +1205,7 @@ namespace bx
 		for (uint32_t ii = 0; ii < _num && _err->isOk(); ++ii)
 		{
 			total += write(_writer, _err
-				, "\t%2d: %-*S % 5d  %*p  %S\n"
+				, "\t%2d: %-*S % 6d  %*p  %S\n"
 				, ii
 				, kWidth
 				, &fileName
