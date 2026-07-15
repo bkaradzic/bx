@@ -79,8 +79,8 @@ extern "C" __declspec(dllimport) unsigned int __stdcall SetErrorMode(unsigned in
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
 extern "C" __declspec(dllimport) void  __stdcall OutputDebugStringA(const char* _str);
-extern "C" __declspec(dllimport) void* __stdcall GetStdHandle(uint32_t _stdHandle);
-extern "C" __declspec(dllimport) int   __stdcall WriteFile(void* _file, const void* _buffer, uint32_t _sizeInBytes, uint32_t* _outNumberOfBytesWritten, void* _overapped);
+extern "C" __declspec(dllimport) void* __stdcall GetStdHandle(unsigned long _stdHandle);
+extern "C" __declspec(dllimport) int   __stdcall WriteFile(void* _file, const void* _buffer, unsigned long _sizeInBytes, unsigned long* _outNumberOfBytesWritten, struct _OVERLAPPED* _overlapped);
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_VISIONOS
 #	if defined(__OBJC__)
 #		import <Foundation/NSObjCRuntime.h>
@@ -143,8 +143,8 @@ namespace bx
 	{
 		OutputDebugStringA(_out);
 
-		uint32_t written;
-		WriteFile(s_debugConsoleHandle, _out, (uint32_t)strLen(_out), &written, NULL);
+		unsigned long written;
+		WriteFile(s_debugConsoleHandle, _out, (unsigned long)strLen(_out), &written, NULL);
 	}
 
 	static void stubDebugOutput(const char* _out)
