@@ -188,7 +188,7 @@ namespace bx
 		return m_0terminated;
 	}
 
-	inline constexpr bool operator==(const StringView& _lhs, const StringView& _rhs)
+	inline BX_CONSTEXPR_FUNC bool isEqual(const StringView& _lhs, const StringView& _rhs, bool _caseSensitive)
 	{
 		const int32_t len = _lhs.getLength();
 
@@ -214,14 +214,43 @@ namespace bx
 			}
 		}
 
-		for (int32_t ii = 0, num = len-1
-			; ii < num && *lhs == *rhs
-			; ++ii, ++lhs, ++rhs
-			)
+		if (_caseSensitive)
 		{
+			for (int32_t ii = 0; ii < len; ++ii)
+			{
+				if (lhs[ii] != rhs[ii])
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
-		return *lhs == *rhs;
+		for (int32_t ii = 0; ii < len; ++ii)
+		{
+			const char lch = lhs[ii];
+			const char rch = rhs[ii];
+			const char ll  = 'A' <= lch && lch <= 'Z' ? char(lch + 0x20) : lch;
+			const char rl  = 'A' <= rch && rch <= 'Z' ? char(rch + 0x20) : rch;
+
+			if (ll != rl)
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	inline constexpr bool operator==(const StringView& _lhs, const StringView& _rhs)
+	{
+		return isEqual(_lhs, _rhs);
+	}
+
+	inline constexpr bool operator!=(const StringView& _lhs, const StringView& _rhs)
+	{
+		return !(_lhs == _rhs);
 	}
 
 	inline constexpr bool overlap(const StringView& _a, const StringView& _b)

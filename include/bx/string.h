@@ -139,8 +139,19 @@ namespace bx
 		bool        m_0terminated;
 	};
 
-	/// Compare two string views.
+	/// Returns true if two string views are equal.
+	///
+	/// @param[in] _lhs Left-hand side string.
+	/// @param[in] _rhs Right-hand side string.
+	/// @param[in] _caseSensitive Use case sensitive comparison if true.
+	///
+	BX_CONSTEXPR_FUNC bool isEqual(const StringView& _lhs, const StringView& _rhs, bool _caseSensitive = true);
+
+	/// Compare two string views for equality.
 	constexpr bool operator==(const StringView& _lhs, const StringView& _rhs);
+
+	/// Compare two string views for inequality.
+	constexpr bool operator!=(const StringView& _lhs, const StringView& _rhs);
 
 	/// Returns true if two string views overlap.
 	constexpr bool overlap(const StringView& _a, const StringView& _b);
@@ -471,18 +482,18 @@ namespace bx
 	///
 	int32_t formatHumanNumber(char* _out, uint32_t _count, double _value, uint8_t _numFrac, const StringView& _unit = "", char _prefix = ' ');
 
-	/// 
+	///
 	int32_t formatHumanNumber(char* _out, uint32_t _count, double _value, uint8_t _numFrac, double _unitStep, const StringView& _unit, const StringView& _prefix, uint8_t _basePrefix = 0);
 
-	/// 
+	///
 	template<uint16_t MaxCapacityT = 32>
 	FixedStringT<MaxCapacityT> toHuman(uint64_t _value);
 
-	/// 
+	///
 	template<uint16_t MaxCapacityT = 32>
 	FixedStringT<MaxCapacityT> toHuman(uint64_t _value, Units::Enum _units, uint8_t _numFrac = 2);
 
-	/// 
+	///
 	template<uint16_t MaxCapacityT = 32>
 	FixedStringT<MaxCapacityT> toHuman(Ticks _value, uint8_t _numFrac = 4);
 

@@ -120,6 +120,59 @@ TEST_CASE("strCmpI", "[string]")
 	REQUIRE(0 <  bx::strCmpI(abvgd, empty) );
 }
 
+TEST_CASE("isEqual", "[string]")
+{
+	// Case sensitive (default).
+	REQUIRE( bx::isEqual("test", "test") );
+	REQUIRE(!bx::isEqual("test", "Test") );
+	REQUIRE(!bx::isEqual("test", "testtest") );
+	REQUIRE(!bx::isEqual("testtest", "test") );
+	REQUIRE( bx::isEqual("", "") );
+	REQUIRE(!bx::isEqual("", "test") );
+	REQUIRE(!bx::isEqual("a", "A") );
+
+	// Case insensitive.
+	REQUIRE( bx::isEqual("test", "TEST", false) );
+	REQUIRE( bx::isEqual("TeSt", "tEsT", false) );
+	REQUIRE( bx::isEqual("a", "A", false) );
+	REQUIRE(!bx::isEqual("test", "testest", false) );
+	REQUIRE( bx::isEqual("", "", false) );
+
+	// Non-letters are unaffected by case folding.
+	REQUIRE( bx::isEqual("1389-[]", "1389-[]", false) );
+	REQUIRE(!bx::isEqual("1389-[]", "1389-{}", false) );
+
+	// Mixed string types (all implicitly convert to StringView).
+	const bx::StringView    sv("RGBA");
+	const bx::StringLiteral sl("RGBA");
+	REQUIRE( bx::isEqual(sv, sl) );
+	REQUIRE( bx::isEqual(sv, "RGBA") );
+	REQUIRE( bx::isEqual("rgba", sl, false) );
+}
+
+TEST_CASE("operator==/operator!=", "[string]")
+{
+	REQUIRE(  bx::StringView("test") == bx::StringView("test") );
+	REQUIRE(  bx::StringView("test") == "test" );
+	REQUIRE(  "test" == bx::StringView("test") );
+	REQUIRE(!(bx::StringView("test") == "Test") );
+
+	REQUIRE(  bx::StringView("test") != "Test" );
+	REQUIRE(!(bx::StringView("test") != "test") );
+}
+
+TEST_CASE("isEqual constexpr", "[string]")
+{
+	STATIC_REQUIRE( bx::isEqual("1389", "1389") );
+	STATIC_REQUIRE(!bx::isEqual("1389", "1388") );
+	STATIC_REQUIRE( bx::isEqual("abvgd", "ABVGD", false) );
+	STATIC_REQUIRE(!bx::isEqual("abvgd", "ABVGD") );
+
+	STATIC_REQUIRE( bx::StringView("mac") == "mac" );
+	STATIC_REQUIRE( bx::StringView("mac") != "pod" );
+	STATIC_REQUIRE( bx::isEqual(bx::StringLiteral("pod"), bx::StringView("POD"), false) );
+}
+
 TEST_CASE("strCmpV", "[string]")
 {
 	REQUIRE(0 == bx::strCmpV("test", "test") );
