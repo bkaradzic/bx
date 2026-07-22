@@ -4,6 +4,7 @@
  */
 
 #include "test.h"
+#include <bx/constants.h>
 #include <bx/filepath.h>
 #include <bx/string.h>
 #include <bx/handlealloc.h>
@@ -477,6 +478,40 @@ TEST_CASE("fromString double", "[string]")
 	REQUIRE(testFromString<double>(std::numeric_limits<double>::min(),    "2.2250738585072014e-308") );
 	REQUIRE(testFromString<double>(std::numeric_limits<double>::lowest(), "-1.7976931348623158e+308") );
 	REQUIRE(testFromString<double>(std::numeric_limits<double>::max(),    "1.7976931348623158e+308") );
+}
+
+TEST_CASE("fromString hex float", "[string]")
+{
+	double d = 1.0;
+
+	REQUIRE(bx::fromString(&d, "0x1p+0")   ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1P0")    ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1.8p+1") ); REQUIRE(d ==  3.0);
+	REQUIRE(bx::fromString(&d, "0x1p-1")   ); REQUIRE(d ==  0.5);
+	REQUIRE(bx::fromString(&d, "-0x1.4p+2")); REQUIRE(d == -5.0);
+	REQUIRE(bx::fromString(&d, "0x0.8p+1") ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1.8")    ); REQUIRE(d ==  1.5);
+	REQUIRE(bx::fromString(&d, "0x10")     ); REQUIRE(d == 16.0);
+
+	REQUIRE(bx::fromString(&d, "0x1.fffffep+127") );
+	REQUIRE(d == double(bx::kFloatLargest) );
+
+	REQUIRE(bx::fromString(&d, "0x1p-126") );
+	REQUIRE(d == double(bx::kFloatSmallest) );
+
+	REQUIRE(bx::fromString(&d, "0x1.fffffffffffffp+1023") );
+	REQUIRE(d == bx::kDoubleLargest);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1022") );
+	REQUIRE(d == bx::kDoubleSmallest);
+
+	float f = 0.0f;
+
+	REQUIRE(bx::fromString(&f, "0x1.fffffep+127") );
+	REQUIRE(f == bx::kFloatLargest);
+
+	REQUIRE(bx::fromString(&f, "0x1p-126") );
+	REQUIRE(f == bx::kFloatSmallest);
 }
 
 static bool testFromString(int32_t _value, const char* _input)
