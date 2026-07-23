@@ -123,6 +123,8 @@
 #if defined(__x86_64__)    \
  || defined(_M_X64)        \
  || defined(__aarch64__)   \
+ || defined(_M_ARM64)      \
+ || defined(_M_ARM64EC)    \
  || defined(__64BIT__)     \
  || defined(__mips64)      \
  || defined(__powerpc64__) \
@@ -170,9 +172,9 @@
 #				define WINVER 0x0601
 #				define _WIN32_WINNT 0x0601
 #			else
-//				Windows Server 2003 with SP1, Windows XP with SP2 and above
-#				define WINVER 0x0502
-#				define _WIN32_WINNT 0x0502
+//				When building 32-bit target Win7 and above.
+#				define WINVER 0x0601
+#				define _WIN32_WINNT 0x0601
 #			endif // BX_ARCH_64BIT
 #		endif // !defined(WINVER) && !defined(_WIN32_WINNT)
 #		define BX_PLATFORM_WINDOWS _WIN32_WINNT
