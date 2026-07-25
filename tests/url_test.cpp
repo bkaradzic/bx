@@ -41,6 +41,39 @@ static const UrlTest s_urlTest[] =
 	, "file:///d:/tmp/archive.tar.gz",
 	{ "file", "", "", "", "", "/d:/tmp/archive.tar.gz", "", "" },
 	},
+
+	{ true
+	, "scheme://host.rs/path#fragment",
+	{ "scheme", "", "", "host.rs", "", "/path", "", "fragment" },
+	},
+	{ true
+	, "scheme://host.rs/path?query#fragment",
+	{ "scheme", "", "", "host.rs", "", "/path", "query", "fragment" },
+	},
+	{ true
+	, "scheme://host.rs/path?",
+	{ "scheme", "", "", "host.rs", "", "/path", "", "" },
+	},
+	{ true
+	, "scheme://username:password@host.rs/",
+	{ "scheme", "username", "password", "host.rs", "", "/", "", "" },
+	},
+	{ true
+	, "scheme://host.rs",
+	{ "scheme", "", "", "host.rs", "", "", "", "" },
+	},
+	{ false // Fragment must not precede query.
+	, "scheme://host.rs/path#fragment?query",
+	{ "", "", "", "", "", "", "", "" },
+	},
+	{ false // Neither scheme nor path.
+	, "host.rs",
+	{ "", "", "", "", "", "", "", "" },
+	},
+	{ false // Scheme must be alpha.
+	, "1scheme://host.rs/",
+	{ "", "", "", "", "", "", "", "" },
+	},
 };
 
 TEST_CASE("tokenizeUrl", "[url][string]")

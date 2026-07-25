@@ -3,10 +3,36 @@
  * License: https://github.com/bkaradzic/bnet#license-bsd-2-clause
  */
 
+#include <bx/scanner.h>
 #include <bx/url.h>
 
 namespace bx
 {
+	static bool isNotSlash(char _ch)
+	{
+		return '/' != _ch;
+	}
+
+	static bool isNotColon(char _ch)
+	{
+		return ':' != _ch;
+	}
+
+	static bool isNotQuery(char _ch)
+	{
+		return '?' != _ch;
+	}
+
+	static bool isNotFragment(char _ch)
+	{
+		return '#' != _ch;
+	}
+
+	static bool isNotQueryOrFragment(char _ch)
+	{
+		return isNotQuery(_ch) && isNotFragment(_ch);
+	}
+
 	UrlView::UrlView()
 	{
 	}
@@ -23,22 +49,16 @@ namespace bx
 	{
 		clear();
 
-		const char* term  = _url.getTerm();
-		StringView schemeEnd = strFind(_url, "://");
-		const char* hostStart = !schemeEnd.isEmpty() ? schemeEnd.getTerm() : _url.getPtr();
-		StringView path = strFind(StringView(hostStart, term), '/');
+		Scanner scanner(_url);
 
-		if (schemeEnd.isEmpty()
-		&&  path.isEmpty() )
+		const StringView schemeBegin = scanner.getCursor();
+		scanner.acceptUntil("://");
+		const StringView scheme = scanner.between(schemeBegin);
+
+		const bool hasScheme = !scanner.accept("://").isEmpty();
+
+		if (hasScheme)
 		{
-			return false;
-		}
-
-		if (!schemeEnd.isEmpty()
-		&& (path.isEmpty() || path.getPtr() > schemeEnd.getPtr() ) )
-		{
-			const StringView scheme(_url.getPtr(), schemeEnd.getPtr() );
-
 			if (!isAlpha(scheme) )
 			{
 				return false;
@@ -47,65 +67,72 @@ namespace bx
 			m_tokens[Scheme].set(scheme);
 		}
 
-		if (!path.isEmpty() )
-		{
-			path.set(path.getPtr(), term);
-			const StringView query    = strFind(path, '?');
-			const StringView fragment = strFind(path, '#');
+		const StringView authorityBegin = scanner.getCursor();
+		scanner.acceptWhile(isNotSlash);
+		const StringView authority = scanner.between(authorityBegin);
 
-			if (!fragment.isEmpty()
-			&&   fragment.getPtr() < query.getPtr() )
+		const bool hasPath = !scanner.peek('/').isEmpty();
+
+		if (!hasScheme
+		&&  !hasPath)
+		{
+			return false;
+		}
+
+		if (hasPath)
+		{
+			const StringView pathBegin = scanner.getCursor();
+			scanner.acceptWhile(isNotQueryOrFragment);
+			m_tokens[Path].set(scanner.between(pathBegin) );
+
+			if (!scanner.accept('?').isEmpty() )
+			{
+				const StringView queryBegin = scanner.getCursor();
+				scanner.acceptWhile(isNotFragment);
+				m_tokens[Query].set(scanner.between(queryBegin) );
+			}
+
+			if (!scanner.accept('#').isEmpty() )
+			{
+				const StringView fragmentBegin = scanner.getCursor();
+				scanner.acceptWhile(isNotQuery);
+				m_tokens[Fragment].set(scanner.between(fragmentBegin) );
+			}
+
+			// Anything left over is a query following a fragment.
+			if (!scanner.isDone() )
 			{
 				return false;
 			}
-
-			m_tokens[Path].set(path.getPtr()
-				, !query.isEmpty()    ? query.getPtr()
-				: !fragment.isEmpty() ? fragment.getPtr()
-				: term
-				);
-
-			if (!query.isEmpty() )
-			{
-				m_tokens[Query].set(query.getPtr()+1
-					, !fragment.isEmpty() ? fragment.getPtr()
-					: term
-					);
-			}
-
-			if (!fragment.isEmpty() )
-			{
-				m_tokens[Fragment].set(fragment.getPtr()+1, term);
-			}
-
-			term = path.getPtr();
 		}
 
-		const StringView userPassEnd = strFind(StringView(hostStart, term), '@');
-		const char* userPassStart = !userPassEnd.isEmpty() ? hostStart : NULL;
-		hostStart = !userPassEnd.isEmpty() ? userPassEnd.getPtr()+1 : hostStart;
-		const StringView portStart = strFind(StringView(hostStart, term), ':');
+		Scanner authorityScanner(authority);
 
-		m_tokens[Host].set(hostStart, !portStart.isEmpty() ? portStart.getPtr() : term);
+		const StringView userInfoBegin = authorityScanner.getCursor();
+		authorityScanner.acceptUntil("@");
+		const StringView userInfo = authorityScanner.between(userInfoBegin);
 
-		if (!portStart.isEmpty())
+		if (!authorityScanner.accept('@').isEmpty() )
 		{
-			m_tokens[Port].set(portStart.getPtr()+1, term);
+			Scanner userInfoScanner(userInfo);
+
+			const StringView userNameBegin = userInfoScanner.getCursor();
+			userInfoScanner.acceptWhile(isNotColon);
+			m_tokens[UserName].set(userInfoScanner.between(userNameBegin) );
+
+			if (!userInfoScanner.accept(':').isEmpty() )
+			{
+				m_tokens[Password].set(userInfoScanner.acceptAll() );
+			}
 		}
 
-		if (NULL != userPassStart)
+		const StringView hostBegin = authorityScanner.getCursor();
+		authorityScanner.acceptWhile(isNotColon);
+		m_tokens[Host].set(authorityScanner.between(hostBegin) );
+
+		if (!authorityScanner.accept(':').isEmpty() )
 		{
-			StringView passStart = strFind(StringView(userPassStart, userPassEnd.getPtr() ), ':');
-
-			m_tokens[UserName].set(userPassStart
-				, !passStart.isEmpty() ? passStart.getPtr()
-				: userPassEnd.getPtr()
-				);
-
-			if (!passStart.isEmpty() )
-			{
-				m_tokens[Password].set(passStart.getPtr()+1, userPassEnd.getPtr() );
-			}
+			m_tokens[Port].set(authorityScanner.acceptAll() );
 		}
 
 		return true;

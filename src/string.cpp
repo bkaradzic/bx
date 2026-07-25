@@ -10,65 +10,6 @@
 
 namespace bx
 {
-	inline bool isInRange(char _ch, char _from, char _to)
-	{
-		return unsigned(_ch - _from) <= unsigned(_to-_from);
-	}
-
-	bool isSpace(char _ch)
-	{
-		return ' '  == _ch // Space.
-			|| '\t' == _ch // Horizontal tab.
-			|| '\n' == _ch // Line feed / new line.
-			|| '\r' == _ch // Carriage return.
-			|| '\v' == _ch // Vertical tab.
-			|| '\f' == _ch // Form feed / new page.
-			;
-	}
-
-	bool isUpper(char _ch)
-	{
-		return isInRange(_ch, 'A', 'Z');
-	}
-
-	bool isLower(char _ch)
-	{
-		return isInRange(_ch, 'a', 'z');
-	}
-
-	bool isAlpha(char _ch)
-	{
-		return isLower(_ch) || isUpper(_ch);
-	}
-
-	bool isNumeric(char _ch)
-	{
-		return isInRange(_ch, '0', '9');
-	}
-
-	bool isAlphaNum(char _ch)
-	{
-		return false
-			|| isAlpha(_ch)
-			|| isNumeric(_ch)
-			;
-	}
-
-	bool isHexNum(char _ch)
-	{
-		return false
-			|| isInRange(toLower(_ch), 'a', 'f')
-			|| isNumeric(_ch)
-			;
-	}
-
-	bool isPrint(char _ch)
-	{
-		return isInRange(_ch, ' ', '~');
-	}
-
-	typedef bool (*CharTestFn)(char _ch);
-
 	template<CharTestFn fn>
 	inline bool isCharTest(const StringView& _str)
 	{
@@ -125,11 +66,6 @@ namespace bx
 		return isCharTest<isPrint>(_str);
 	}
 
-	char toLower(char _ch)
-	{
-		return _ch + (isUpper(_ch) ? 0x20 : 0);
-	}
-
 	void toLowerUnsafe(char* _inOutStr, int32_t _len)
 	{
 		for (int32_t ii = 0; ii < _len; ++ii)
@@ -142,11 +78,6 @@ namespace bx
 	{
 		const int32_t len = strLen(_inOutStr, _max);
 		toLowerUnsafe(_inOutStr, len);
-	}
-
-	char toUpper(char _ch)
-	{
-		return _ch - (isLower(_ch) ? 0x20 : 0);
 	}
 
 	void toUpperUnsafe(char* _inOutStr, int32_t _len)
@@ -165,7 +96,7 @@ namespace bx
 
 	typedef char (*CharFn)(char _ch);
 
-	inline constexpr char toNoop(char _ch)
+	inline BX_CONSTEXPR_FUNC char toNoop(char _ch)
 	{
 		return _ch;
 	}
@@ -560,8 +491,6 @@ namespace bx
 				);
 	}
 
-	constexpr uint32_t kFindStep = 1024;
-
 	StringView strFindNl(const StringView& _str)
 	{
 		StringView str(_str);
@@ -578,23 +507,19 @@ namespace bx
 
 	StringView strFindEol(const StringView& _str)
 	{
-		StringView str(_str);
+		const StringView eol = strFind(_str, '\n');
 
-		for (; str.getPtr() != _str.getTerm()
-			 ; str = StringView(min(str.getPtr() + kFindStep, _str.getTerm() ), min(str.getPtr() + kFindStep*2, _str.getTerm() ) )
-			)
+		if (!eol.isEmpty() )
 		{
-			StringView eol = strFind(str, "\r\n");
-			if (!eol.isEmpty() )
+			const char* ptr = eol.getPtr();
+
+			if (ptr != _str.getPtr()
+			&&  '\r' == ptr[-1])
 			{
-				return StringView(eol.getPtr(), _str.getTerm() );
+				--ptr;
 			}
 
-			eol = strFind(str, '\n');
-			if (!eol.isEmpty() )
-			{
-				return StringView(eol.getPtr(), _str.getTerm() );
-			}
+			return StringView(ptr, _str.getTerm() );
 		}
 
 		return StringView(_str.getTerm(), _str.getTerm() );
