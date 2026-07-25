@@ -279,6 +279,8 @@ namespace bx
 		int32_t     m_capacity;
 	};
 
+	typedef bool (*CharTestFn)(char _ch);
+
 	/// Returns true if character is part of white space set.
 	///
 	/// White space set is:
@@ -289,55 +291,73 @@ namespace bx
 	///   '\v' - Vertical tab.
 	///   '\f' - Form feed / new page.
 	///
-	bool isSpace(char _ch);
+	BX_CONSTEXPR_FUNC bool isSpace(char _ch);
 
 	/// Returns true if string view contains only space characters.
 	bool isSpace(const StringView& _str);
 
+	/// Returns true if character is horizontal white space.
+	BX_CONSTEXPR_FUNC bool isSpaceHoriz(char _ch);
+
 	/// Returns true if character is uppercase.
-	bool isUpper(char _ch);
+	BX_CONSTEXPR_FUNC bool isUpper(char _ch);
 
 	/// Returns true if string view contains only uppercase characters.
 	bool isUpper(const StringView& _str);
 
 	/// Returns true if character is lowercase.
-	bool isLower(char _ch);
+	BX_CONSTEXPR_FUNC bool isLower(char _ch);
 
 	/// Returns true if string view contains only lowercase characters.
 	bool isLower(const StringView& _str);
 
 	/// Returns true if character is part of alphabet set.
-	bool isAlpha(char _ch);
+	BX_CONSTEXPR_FUNC bool isAlpha(char _ch);
 
 	/// Returns true if string view contains only alphabet characters.
 	bool isAlpha(const StringView& _str);
 
 	/// Returns true if character is part of numeric set.
-	bool isNumeric(char _ch);
+	BX_CONSTEXPR_FUNC bool isNumeric(char _ch);
 
 	/// Returns true if string view contains only numeric characters.
 	bool isNumeric(const StringView& _str);
 
 	/// Returns true if character is part of alpha numeric set.
-	bool isAlphaNum(char _ch);
+	BX_CONSTEXPR_FUNC bool isAlphaNum(char _ch);
 
 	/// Returns true if string view contains only alphanumeric characters.
 	bool isAlphaNum(const StringView& _str);
 
 	/// Returns true if character is part of hexadecimal set.
-	bool isHexNum(char _ch);
+	BX_CONSTEXPR_FUNC bool isHexNum(char _ch);
 
 	/// Returns true if string view contains only hexadecimal characters.
 	bool isHexNum(const StringView& _str);
 
+	///
+	BX_CONSTEXPR_FUNC bool isOctNum(char _ch);
+
+	///
+	BX_CONSTEXPR_FUNC bool isBinNum(char _ch);
+
+	///
+	BX_CONSTEXPR_FUNC bool isIdentStart(char _ch);
+
+	///
+	BX_CONSTEXPR_FUNC bool isIdentChar(char _ch);
+
+	///
+	BX_CONSTEXPR_FUNC bool isPathSeparator(char _ch);
+
 	/// Returns true if character is printable.
-	bool isPrint(char _ch);
+	BX_CONSTEXPR_FUNC bool isPrint(char _ch);
 
 	/// Returns true if string vieww contains only printable characters.
 	bool isPrint(const StringView& _str);
 
 	/// Returns lower case character representing _ch.
-	char toLower(char _ch);
+	BX_CONSTEXPR_FUNC char toLower(char _ch);
 
 	/// Lower case string in place assuming length passed is valid.
 	void toLowerUnsafe(char* _inOutStr, int32_t _len);
@@ -346,7 +366,7 @@ namespace bx
 	void toLower(char* _inOutStr, int32_t _max = INT32_MAX);
 
 	/// Returns upper case character representing _ch.
-	char toUpper(char _ch);
+	BX_CONSTEXPR_FUNC char toUpper(char _ch);
 
 	/// Upper case string in place assuming length passed is valid.
 	void toUpperUnsafe(char* _inOutStr, int32_t _len);
@@ -556,31 +576,6 @@ namespace bx
 
 	/// Converts string to 64-bit unsigned long long value.
 	bool fromString(unsigned long long* _out, const StringView& _str);
-
-	///
-	class LineReader
-	{
-	public:
-		///
-		LineReader(const StringView& _str);
-
-		///
-		void reset();
-
-		///
-		StringView next();
-
-		///
-		bool isDone() const;
-
-		///
-		uint32_t getLine() const;
-
-	private:
-		const StringView m_str;
-		StringView m_curr;
-		uint32_t m_line;
-	};
 
 } // namespace bx
 

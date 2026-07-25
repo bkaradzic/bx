@@ -8,6 +8,7 @@
 #include <bx/readerwriter.h> // WriterI
 #include <bx/os.h>           // exit
 #include <bx/process.h>      // ProcessReader
+#include <bx/scanner.h>      // Scanner
 
 #include <inttypes.h>        // PRIx*
 
@@ -947,22 +948,6 @@ namespace bx
 
 #elif BX_CONFIG_CALLSTACK_USE_EXECINFO
 
-	StringView strConsumeTo(StringView& _input, const StringView& _find)
-	{
-		const StringView to = strFind(_input, _find);
-
-		if (!to.isEmpty() )
-		{
-			const StringView result(_input.getPtr(), to.getPtr() );
-
-			_input.set(to.getTerm(), _input.getTerm() );
-
-			return result;
-		}
-
-		return StringView();
-	}
-
 	int32_t writeCallstack(WriterI* _writer, const uintptr_t* _stack, uint32_t _num, Error* _err)
 	{
 		int32_t total = write(_writer, _err, "Callstack (%d):\n", _num);
@@ -1126,16 +1111,18 @@ namespace bx
 					{
 						for (LineReader lr({atosBuffer, bytes}); !lr.isDone();)
 						{
-							StringView input = lr.next();
+							Scanner scanner(lr.next() );
 
-							atosFunctionName = strConsumeTo(input, " (");
+							atosFunctionName = scanner.acceptUntil(" (");
 
 							if (atosFunctionName.isEmpty() )
 							{
 								break;
 							}
 
-							filePath = strConsumeTo(input, ":");
+							scanner.accept(" (");
+
+							filePath = scanner.acceptUntil(":");
 
 							if (filePath.isEmpty() )
 							{
@@ -1143,7 +1130,9 @@ namespace bx
 								break;
 							}
 
-							const StringView lineStr = strConsumeTo(input, ")");
+							scanner.accept(':');
+
+							const StringView lineStr = scanner.acceptUntil(")");
 
 							if (!lineStr.isEmpty() )
 							{

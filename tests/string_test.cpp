@@ -691,6 +691,55 @@ TEST_CASE("strWord", "[string]")
 	REQUIRE(0 == bx::strCmp(bx::strWord("abvgd-1389.0"), "abvgd") );
 }
 
+TEST_CASE("strFindEol strFindNl", "[string]")
+{
+	{
+		const bx::StringView test("abc");
+		REQUIRE(test.getTerm() == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getTerm() == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		const bx::StringView test("abc\ndef");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 4 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// End of line is the \r of a \r\n pair, new line is past the \n.
+		const bx::StringView test("abc\r\ndef");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 5 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// A lone \r is not a line terminator.
+		const bx::StringView test("abc\rdef\n");
+		REQUIRE(test.getPtr() + 7 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 8 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// Must return the *first* terminator, not the first \r\n.
+		const bx::StringView test("abc\ndef\r\n");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 4 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		const bx::StringView test("\r\n");
+		REQUIRE(test.getPtr() == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getTerm() == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// Leading \n whose preceding \r is outside the view.
+		const bx::StringView test("a\r\nb");
+		const bx::StringView tail(test, 2, INT32_MAX);
+		REQUIRE(tail.getPtr() == bx::strFindEol(tail).getPtr() );
+	}
+}
+
 TEST_CASE("strFindBlock", "[string]")
 {
 	const bx::StringView test0("{ { {} {} abvgd; {} } }");
