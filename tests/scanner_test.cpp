@@ -14,7 +14,7 @@ namespace bx
 		Scanner scanner(_str);
 		scanner.acceptAll();
 
-		return scanner.getLine();
+		return scanner.getLine() - 1;
 	}
 
 	void printLines(const StringView& _str)
@@ -79,27 +79,27 @@ TEST_CASE("Scanner", "[scanner]")
 	REQUIRE(!scanner.isDone() );
 	REQUIRE("xyz" == scanner.accept("xyz") );
 
-	REQUIRE(0 == scanner.getLine() );
-	REQUIRE("\n    " == scanner.acceptUntil(bx::Scanner::Class::Space) );
 	REQUIRE(1 == scanner.getLine() );
+	REQUIRE("\n    " == scanner.acceptUntil(bx::Scanner::Class::Space) );
+	REQUIRE(2 == scanner.getLine() );
 
 	scanner.acceptAll();
 	REQUIRE(scanner.accept().isEmpty() );
 
-	REQUIRE(numLines == scanner.getLine() );
+	REQUIRE(numLines + 1 == scanner.getLine() );
 
 	REQUIRE(scanner.isDone() );
 
 	REQUIRE(scanner.seek(start) );
-	REQUIRE(0 == scanner.getLine() );
+	REQUIRE(1 == scanner.getLine() );
 	REQUIRE(!scanner.isDone() );
 
 	REQUIRE(scanner.seek(INT32_MAX) );
-	REQUIRE(numLines == scanner.getLine() );
+	REQUIRE(numLines + 1 == scanner.getLine() );
 	REQUIRE(scanner.isDone() );
 
 	REQUIRE(scanner.seek(INT32_MIN) );
-	REQUIRE(0 == scanner.getLine() );
+	REQUIRE(1 == scanner.getLine() );
 	REQUIRE(!scanner.isDone() );
 }
 
@@ -206,7 +206,7 @@ TEST_CASE("Scanner.getColumn", "[scanner]")
 	REQUIRE(4 == sc.getColumn() );
 
 	sc.accept('\n');
-	REQUIRE(1 == sc.getLine() );
+	REQUIRE(2 == sc.getLine() );
 	REQUIRE(1 == sc.getColumn() );
 	sc.accept();
 	REQUIRE(2 == sc.getColumn() );
@@ -237,11 +237,11 @@ TEST_CASE("Scanner.reset", "[scanner]")
 
 	sc.acceptAll();
 	REQUIRE(sc.isDone() );
-	REQUIRE(2 == sc.getLine() );
+	REQUIRE(3 == sc.getLine() );
 
 	sc.reset();
 	REQUIRE(!sc.isDone() );
-	REQUIRE(0 == sc.getLine() );
+	REQUIRE(1 == sc.getLine() );
 	REQUIRE(1 == sc.getColumn() );
 	REQUIRE("abc" == sc.accept(bx::Scanner::Class::Identifier) );
 

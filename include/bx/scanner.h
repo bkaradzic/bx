@@ -16,7 +16,9 @@ namespace bx
 	/// moves. `accept*` functions advance cursor when they match, `peek*` functions perform the
 	/// same test without moving cursor.
 	///
-	/// All returned string views point into input string, and no copies are made.
+	/// All returned string views point into input string, and no copies are made. This includes
+	/// empty string views returned when nothing matched, which point at cursor rather than being
+	/// default constructed. They can be used with `seek` and `between`.
 	///
 	/// @attention Scanner doesn't own input string. Input string must outlive Scanner.
 	///
@@ -142,11 +144,11 @@ namespace bx
 		///
 		/// @param[in] _find String to search for.
 		///
-		/// @returns Accepted string view, or empty string view if `_find` is not found, or it's
-		///   already at cursor.
+		/// @returns Accepted string view, or empty string view at cursor if `_find` is not found,
+		///   or it's already at cursor.
 		///
-		/// @attention Returned string view is empty in both cases, and cursor doesn't move.
-		///   Use `getCursor` and `between` to capture text that can legitimately be empty.
+		/// @attention Returned string view is empty in both cases, and cursor doesn't move. If
+		///   these two cases have to be told apart, test for `_find` separately with `peek`.
 		///
 		StringView acceptUntil(const StringView& _find);
 
@@ -208,7 +210,7 @@ namespace bx
 		///
 		bool seek(int32_t _bytes);
 
-		/// Returns zero-based line number cursor is on.
+		/// Returns one-based line number cursor is on.
 		///
 		/// @returns Line number.
 		///
@@ -226,9 +228,9 @@ namespace bx
 		///
 		/// @returns Zero length string view at requested position.
 		///
-		/// @remarks Unlike default constructed `StringView`, returned string view keeps pointer
-		///   into input string even though it's empty. Use it with `between` to capture text that
-		///   can legitimately be empty.
+		/// @remarks Returned string view keeps pointer into input string even though it's empty,
+		///   and it can be passed to `seek` to return to this position later, or to `between` to
+		///   capture text that can legitimately be empty.
 		///
 		StringView getCursor(Cursor _which = Cursor::Current) const;
 
@@ -250,10 +252,10 @@ namespace bx
 	private:
 		/// Move cursor to `_to`, and update line number.
 		///
-		/// @param[in] _to Position to move cursor to.
+		/// @param[in] _to Position to move cursor to. Empty string view is treated as cursor
+		///   position obtained by `getCursor` rather than as span, and cursor moves to it.
 		///
-		/// @returns String view between old and new cursor position, or empty string view if `_to`
-		///   is empty.
+		/// @returns String view between old and new cursor position.
 		///
 		StringView moveTo(const StringView& _to);
 

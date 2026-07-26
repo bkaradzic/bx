@@ -12,14 +12,14 @@ namespace bx
 	inline Scanner::Scanner(const StringView& _input)
 		: m_input(_input)
 		, m_tail(_input)
-		, m_line(0)
+		, m_line(1)
 	{
 	}
 
 	inline void Scanner::reset()
 	{
 		m_tail = m_input;
-		m_line = 0;
+		m_line = 1;
 	}
 
 	inline StringView Scanner::acceptAll()
@@ -43,7 +43,7 @@ namespace bx
 			return moveBy(1);
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::accept(char _ch0, char _ch1)
@@ -59,7 +59,7 @@ namespace bx
 			}
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	template<typename ...Args>
@@ -82,7 +82,7 @@ namespace bx
 			return moveTo({ m_tail.getPtr(), _str.getLength() });
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::accept(Class _class)
@@ -98,7 +98,7 @@ namespace bx
 			return moveBy(1);
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::acceptWhile(const StringView& _any)
@@ -110,7 +110,7 @@ namespace bx
 			return moveTo({ m_tail.getPtr(), input.getPtr() });
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::acceptWhile(CharTestFn _fn)
@@ -136,7 +136,7 @@ namespace bx
 			return moveTo({ m_tail.getPtr(), result.getPtr() });
 		}
 
-		return result;
+		return getCursor();
 	}
 
 	inline StringView Scanner::acceptUntil(Class _class)
@@ -148,7 +148,7 @@ namespace bx
 	inline StringView Scanner::peek() const
 	{
 		return m_tail.isEmpty()
-			? StringView()
+			? getCursor()
 			: StringView(m_tail.getPtr(), m_tail.getPtr() + 1)
 			;
 	}
@@ -161,7 +161,7 @@ namespace bx
 			return StringView(m_tail.getPtr(), m_tail.getPtr() + 1);
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::peek(const StringView& _str) const
@@ -171,7 +171,7 @@ namespace bx
 			return StringView(m_tail.getPtr(), _str.getLength() );
 		}
 
-		return StringView();
+		return getCursor();
 	}
 
 	inline StringView Scanner::peek(Class _class) const

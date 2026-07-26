@@ -71,7 +71,13 @@ namespace bx
 			return result;
 		}
 
-		return StringView();
+		if (_to.getPtr() != m_tail.getPtr()
+		&&  contain(m_input, _to) )
+		{
+			moveBy(int32_t(_to.getPtr() - m_tail.getPtr() ) );
+		}
+
+		return getCursor();
 	}
 
 	StringView Scanner::strFunc(Class _class) const

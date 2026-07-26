@@ -51,9 +51,7 @@ namespace bx
 
 		Scanner scanner(_url);
 
-		const StringView schemeBegin = scanner.getCursor();
-		scanner.acceptUntil("://");
-		const StringView scheme = scanner.between(schemeBegin);
+		const StringView scheme = scanner.acceptUntil("://");
 
 		const bool hasScheme = !scanner.accept("://").isEmpty();
 
@@ -67,9 +65,7 @@ namespace bx
 			m_tokens[Scheme].set(scheme);
 		}
 
-		const StringView authorityBegin = scanner.getCursor();
-		scanner.acceptWhile(isNotSlash);
-		const StringView authority = scanner.between(authorityBegin);
+		const StringView authority = scanner.acceptWhile(isNotSlash);
 
 		const bool hasPath = !scanner.peek('/').isEmpty();
 
@@ -81,22 +77,16 @@ namespace bx
 
 		if (hasPath)
 		{
-			const StringView pathBegin = scanner.getCursor();
-			scanner.acceptWhile(isNotQueryOrFragment);
-			m_tokens[Path].set(scanner.between(pathBegin) );
+			m_tokens[Path].set(scanner.acceptWhile(isNotQueryOrFragment) );
 
 			if (!scanner.accept('?').isEmpty() )
 			{
-				const StringView queryBegin = scanner.getCursor();
-				scanner.acceptWhile(isNotFragment);
-				m_tokens[Query].set(scanner.between(queryBegin) );
+				m_tokens[Query].set(scanner.acceptWhile(isNotFragment) );
 			}
 
 			if (!scanner.accept('#').isEmpty() )
 			{
-				const StringView fragmentBegin = scanner.getCursor();
-				scanner.acceptWhile(isNotQuery);
-				m_tokens[Fragment].set(scanner.between(fragmentBegin) );
+				m_tokens[Fragment].set(scanner.acceptWhile(isNotQuery) );
 			}
 
 			// Anything left over is a query following a fragment.
@@ -108,17 +98,13 @@ namespace bx
 
 		Scanner authorityScanner(authority);
 
-		const StringView userInfoBegin = authorityScanner.getCursor();
-		authorityScanner.acceptUntil("@");
-		const StringView userInfo = authorityScanner.between(userInfoBegin);
+		const StringView userInfo = authorityScanner.acceptUntil("@");
 
 		if (!authorityScanner.accept('@').isEmpty() )
 		{
 			Scanner userInfoScanner(userInfo);
 
-			const StringView userNameBegin = userInfoScanner.getCursor();
-			userInfoScanner.acceptWhile(isNotColon);
-			m_tokens[UserName].set(userInfoScanner.between(userNameBegin) );
+			m_tokens[UserName].set(userInfoScanner.acceptWhile(isNotColon) );
 
 			if (!userInfoScanner.accept(':').isEmpty() )
 			{
@@ -126,9 +112,7 @@ namespace bx
 			}
 		}
 
-		const StringView hostBegin = authorityScanner.getCursor();
-		authorityScanner.acceptWhile(isNotColon);
-		m_tokens[Host].set(authorityScanner.between(hostBegin) );
+		m_tokens[Host].set(authorityScanner.acceptWhile(isNotColon) );
 
 		if (!authorityScanner.accept(':').isEmpty() )
 		{
