@@ -85,7 +85,8 @@
 // http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures
 #if defined(__arm__)     \
  || defined(__aarch64__) \
- || defined(_M_ARM)
+ || defined(_M_ARM)      \
+ || defined(_M_ARM64)
 #	undef  BX_CPU_ARM
 #	define BX_CPU_ARM 1
 #	define BX_CACHE_LINE_SIZE 64

@@ -357,9 +357,10 @@ namespace bx
 		const float absA   = abs(aa);
 		const float cosA   = cos(absA);
 		const float cosASq = square(cosA);
-		const float tmp0   = sqrt(1.0f - cosASq);
-		const float tmp1   = aa > 0.0f && aa < kPi ? 1.0f : -1.0f;
-		const float sinA   = mul(tmp0, tmp1);
+		const float tmp0   = max(0.0f, 1.0f - cosASq);
+		const float tmp1   = sqrt(tmp0);
+		const float tmp2   = aa > 0.0f && aa < kPi ? 1.0f : -1.0f;
+		const float sinA   = mul(tmp1, tmp2);
 
 		_outSinApprox = sinA;
 		_outCos = cosA;
