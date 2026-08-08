@@ -538,6 +538,17 @@ namespace bx
 		return StringView(ptr, term);
 	}
 
+	StringView strIdentifier(const StringView& _str)
+	{
+		if (_str.isEmpty()
+		||  !(isAlpha(*_str.getPtr() ) || '_' == *_str.getPtr() ) )
+		{
+			return StringView(_str.getPtr(), _str.getPtr() );
+		}
+
+		return strWord(_str);
+	}
+
 	StringView strFindBlock(const StringView& _str, char _open, char _close)
 	{
 		const char* curr  = _str.getPtr();
