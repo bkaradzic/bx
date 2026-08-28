@@ -127,42 +127,59 @@ namespace bx
 		return m_tokens[_token];
 	}
 
-	static char toHex(char _nible)
+	static char toHex(uint8_t _nible)
 	{
 		return "0123456789ABCDEF"[_nible&0xf];
 	}
 
 	// https://secure.wikimedia.org/wikipedia/en/wiki/URL_encoding
-	void urlEncode(char* _out, uint32_t _max, const StringView& _str)
+	int32_t urlEncode(char* _out, int32_t _max, const StringView& _str, UrlEncoding::Enum _encoding)
 	{
-		_max--; // need space for zero terminator
-
-		const char* str  = _str.getPtr();
-		const char* term = _str.getTerm();
-
-		uint32_t ii = 0;
-		for (char ch = *str++
-			; str <= term && ii < _max
-			; ch = *str++
-			)
+		if (0 >= _max)
 		{
+			return 0;
+		}
+
+		const char* str = _str.getPtr();
+
+		const int32_t max = _max-1; // need space for zero terminator
+		int32_t len = 0;
+
+		for (int32_t ii = 0, num = _str.getLength(); ii < num; ++ii)
+		{
+			const char ch = str[ii];
+
 			if (isAlphaNum(ch)
-			||  ch == '-'
-			||  ch == '_'
-			||  ch == '.'
-			||  ch == '~')
+			||  '-' == ch
+			||  '_' == ch
+			||  '.' == ch
+			||  '~' == ch
+			|| ('/' == ch && UrlEncoding::Path == _encoding) )
 			{
-				_out[ii++] = ch;
+				if (max < len+1)
+				{
+					break;
+				}
+
+				_out[len++] = ch;
 			}
-			else if (ii+3 < _max)
+			else
 			{
-				_out[ii++] = '%';
-				_out[ii++] = toHex(ch>>4);
-				_out[ii++] = toHex(ch);
+				// Escape sequence must not be split by truncation.
+				if (max < len+3)
+				{
+					break;
+				}
+
+				_out[len++] = '%';
+				_out[len++] = toHex(uint8_t(ch)>>4);
+				_out[len++] = toHex(uint8_t(ch) );
 			}
 		}
 
-		_out[ii] = '\0';
+		_out[len] = '\0';
+
+		return len;
 	}
 
 } // namespace bx
