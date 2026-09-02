@@ -419,41 +419,36 @@ namespace bx
 
 	inline BX_CONSTEXPR_FUNC simd64_t simd64_f32_madd(simd64_t _a, simd64_t _b, simd64_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		return bitCast<simd64_t>(bitCast<simd64_f32_langext_t>(_a) * bitCast<simd64_f32_langext_t>(_b) + bitCast<simd64_f32_langext_t>(_c));
-#else
 		const simd64_f32_ref_t a = bitCast<simd64_f32_ref_t>(_a);
 		const simd64_f32_ref_t b = bitCast<simd64_f32_ref_t>(_b);
 		const simd64_f32_ref_t c = bitCast<simd64_f32_ref_t>(_c);
-		const simd64_f32_ref_t result = { { a.f32[0] * b.f32[0] + c.f32[0], a.f32[1] * b.f32[1] + c.f32[1] } };
+
+		simd64_f32_ref_t result = {};
+
+		for (uint32_t ii = 0; ii < 2; ++ii)
+		{
+			const simd32_t aa = simd32_ld(a.f32[ii]);
+			const simd32_t bb = simd32_ld(b.f32[ii]);
+			const simd32_t cc = simd32_ld(c.f32[ii]);
+			const simd32_t rr = simd32_f32_madd(aa, bb, cc);
+			result.f32[ii] = bitCast<float>(rr);
+		}
+
 		return bitCast<simd64_t>(result);
-#endif // BX_SIMD_LANGEXT
 	}
 
 	inline BX_CONSTEXPR_FUNC simd64_t simd64_f32_msub(simd64_t _a, simd64_t _b, simd64_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		return bitCast<simd64_t>(bitCast<simd64_f32_langext_t>(_a) * bitCast<simd64_f32_langext_t>(_b) - bitCast<simd64_f32_langext_t>(_c));
-#else
-		const simd64_f32_ref_t a = bitCast<simd64_f32_ref_t>(_a);
-		const simd64_f32_ref_t b = bitCast<simd64_f32_ref_t>(_b);
-		const simd64_f32_ref_t c = bitCast<simd64_f32_ref_t>(_c);
-		const simd64_f32_ref_t result = { { a.f32[0] * b.f32[0] - c.f32[0], a.f32[1] * b.f32[1] - c.f32[1] } };
-		return bitCast<simd64_t>(result);
-#endif // BX_SIMD_LANGEXT
+		const simd64_t nc     = simd64_f32_neg(_c);
+		const simd64_t result = simd64_f32_madd(_a, _b, nc);
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC simd64_t simd64_f32_nmsub(simd64_t _a, simd64_t _b, simd64_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		return bitCast<simd64_t>(bitCast<simd64_f32_langext_t>(_c) - bitCast<simd64_f32_langext_t>(_a) * bitCast<simd64_f32_langext_t>(_b));
-#else
-		const simd64_f32_ref_t a = bitCast<simd64_f32_ref_t>(_a);
-		const simd64_f32_ref_t b = bitCast<simd64_f32_ref_t>(_b);
-		const simd64_f32_ref_t c = bitCast<simd64_f32_ref_t>(_c);
-		const simd64_f32_ref_t result = { { c.f32[0] - a.f32[0] * b.f32[0], c.f32[1] - a.f32[1] * b.f32[1] } };
-		return bitCast<simd64_t>(result);
-#endif // BX_SIMD_LANGEXT
+		const simd64_t na     = simd64_f32_neg(_a);
+		const simd64_t result = simd64_f32_madd(na, _b, _c);
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC int simd64_x32_signbitsmask(simd64_t _a)
@@ -584,6 +579,13 @@ namespace bx
 	{
 		const simd64_f32_ref_t a = bitCast<simd64_f32_ref_t>(_a);
 		const simd64_f32_ref_t result = { { floor(a.f32[0]), floor(a.f32[1]) } };
+		return bitCast<simd64_t>(result);
+	}
+
+	inline BX_CONSTEXPR_FUNC simd64_t simd64_f32_trunc(simd64_t _a)
+	{
+		const simd64_f32_ref_t a = bitCast<simd64_f32_ref_t>(_a);
+		const simd64_f32_ref_t result = { { trunc(a.f32[0]), trunc(a.f32[1]) } };
 		return bitCast<simd64_t>(result);
 	}
 

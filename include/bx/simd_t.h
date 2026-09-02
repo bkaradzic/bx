@@ -72,6 +72,19 @@
 #	define BX_SIMD_AVX  1
 #endif //
 
+#if BX_CONFIG_FMA
+#	if BX_CPU_X86
+#		include <immintrin.h> // FMA3
+#	endif // BX_CPU_X86
+#	if BX_COMPILER_MSVC
+// With /arch:AVX2 MSVC compiles fmaf to a single vfmadd213ss (no CRT call and,
+// unlike _mm_fmadd_ss, no zeroing of the upper lanes); the CRT's own
+// declaration is compatible with this one. On ARM64 it compiles to fmadd.
+extern "C" float fmaf(float, float, float);
+#		pragma intrinsic(fmaf)
+#	endif // BX_COMPILER_MSVC
+#endif // BX_CONFIG_FMA
+
 #if BX_CPU_X86 && (defined(__SSE2__) || (BX_COMPILER_MSVC && (BX_ARCH_64BIT || _M_IX86_FP >= 2) ) )
 #	include <emmintrin.h>
 #	include <smmintrin.h> // SSE4.1  minspec is SSE4.2 so always available
@@ -733,6 +746,17 @@ namespace bx
 	template<typename Ty>
 	Ty simd_f32_floor(Ty _a);
 
+	/// Per-lane f32 truncation toward zero.
+	///
+	/// @param[in] _a Input register.
+	///
+	/// @returns Per-lane integral value not greater in magnitude than `_a`.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_trunc(Ty _a);
+
 	/// Per-lane f32 base-2 logarithm: `log2(_a)`.
 	///
 	/// @param[in] _a Input register.
@@ -822,6 +846,97 @@ namespace bx
 	///
 	template<typename Ty>
 	Ty simd_f32_ldexp(Ty _a, Ty _b);
+
+	/// Per-lane f32 fractional part: `_a - trunc(_a)`, as bx::fract.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_fract(Ty _a);
+
+	/// Per-lane f32 sign: -1, 0 or 1, as bx::sign.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_sign(Ty _a);
+
+	/// Per-lane f32 step: 0 where `_a < _edge`, 1 elsewhere, as bx::step.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_step(Ty _edge, Ty _a);
+
+	/// Per-lane f32 Hermite smoothstep: `_a^2 * (3 - 2 * _a)`, as bx::smoothStep.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_smoothstep(Ty _a);
+
+	/// Per-lane f32 remainder: `_a - _b * floor(_a / _b)`, as bx::mod.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_mod(Ty _a, Ty _b);
+
+	/// Per-lane f32 tangent, as bx::tan.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_tan(Ty _a);
+
+	/// Per-lane f32 arc cosine, as bx::acos.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_acos(Ty _a);
+
+	/// Per-lane f32 arc sine, as bx::asin.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_asin(Ty _a);
+
+	/// Per-lane f32 two-argument arc tangent of `_y / _x`, as bx::atan2.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_atan2(Ty _y, Ty _x);
+
+	/// Per-lane f32 arc tangent, as bx::atan.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_atan(Ty _a);
+
+	/// Per-lane f32 hyperbolic sine, as bx::sinh.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_sinh(Ty _a);
+
+	/// Per-lane f32 hyperbolic cosine, as bx::cosh.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_cosh(Ty _a);
+
+	/// Per-lane f32 hyperbolic tangent, as bx::tanh.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_tanh(Ty _a);
 
 	/// Per-lane f32 to i32 conversion with truncation toward zero.
 	///
@@ -1260,6 +1375,109 @@ namespace bx
 	///
 	template<typename Ty>
 	Ty simd_u32_cmpgt(Ty _a, Ty _b);
+
+	/// Per-lane i32 compare not-equal, less-or-equal, greater-or-equal (masks).
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_i32_cmpneq(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_cmple(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_cmpge(Ty _a, Ty _b);
+
+	/// Per-lane u32 compare not-equal, less-or-equal, greater-or-equal (masks).
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_u32_cmpneq(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_cmple(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_cmpge(Ty _a, Ty _b);
+
+	/// Per-lane u32 minimum, maximum and clamp.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_u32_min(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_max(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_clamp(Ty _a, Ty _min, Ty _max);
+
+	/// Per-lane integer division and remainder with the shading-language
+	/// rules: `x / 0 == x`, `x % 0 == 0`, `INT32_MIN / -1 == INT32_MIN` and
+	/// `INT32_MIN % -1 == 0`. Never traps.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_i32_div(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_mod(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_div(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_mod(Ty _a, Ty _b);
+
+	/// Per-lane f32 to i32/u32 conversion, saturating: out of range clamps to
+	/// the type's limits, NaN is 0.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f32_ftoi_sat(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_ftou_sat(Ty _a);
+
+	/// Per-lane u32 to f32 conversion, correctly rounded.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_u32_utof(Ty _a);
+
+	/// Per-lane bit counts: leading zeros, trailing zeros (32 for a zero lane)
+	/// and set bits; and the bit-reversed lane.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_u32_cntlz(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_cnttz(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_cntbits(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_reversebits(Ty _a);
+
+	/// Per-lane f32 to half (in the low 16 bits of the lane) and back, the same
+	/// bits as bx::halfFromFloat / bx::halfToFloat.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_f16_fromf32(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f16_tof32(Ty _a);
 
 	/// Broadcast float value to all lanes.
 	///

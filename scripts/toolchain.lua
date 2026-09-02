@@ -239,7 +239,6 @@ function toolchain(_buildDir, _libDir)
 	flags {
 		"Cpp20",
 		"ExtraWarnings",
-		"FloatFast",
 	}
 
 	if _ACTION == "gmake" or _ACTION == "ninja" then

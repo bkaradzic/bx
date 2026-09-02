@@ -334,7 +334,7 @@ namespace bx
 		return vrndnq_f32(_a);
 #else
 		return simd_f32_round_ni(_a);
-#endif
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -344,7 +344,7 @@ namespace bx
 		return vrndpq_f32(_a);
 #else
 		return simd_f32_ceil_ni(_a);
-#endif
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -354,7 +354,17 @@ namespace bx
 		return vrndmq_f32(_a);
 #else
 		return simd_f32_floor_ni(_a);
-#endif
+#endif // BX_ARCH_64BIT
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_trunc(simd128_neon_t _a)
+	{
+#if BX_ARCH_64BIT
+		return vrndq_f32(_a);
+#else
+		return simd_f32_trunc_ni(_a);
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -382,7 +392,7 @@ namespace bx
 		return vdivq_f32(_a, _b);
 #else
 		return simd_f32_div_nr_ni(_a, _b);
-#endif
+#endif // BX_ARCH_64BIT
 	}
 
 	template<>
@@ -619,6 +629,30 @@ namespace bx
 		const uint32x4_t b      = vreinterpretq_u32_f32(_b);
 		const uint32x4_t result = vcltq_u32(a, b);
 		return vreinterpretq_f32_u32(result);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_i32_div(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		return simd_i32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_i32_mod(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		return simd_i32_mod_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_u32_div(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		return simd_u32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_u32_mod(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		return simd_u32_mod_ni(_a, _b);
 	}
 
 	template<>
@@ -912,27 +946,33 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_madd(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
 	{
-#if BX_ARCH_64BIT
+#if BX_CONFIG_FMA
 		return vfmaq_f32(_c, _a, _b);
 #else
 		return simd_f32_madd_ni(_a, _b, _c);
-#endif
+#endif // BX_CONFIG_FMA
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_msub(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
 	{
+#if BX_CONFIG_FMA
+		const simd128_neon_t nmsub  = vfmsq_f32(_c, _a, _b);
+		const simd128_neon_t result = vnegq_f32(nmsub);
+		return result;
+#else
 		return simd_f32_msub_ni(_a, _b, _c);
+#endif // BX_CONFIG_FMA
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_nmsub(simd128_neon_t _a, simd128_neon_t _b, simd128_neon_t _c)
 	{
-#if BX_ARCH_64BIT
+#if BX_CONFIG_FMA
 		return vfmsq_f32(_c, _a, _b);
 #else
 		return simd_f32_nmsub_ni(_a, _b, _c);
-#endif
+#endif // BX_CONFIG_FMA
 	}
 
 	template<>

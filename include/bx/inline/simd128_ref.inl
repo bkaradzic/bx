@@ -558,6 +558,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_trunc(simd128_ref_t _a)
+	{
+		return simd_f32_trunc_ni(_a);
+	}
+
+	template<>
 	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f32_cmpeq(simd128_ref_t _a, simd128_ref_t _b)
 	{
 #if BX_SIMD_LANGEXT
@@ -911,6 +917,30 @@ namespace bx
 		result.u32[3] = _a.u32[3] == _b.u32[3] ? 0xffffffff : 0;
 		return result;
 #endif // BX_SIMD_LANGEXT
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_i32_div(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		return simd_i32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_i32_mod(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		return simd_i32_mod_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_u32_div(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		return simd_u32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_u32_mod(simd128_ref_t _a, simd128_ref_t _b)
+	{
+		return simd_u32_mod_ni(_a, _b);
 	}
 
 	template<>
@@ -1350,19 +1380,42 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_madd(simd128_ref_t _a, simd128_ref_t _b, simd128_ref_t _c)
 	{
-		return simd_f32_madd_ni(_a, _b, _c);
+		const simd128_f32_ref_t a = bitCast<simd128_f32_ref_t>(_a);
+		const simd128_f32_ref_t b = bitCast<simd128_f32_ref_t>(_b);
+		const simd128_f32_ref_t c = bitCast<simd128_f32_ref_t>(_c);
+
+		simd128_f32_ref_t result = {};
+
+		for (uint32_t ii = 0; ii < 4; ++ii)
+		{
+			const simd32_t aa = simd32_ld(a.f32[ii]);
+			const simd32_t bb = simd32_ld(b.f32[ii]);
+			const simd32_t cc = simd32_ld(c.f32[ii]);
+			const simd32_t rr = simd32_f32_madd(aa, bb, cc);
+			result.f32[ii] = bitCast<float>(rr);
+		}
+
+		return bitCast<simd128_ref_t>(result);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_msub(simd128_ref_t _a, simd128_ref_t _b, simd128_ref_t _c)
 	{
-		return simd_f32_msub_ni(_a, _b, _c);
+		const simd128_f32_ref_t c      = bitCast<simd128_f32_ref_t>(_c);
+		const simd128_f32_ref_t nc     = { { -c.f32[0], -c.f32[1], -c.f32[2], -c.f32[3] } };
+		const simd128_ref_t     ncc    = bitCast<simd128_ref_t>(nc);
+		const simd128_ref_t     result = simd128_f32_madd(_a, _b, ncc);
+		return result;
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_nmsub(simd128_ref_t _a, simd128_ref_t _b, simd128_ref_t _c)
 	{
-		return simd_f32_nmsub_ni(_a, _b, _c);
+		const simd128_f32_ref_t a      = bitCast<simd128_f32_ref_t>(_a);
+		const simd128_f32_ref_t na     = { { -a.f32[0], -a.f32[1], -a.f32[2], -a.f32[3] } };
+		const simd128_ref_t     naa    = bitCast<simd128_ref_t>(na);
+		const simd128_ref_t     result = simd128_f32_madd(naa, _b, _c);
+		return result;
 	}
 
 	template<>

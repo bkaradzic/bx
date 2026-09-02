@@ -145,11 +145,9 @@ TEST_CASE("Format %f", "[string][printf]")
 	REQUIRE(test("     nan", "%8f",   kDoubleNan) );
 	REQUIRE(test("-NAN    ", "%-8F", -kDoubleNan) );
 
-#if !defined(__FAST_MATH__) || !__FAST_MATH__
 	REQUIRE(test("     inf", "%8f",   bx::kDoubleInfinity) );
 	REQUIRE(test("inf     ", "%-8f",  bx::kDoubleInfinity) );
 	REQUIRE(test("    -INF", "%8F",  -bx::kDoubleInfinity) );
-#endif // !defined(__FAST_MATH__) || !__FAST_MATH__
 
 	REQUIRE(test(" 1.0",     "%4.1f",    1.0) );
 	REQUIRE(test(" 1.500",   "%6.3f",    1.5) );
