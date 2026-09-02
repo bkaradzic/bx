@@ -566,7 +566,8 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float fract(float _a);
 
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b.
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b,
+	/// rounded like mad.
 	///
 	/// @param[in] _a First factor.
 	/// @param[in] _b Second factor.

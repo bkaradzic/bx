@@ -48,6 +48,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC simd32_t simd32_f32_round(simd32_t _a);
 	BX_CONSTEXPR_FUNC simd32_t simd32_f32_ceil(simd32_t _a);
 	BX_CONSTEXPR_FUNC simd32_t simd32_f32_floor(simd32_t _a);
+	BX_CONSTEXPR_FUNC simd32_t simd32_f32_trunc(simd32_t _a);
 
 	BX_CONSTEXPR_FUNC simd32_t simd32_f32_cmpeq(simd32_t _a, simd32_t _b);
 	BX_CONSTEXPR_FUNC simd32_t simd32_f32_cmpneq(simd32_t _a, simd32_t _b);
@@ -182,6 +183,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_round(simd64_t _a);
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_ceil(simd64_t _a);
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_floor(simd64_t _a);
+	BX_CONSTEXPR_FUNC simd64_t simd64_f32_trunc(simd64_t _a);
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_cmpeq(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_cmpneq(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_f32_cmplt(simd64_t _a, simd64_t _b);
@@ -483,6 +485,11 @@ namespace bx
 	template<typename Ty>
 	Ty simd128_f32_floor(Ty _a);
 
+	/// 4xf32 truncate toward zero.
+	///
+	template<typename Ty>
+	Ty simd128_f32_trunc(Ty _a);
+
 	/// 4xf32 compare equal (returns mask).
 	///
 	template<typename Ty>
@@ -617,6 +624,26 @@ namespace bx
 	///
 	template<typename Ty>
 	Ty simd128_u32_clamp(Ty _a, Ty _min, Ty _max);
+
+	/// 4xi32 division, x / 0 == x and INT32_MIN / -1 == INT32_MIN.
+	///
+	template<typename Ty>
+	Ty simd128_i32_div(Ty _a, Ty _b);
+
+	/// 4xi32 remainder, x % 0 == 0 and INT32_MIN % -1 == 0.
+	///
+	template<typename Ty>
+	Ty simd128_i32_mod(Ty _a, Ty _b);
+
+	/// 4xu32 division, x / 0 == x.
+	///
+	template<typename Ty>
+	Ty simd128_u32_div(Ty _a, Ty _b);
+
+	/// 4xu32 remainder, x % 0 == 0.
+	///
+	template<typename Ty>
+	Ty simd128_u32_mod(Ty _a, Ty _b);
 
 	/// 4xu32 compare equal.
 	///
@@ -996,6 +1023,7 @@ namespace bx
 	template<typename Ty> Ty simd256_f32_round(Ty _a);
 	template<typename Ty> Ty simd256_f32_ceil(Ty _a);
 	template<typename Ty> Ty simd256_f32_floor(Ty _a);
+	template<typename Ty> Ty simd256_f32_trunc(Ty _a);
 	template<typename Ty> Ty simd256_f32_cmpeq(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_f32_cmpneq(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_f32_cmplt(Ty _a, Ty _b);
@@ -1017,6 +1045,10 @@ namespace bx
 	template<typename Ty> Ty simd256_u32_min(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u32_max(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u32_clamp(Ty _a, Ty _min, Ty _max);
+	template<typename Ty> Ty simd256_i32_div(Ty _a, Ty _b);
+	template<typename Ty> Ty simd256_i32_mod(Ty _a, Ty _b);
+	template<typename Ty> Ty simd256_u32_div(Ty _a, Ty _b);
+	template<typename Ty> Ty simd256_u32_mod(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u32_cmpeq(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u32_cmplt(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u32_cmpgt(Ty _a, Ty _b);
@@ -1221,6 +1253,48 @@ namespace bx
 	Ty simd_f32_exp_ni(Ty _a);
 
 	template<typename Ty>
+	Ty simd_f32_trunc_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_fract_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_sign_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_step_ni(Ty _edge, Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_smoothstep_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_mod_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_f32_tan_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_acos_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_asin_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_atan2_ni(Ty _y, Ty _x);
+
+	template<typename Ty>
+	Ty simd_f32_atan_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_sinh_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_cosh_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_tanh_ni(Ty _a);
+
+	template<typename Ty>
 	Ty simd_f32_cmpneq_ni(Ty _a, Ty _b);
 
 	template<typename Ty>
@@ -1272,6 +1346,63 @@ namespace bx
 	Ty simd_u32_cntlz_ni(Ty _a);
 
 	template<typename Ty>
+	Ty simd_u32_cntbits_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_cnttz_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_reversebits_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_i32_cmpneq_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_cmple_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_cmpge_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_cmpneq_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_cmple_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_cmpge_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_min_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_max_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_clamp_ni(Ty _a, Ty _min, Ty _max);
+
+	template<typename Ty>
+	Ty simd_i32_div_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_i32_mod_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_div_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_u32_mod_ni(Ty _a, Ty _b);
+
+	template<typename Ty>
+	Ty simd_f32_ftoi_sat_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f32_ftou_sat_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_u32_utof_ni(Ty _a);
+
+	template<typename Ty>
 	Ty simd_x32_srl_ni(Ty _a, Ty _count);
 
 	template<typename Ty>
@@ -1294,13 +1425,13 @@ namespace bx
 
 } // namespace bx
 
-#if BX_SIMD_AVX
-#	include "simd256_avx.inl"
-#endif // BX_SIMD_AVX
-
 #if BX_SIMD_SSE
 #	include "simd128_sse.inl"
 #endif // BX_SIMD_SSE
+
+#if BX_SIMD_AVX
+#	include "simd256_avx.inl" // After SSE: 256-bit fallbacks use the 128-bit ops.
+#endif // BX_SIMD_AVX
 
 #if BX_SIMD_NEON
 #	include "simd128_neon.inl"
@@ -1315,6 +1446,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC float floor(float _f);
 	BX_CONSTEXPR_FUNC float ceil(float _f);
 	BX_CONSTEXPR_FUNC float round(float _f);
+	BX_CONSTEXPR_FUNC float trunc(float _f);
 	BX_CONSTEXPR_FUNC float sqrt(float _a);
 } // namespace bx
 
@@ -1490,10 +1622,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cmpneq(simd128_t _a, simd128_t _b) { return simd128_f32_cmpneq(_a, _b); }
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cmple(simd128_t _a, simd128_t _b) { return simd128_f32_cmpgt(_b, _a); }
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cmple(simd128_t _a, simd128_t _b) { return simd128_f32_cmple(_a, _b); }
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cmpge(simd128_t _a, simd128_t _b) { return simd128_f32_cmplt(_b, _a); }
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cmpge(simd128_t _a, simd128_t _b) { return simd128_f32_cmpge(_a, _b); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_clamp(simd128_t _a, simd128_t _min, simd128_t _max) { return simd128_f32_clamp(_a, _min, _max); }
@@ -1527,6 +1659,48 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_ldexp(simd128_t _a, simd128_t _b) { return simd_f32_ldexp_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_trunc(simd128_t _a) { return simd128_f32_trunc(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_fract(simd128_t _a) { return simd_f32_fract_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_sign(simd128_t _a) { return simd_f32_sign_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_step(simd128_t _edge, simd128_t _a) { return simd_f32_step_ni(_edge, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_smoothstep(simd128_t _a) { return simd_f32_smoothstep_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_mod(simd128_t _a, simd128_t _b) { return simd_f32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_tan(simd128_t _a) { return simd_f32_tan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_acos(simd128_t _a) { return simd_f32_acos_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_asin(simd128_t _a) { return simd_f32_asin_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_atan2(simd128_t _y, simd128_t _x) { return simd_f32_atan2_ni(_y, _x); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_atan(simd128_t _a) { return simd_f32_atan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_sinh(simd128_t _a) { return simd_f32_sinh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_cosh(simd128_t _a) { return simd_f32_cosh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_tanh(simd128_t _a) { return simd_f32_tanh_ni(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_log2(simd128_t _a) { return simd_f32_log2_ni(_a); }
@@ -1649,6 +1823,72 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cmpgt(simd128_t _a, simd128_t _b) { return simd128_u32_cmpgt(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i32_cmpneq(simd128_t _a, simd128_t _b) { return simd_i32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i32_cmple(simd128_t _a, simd128_t _b) { return simd_i32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i32_cmpge(simd128_t _a, simd128_t _b) { return simd_i32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cmpneq(simd128_t _a, simd128_t _b) { return simd_u32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cmple(simd128_t _a, simd128_t _b) { return simd_u32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cmpge(simd128_t _a, simd128_t _b) { return simd_u32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_min(simd128_t _a, simd128_t _b) { return simd128_u32_min(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_max(simd128_t _a, simd128_t _b) { return simd128_u32_max(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_clamp(simd128_t _a, simd128_t _min, simd128_t _max) { return simd128_u32_clamp(_a, _min, _max); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i32_div(simd128_t _a, simd128_t _b) { return simd128_i32_div(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i32_mod(simd128_t _a, simd128_t _b) { return simd128_i32_mod(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_div(simd128_t _a, simd128_t _b) { return simd128_u32_div(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_mod(simd128_t _a, simd128_t _b) { return simd128_u32_mod(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_ftoi_sat(simd128_t _a) { return simd_f32_ftoi_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_ftou_sat(simd128_t _a) { return simd_f32_ftou_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_utof(simd128_t _a) { return simd_u32_utof_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cntlz(simd128_t _a) { return simd_u32_cntlz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cnttz(simd128_t _a) { return simd_u32_cnttz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_cntbits(simd128_t _a) { return simd_u32_cntbits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_u32_reversebits(simd128_t _a) { return simd_u32_reversebits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f16_fromf32(simd128_t _a) { return simd_f16_fromf32_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f16_tof32(simd128_t _a) { return simd_f16_tof32_ni(_a); }
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_orc(simd128_t _a, simd128_t _b) { return simd128_orc(_a, _b); }
 
 	template<>
@@ -1662,6 +1902,20 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE void simd_stu(void* _ptr, simd128_t _a) { simd128_stu(_ptr, _a); }
+
+#if BX_SIMD_SSE || BX_SIMD_NEON || BX_SIMD_WASM
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd_ld<simd128_ref_t>(const void* _ptr) { return simd128_ld<simd128_ref_t>(_ptr); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd_ldu<simd128_ref_t>(const void* _ptr) { return simd128_ldu<simd128_ref_t>(_ptr); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE void simd_st(void* _ptr, simd128_ref_t _a) { simd128_st(_ptr, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE void simd_stu(void* _ptr, simd128_ref_t _a) { simd128_stu(_ptr, _a); }
+#endif // BX_SIMD_SSE || BX_SIMD_NEON || BX_SIMD_WASM
 
 	template<>
 	BX_SIMD_FORCE_INLINE void simd_x32_st1(void* _ptr, simd128_t _a) { simd128_x32_st1(_ptr, _a); }
@@ -1781,10 +2035,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cmpneq(simd256_t _a, simd256_t _b) { return simd256_f32_cmpneq(_a, _b); }
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cmple(simd256_t _a, simd256_t _b) { return simd256_f32_cmpgt(_b, _a); }
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cmple(simd256_t _a, simd256_t _b) { return simd256_f32_cmple(_a, _b); }
 
 	template<>
-	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cmpge(simd256_t _a, simd256_t _b) { return simd256_f32_cmplt(_b, _a); }
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cmpge(simd256_t _a, simd256_t _b) { return simd256_f32_cmpge(_a, _b); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_t simd_f32_clamp(simd256_t _a, simd256_t _min, simd256_t _max) { return simd256_f32_clamp(_a, _min, _max); }
@@ -1818,6 +2072,48 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_t simd_f32_ldexp(simd256_t _a, simd256_t _b) { return simd_f32_ldexp_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_trunc(simd256_t _a) { return simd256_f32_trunc(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_fract(simd256_t _a) { return simd_f32_fract_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_sign(simd256_t _a) { return simd_f32_sign_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_step(simd256_t _edge, simd256_t _a) { return simd_f32_step_ni(_edge, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_smoothstep(simd256_t _a) { return simd_f32_smoothstep_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_mod(simd256_t _a, simd256_t _b) { return simd_f32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_tan(simd256_t _a) { return simd_f32_tan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_acos(simd256_t _a) { return simd_f32_acos_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_asin(simd256_t _a) { return simd_f32_asin_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_atan2(simd256_t _y, simd256_t _x) { return simd_f32_atan2_ni(_y, _x); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_atan(simd256_t _a) { return simd_f32_atan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_sinh(simd256_t _a) { return simd_f32_sinh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_cosh(simd256_t _a) { return simd_f32_cosh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_tanh(simd256_t _a) { return simd_f32_tanh_ni(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_t simd_f32_log2(simd256_t _a) { return simd_f32_log2_ni(_a); }
@@ -1937,6 +2233,72 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cmplt(simd256_t _a, simd256_t _b) { return simd256_u32_cmplt(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i32_cmpneq(simd256_t _a, simd256_t _b) { return simd_i32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i32_cmple(simd256_t _a, simd256_t _b) { return simd_i32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i32_cmpge(simd256_t _a, simd256_t _b) { return simd_i32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cmpneq(simd256_t _a, simd256_t _b) { return simd_u32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cmple(simd256_t _a, simd256_t _b) { return simd_u32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cmpge(simd256_t _a, simd256_t _b) { return simd_u32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_min(simd256_t _a, simd256_t _b) { return simd256_u32_min(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_max(simd256_t _a, simd256_t _b) { return simd256_u32_max(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_clamp(simd256_t _a, simd256_t _min, simd256_t _max) { return simd256_u32_clamp(_a, _min, _max); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i32_div(simd256_t _a, simd256_t _b) { return simd256_i32_div(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i32_mod(simd256_t _a, simd256_t _b) { return simd256_i32_mod(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_div(simd256_t _a, simd256_t _b) { return simd256_u32_div(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_mod(simd256_t _a, simd256_t _b) { return simd256_u32_mod(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_ftoi_sat(simd256_t _a) { return simd_f32_ftoi_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f32_ftou_sat(simd256_t _a) { return simd_f32_ftou_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_utof(simd256_t _a) { return simd_u32_utof_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cntlz(simd256_t _a) { return simd_u32_cntlz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cnttz(simd256_t _a) { return simd_u32_cnttz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cntbits(simd256_t _a) { return simd_u32_cntbits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_u32_reversebits(simd256_t _a) { return simd_u32_reversebits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f16_fromf32(simd256_t _a) { return simd_f16_fromf32_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_f16_tof32(simd256_t _a) { return simd_f16_tof32_ni(_a); }
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd256_t simd_u32_cmpgt(simd256_t _a, simd256_t _b) { return simd256_u32_cmpgt(_a, _b); }
 
 	template<>
@@ -1953,6 +2315,20 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE void simd_stu(void* _ptr, simd256_t _a) { simd256_stu(_ptr, _a); }
+
+#if BX_SIMD_AVX
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ld<simd256_ref_t>(const void* _ptr) { return simd256_ld<simd256_ref_t>(_ptr); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd_ldu<simd256_ref_t>(const void* _ptr) { return simd256_ldu<simd256_ref_t>(_ptr); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE void simd_st(void* _ptr, simd256_ref_t _a) { simd256_st(_ptr, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE void simd_stu(void* _ptr, simd256_ref_t _a) { simd256_stu(_ptr, _a); }
+#endif // BX_SIMD_AVX
 
 	template<>
 	BX_SIMD_FORCE_INLINE void simd_x32_st1(void* _ptr, simd256_t _a) { simd256_x32_st1(_ptr, _a); }
@@ -2092,6 +2468,72 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cmplt(simd32_t _a, simd32_t _b) { return simd32_u32_cmplt(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i32_cmpneq(simd32_t _a, simd32_t _b) { return simd_i32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i32_cmple(simd32_t _a, simd32_t _b) { return simd_i32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i32_cmpge(simd32_t _a, simd32_t _b) { return simd_i32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cmpneq(simd32_t _a, simd32_t _b) { return simd_u32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cmple(simd32_t _a, simd32_t _b) { return simd_u32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cmpge(simd32_t _a, simd32_t _b) { return simd_u32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_min(simd32_t _a, simd32_t _b) { return simd_u32_min_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_max(simd32_t _a, simd32_t _b) { return simd_u32_max_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_clamp(simd32_t _a, simd32_t _min, simd32_t _max) { return simd_u32_clamp_ni(_a, _min, _max); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i32_div(simd32_t _a, simd32_t _b) { return simd_i32_div_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i32_mod(simd32_t _a, simd32_t _b) { return simd_i32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_div(simd32_t _a, simd32_t _b) { return simd_u32_div_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_mod(simd32_t _a, simd32_t _b) { return simd_u32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_ftoi_sat(simd32_t _a) { return simd_f32_ftoi_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_ftou_sat(simd32_t _a) { return simd_f32_ftou_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_utof(simd32_t _a) { return simd_u32_utof_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cntlz(simd32_t _a) { return simd_u32_cntlz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cnttz(simd32_t _a) { return simd_u32_cnttz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cntbits(simd32_t _a) { return simd_u32_cntbits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_u32_reversebits(simd32_t _a) { return simd_u32_reversebits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f16_fromf32(simd32_t _a) { return simd_f16_fromf32_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f16_tof32(simd32_t _a) { return simd_f16_tof32_ni(_a); }
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd32_t simd_u32_cmpgt(simd32_t _a, simd32_t _b) { return simd32_u32_cmpgt(_a, _b); }
 
 	template<>
@@ -2225,6 +2667,48 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd32_t simd_f32_ldexp(simd32_t _a, simd32_t _b) { return simd_f32_ldexp_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_trunc(simd32_t _a) { return simd32_f32_trunc(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_fract(simd32_t _a) { return simd_f32_fract_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_sign(simd32_t _a) { return simd_f32_sign_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_step(simd32_t _edge, simd32_t _a) { return simd_f32_step_ni(_edge, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_smoothstep(simd32_t _a) { return simd_f32_smoothstep_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_mod(simd32_t _a, simd32_t _b) { return simd_f32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_tan(simd32_t _a) { return simd_f32_tan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_acos(simd32_t _a) { return simd_f32_acos_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_asin(simd32_t _a) { return simd_f32_asin_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_atan2(simd32_t _y, simd32_t _x) { return simd_f32_atan2_ni(_y, _x); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_atan(simd32_t _a) { return simd_f32_atan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_sinh(simd32_t _a) { return simd_f32_sinh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_cosh(simd32_t _a) { return simd_f32_cosh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_f32_tanh(simd32_t _a) { return simd_f32_tanh_ni(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd32_t simd_f32_ftoi_trunc(simd32_t _a) { return simd32_f32_ftoi_trunc(_a); }
@@ -2364,6 +2848,72 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cmplt(simd64_t _a, simd64_t _b) { return simd64_u32_cmplt(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i32_cmpneq(simd64_t _a, simd64_t _b) { return simd_i32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i32_cmple(simd64_t _a, simd64_t _b) { return simd_i32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i32_cmpge(simd64_t _a, simd64_t _b) { return simd_i32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cmpneq(simd64_t _a, simd64_t _b) { return simd_u32_cmpneq_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cmple(simd64_t _a, simd64_t _b) { return simd_u32_cmple_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cmpge(simd64_t _a, simd64_t _b) { return simd_u32_cmpge_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_min(simd64_t _a, simd64_t _b) { return simd_u32_min_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_max(simd64_t _a, simd64_t _b) { return simd_u32_max_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_clamp(simd64_t _a, simd64_t _min, simd64_t _max) { return simd_u32_clamp_ni(_a, _min, _max); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i32_div(simd64_t _a, simd64_t _b) { return simd_i32_div_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i32_mod(simd64_t _a, simd64_t _b) { return simd_i32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_div(simd64_t _a, simd64_t _b) { return simd_u32_div_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_mod(simd64_t _a, simd64_t _b) { return simd_u32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_ftoi_sat(simd64_t _a) { return simd_f32_ftoi_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_ftou_sat(simd64_t _a) { return simd_f32_ftou_sat_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_utof(simd64_t _a) { return simd_u32_utof_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cntlz(simd64_t _a) { return simd_u32_cntlz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cnttz(simd64_t _a) { return simd_u32_cnttz_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cntbits(simd64_t _a) { return simd_u32_cntbits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_u32_reversebits(simd64_t _a) { return simd_u32_reversebits_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f16_fromf32(simd64_t _a) { return simd_f16_fromf32_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f16_tof32(simd64_t _a) { return simd_f16_tof32_ni(_a); }
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd64_t simd_u32_cmpgt(simd64_t _a, simd64_t _b) { return simd64_u32_cmpgt(_a, _b); }
 
 	template<>
@@ -2497,6 +3047,48 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd64_t simd_f32_ldexp(simd64_t _a, simd64_t _b) { return simd_f32_ldexp_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_trunc(simd64_t _a) { return simd64_f32_trunc(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_fract(simd64_t _a) { return simd_f32_fract_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_sign(simd64_t _a) { return simd_f32_sign_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_step(simd64_t _edge, simd64_t _a) { return simd_f32_step_ni(_edge, _a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_smoothstep(simd64_t _a) { return simd_f32_smoothstep_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_mod(simd64_t _a, simd64_t _b) { return simd_f32_mod_ni(_a, _b); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_tan(simd64_t _a) { return simd_f32_tan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_acos(simd64_t _a) { return simd_f32_acos_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_asin(simd64_t _a) { return simd_f32_asin_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_atan2(simd64_t _y, simd64_t _x) { return simd_f32_atan2_ni(_y, _x); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_atan(simd64_t _a) { return simd_f32_atan_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_sinh(simd64_t _a) { return simd_f32_sinh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_cosh(simd64_t _a) { return simd_f32_cosh_ni(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_f32_tanh(simd64_t _a) { return simd_f32_tanh_ni(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd64_t simd_f32_ftoi_trunc(simd64_t _a) { return simd64_f32_ftoi_trunc(_a); }

@@ -6,31 +6,35 @@
 #include "test.h"
 #include <bx/math.h>
 #include <bx/file.h>
+#include <bx/rng.h>
 
 #include <math.h>
 #include <stdint.h> // intXX_t
 #include <limits.h> // UCHAR_*
+#include <float.h>  // LDBL_MANT_DIG
+
+TEST_CASE("fast-math is disabled", "[math][config]")
+{
+#if (defined(__FAST_MATH__) && __FAST_MATH__) || defined(_M_FP_FAST)
+	FAIL("Built with fast math enabled. bx math requires IEEE semantics: drop"
+		" `-ffast-math` / `/fp:fast` (`FloatFast` in scripts/toolchain.lua)."
+		);
+#else
+	SUCCEED("IEEE semantics available.");
+#endif // (defined(__FAST_MATH__) && __FAST_MATH__) || defined(_M_FP_FAST)
+}
 
 TEST_CASE("isFinite, isInfinite, isNan", "[math]")
 {
-#if defined(__FAST_MATH__) && __FAST_MATH__
-	SKIP("This unit test fails with fast math is enabled.");
-#endif // !defined(__FAST_MATH__) || !__FAST_MATH__
-
 	for (uint64_t ii = 0; ii < UINT32_MAX; ii += rand()%(1<<13)+1)
 	{
 		union { uint32_t ui; float f; } u = { uint32_t(ii) };
 		BX_UNUSED(u);
 
-#if BX_PLATFORM_OSX || BX_PLATFORM_IOS
-		REQUIRE(::__isnanf(u.f)    == bx::isNan(u.f) );
-		REQUIRE(::__isfinitef(u.f) == bx::isFinite(u.f) );
-		REQUIRE(::__isinff(u.f)    == bx::isInfinite(u.f) );
-#elif BX_COMPILER_MSVC
-		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
-		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
-		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
-#elif BX_PLATFORM_ANDROID
+#if BX_PLATFORM_OSX     \
+ || BX_PLATFORM_IOS     \
+ || BX_COMPILER_MSVC    \
+ || BX_PLATFORM_ANDROID
 		REQUIRE(!!::isnan(u.f)    == bx::isNan(u.f) );
 		REQUIRE(!!::isfinite(u.f) == bx::isFinite(u.f) );
 		REQUIRE(!!::isinf(u.f)    == bx::isInfinite(u.f) );
@@ -421,9 +425,7 @@ TEST_CASE("rsqrt", "[math][libm]")
 	}
 
 	// rsqrtSimd
-#if !defined(__FAST_MATH__) || !__FAST_MATH__
 	REQUIRE(bx::isInfinite(bx::rsqrtSimd(0.0f) ) );
-#endif // !defined(__FAST_MATH__) || !__FAST_MATH__
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
@@ -433,10 +435,8 @@ TEST_CASE("rsqrt", "[math][libm]")
 	}
 
 	// rsqrt
-#if !defined(__FAST_MATH__) || !__FAST_MATH__
 	REQUIRE(bx::isInfinite(1.0f / ::sqrtf(0.0f) ) );
 	REQUIRE(bx::isInfinite(bx::rsqrt(0.0f) ) );
-#endif // !defined(__FAST_MATH__) || !__FAST_MATH__
 
 	for (float xx = bx::kNearZero; xx < 100.0f; xx += 0.1f)
 	{
@@ -523,6 +523,99 @@ TEST_CASE("mod", "[math][libm]")
 	STATIC_REQUIRE(  1.0f == bx::mod(1389.0f, 2.0f) );
 }
 
+static float madSplit(float _a, float _b, float _c)
+{
+	volatile float ab = _a * _b;
+	return ab + _c;
+}
+
+static constexpr float maddRef(float _a, float _b, float _c)
+{
+	return bx::bitCast<float>(
+		bx::simd32_f32_madd_ref(bx::simd32_ld(_a), bx::simd32_ld(_b), bx::simd32_ld(_c) )
+		);
+}
+
+TEST_CASE("mad", "[math]")
+{
+	constexpr float kA     = 0x1.000002p+0f;
+	constexpr float kB     = 0x1.fffffcp-1f;
+	constexpr float kFused = -0x1p-46f;
+
+	STATIC_REQUIRE(kFused == maddRef(kA, kB, -1.0f) );
+
+	volatile float va = kA;
+	volatile float vb = kB;
+	volatile float vc = -1.0f;
+	REQUIRE(kFused == maddRef(va, vb, vc) );
+
+	STATIC_REQUIRE( kFused == bx::mad(kA, kB, -1.0f) );
+	STATIC_REQUIRE(-kFused == bx::nms(kA, kB,  1.0f) );
+
+#if BX_CONFIG_FMA
+	REQUIRE(kFused == bx::mad(va, vb, vc) );
+#else
+	REQUIRE(0.0f   == bx::mad(va, vb, vc) );
+#endif // BX_CONFIG_FMA
+
+	REQUIRE(0.0f == madSplit(va, vb, vc) );
+
+	REQUIRE(bx::isNan(bx::mad(bx::kFloatInfinity, 0.0f, 1.0f) ) );
+	REQUIRE(bx::isNan(bx::mad(bx::kFloatInfinity, 1.0f, -bx::kFloatInfinity) ) );
+
+	REQUIRE(bx::kFloatExponentMask == bx::bitCast<uint32_t>(bx::mad(3.0e38f, 2.0f, 0.0f) ) );
+
+#if BX_CONFIG_FMA
+	REQUIRE( (bx::kFloatSignMask|bx::kFloatExponentMask) == bx::bitCast<uint32_t>(bx::mad(3.0e38f, 2.0f, -bx::kFloatInfinity) ) );
+#else
+	REQUIRE(bx::isNan(bx::mad(3.0e38f, 2.0f, -bx::kFloatInfinity) ) );
+#endif // BX_CONFIG_FMA
+
+	STATIC_REQUIRE( (bx::kFloatSignMask|bx::kFloatExponentMask) == bx::bitCast<uint32_t>(maddRef(3.0e38f, 2.0f, -bx::kFloatInfinity) ) );
+	REQUIRE(0                   == bx::bitCast<uint32_t>(bx::mad( 1.0f, 1.0f, -1.0f) ) );
+
+	REQUIRE(bx::kFloatSignMask  == bx::bitCast<uint32_t>(bx::mad(-1.0f, 0.0f, -0.0f) ) );
+
+	REQUIRE(0                   == bx::bitCast<uint32_t>(bx::mad(-1.0f, 0.0f,  0.0f) ) );
+
+	STATIC_REQUIRE(bx::bitCast<uint32_t>(0x1p-140f) == bx::bitCast<uint32_t>(maddRef(0x1p-100f, 0x1p-40f, 0.0f) ) );
+	STATIC_REQUIRE(bx::bitCast<uint32_t>(0x1p-149f) == bx::bitCast<uint32_t>(maddRef(0x1p-75f, 0x1.000002p-75f, 0.0f) ) );
+	STATIC_REQUIRE(bx::bitCast<uint32_t>(0.0f)      == bx::bitCast<uint32_t>(maddRef(0x1p-75f, 0x1p-75f, 0.0f) ) );
+	STATIC_REQUIRE(bx::bitCast<uint32_t>(0x1p-148f) == bx::bitCast<uint32_t>(maddRef(0x1p-75f, 0x1p-75f, 0x1p-149f) ) );
+
+	STATIC_REQUIRE(0x1p-46f == maddRef(0x1.000002p+0f, 0x1.000002p+0f, -0x1.000004p+0f) );
+	STATIC_REQUIRE(1.0f     == maddRef(0x1.fffffep+22f, 2.0f, -0x1.fffffcp+23f) );
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 65536; ++ii)
+	{
+		auto gen = [&rng]() -> float
+		{
+			const uint32_t bits = rng.gen();
+			const uint32_t exp  = 96 + (bits>>23)%64;
+			return bx::bitCast<float>( (bits & 0x807fffff) | (exp<<23) );
+		};
+
+		const float aa = gen();
+		const float bb = gen();
+		const float cc = gen();
+
+#if LDBL_MANT_DIG >= 64
+		const float ref = float( (long double)(aa) * (long double)(bb) + (long double)(cc) );
+#else
+		const float ref = ::fmaf(aa, bb, cc);
+#endif // LDBL_MANT_DIG >= 64
+		const float sw  = maddRef(aa, bb, cc);
+		REQUIRE(bx::bitCast<uint32_t>(ref) == bx::bitCast<uint32_t>(sw) );
+
+#if BX_CONFIG_FMA
+		const float mad = bx::mad(aa, bb, cc);
+		REQUIRE(bx::bitCast<uint32_t>(ref) == bx::bitCast<uint32_t>(mad) );
+#endif // BX_CONFIG_FMA
+	}
+}
+
 typedef float (*MathFloatFn)(float);
 
 template<MathFloatFn BxT, MathFloatFn CrtT>
@@ -554,6 +647,14 @@ TEST_CASE("round", "[math][libm]")
 	STATIC_REQUIRE( 14.0f == bx::round(  13.89f) );
 	STATIC_REQUIRE(-14.0f == bx::round( -13.89f) );
 
+	STATIC_REQUIRE(  2.0f == bx::round(   2.5f) );
+	STATIC_REQUIRE(  4.0f == bx::round(   3.5f) );
+	STATIC_REQUIRE( -2.0f == bx::round(  -2.5f) );
+	STATIC_REQUIRE(  0.0f == bx::round(   0.49999997f) );
+	STATIC_REQUIRE(  0x1p22f        == bx::round(0x1p22f + 0.5f) );
+	STATIC_REQUIRE(  0x1p22f + 2.0f == bx::round(0x1p22f + 1.5f) );
+	STATIC_REQUIRE(bx::kFloatSignMask == bx::bitCast<uint32_t>(bx::round(-0.4f) ) );
+
 	testMathFunc1Float<bx::round, ::roundf>( 13.89f);
 	testMathFunc1Float<bx::round, ::roundf>(-13.89f);
 }
@@ -562,6 +663,17 @@ TEST_CASE("trunc", "[math][libm]")
 {
 	STATIC_REQUIRE( 13.0f == bx::trunc( 13.89f) );
 	STATIC_REQUIRE(-13.0f == bx::trunc(-13.89f) );
+
+	STATIC_REQUIRE( 1.0e10f == bx::trunc( 1.0e10f) );
+	STATIC_REQUIRE(-1.0e10f == bx::trunc(-1.0e10f) );
+	STATIC_REQUIRE( 1.0e10f == bx::floor( 1.0e10f) );
+	STATIC_REQUIRE(-1.0e10f == bx::ceil( -1.0e10f) );
+	STATIC_REQUIRE(bx::kFloatSignMask == bx::bitCast<uint32_t>(bx::trunc(-0.5f) ) );
+	STATIC_REQUIRE(bx::kFloatSignMask == bx::bitCast<uint32_t>(bx::ceil( -0.5f) ) );
+	STATIC_REQUIRE(bx::kFloatExponentMask == bx::bitCast<uint32_t>(bx::floor(bx::kFloatInfinity) ) );
+	volatile float nan = bx::bitCast<float>(0x7fc00000u);
+	REQUIRE(bx::isNan(bx::trunc(nan) ) );
+	REQUIRE(bx::isNan(bx::floor(nan) ) );
 
 	testMathFunc1Float<bx::trunc, ::truncf>( 13.89f);
 	testMathFunc1Float<bx::trunc, ::truncf>(-13.89f);
@@ -840,6 +952,7 @@ TEST_CASE("signBit", "[math][libm]")
 {
 	STATIC_REQUIRE( bx::signBit(-0.1389f) );
 	STATIC_REQUIRE(!bx::signBit( 0.0000f) );
+	STATIC_REQUIRE( bx::signBit(-0.0000f) );
 	STATIC_REQUIRE(!bx::signBit( 0.1389f) );
 
 	STATIC_REQUIRE( bx::signBit(-bx::kFloatInfinity) );

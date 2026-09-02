@@ -309,6 +309,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_trunc(simd128_sse_t _a)
+	{
+		return _mm_round_ps(_a, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_add(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		return _mm_add_ps(_a, _b);
@@ -554,6 +560,114 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_u32_cmplt(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		return simd_u32_cmplt_ni(_a, _b);
+	}
+
+	BX_SIMD_FORCE_INLINE __m128i simd128_sse_i32_quot(__m128i _a, __m128i _b)
+	{
+		const __m128i ahi    = _mm_unpackhi_epi64(_a, _a);
+		const __m128i bhi    = _mm_unpackhi_epi64(_b, _b);
+		const __m128d alo_d  = _mm_cvtepi32_pd(_a);
+		const __m128d ahi_d  = _mm_cvtepi32_pd(ahi);
+		const __m128d blo_d  = _mm_cvtepi32_pd(_b);
+		const __m128d bhi_d  = _mm_cvtepi32_pd(bhi);
+		const __m128d qlo    = _mm_div_pd(alo_d, blo_d);
+		const __m128d qhi    = _mm_div_pd(ahi_d, bhi_d);
+		const __m128i ilo    = _mm_cvttpd_epi32(qlo);
+		const __m128i ihi    = _mm_cvttpd_epi32(qhi);
+		const __m128i result = _mm_unpacklo_epi64(ilo, ihi);
+		return result;
+	}
+
+	BX_SIMD_FORCE_INLINE __m128i simd128_sse_u32_quot(__m128i _a, __m128i _b)
+	{
+		// The signed convert, plus 2^32 where the top bit was set.
+		const __m128d two32  = _mm_set1_pd(4294967296.0);
+		const __m128i aneg   = _mm_srai_epi32(_a, 31);
+		const __m128i bneg   = _mm_srai_epi32(_b, 31);
+		const __m128i ahi    = _mm_unpackhi_epi64(_a, _a);
+		const __m128i bhi    = _mm_unpackhi_epi64(_b, _b);
+		const __m128i anhi   = _mm_unpackhi_epi64(aneg, aneg);
+		const __m128i bnhi   = _mm_unpackhi_epi64(bneg, bneg);
+		const __m128d alo_s  = _mm_cvtepi32_pd(_a);
+		const __m128d ahi_s  = _mm_cvtepi32_pd(ahi);
+		const __m128d blo_s  = _mm_cvtepi32_pd(_b);
+		const __m128d bhi_s  = _mm_cvtepi32_pd(bhi);
+		const __m128d anlo_d = _mm_cvtepi32_pd(aneg);
+		const __m128d anhi_d = _mm_cvtepi32_pd(anhi);
+		const __m128d bnlo_d = _mm_cvtepi32_pd(bneg);
+		const __m128d bnhi_d = _mm_cvtepi32_pd(bnhi);
+		const __m128d alo_f  = _mm_mul_pd(anlo_d, two32);
+		const __m128d ahi_f  = _mm_mul_pd(anhi_d, two32);
+		const __m128d blo_f  = _mm_mul_pd(bnlo_d, two32);
+		const __m128d bhi_f  = _mm_mul_pd(bnhi_d, two32);
+		const __m128d alo_d  = _mm_sub_pd(alo_s, alo_f);
+		const __m128d ahi_d  = _mm_sub_pd(ahi_s, ahi_f);
+		const __m128d blo_d  = _mm_sub_pd(blo_s, blo_f);
+		const __m128d bhi_d  = _mm_sub_pd(bhi_s, bhi_f);
+		const __m128d qlo    = _mm_div_pd(alo_d, blo_d);
+		const __m128d qhi    = _mm_div_pd(ahi_d, bhi_d);
+		const __m128i ilo    = _mm_cvttpd_epi32(qlo);
+		const __m128i ihi    = _mm_cvttpd_epi32(qhi);
+		const __m128i result = _mm_unpacklo_epi64(ilo, ihi);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_i32_div(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		const __m128i a      = _mm_castps_si128(_a);
+		const __m128i b      = _mm_castps_si128(_b);
+		const __m128i zero   = _mm_setzero_si128();
+		const __m128i quot   = simd128_sse_i32_quot(a, b);
+		const __m128i bzero  = _mm_cmpeq_epi32(b, zero);
+		const __m128i result = _mm_blendv_epi8(quot, a, bzero);
+		return _mm_castsi128_ps(result);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_i32_mod(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		const __m128i a      = _mm_castps_si128(_a);
+		const __m128i b      = _mm_castps_si128(_b);
+		const __m128i zero   = _mm_setzero_si128();
+		const __m128i quot   = simd128_sse_i32_quot(a, b);
+		const __m128i prod   = _mm_mullo_epi32(quot, b);
+		const __m128i rem    = _mm_sub_epi32(a, prod);
+		const __m128i bzero  = _mm_cmpeq_epi32(b, zero);
+		const __m128i result = _mm_andnot_si128(bzero, rem);
+		return _mm_castsi128_ps(result);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_u32_div(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		const __m128i a      = _mm_castps_si128(_a);
+		const __m128i b      = _mm_castps_si128(_b);
+		const __m128i zero   = _mm_setzero_si128();
+		const __m128i one    = _mm_set1_epi32(1);
+		const __m128i quot   = simd128_sse_u32_quot(a, b);
+		const __m128i bzero  = _mm_cmpeq_epi32(b, zero);
+		const __m128i bone   = _mm_cmpeq_epi32(b, one);
+		const __m128i keep   = _mm_or_si128(bzero, bone);
+		const __m128i result = _mm_blendv_epi8(quot, a, keep);
+		return _mm_castsi128_ps(result);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_u32_mod(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		const __m128i a      = _mm_castps_si128(_a);
+		const __m128i b      = _mm_castps_si128(_b);
+		const __m128i zero   = _mm_setzero_si128();
+		const __m128i one    = _mm_set1_epi32(1);
+		const __m128i quot0  = simd128_sse_u32_quot(a, b);
+		const __m128i bone   = _mm_cmpeq_epi32(b, one);
+		const __m128i quot   = _mm_blendv_epi8(quot0, a, bone);
+		const __m128i prod   = _mm_mullo_epi32(quot, b);
+		const __m128i rem    = _mm_sub_epi32(a, prod);
+		const __m128i bzero  = _mm_cmpeq_epi32(b, zero);
+		const __m128i result = _mm_andnot_si128(bzero, rem);
+		return _mm_castsi128_ps(result);
 	}
 
 	template<>
@@ -821,23 +935,49 @@ namespace bx
 		return simd128_orx_ni(_a);
 	}
 
+#if BX_CONFIG_FMA
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_madd(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
 	{
-		return simd_f32_madd_ni(_a, _b, _c);
+		return _mm_fmadd_ps(_a, _b, _c);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_msub(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
 	{
-		return simd_f32_msub_ni(_a, _b, _c);
+		return _mm_fmsub_ps(_a, _b, _c);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_nmsub(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
 	{
-		return simd_f32_nmsub_ni(_a, _b, _c);
+		return _mm_fnmadd_ps(_a, _b, _c);
 	}
+#else
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_madd(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
+	{
+		const simd128_sse_t prod   = _mm_mul_ps(_a, _b);
+		const simd128_sse_t result = _mm_add_ps(prod, _c);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_msub(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
+	{
+		const simd128_sse_t prod   = _mm_mul_ps(_a, _b);
+		const simd128_sse_t result = _mm_sub_ps(prod, _c);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_nmsub(simd128_sse_t _a, simd128_sse_t _b, simd128_sse_t _c)
+	{
+		const simd128_sse_t prod   = _mm_mul_ps(_a, _b);
+		const simd128_sse_t result = _mm_sub_ps(_c, prod);
+		return result;
+	}
+#endif // BX_CONFIG_FMA
 
 	template<>
 	BX_SIMD_FORCE_INLINE int simd128_x32_signbitsmask(simd128_sse_t _a)

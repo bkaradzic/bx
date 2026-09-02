@@ -178,23 +178,49 @@ namespace bx
 		return _mm256_rsqrt_ps(_a);
 	}
 
+#if BX_CONFIG_FMA
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_madd(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
 	{
-		return simd_f32_madd_ni(_a, _b, _c);
+		return _mm256_fmadd_ps(_a, _b, _c);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_msub(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
 	{
-		return simd_f32_msub_ni(_a, _b, _c);
+		return _mm256_fmsub_ps(_a, _b, _c);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_nmsub(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
 	{
-		return simd_f32_nmsub_ni(_a, _b, _c);
+		return _mm256_fnmadd_ps(_a, _b, _c);
 	}
+#else
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_madd(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
+	{
+		const simd256_avx_t prod   = _mm256_mul_ps(_a, _b);
+		const simd256_avx_t result = _mm256_add_ps(prod, _c);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_msub(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
+	{
+		const simd256_avx_t prod   = _mm256_mul_ps(_a, _b);
+		const simd256_avx_t result = _mm256_sub_ps(prod, _c);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_nmsub(simd256_avx_t _a, simd256_avx_t _b, simd256_avx_t _c)
+	{
+		const simd256_avx_t prod   = _mm256_mul_ps(_a, _b);
+		const simd256_avx_t result = _mm256_sub_ps(_c, prod);
+		return result;
+	}
+#endif // BX_CONFIG_FMA
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_neg(simd256_avx_t _a)
@@ -266,6 +292,12 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_floor(simd256_avx_t _a)
 	{
 		return _mm256_floor_ps(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_f32_trunc(simd256_avx_t _a)
+	{
+		return _mm256_round_ps(_a, _MM_FROUND_TO_ZERO | _MM_FROUND_NO_EXC);
 	}
 
 	template<>
@@ -518,6 +550,62 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_cmplt(simd256_avx_t _a, simd256_avx_t _b)
 	{
 		return simd_u32_cmplt_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i32_div(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_i32_div(alo, blo);
+		const simd128_sse_t hi     = simd128_i32_div(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i32_mod(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_i32_mod(alo, blo);
+		const simd128_sse_t hi     = simd128_i32_mod(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_div(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_u32_div(alo, blo);
+		const simd128_sse_t hi     = simd128_u32_div(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_mod(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_u32_mod(alo, blo);
+		const simd128_sse_t hi     = simd128_u32_mod(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
 	}
 
 	template<>
@@ -1023,6 +1111,62 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_cmplt(simd256_avx_t _a, simd256_avx_t _b)
 	{
 		return simd_u32_cmplt_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i32_div(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_i32_div(alo, blo);
+		const simd128_sse_t hi     = simd128_i32_div(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i32_mod(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_i32_mod(alo, blo);
+		const simd128_sse_t hi     = simd128_i32_mod(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_div(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_u32_div(alo, blo);
+		const simd128_sse_t hi     = simd128_u32_div(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u32_mod(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const simd128_sse_t alo    = _mm256_castps256_ps128(_a);
+		const simd128_sse_t blo    = _mm256_castps256_ps128(_b);
+		const simd128_sse_t ahi    = _mm256_extractf128_ps(_a, 1);
+		const simd128_sse_t bhi    = _mm256_extractf128_ps(_b, 1);
+		const simd128_sse_t lo     = simd128_u32_mod(alo, blo);
+		const simd128_sse_t hi     = simd128_u32_mod(ahi, bhi);
+		const simd256_avx_t lo256  = _mm256_castps128_ps256(lo);
+		const simd256_avx_t result = _mm256_insertf128_ps(lo256, hi, 1);
+		return result;
 	}
 
 	template<>

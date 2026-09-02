@@ -260,49 +260,28 @@ namespace bx
 	template<>
 	inline BX_CONST_FUNC simd256_ref_t simd256_f32_madd(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
-		const simd256_f32_langext_t b      = bitCast<simd256_f32_langext_t>(_b);
-		const simd256_f32_langext_t c      = bitCast<simd256_f32_langext_t>(_c);
-		const simd256_f32_langext_t prod   = a * b;
-		const simd256_f32_langext_t sum    = prod + c;
-		const simd256_ref_t         result = bitCast<simd256_ref_t>(sum);
+		simd256_ref_t result;
+		result.lo = simd128_f32_madd(_a.lo, _b.lo, _c.lo);
+		result.hi = simd128_f32_madd(_a.hi, _b.hi, _c.hi);
 		return result;
-#else
-		return simd_f32_madd_ni(_a, _b, _c);
-#endif // BX_SIMD_LANGEXT
 	}
 
 	template<>
 	inline BX_CONST_FUNC simd256_ref_t simd256_f32_msub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
-		const simd256_f32_langext_t b      = bitCast<simd256_f32_langext_t>(_b);
-		const simd256_f32_langext_t c      = bitCast<simd256_f32_langext_t>(_c);
-		const simd256_f32_langext_t prod   = a * b;
-		const simd256_f32_langext_t diff   = prod - c;
-		const simd256_ref_t         result = bitCast<simd256_ref_t>(diff);
+		simd256_ref_t result;
+		result.lo = simd128_f32_msub(_a.lo, _b.lo, _c.lo);
+		result.hi = simd128_f32_msub(_a.hi, _b.hi, _c.hi);
 		return result;
-#else
-		return simd_f32_msub_ni(_a, _b, _c);
-#endif // BX_SIMD_LANGEXT
 	}
 
 	template<>
 	inline BX_CONST_FUNC simd256_ref_t simd256_f32_nmsub(simd256_ref_t _a, simd256_ref_t _b, simd256_ref_t _c)
 	{
-#if BX_SIMD_LANGEXT
-		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
-		const simd256_f32_langext_t b      = bitCast<simd256_f32_langext_t>(_b);
-		const simd256_f32_langext_t c      = bitCast<simd256_f32_langext_t>(_c);
-		const simd256_f32_langext_t prod   = a * b;
-		const simd256_f32_langext_t diff   = c - prod;
-		const simd256_ref_t         result = bitCast<simd256_ref_t>(diff);
+		simd256_ref_t result;
+		result.lo = simd128_f32_nmsub(_a.lo, _b.lo, _c.lo);
+		result.hi = simd128_f32_nmsub(_a.hi, _b.hi, _c.hi);
 		return result;
-#else
-		return simd_f32_nmsub_ni(_a, _b, _c);
-#endif // BX_SIMD_LANGEXT
 	}
 
 	template<>
@@ -377,10 +356,10 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_rcp_est(simd256_ref_t _a)
 	{
 #if BX_SIMD_LANGEXT
-		const simd256_f32_langext_t one = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
+		const simd256_f32_langext_t one    = {1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f};
 		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
 		const simd256_f32_langext_t quot   = one / a;
-		const simd256_ref_t    result = bitCast<simd256_ref_t>(quot);
+		const simd256_ref_t         result = bitCast<simd256_ref_t>(quot);
 		return result;
 #else
 		simd256_ref_t result;
@@ -430,6 +409,12 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_f32_floor(simd256_ref_t _a)
 	{
 		return simd_f32_floor_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_f32_trunc(simd256_ref_t _a)
+	{
+		return simd_f32_trunc_ni(_a);
 	}
 
 	template<>
@@ -493,6 +478,40 @@ namespace bx
 		simd256_ref_t result;
 		result.lo = simd128_f32_cmpgt(_a.lo, _b.lo);
 		result.hi = simd128_f32_cmpgt(_a.hi, _b.hi);
+		return result;
+#endif // BX_SIMD_LANGEXT
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_cmple(simd256_ref_t _a, simd256_ref_t _b)
+	{
+#if BX_SIMD_LANGEXT
+		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
+		const simd256_f32_langext_t b      = bitCast<simd256_f32_langext_t>(_b);
+		const simd256_f32_langext_t cmp    = a <= b;
+		const simd256_ref_t         result = bitCast<simd256_ref_t>(cmp);
+		return result;
+#else
+		simd256_ref_t result;
+		result.lo = simd128_f32_cmple(_a.lo, _b.lo);
+		result.hi = simd128_f32_cmple(_a.hi, _b.hi);
+		return result;
+#endif // BX_SIMD_LANGEXT
+	}
+
+	template<>
+	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_f32_cmpge(simd256_ref_t _a, simd256_ref_t _b)
+	{
+#if BX_SIMD_LANGEXT
+		const simd256_f32_langext_t a      = bitCast<simd256_f32_langext_t>(_a);
+		const simd256_f32_langext_t b      = bitCast<simd256_f32_langext_t>(_b);
+		const simd256_f32_langext_t cmp    = a >= b;
+		const simd256_ref_t         result = bitCast<simd256_ref_t>(cmp);
+		return result;
+#else
+		simd256_ref_t result;
+		result.lo = simd128_f32_cmpge(_a.lo, _b.lo);
+		result.hi = simd128_f32_cmpge(_a.hi, _b.hi);
 		return result;
 #endif // BX_SIMD_LANGEXT
 	}
@@ -719,6 +738,42 @@ namespace bx
 		result.hi = simd128_u32_cmpeq(_a.hi, _b.hi);
 		return result;
 #endif // BX_SIMD_LANGEXT
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_i32_div(simd256_ref_t _a, simd256_ref_t _b)
+	{
+		simd256_ref_t result;
+		result.lo = simd128_i32_div(_a.lo, _b.lo);
+		result.hi = simd128_i32_div(_a.hi, _b.hi);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_i32_mod(simd256_ref_t _a, simd256_ref_t _b)
+	{
+		simd256_ref_t result;
+		result.lo = simd128_i32_mod(_a.lo, _b.lo);
+		result.hi = simd128_i32_mod(_a.hi, _b.hi);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_u32_div(simd256_ref_t _a, simd256_ref_t _b)
+	{
+		simd256_ref_t result;
+		result.lo = simd128_u32_div(_a.lo, _b.lo);
+		result.hi = simd128_u32_div(_a.hi, _b.hi);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_ref_t simd256_u32_mod(simd256_ref_t _a, simd256_ref_t _b)
+	{
+		simd256_ref_t result;
+		result.lo = simd128_u32_mod(_a.lo, _b.lo);
+		result.hi = simd128_u32_mod(_a.hi, _b.hi);
+		return result;
 	}
 
 	template<>

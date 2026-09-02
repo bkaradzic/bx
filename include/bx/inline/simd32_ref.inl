@@ -121,31 +121,82 @@ namespace bx
 		return bitCast<simd32_t>(result);
 	}
 
+BX_FP_PRECISE_BEGIN()
+
+	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_madd_ref(simd32_t _a, simd32_t _b, simd32_t _c)
+	{
+		const double aa   = double(bitCast<simd32_f32_ref_t>(_a).f32);
+		const double bb   = double(bitCast<simd32_f32_ref_t>(_b).f32);
+		const double cc   = double(bitCast<simd32_f32_ref_t>(_c).f32);
+		const double prod = aa * bb;
+		const double sum  = prod + cc;
+
+		const uint64_t sumBits = bitCast<uint64_t>(sum);
+
+		// A non-finite sum is exact; the two-sum below would evaluate Inf - Inf.
+		if (kDoubleExponentMask == (sumBits & kDoubleExponentMask) )
+		{
+			return simd32_ld(float(sum) );
+		}
+
+		const double hi   = sum - prod;
+		const double tmp0 = sum - hi;
+		const double tmp1 = prod - tmp0;
+		const double tmp2 = cc - hi;
+		const double err  = tmp1 + tmp2;
+
+		const uint64_t bits     = bitCast<uint64_t>(sum);
+		const uint64_t exponent = bits & kDoubleExponentMask;
+		const bool     inexact  = 0.0 != err;
+		const bool     even     = 0 == (bits & 1);
+		const bool     finite   = kDoubleExponentMask != exponent;
+		const bool     up       = (0.0 < err) == (0.0 < sum);
+		const uint64_t nudged   = up ? bits + 1 : bits - 1;
+		const uint64_t odd      = (inexact && even && finite) ? nudged : bits;
+		const double   result   = bitCast<double>(odd);
+
+		return simd32_ld(float(result) );
+	}
+
+BX_FP_PRECISE_END()
+
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_madd(simd32_t _a, simd32_t _b, simd32_t _c)
 	{
 		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
 		const simd32_f32_ref_t b = bitCast<simd32_f32_ref_t>(_b);
 		const simd32_f32_ref_t c = bitCast<simd32_f32_ref_t>(_c);
-		const simd32_f32_ref_t result = { .f32 = a.f32 * b.f32 + c.f32 };
-		return bitCast<simd32_t>(result);
+
+		if (isConstantEvaluated() )
+		{
+			return simd32_f32_madd_ref(_a, _b, _c);
+		}
+
+#if BX_CONFIG_FMA
+#	if BX_COMPILER_MSVC
+		const float result = fmaf(a.f32, b.f32, c.f32);
+#	else
+		const float result = __builtin_fmaf(a.f32, b.f32, c.f32);
+#	endif // BX_COMPILER_MSVC
+		return simd32_ld(result);
+#else
+		const float prod   = a.f32 * b.f32;
+		const float result = prod + c.f32;
+		return simd32_ld(result);
+#endif // BX_CONFIG_FMA
 	}
 
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_msub(simd32_t _a, simd32_t _b, simd32_t _c)
 	{
-		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
-		const simd32_f32_ref_t b = bitCast<simd32_f32_ref_t>(_b);
-		const simd32_f32_ref_t c = bitCast<simd32_f32_ref_t>(_c);
-		const simd32_f32_ref_t result = { .f32 = a.f32 * b.f32 - c.f32 };
-		return bitCast<simd32_t>(result);
+		const simd32_t nc     = simd32_f32_neg(_c);
+		const simd32_t result = simd32_f32_madd(_a, _b, nc);
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_nmsub(simd32_t _a, simd32_t _b, simd32_t _c)
 	{
-		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
-		const simd32_f32_ref_t b = bitCast<simd32_f32_ref_t>(_b);
-		const simd32_f32_ref_t c = bitCast<simd32_f32_ref_t>(_c);
-		const simd32_f32_ref_t result = { .f32 = c.f32 - a.f32 * b.f32 };
-		return bitCast<simd32_t>(result);
+		const simd32_t na     = simd32_f32_neg(_a);
+		const simd32_t result = simd32_f32_madd(na, _b, _c);
+		return result;
 	}
 
 	inline BX_CONSTEXPR_FUNC int simd32_x32_signbitsmask(simd32_t _a)
@@ -275,6 +326,13 @@ namespace bx
 	{
 		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
 		const simd32_f32_ref_t result = { .f32 = floor(a.f32) };
+		return bitCast<simd32_t>(result);
+	}
+
+	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_trunc(simd32_t _a)
+	{
+		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
+		const simd32_f32_ref_t result = { .f32 = trunc(a.f32) };
 		return bitCast<simd32_t>(result);
 	}
 

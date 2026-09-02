@@ -300,6 +300,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f32_trunc(simd128_wasm_t _a)
+	{
+		return wasm_f32x4_trunc(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f32_add(simd128_wasm_t _a, simd128_wasm_t _b)
 	{
 		return wasm_f32x4_add(_a, _b);
@@ -510,6 +516,30 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_u32_cmplt(simd128_wasm_t _a, simd128_wasm_t _b)
 	{
 		return wasm_u32x4_lt(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_i32_div(simd128_wasm_t _a, simd128_wasm_t _b)
+	{
+		return simd_i32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_i32_mod(simd128_wasm_t _a, simd128_wasm_t _b)
+	{
+		return simd_i32_mod_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_u32_div(simd128_wasm_t _a, simd128_wasm_t _b)
+	{
+		return simd_u32_div_ni(_a, _b);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_u32_mod(simd128_wasm_t _a, simd128_wasm_t _b)
+	{
+		return simd_u32_mod_ni(_a, _b);
 	}
 
 	template<>

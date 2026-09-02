@@ -178,6 +178,29 @@ extern "C" void* __cdecl _alloca(size_t _size);
 #	define BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC(_x)
 #endif // BX_COMPILER_
 
+///
+#if BX_COMPILER_MSVC
+#	define BX_FP_CONTRACT_OFF_BEGIN()
+#	define BX_FP_CONTRACT_OFF_END()
+#	define BX_FP_PRECISE_BEGIN()      __pragma(float_control(push) ) __pragma(float_control(precise, on) ) __pragma(fp_contract(off) )
+#	define BX_FP_PRECISE_END()        __pragma(float_control(pop) )
+#elif BX_COMPILER_CLANG
+#	define BX_FP_CONTRACT_OFF_BEGIN() _Pragma("float_control(push)") _Pragma("clang fp contract(off)")
+#	define BX_FP_CONTRACT_OFF_END()   _Pragma("float_control(pop)")
+#	define BX_FP_PRECISE_BEGIN()      _Pragma("float_control(push)") _Pragma("float_control(precise, on)") _Pragma("clang fp contract(off)")
+#	define BX_FP_PRECISE_END()        _Pragma("float_control(pop)")
+#elif BX_COMPILER_GCC
+#	define BX_FP_CONTRACT_OFF_BEGIN()
+#	define BX_FP_CONTRACT_OFF_END()
+#	define BX_FP_PRECISE_BEGIN()      _Pragma("GCC push_options") _Pragma("GCC optimize(\"no-fast-math\",\"fp-contract=off\")")
+#	define BX_FP_PRECISE_END()        _Pragma("GCC pop_options")
+#else
+#	define BX_FP_CONTRACT_OFF_BEGIN()
+#	define BX_FP_CONTRACT_OFF_END()
+#	define BX_FP_PRECISE_BEGIN()
+#	define BX_FP_PRECISE_END()
+#endif // BX_COMPILER_
+
 /// No default constructor.
 #define BX_CLASS_NO_DEFAULT_CTOR(_class) \
 	_class() = delete
