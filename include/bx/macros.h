@@ -184,11 +184,16 @@ extern "C" void* __cdecl _alloca(size_t _size);
 #	define BX_FP_CONTRACT_OFF_END()
 #	define BX_FP_PRECISE_BEGIN()      __pragma(float_control(push) ) __pragma(float_control(precise, on) ) __pragma(fp_contract(off) )
 #	define BX_FP_PRECISE_END()        __pragma(float_control(pop) )
-#elif BX_COMPILER_CLANG
+#elif BX_COMPILER_CLANG && (BX_CPU_X86 || (BX_CPU_ARM && BX_ARCH_64BIT) )
 #	define BX_FP_CONTRACT_OFF_BEGIN() _Pragma("float_control(push)") _Pragma("clang fp contract(off)")
 #	define BX_FP_CONTRACT_OFF_END()   _Pragma("float_control(pop)")
 #	define BX_FP_PRECISE_BEGIN()      _Pragma("float_control(push)") _Pragma("float_control(precise, on)") _Pragma("clang fp contract(off)")
 #	define BX_FP_PRECISE_END()        _Pragma("float_control(pop)")
+#elif BX_COMPILER_CLANG
+#	define BX_FP_CONTRACT_OFF_BEGIN() _Pragma("clang fp contract(off)")
+#	define BX_FP_CONTRACT_OFF_END()
+#	define BX_FP_PRECISE_BEGIN()      _Pragma("clang fp contract(off)")
+#	define BX_FP_PRECISE_END()
 #elif BX_COMPILER_GCC
 #	define BX_FP_CONTRACT_OFF_BEGIN()
 #	define BX_FP_CONTRACT_OFF_END()
