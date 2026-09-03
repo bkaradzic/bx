@@ -33,6 +33,7 @@ void testAssert()
 {
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4804); // warning C4804: '%': unsafe use of type 'bool' in operation)
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4127); // warning C4127: conditional expression is constant
 
 	BX_ASSERT(false % 1, "Assert works!");
 

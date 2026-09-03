@@ -107,7 +107,7 @@ TEST_CASE("Saturate cast", "[cast]")
 	STATIC_REQUIRE(saturateCastTest<int64_t, uint16_t>(                      0,                 65535) );
 	STATIC_REQUIRE(saturateCastTest<int64_t,  int32_t>(            -2147483648,            2147483647) );
 	STATIC_REQUIRE(saturateCastTest<int64_t, uint32_t>(                      0,            4294967295) );
-	STATIC_REQUIRE(saturateCastTest<int64_t,  int64_t>( -9223372036854775808ll, 9223372036854775807ll) );
+	STATIC_REQUIRE(saturateCastTest<int64_t,  int64_t>(-9223372036854775807ll-1, 9223372036854775807ll) );
 	STATIC_REQUIRE(saturateCastTest<int64_t, uint64_t>(                      0, 9223372036854775807ll) );
 
 	STATIC_REQUIRE(saturateCastTest<uint64_t,   int8_t>(                     0,              127) );

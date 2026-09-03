@@ -37,6 +37,9 @@
 
 #include <bx/bx.h>
 
+BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wexceptions"); // error: '~ErrorAssert' has a non-throwing exception specification but can still throw
+BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wterminate");    // error: 'throw' will always call 'terminate'
+
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4312); // warning C4312 : 'reinterpret_cast' : conversion from 'int' to 'const char *' of greater size
 //BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG("-Wnan-infinity-disabled");

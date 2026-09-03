@@ -159,6 +159,7 @@ namespace bx
 {
 	Mutex::Mutex()
 	{
+		BX_UNUSED(m_internal);
 	}
 
 	Mutex::~Mutex()

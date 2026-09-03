@@ -271,7 +271,7 @@ namespace bx
 
 				if (_from < mn)
 				{
-					return mn;
+					return Ty(mn);
 				}
 				else if (_from > mx)
 				{

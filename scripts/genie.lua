@@ -46,7 +46,7 @@ project "bx.test"
 	debugdir (path.join(BX_DIR, "tests"))
 
 	flags {
---		"FatalWarnings",
+		"FatalWarnings",
 	}
 
 	removeflags {
@@ -113,6 +113,10 @@ project "bx.test"
 
 project "bx.bench"
 	kind "ConsoleApp"
+
+	flags {
+		"FatalWarnings",
+	}
 
 	debugdir (path.join(BX_DIR, "tests"))
 
