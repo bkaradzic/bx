@@ -40,6 +40,10 @@ end
 project "bx"
 	kind "StaticLib"
 
+	flags {
+		"FatalWarnings",
+	}
+
 	includedirs {
 		path.join(BX_DIR, "include"),
 		path.join(BX_DIR, "3rdparty"),

@@ -160,6 +160,9 @@ BX_FP_PRECISE_BEGIN()
 
 BX_FP_PRECISE_END()
 
+BX_PRAGMA_DIAGNOSTIC_PUSH();
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4756); // warning C4756: overflow in constant arithmetic
+
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_madd(simd32_t _a, simd32_t _b, simd32_t _c)
 	{
 		const simd32_f32_ref_t a = bitCast<simd32_f32_ref_t>(_a);
@@ -184,6 +187,8 @@ BX_FP_PRECISE_END()
 		return simd32_ld(result);
 #endif // BX_CONFIG_FMA
 	}
+
+BX_PRAGMA_DIAGNOSTIC_POP();
 
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_f32_msub(simd32_t _a, simd32_t _b, simd32_t _c)
 	{
