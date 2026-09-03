@@ -25,6 +25,7 @@ namespace bx
 		{
 			StringView sv = scanner.acceptUntil(Scanner::Class::EndOfLine);
 			BX_TRACE("%d: '%S'", scanner.getLine(), &sv);
+			BX_UNUSED(sv);
 
 			scanner.acceptUntil(Scanner::Class::NewLine);
 		}

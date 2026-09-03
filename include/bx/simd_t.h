@@ -113,6 +113,12 @@ extern "C" float fmaf(float, float, float);
 #	define BX_SIMD_SUPPORTED 1
 #endif // BX_SIMD_*
 
+#if BX_SIMD_LANGEXT && BX_SIMD_AVX
+#	define BX_SIMD256_LANGEXT 1
+#else
+#	define BX_SIMD256_LANGEXT 0
+#endif // BX_SIMD_LANGEXT && BX_SIMD_AVX
+
 #define BX_SIMD_FORCE_INLINE BX_FORCE_INLINE
 #define BX_SIMD_INLINE inline
 

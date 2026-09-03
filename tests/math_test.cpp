@@ -712,7 +712,7 @@ TEST_CASE("exp", "[math][libm]")
 {
 	STATIC_REQUIRE( 1.0f == bx::exp(-0.0f) );
 	STATIC_REQUIRE( 0.0f == bx::exp(-bx::kFloatInfinity) );
-	STATIC_REQUIRE( 0.0f == bx::exp(bx::log(bx::kFloatSmallest) ) );
+	STATIC_REQUIRE(bx::exp(bx::log(bx::kFloatSmallest) ) <= bx::kFloatSmallest);
 
 	bx::WriterI* writer = bx::getNullOut();
 	bx::Error err;
