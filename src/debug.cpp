@@ -104,6 +104,8 @@ namespace bx
 #elif BX_CPU_ARM
 		__builtin_trap();
 //		asm("bkpt 0");
+#elif BX_CPU_RISCV && (BX_COMPILER_GCC || BX_COMPILER_CLANG)
+		__asm__ volatile("ebreak");
 #elif BX_CPU_X86 && (BX_COMPILER_GCC || BX_COMPILER_CLANG)
 		// NaCl doesn't like int 3:
 		// NativeClient: NaCl module load failed: Validation failure. File violates Native Client safety rules.
@@ -119,9 +121,10 @@ namespace bx
 		// Doing emscripten_debugger() disables asm.js validation due to an emscripten bug
 		//emscripten_debugger();
 		EM_ASM({ debugger; });
-#else // cross platform implementation
-		int* int3 = (int*)3L;
-		*int3 = 3;
+#elif BX_COMPILER_GCC || BX_COMPILER_CLANG
+		__builtin_trap();
+#else
+#	error "Unknown BX_CPU_? / BX_COMPILER_?"
 #endif // BX
 	}
 
