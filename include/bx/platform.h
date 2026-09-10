@@ -109,7 +109,7 @@
 #	undef  BX_CPU_RISCV
 #	define BX_CPU_RISCV 1
 #	define BX_CACHE_LINE_SIZE 64
-#elif defined(__loongarch__) || defined(__loongarch64)
+#elif defined(__loongarch__) && (__loongarch_grlen == 64)
 #	undef  BX_CPU_LOONGARCH64
 #	define BX_CPU_LOONGARCH64 1
 #	define BX_CACHE_LINE_SIZE 64
