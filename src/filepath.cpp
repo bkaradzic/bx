@@ -161,6 +161,7 @@ namespace bx
 	static char* pwd(char* _buffer, uint32_t _size)
 	{
 #if BX_PLATFORM_PS4     \
+ || BX_PLATFORM_PS5     \
  || BX_PLATFORM_XBOXONE \
  || BX_PLATFORM_WINRT   \
  || BX_CRT_NONE
