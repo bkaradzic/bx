@@ -23,14 +23,15 @@
 #	if BX_PLATFORM_IOS       \
 	|| BX_PLATFORM_OSX       \
 	|| BX_PLATFORM_PS4       \
+	|| BX_PLATFORM_PS5       \
 	|| BX_PLATFORM_VISIONOS
 #		include <pthread.h> // mach_port_t
 #	endif // BX_PLATFORM_*
 
 #	include <time.h> // nanosleep
-#	if !BX_PLATFORM_PS4
+#	if !BX_PLATFORM_PS4 && !BX_PLATFORM_PS5
 #		include <dlfcn.h> // dlopen, dlclose, dlsym
-#	endif // !BX_PLATFORM_PS4
+#	endif // !BX_PLATFORM_PS4 && !BX_PLATFORM_PS5
 
 #	if BX_PLATFORM_ANDROID
 #		include <malloc.h> // mallinfo
@@ -161,6 +162,7 @@ namespace bx
 		return (void*)handle;
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_PS5        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
@@ -185,6 +187,7 @@ namespace bx
 		::FreeLibrary( (HMODULE)_handle);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_PS5        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
@@ -205,6 +208,7 @@ namespace bx
 		return (void*)::GetProcAddress( (HMODULE)_handle, symbol);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_PS5        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
@@ -229,6 +233,7 @@ namespace bx
 		return result;
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_PS5        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
@@ -273,6 +278,7 @@ namespace bx
 		::SetEnvironmentVariableA(name, value);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
+	|| BX_PLATFORM_PS5        \
 	|| BX_PLATFORM_XBOXONE    \
 	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
@@ -293,6 +299,7 @@ namespace bx
 	int chdir(const char* _path)
 	{
 #if BX_PLATFORM_PS4     \
+ || BX_PLATFORM_PS5     \
  || BX_PLATFORM_XBOXONE \
  || BX_PLATFORM_WINRT   \
  || BX_CRT_NONE
