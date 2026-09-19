@@ -25,6 +25,7 @@
 #define BX_CPU_JIT   0
 #define BX_CPU_MIPS  0
 #define BX_CPU_PPC   0
+#define BX_CPU_LOONGARCH64 0
 #define BX_CPU_RISCV 0
 #define BX_CPU_X86   0
 
@@ -107,6 +108,10 @@
  ||   defined(RISCVEL)
 #	undef  BX_CPU_RISCV
 #	define BX_CPU_RISCV 1
+#	define BX_CACHE_LINE_SIZE 64
+#elif defined(__loongarch__) && (__loongarch_grlen == 64)
+#	undef  BX_CPU_LOONGARCH64
+#	define BX_CPU_LOONGARCH64 1
 #	define BX_CACHE_LINE_SIZE 64
 #elif defined(_M_IX86)    \
  ||   defined(_M_X64)     \
@@ -400,6 +405,8 @@
 #	define BX_CPU_NAME "MIPS"
 #elif BX_CPU_PPC
 #	define BX_CPU_NAME "PowerPC"
+#elif BX_CPU_LOONGARCH64
+#	define BX_CPU_NAME "LoongArch64"
 #elif BX_CPU_RISCV
 #	define BX_CPU_NAME "RISC-V"
 #elif BX_CPU_X86
