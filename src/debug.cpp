@@ -17,6 +17,11 @@
 #	include <execinfo.h> // backtrace, backtrace_symbols
 #	include <unwind.h>   // _Unwind_Backtrace
 #	include <dlfcn.h>
+
+#	if BX_PLATFORM_OSX
+#		include <sys/sysctl.h> // sysctl
+#		include <unistd.h>     // getpid
+#	endif // BX_PLATFORM_OSX
 #endif // BX_PLATFORM_*
 
 #ifndef BX_CONFIG_CALLSTACK_USE_EXECINFO
@@ -79,6 +84,7 @@ extern "C" __declspec(dllimport) unsigned int __stdcall SetErrorMode(unsigned in
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
 	|| BX_PLATFORM_XBOXONE
+extern "C" __declspec(dllimport) bool  __stdcall IsDebuggerPresent();
 extern "C" __declspec(dllimport) void  __stdcall OutputDebugStringA(const char* _str);
 extern "C" __declspec(dllimport) void* __stdcall GetStdHandle(unsigned long _stdHandle);
 extern "C" __declspec(dllimport) int   __stdcall WriteFile(void* _file, const void* _buffer, unsigned long _sizeInBytes, unsigned long* _outNumberOfBytesWritten, struct _OVERLAPPED* _overlapped);
@@ -126,6 +132,28 @@ namespace bx
 #else
 #	error "Unknown BX_CPU_? / BX_COMPILER_?"
 #endif // BX
+	}
+
+	bool isDebuggerPresent()
+	{
+#if BX_PLATFORM_WINDOWS
+		return 0 != ::IsDebuggerPresent();
+#elif BX_PLATFORM_OSX
+		struct kinfo_proc info;
+		size_t size = sizeof(info);
+		int mib[] = { CTL_KERN, KERN_PROC, KERN_PROC_PID, getpid() };
+
+		bx::memSet(&info, 0, sizeof(info) );
+
+		if (0 != sysctl(mib, BX_COUNTOF(mib), &info, &size, NULL, 0) )
+		{
+			return false;
+		}
+
+		return 0 != (info.kp_proc.p_flag & P_TRACED);
+#else
+		return false;
+#endif // BX_PLATFORM_*
 	}
 
 #if BX_PLATFORM_WINDOWS \
