@@ -55,6 +55,119 @@ namespace bx
 		quickSort( (void*)_data, _num, sizeof(Ty), _fn);
 	}
 
+	constexpr uint32_t kStableSortInsertionRun = 32;
+
+	template<typename Ty, typename LessFn>
+	inline void insertionSort(Ty* _data, uint32_t _num, LessFn _less)
+	{
+		for (uint32_t ii = 1; ii < _num; ++ii)
+		{
+			Ty item = _data[ii];
+
+			uint32_t jj = ii;
+			for (; jj > 0 && _less(item, _data[jj-1]); --jj)
+			{
+				_data[jj] = _data[jj-1];
+			}
+
+			_data[jj] = item;
+		}
+	}
+
+	template<typename Ty, typename LessFn>
+	inline void stableSort(AllocatorI* _allocator, Ty* _data, uint32_t _num, LessFn _less)
+	{
+		if (2 > _num)
+		{
+			return;
+		}
+
+		for (uint32_t ii = 0; ii < _num; ii += kStableSortInsertionRun)
+		{
+			insertionSort(_data + ii, min(kStableSortInsertionRun, _num - ii), _less);
+		}
+
+		if (kStableSortInsertionRun >= _num)
+		{
+			return;
+		}
+
+		Ty* scratch = (Ty*)alloc(_allocator, _num*sizeof(Ty) );
+		for (uint32_t ii = 0; ii < _num; ++ii)
+		{
+			BX_PLACEMENT_NEW(&scratch[ii], Ty);
+		}
+
+		Ty* src = _data;
+		Ty* dst = scratch;
+
+		for (uint32_t width = kStableSortInsertionRun; width < _num; width <<= 1)
+		{
+			for (uint32_t ii = 0; ii < _num; ii += width<<1)
+			{
+				const uint32_t mid = min(ii +  width,     _num);
+				const uint32_t end = min(ii + (width<<1), _num);
+
+				uint32_t ll = ii;
+				uint32_t rr = mid;
+				uint32_t oo = ii;
+
+				while (ll < mid
+				&&     rr < end)
+				{
+					if (_less(src[rr], src[ll]) )
+					{
+						dst[oo] = src[rr];
+						++rr;
+					}
+					else
+					{
+						dst[oo] = src[ll];
+						++ll;
+					}
+
+					++oo;
+				}
+
+				for (; ll < mid; ++ll, ++oo)
+				{
+					dst[oo] = src[ll];
+				}
+
+				for (; rr < end; ++rr, ++oo)
+				{
+					dst[oo] = src[rr];
+				}
+			}
+
+			swap(src, dst);
+		}
+
+		if (src != _data)
+		{
+			for (uint32_t ii = 0; ii < _num; ++ii)
+			{
+				_data[ii] = src[ii];
+			}
+		}
+
+		for (uint32_t ii = 0; ii < _num; ++ii)
+		{
+			scratch[ii].~Ty();
+		}
+
+		free(_allocator, scratch);
+	}
+
+	template<typename ContainerT, typename LessFn>
+	inline void stableSort(AllocatorI* _allocator, ContainerT& _container, LessFn _less)
+	{
+		if (!_container.empty() )
+		{
+			stableSort(_allocator, &_container[0], uint32_t(_container.size() ), _less);
+		}
+	}
+
 	template<typename Ty>
 	inline uint32_t unique(void* _data, uint32_t _num, uint32_t _stride, const ComparisonFn _fn)
 	{

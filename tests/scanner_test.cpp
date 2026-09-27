@@ -390,3 +390,112 @@ TEST_CASE("LineReader", "[scanner][string]")
 		REQUIRE(second.getPtr() == input.getPtr() + 4);
 	}
 }
+
+TEST_CASE("Scanner.class Word", "[scanner]")
+{
+	{
+		bx::Scanner sc("2d, f32");
+
+		REQUIRE("2d" == sc.accept(bx::Scanner::Class::Word) );
+		REQUIRE("," == sc.accept(',') );
+	}
+
+	{
+		bx::Scanner sc("2d");
+
+		REQUIRE(sc.accept(bx::Scanner::Class::Identifier).isEmpty() );
+		REQUIRE("2d" == sc.accept(bx::Scanner::Class::Word) );
+	}
+
+	{
+		bx::Scanner sc("_leading and9digits");
+
+		REQUIRE("_leading" == sc.accept(bx::Scanner::Class::Word) );
+		REQUIRE(" " == sc.accept(bx::Scanner::Class::SpaceHoriz) );
+		REQUIRE("and9digits" == sc.accept(bx::Scanner::Class::Word) );
+		REQUIRE(sc.isDone() );
+	}
+}
+
+TEST_CASE("Scanner.class SpaceHoriz", "[scanner]")
+{
+	{
+		bx::Scanner horiz("  \t\nx");
+
+		REQUIRE("  \t" == horiz.accept(bx::Scanner::Class::SpaceHoriz) );
+		REQUIRE("\n" == horiz.accept('\n') );
+
+		bx::Scanner space("  \t\nx");
+
+		REQUIRE("  \t\n" == space.accept(bx::Scanner::Class::Space) );
+	}
+
+	{
+		bx::Scanner sc("x");
+
+		REQUIRE(sc.accept(bx::Scanner::Class::SpaceHoriz).isEmpty() );
+		REQUIRE("x" == sc.accept('x') );
+	}
+
+	{
+		bx::Scanner sc("a  \r\nb");
+
+		REQUIRE("a" == sc.accept(bx::Scanner::Class::Word) );
+		REQUIRE("  \r" == sc.accept(bx::Scanner::Class::SpaceHoriz) );
+		REQUIRE("\n" == sc.accept('\n') );
+		REQUIRE("b" == sc.accept(bx::Scanner::Class::Word) );
+	}
+}
+
+TEST_CASE("Scanner.acceptToken", "[scanner]")
+{
+	{
+		bx::Scanner bare("ifx");
+		REQUIRE("if" == bare.accept(bx::StringView("if") ) );
+
+		bx::Scanner token("ifx");
+		REQUIRE(token.acceptToken(bx::StringView("if") ).isEmpty() );
+		REQUIRE("ifx" == token.accept(bx::Scanner::Class::Word) );
+	}
+
+	{
+		bx::Scanner sc("if (x)");
+
+		REQUIRE("if" == sc.acceptToken(bx::StringView("if") ) );
+		REQUIRE(" " == sc.accept(bx::Scanner::Class::SpaceHoriz) );
+		REQUIRE("(" == sc.acceptToken(bx::StringView("(") ) );
+	}
+
+	{
+		bx::Scanner sc("->x");
+
+		REQUIRE("->" == sc.acceptToken(bx::StringView("->") ) );
+		REQUIRE("x" == sc.accept(bx::Scanner::Class::Word) );
+	}
+
+	{
+		bx::Scanner sc("if");
+
+		REQUIRE("if" == sc.acceptToken(bx::StringView("if") ) );
+		REQUIRE(sc.isDone() );
+	}
+}
+
+TEST_CASE("Scanner.getTail", "[scanner]")
+{
+	const bx::StringView input("abc def");
+
+	bx::Scanner sc(input);
+
+	REQUIRE(input == sc.getTail() );
+
+	sc.accept(bx::Scanner::Class::Word);
+
+	REQUIRE(" def" == sc.getTail() );
+	REQUIRE(sc.getTail().getPtr() == input.getPtr() + 3);
+	REQUIRE(sc.getTail().getTerm() == input.getTerm() );
+
+	sc.acceptAll();
+
+	REQUIRE(sc.getTail().isEmpty() );
+}

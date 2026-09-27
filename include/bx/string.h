@@ -420,6 +420,9 @@ namespace bx
 	/// Returns string view with whitespace characters trimmed from left.
 	StringView strLTrimSpace(const StringView& _str);
 
+	/// Returns string view with horizontal whitespace characters trimmed from left.
+	StringView strLTrimSpaceHoriz(const StringView& _str);
+
 	/// Returns string view with non-whitespace characters trimmed from left.
 	StringView strLTrimNonSpace(const StringView& _str);
 

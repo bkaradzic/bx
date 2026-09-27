@@ -29,9 +29,11 @@ namespace bx
 		///
 		enum class Class : uint8_t
 		{
-			Space,      //!< Run of whitespace characters.
+			Space,      //!< Run of whitespace characters, line terminators included.
+			SpaceHoriz, //!< Run of horizontal whitespace as `isSpaceHoriz` reads it, so up to but not including a line feed.
 			NonSpace,   //!< Run of non-whitespace characters.
-			Identifier, //!< Run of alphanumeric characters and `_`.
+			Identifier, //!< Identifier as `strIdentifier` reads one: alphanumeric characters and `_`, not starting with a digit.
+			Word,       //!< Word as `strWord` reads one: run of alphanumeric characters and `_`, a leading digit included.
 			EndOfLine,  //!< Everything up to, but not including, line terminator.
 			NewLine,    //!< Everything up to, and including, line terminator.
 		};
@@ -106,6 +108,19 @@ namespace bx
 		/// @returns Accepted string view, or empty string view if it doesn't match.
 		///
 		StringView accept(const StringView& _str);
+
+		/// Accept `_str` if input at cursor starts with it and it does not run into a word.
+		///
+		/// Unlike `accept`, which is a plain prefix test, a token ending in a word
+		/// character must be followed by something that is not one, so a keyword does not
+		/// match the head of a longer word: `acceptToken("if")` leaves `ifx` alone. For a
+		/// token ending in punctuation the two behave the same.
+		///
+		/// @param[in] _str Token to match.
+		///
+		/// @returns Accepted string view, or empty string view if it doesn't match.
+		///
+		StringView acceptToken(const StringView& _str);
 
 		/// Accept leading run of characters belonging to `_class`.
 		///
@@ -233,6 +248,15 @@ namespace bx
 		///   capture text that can legitimately be empty.
 		///
 		StringView getCursor(Cursor _which = Cursor::Current) const;
+
+		/// Returns input from cursor to end of input.
+		///
+		/// Where `getCursor` gives a position, this gives the range still to be scanned,
+		/// which is what another parser over the same text needs handed to it.
+		///
+		/// @returns String view from cursor to end of input.
+		///
+		StringView getTail() const;
 
 		/// Returns text between `_from` and current cursor position.
 		///
