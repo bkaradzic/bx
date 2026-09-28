@@ -70,7 +70,7 @@ namespace bx
 		constexpr StringView(const StringLiteral& _str);
 
 		///
-		constexpr StringView(const StringView& _rhs);
+		constexpr StringView(const StringView& _rhs) = default;
 
 		///
 		constexpr StringView(const StringView& _rhs, int32_t _start, int32_t _len);
@@ -79,7 +79,7 @@ namespace bx
 		constexpr StringView& operator=(const char* _rhs);
 
 		///
-		constexpr StringView& operator=(const StringView& _rhs);
+		constexpr StringView& operator=(const StringView& _rhs) = default;
 
 		///
 		constexpr StringView(const char* _ptr);
