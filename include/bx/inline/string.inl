@@ -85,23 +85,12 @@ namespace bx
 	{
 	}
 
-	inline constexpr StringView::StringView(const StringView& _rhs)
-	{
-		set(_rhs);
-	}
-
 	inline constexpr StringView::StringView(const StringView& _rhs, int32_t _start, int32_t _len)
 	{
 		set(_rhs, _start, _len);
 	}
 
 	inline constexpr StringView& StringView::operator=(const char* _rhs)
-	{
-		set(_rhs);
-		return *this;
-	}
-
-	inline constexpr StringView& StringView::operator=(const StringView& _rhs)
 	{
 		set(_rhs);
 		return *this;

@@ -953,3 +953,35 @@ TEST_CASE("formatHumanNumber", "[string]")
 
 	REQUIRE(testFormatHumanNumber("", 1389983113.891389, 2, 4) );
 }
+
+TEST_CASE("StringView is trivially copyable", "[string]")
+{
+	static_assert(bx::isTriviallyCopyable<bx::StringView>(), "StringView must stay trivially copyable");
+
+	union Variant
+	{
+		struct { bx::StringView name; } named;
+		struct { int32_t value; }       scalar;
+	};
+
+	struct Node
+	{
+		int32_t        kind;
+		bx::StringView span;
+		Variant        variant;
+	};
+
+	static_assert(bx::isTriviallyCopyable<Variant>(), "a union holding a StringView must stay copyable");
+
+	const Node node =
+	{
+		.kind    = 7,
+		.span    = bx::StringView("span"),
+		.variant = { .named = { .name = bx::StringView("hello") } },
+	};
+
+	const Node copy = node;
+	REQUIRE(7 == copy.kind);
+	REQUIRE(0 == bx::strCmp(copy.span, "span") );
+	REQUIRE(0 == bx::strCmp(copy.variant.named.name, "hello") );
+}
