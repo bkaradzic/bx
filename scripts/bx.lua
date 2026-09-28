@@ -78,6 +78,7 @@ project "bx"
 			path.join(BX_DIR, "src/file.cpp"),
 			path.join(BX_DIR, "src/filepath.cpp"),
 			path.join(BX_DIR, "src/hash.cpp"),
+			path.join(BX_DIR, "src/literal-parser.cpp"),
 			path.join(BX_DIR, "src/math.cpp"),
 			path.join(BX_DIR, "src/mutex.cpp"),
 			path.join(BX_DIR, "src/os.cpp"),

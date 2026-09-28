@@ -85,6 +85,31 @@ namespace bx
 		return getCursor();
 	}
 
+	inline StringView Scanner::acceptToken(const StringView& _str)
+	{
+		if (!hasPrefix(m_tail, _str) )
+		{
+			return getCursor();
+		}
+
+		const char   last = _str.getTerm()[-1];
+		const char* after = m_tail.getPtr() + _str.getLength();
+
+		if ( (isAlphaNum(last) || '_' == last)
+		&&  after < m_input.getTerm()
+		&& (isAlphaNum(*after) || '_' == *after) )
+		{
+			return getCursor();
+		}
+
+		return moveTo({ m_tail.getPtr(), _str.getLength() });
+	}
+
+	inline StringView Scanner::getTail() const
+	{
+		return m_tail;
+	}
+
 	inline StringView Scanner::accept(Class _class)
 	{
 		return moveTo({ m_tail.getPtr(), strFunc(_class).getPtr() });

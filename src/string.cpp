@@ -410,6 +410,19 @@ namespace bx
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
+	StringView strLTrimSpaceHoriz(const StringView& _str)
+	{
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
+		{
+			if (!isSpaceHoriz(*ptr) )
+			{
+				return StringView(ptr, term);
+			}
+		}
+
+		return StringView(_str.getTerm(), _str.getTerm() );
+	}
+
 	StringView strLTrimNonSpace(const StringView& _str)
 	{
 		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)

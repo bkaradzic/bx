@@ -14,6 +14,7 @@
 #include "file.cpp"
 #include "filepath.cpp"
 #include "hash.cpp"
+#include "literal-parser.cpp"
 #include "math.cpp"
 #include "mutex.cpp"
 #include "os.cpp"

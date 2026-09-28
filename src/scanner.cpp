@@ -90,9 +90,21 @@ namespace bx
 		case Class::NonSpace:
 			return strLTrimNonSpace(m_tail);
 
+		case Class::SpaceHoriz:
+			return strLTrimSpaceHoriz(m_tail);
+
 		case Class::Identifier:
 			{
 				const StringView word = strIdentifier(m_tail);
+				return word.isEmpty()
+					? m_tail
+					: StringView(word.getTerm(), m_tail.getTerm() )
+					;
+			}
+
+		case Class::Word:
+			{
+				const StringView word = strWord(m_tail);
 				return word.isEmpty()
 					? m_tail
 					: StringView(word.getTerm(), m_tail.getTerm() )

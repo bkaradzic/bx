@@ -181,3 +181,199 @@ TEST_CASE("ComparisonFn", "[sort]")
 	compareTest< float>(-13.89f, 1389.0f);
 	compareTest<double>(-13.89f, 1389.0f);
 }
+
+#include <bx/allocator.h>
+#include <tinystl/allocator.h>
+#include <tinystl/string.h>
+#include <tinystl/vector.h>
+
+namespace
+{
+	struct Item
+	{
+		uint32_t key;
+		uint32_t seq;
+	};
+
+	bool byKey(const Item& _a, const Item& _b)
+	{
+		return _a.key < _b.key;
+	}
+
+	tinystl::vector<Item> makeItems(uint32_t _num, uint32_t _numKeys)
+	{
+		tinystl::vector<Item> items;
+		uint32_t rng = 12345;
+		for (uint32_t ii = 0; ii < _num; ++ii)
+		{
+			rng = rng*1664525 + 1013904223;
+			const Item item =
+			{
+				.key = (rng >> 16) % _numKeys,
+				.seq = ii,
+			};
+
+			items.push_back(item);
+		}
+
+		return items;
+	}
+
+	void checkSortedAndStable(tinystl::vector<Item>& _items)
+	{
+		bx::DefaultAllocator allocator;
+
+		const uint32_t num = uint32_t(_items.size() );
+		bx::stableSort(&allocator, _items, byKey);
+
+		REQUIRE(num == _items.size() );
+
+		for (uint32_t ii = 1; ii < num; ++ii)
+		{
+			REQUIRE(_items[ii-1].key <= _items[ii].key);
+
+			if (_items[ii-1].key == _items[ii].key)
+			{
+				REQUIRE(_items[ii-1].seq < _items[ii].seq);
+			}
+		}
+	}
+
+} // namespace
+
+TEST_CASE("insertionSort", "[sort]")
+{
+	Item items[] =
+	{
+		{ 3, 0 }, { 1, 1 }, { 3, 2 }, { 0, 3 }, { 1, 4 }, { 3, 5 },
+	};
+
+	bx::insertionSort(items, BX_COUNTOF(items), byKey);
+
+	const uint32_t expectedKey[] = { 0, 1, 1, 3, 3, 3 };
+	const uint32_t expectedSeq[] = { 3, 1, 4, 0, 2, 5 };
+	for (uint32_t ii = 0; ii < BX_COUNTOF(items); ++ii)
+	{
+		REQUIRE(expectedKey[ii] == items[ii].key);
+		REQUIRE(expectedSeq[ii] == items[ii].seq);
+	}
+
+	bx::insertionSort(items, 0, byKey);
+	bx::insertionSort(items, 1, byKey);
+	REQUIRE(0 == items[0].key);
+}
+
+TEST_CASE("stableSort is stable across the insertion/merge threshold", "[sort]")
+{
+	const uint32_t sizes[] = { 0, 1, 2, 3, 31, 32, 33, 63, 64, 65, 127, 128, 129, 1000 };
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(sizes); ++ii)
+	{
+		tinystl::vector<Item> items = makeItems(sizes[ii], 4);
+		checkSortedAndStable(items);
+	}
+}
+
+TEST_CASE("stableSort handles degenerate orderings", "[sort]")
+{
+	bx::DefaultAllocator allocator;
+
+	{
+		tinystl::vector<Item> items;
+		for (uint32_t ii = 0; ii < 100; ++ii)
+		{
+			const Item item = { ii, ii };
+			items.push_back(item);
+		}
+
+		checkSortedAndStable(items);
+		REQUIRE(0  == items[0].key);
+		REQUIRE(99 == items[99].key);
+	}
+
+	{
+		tinystl::vector<Item> items;
+		for (uint32_t ii = 0; ii < 100; ++ii)
+		{
+			const Item item = { 100-ii, ii };
+			items.push_back(item);
+		}
+
+		bx::stableSort(&allocator, items, byKey);
+		for (uint32_t ii = 1; ii < 100; ++ii)
+		{
+			REQUIRE(items[ii-1].key < items[ii].key);
+		}
+	}
+
+	{
+		tinystl::vector<Item> items;
+		for (uint32_t ii = 0; ii < 100; ++ii)
+		{
+			const Item item = { 7, ii };
+			items.push_back(item);
+		}
+
+		bx::stableSort(&allocator, items, byKey);
+		for (uint32_t ii = 0; ii < 100; ++ii)
+		{
+			REQUIRE(ii == items[ii].seq);
+		}
+	}
+}
+
+TEST_CASE("stableSort moves elements by assignment", "[sort]")
+{
+	struct Named
+	{
+		uint32_t         key;
+		tinystl::string name;
+	};
+
+	const tinystl::string prefix("a-long-name-that-will-not-fit-in-a-small-string-buffer-");
+
+	bx::DefaultAllocator allocator;
+
+	tinystl::vector<Named> items;
+	for (uint32_t ii = 0; ii < 200; ++ii)
+	{
+		const char suffix[] = { char('0' + ii%10) };
+
+		Named item;
+		item.key  = (200 - ii) % 10;
+		item.name = prefix;
+		item.name.append(suffix, suffix + 1);
+
+		items.push_back(item);
+	}
+
+	bx::stableSort(&allocator, items, [](const Named& _a, const Named& _b) { return _a.key < _b.key; });
+
+	REQUIRE(200 == items.size() );
+	for (uint32_t ii = 1; ii < items.size(); ++ii)
+	{
+		REQUIRE(items[ii-1].key <= items[ii].key);
+	}
+
+	for (uint32_t ii = 0; ii < items.size(); ++ii)
+	{
+		REQUIRE(prefix.size() + 1 == items[ii].name.size() );
+		REQUIRE(0 == bx::memCmp(items[ii].name.c_str(), prefix.c_str(), prefix.size() ) );
+	}
+}
+
+TEST_CASE("stableSort handles empty and single-element containers", "[sort]")
+{
+	bx::DefaultAllocator allocator;
+
+	tinystl::vector<Item> empty;
+	bx::stableSort(&allocator, empty, byKey);
+	REQUIRE(empty.empty() );
+
+	tinystl::vector<Item> one;
+	const Item item = { 42, 0 };
+	one.push_back(item);
+	bx::stableSort(&allocator, one, byKey);
+	REQUIRE(1  == one.size() );
+	REQUIRE(42 == one[0].key);
+}

@@ -6,6 +6,7 @@
 #ifndef BX_SORT_H_HEADER_GUARD
 #define BX_SORT_H_HEADER_GUARD
 
+#include "allocator.h"
 #include "bx.h"
 #include "math.h"
 #include "string.h"
@@ -73,6 +74,52 @@ namespace bx
 	///
 	template<typename Ty>
 	void quickSort(Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
+
+	/// Performs sort (Insertion Sort algorithm).
+	///
+	/// It's stable, it sorts in place, and it doesn't allocate. Elements move by assignment rather
+	/// than by byte-wise swap, so unlike `quickSort` element type doesn't have to be trivially
+	/// move assignable. It's quadratic, and it's meant for short arrays, or as a building block of
+	/// `stableSort`.
+	///
+	/// @param _data Pointer to array data.
+	/// @param _num Number of elements.
+	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. It must be a
+	///   strict weak ordering.
+	///
+	template<typename Ty, typename LessFn>
+	void insertionSort(Ty* _data, uint32_t _num, LessFn _less);
+
+	/// Performs stable sort: elements that compare equal keep their relative order.
+	///
+	/// Insertion sort for short runs, and bottom-up merge for the rest, ping-ponging between input
+	/// and a single scratch buffer. Elements move by assignment rather than by byte-wise swap, so
+	/// unlike `quickSort` element type doesn't have to be trivially move assignable. An element
+	/// holding a small-string buffer, or anything else self-referential, is safe here and is not
+	/// safe there.
+	///
+	/// @param _allocator Allocator for scratch buffer. Nothing is allocated when there are few
+	///   enough elements for insertion sort alone.
+	/// @param _data Pointer to array data.
+	/// @param _num Number of elements.
+	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. It must be a
+	///   strict weak ordering.
+	///
+	/// @attention Element type must be default constructible and copy assignable.
+	///
+	template<typename Ty, typename LessFn>
+	void stableSort(AllocatorI* _allocator, Ty* _data, uint32_t _num, LessFn _less);
+
+	/// Performs stable sort over contiguous container.
+	///
+	/// @param _allocator Allocator for scratch buffer.
+	/// @param _container Container with `empty`, `size` and `operator[]`, such as
+	///   `tinystl::vector`.
+	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. It must be a
+	///   strict weak ordering.
+	///
+	template<typename ContainerT, typename LessFn>
+	void stableSort(AllocatorI* _allocator, ContainerT& _container, LessFn _less);
 
 	/// Performs reordering of duplicate elements in the array in the way that unique elements
 	/// are sorted to the front of array, and duplicates are after the return value index.
