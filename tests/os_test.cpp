@@ -131,3 +131,40 @@ TEST_CASE("memoryMap-protection-change", "[os]")
 	bx::memoryUnmap(addr, size, &err);
 	REQUIRE(err.isOk() );
 }
+
+TEST_CASE("memoryAllocationGranularity", "[os]")
+{
+	const size_t pageSize    = bx::memoryPageSize();
+	const size_t granularity = bx::memoryAllocationGranularity();
+	REQUIRE(granularity >= pageSize);
+	REQUIRE(0 == (granularity & (granularity - 1) ) );
+
+	if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	{
+		REQUIRE(4<<10 == pageSize);
+		REQUIRE(64<<10 == granularity);
+	}
+
+	bx::Error err;
+	void* addr = bx::memoryMap(NULL, pageSize, granularity, bx::Memory::ReadWrite, &err);
+	REQUIRE(err.isOk() );
+	REQUIRE(bx::isAligned(uintptr_t(addr), granularity) );
+
+	bx::memoryUnmap(addr, pageSize, &err);
+	REQUIRE(err.isOk() );
+}
+
+TEST_CASE("getHardwareThreads", "[os]")
+{
+	REQUIRE(1 <= bx::getHardwareThreads() );
+}
+
+TEST_CASE("timerResolution", "[os]")
+{
+	bx::timerResolutionBegin(0);
+	bx::timerResolutionEnd(0);
+
+	bx::timerResolutionBegin(1);
+	bx::sleep(1);
+	bx::timerResolutionEnd(1);
+}

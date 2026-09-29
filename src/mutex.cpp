@@ -47,29 +47,47 @@ namespace bx
 	{
 	}
 
+	// Reference(s):
+	// - Futexes Are Tricky, Ulrich Drepper, mutex2
+	//   https://www.akkadia.org/drepper/futex.pdf
+	//
 	void Mutex::lock()
 	{
 		uint32_t* futex = (uint32_t*)m_internal;
 
-		if (State::Unlocked == atomicCompareAndSwap<uint32_t>(futex, State::Unlocked, State::Locked) )
+		BX_TSAN_MUTEX_PRE_LOCK(futex);
+
+		uint32_t state = atomicCompareAndSwap<uint32_t>(futex, State::Unlocked, State::Locked);
+
+		if (State::Unlocked != state)
 		{
-			return;
+			if (State::Contested != state)
+			{
+				state = atomicExchange<uint32_t>(futex, State::Contested);
+			}
+
+			while (State::Unlocked != state)
+			{
+				crt0::futexWait(futex, State::Contested);
+				state = atomicExchange<uint32_t>(futex, State::Contested);
+			}
 		}
 
-		while (State::Unlocked != atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Contested) )
-		{
-			crt0::futexWait(futex, State::Contested);
-		}
+		BX_TSAN_MUTEX_POST_LOCK(futex);
 	}
 
 	void Mutex::unlock()
 	{
 		uint32_t* futex = (uint32_t*)m_internal;
 
-		if (State::Contested == atomicCompareAndSwap<uint32_t>(futex, State::Locked, State::Unlocked) )
+		BX_TSAN_MUTEX_PRE_UNLOCK(futex);
+
+		if (State::Contested == atomicExchange<uint32_t>(futex, State::Unlocked) )
 		{
-			crt0::futexWake(futex, State::Locked);
+			crt0::futexWake(futex, 1);
 		}
+
+		BX_TSAN_MUTEX_POST_UNLOCK(futex);
 	}
 
 #else

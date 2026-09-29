@@ -77,6 +77,68 @@ namespace bx
 #endif // BX_PLATFORM_
 	}
 
+#if BX_PLATFORM_WINDOWS
+	typedef uint32_t (__stdcall* TimePeriodFn)(uint32_t _ms);
+
+	static void timePeriod(const StringView& _name, uint32_t _ms)
+	{
+		if (0 == _ms)
+		{
+			return;
+		}
+
+		// Loaded on demand, so that users of bx don't have to link with winmm.
+		static void* s_winmm = dlopen("winmm.dll");
+
+		if (NULL != s_winmm)
+		{
+			TimePeriodFn fn = dlsym<TimePeriodFn>(s_winmm, _name);
+
+			if (NULL != fn)
+			{
+				fn(_ms);
+			}
+		}
+	}
+
+	void timerResolutionBegin(uint32_t _ms)
+	{
+		timePeriod("timeBeginPeriod", _ms);
+	}
+
+	void timerResolutionEnd(uint32_t _ms)
+	{
+		timePeriod("timeEndPeriod", _ms);
+	}
+#else
+	void timerResolutionBegin(uint32_t _ms)
+	{
+		BX_UNUSED(_ms);
+	}
+
+	void timerResolutionEnd(uint32_t _ms)
+	{
+		BX_UNUSED(_ms);
+	}
+#endif // BX_PLATFORM_WINDOWS
+
+	uint32_t getHardwareThreads()
+	{
+#if BX_CRT_NONE
+		return 1;
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+		SYSTEM_INFO si;
+		memSet(&si, 0, sizeof(si) );
+		::GetNativeSystemInfo(&si);
+		return max<uint32_t>(1, si.dwNumberOfProcessors);
+#elif BX_PLATFORM_POSIX && defined(_SC_NPROCESSORS_ONLN)
+		const long num = ::sysconf(_SC_NPROCESSORS_ONLN);
+		return uint32_t(max<long>(1, num) );
+#else
+		return 1;
+#endif // BX_PLATFORM_
+	}
+
 	uint32_t getTid()
 	{
 #if BX_PLATFORM_WINDOWS
@@ -439,9 +501,9 @@ namespace bx
 		const uint32_t advise  = _flags & Memory::AdviseMask;
 		const uint32_t page    = _flags & Memory::PageMask;
 
-		const size_t pageSize = memoryPageSize();
-		BX_ASSERT(_alignment <= pageSize, "Alignments greater than the page size are not implemented (requested %zu, page %zu).", _alignment, pageSize);
-		BX_UNUSED(_alignment, pageSize);
+		const size_t granularity = memoryAllocationGranularity();
+		BX_ASSERT(_alignment <= granularity, "Alignments greater than the allocation granularity are not implemented (requested %zu, granularity %zu).", _alignment, granularity);
+		BX_UNUSED(_alignment, granularity);
 
 #if BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		if (NULL == _address)
@@ -608,7 +670,7 @@ namespace bx
 		BX_UNUSED(advise);
 		return _address;
 #else
-		BX_UNUSED(_address, _size, _alignment, _flags, state, protect, advise, page, pageSize);
+		BX_UNUSED(_address, _size, _alignment, _flags, state, protect, advise, page, granularity);
 		BX_ERROR_SET(_err, kErrorMemoryMapFailed, "memoryMap: Not implemented!");
 		return NULL;
 #endif // BX_PLATFORM_*
@@ -667,10 +729,22 @@ namespace bx
 		SYSTEM_INFO si;
 		memSet(&si, 0, sizeof(si) );
 		::GetSystemInfo(&si);
-		return si.dwAllocationGranularity;
+		return si.dwPageSize;
 #else
 		BX_UNUSED(page);
 		return 16<<10;
+#endif // BX_PLATFORM_WINDOWS
+	}
+
+	size_t memoryAllocationGranularity()
+	{
+#if BX_PLATFORM_WINDOWS
+		SYSTEM_INFO si;
+		memSet(&si, 0, sizeof(si) );
+		::GetSystemInfo(&si);
+		return si.dwAllocationGranularity;
+#else
+		return memoryPageSize();
 #endif // BX_PLATFORM_WINDOWS
 	}
 
