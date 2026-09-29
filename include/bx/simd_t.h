@@ -77,10 +77,11 @@
 #		include <immintrin.h> // FMA3
 #	endif // BX_CPU_X86
 #	if BX_COMPILER_MSVC
-// With /arch:AVX2 MSVC compiles fmaf to a single vfmadd213ss (no CRT call and,
-// unlike _mm_fmadd_ss, no zeroing of the upper lanes); the CRT's own
-// declaration is compatible with this one. On ARM64 it compiles to fmadd.
-extern "C" float fmaf(float, float, float);
+#		if defined(_DLL)
+extern "C" __declspec(dllimport) float __cdecl fmaf(float, float, float);
+#		else
+extern "C" float __cdecl fmaf(float, float, float);
+#		endif // defined(_DLL)
 #		pragma intrinsic(fmaf)
 #	endif // BX_COMPILER_MSVC
 #endif // BX_CONFIG_FMA
