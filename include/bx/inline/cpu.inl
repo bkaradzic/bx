@@ -58,6 +58,15 @@ extern "C" void* _InterlockedExchangePointer(void* volatile* _ptr, void* _value)
 
 #endif
 
+extern "C" long _InterlockedExchange(long volatile* _ptr, long _value);
+#	pragma intrinsic(_InterlockedExchange)
+
+extern "C" int64_t _InterlockedExchange64(int64_t volatile* _ptr, int64_t _value);
+#	pragma intrinsic(_InterlockedExchange64)
+
+extern "C" void* _InterlockedCompareExchangePointer(void* volatile* _ptr, void* _exchange, void* _comparand);
+#	pragma intrinsic(_InterlockedCompareExchangePointer)
+
 #	if BX_PLATFORM_WINRT
 #		define _InterlockedExchangeAdd64 InterlockedExchangeAdd64
 #	endif // BX_PLATFORM_WINRT
@@ -290,7 +299,7 @@ namespace bx
 	inline Ty atomicFetchTestAndAdd(volatile Ty* _ptr, Ty _test, Ty _value)
 	{
 		Ty oldVal;
-		Ty newVal = *_ptr;
+		Ty newVal = atomicLoad(_ptr);
 		do
 		{
 			oldVal = newVal;
@@ -305,7 +314,7 @@ namespace bx
 	inline Ty atomicFetchTestAndSub(volatile Ty* _ptr, Ty _test, Ty _value)
 	{
 		Ty oldVal;
-		Ty newVal = *_ptr;
+		Ty newVal = atomicLoad(_ptr);
 		do
 		{
 			oldVal = newVal;
@@ -320,7 +329,7 @@ namespace bx
 	Ty atomicFetchAndAddsat(volatile Ty* _ptr, Ty _value, Ty _max)
 	{
 		Ty oldVal;
-		Ty newVal = *_ptr;
+		Ty newVal = atomicLoad(_ptr);
 		do
 		{
 			oldVal = newVal;
@@ -335,7 +344,7 @@ namespace bx
 	Ty atomicFetchAndSubsat(volatile Ty* _ptr, Ty _value, Ty _min)
 	{
 		Ty oldVal;
-		Ty newVal = *_ptr;
+		Ty newVal = atomicLoad(_ptr);
 		do
 		{
 			oldVal = newVal;
@@ -352,6 +361,87 @@ namespace bx
 		return _InterlockedExchangePointer(_ptr, _new);
 #else
 		return __sync_lock_test_and_set(_ptr, _new);
+#endif // BX_COMPILER_*
+	}
+
+	template<typename Ty>
+	inline Ty atomicLoad(const volatile Ty* _ptr)
+	{
+		static_assert(4 == sizeof(Ty) || 8 == sizeof(Ty), "Only 32-bit, and 64-bit types are supported.");
+
+#if BX_COMPILER_MSVC
+		return *_ptr;
+#else
+		return __atomic_load_n(_ptr, __ATOMIC_SEQ_CST);
+#endif // BX_COMPILER_*
+	}
+
+	template<typename Ty>
+	inline void atomicStore(volatile Ty* _ptr, Ty _value)
+	{
+		static_assert(4 == sizeof(Ty) || 8 == sizeof(Ty), "Only 32-bit, and 64-bit types are supported.");
+
+#if BX_COMPILER_MSVC
+		// Exchange, like clang, and GCC do. Store followed by `mfence` is 8x slower on
+		// AMD Zen 4.
+		atomicExchange(_ptr, _value);
+#else
+		__atomic_store_n(_ptr, _value, __ATOMIC_SEQ_CST);
+#endif // BX_COMPILER_*
+	}
+
+	template<typename Ty>
+	inline void atomicStoreRelaxed(volatile Ty* _ptr, Ty _value)
+	{
+		static_assert(4 == sizeof(Ty) || 8 == sizeof(Ty), "Only 32-bit, and 64-bit types are supported.");
+
+#if BX_COMPILER_MSVC
+		*_ptr = _value;
+#else
+		__atomic_store_n(_ptr, _value, __ATOMIC_RELAXED);
+#endif // BX_COMPILER_*
+	}
+
+	template<typename Ty>
+	inline Ty atomicExchange(volatile Ty* _ptr, Ty _new)
+	{
+		static_assert(4 == sizeof(Ty) || 8 == sizeof(Ty), "Only 32-bit, and 64-bit types are supported.");
+
+#if BX_COMPILER_MSVC
+		if constexpr (8 == sizeof(Ty) )
+		{
+			return Ty(_InterlockedExchange64( (volatile int64_t*)_ptr, int64_t(_new) ) );
+		}
+		else
+		{
+			return Ty(_InterlockedExchange( (volatile long*)_ptr, long(_new) ) );
+		}
+#else
+		return __atomic_exchange_n(_ptr, _new, __ATOMIC_SEQ_CST);
+#endif // BX_COMPILER_*
+	}
+
+	inline uintptr_t atomicCompareAndSwapPtr(volatile uintptr_t* _ptr, uintptr_t _old, uintptr_t _new)
+	{
+#if BX_COMPILER_MSVC
+		return uintptr_t(_InterlockedCompareExchangePointer( (void* volatile*)_ptr, (void*)_new, (void*)_old) );
+#else
+		return __sync_val_compare_and_swap(_ptr, _old, _new);
+#endif // BX_COMPILER_*
+	}
+
+	inline void cpuRelax()
+	{
+#if BX_COMPILER_MSVC
+#	if BX_CPU_X86
+		_mm_pause();
+#	else
+		YieldProcessor();
+#	endif // BX_CPU_X86
+#elif BX_CPU_X86
+		__builtin_ia32_pause();
+#elif BX_CPU_ARM && BX_ARCH_64BIT
+		__asm__ volatile("yield");
 #endif // BX_COMPILER_*
 	}
 

@@ -44,3 +44,36 @@ TEST_CASE("atomic", "")
 	REQUIRE(test == 1337);
 
 }
+
+TEST_CASE("atomic load, store, exchange", "")
+{
+	uint32_t value32 = 1337;
+	REQUIRE(1337 == bx::atomicLoad(&value32) );
+
+	bx::atomicStore(&value32, 1389u);
+	REQUIRE(1389 == value32);
+
+	bx::atomicStoreRelaxed(&value32, 1453u);
+	REQUIRE(1453 == value32);
+
+	REQUIRE(1453 == bx::atomicExchange(&value32, 42u) );
+	REQUIRE(42 == value32);
+
+	uint64_t value64 = UINT64_C(0x123456789abcdef0);
+	REQUIRE(UINT64_C(0x123456789abcdef0) == bx::atomicLoad(&value64) );
+
+	bx::atomicStore(&value64, UINT64_C(0xfedcba9876543210) );
+	REQUIRE(UINT64_C(0xfedcba9876543210) == value64);
+
+	REQUIRE(UINT64_C(0xfedcba9876543210) == bx::atomicExchange(&value64, UINT64_C(1) ) );
+	REQUIRE(1 == value64);
+
+	uintptr_t ptr = 16;
+	REQUIRE(16 == bx::atomicCompareAndSwapPtr(&ptr, 8, 32) );
+	REQUIRE(16 == ptr);
+
+	REQUIRE(16 == bx::atomicCompareAndSwapPtr(&ptr, 16, 32) );
+	REQUIRE(32 == ptr);
+
+	bx::cpuRelax();
+}

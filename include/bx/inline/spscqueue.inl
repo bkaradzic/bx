@@ -35,7 +35,7 @@ namespace bx
 	{
 		m_last->m_next = BX_NEW(m_allocator, Node)(_ptr);
 		atomicExchangePtr( (void**)&m_last, m_last->m_next);
-		while (m_first != m_divider)
+		while (m_first != atomicLoad(&m_divider) )
 		{
 			Node* node = m_first;
 			m_first = m_first->m_next;
@@ -45,7 +45,7 @@ namespace bx
 
 	inline void* SpScUnboundedQueue::peek()
 	{
-		if (m_divider != m_last)
+		if (m_divider != atomicLoad(&m_last) )
 		{
 			return m_divider->m_next->m_ptr;
 		}
@@ -55,7 +55,7 @@ namespace bx
 
 	inline void* SpScUnboundedQueue::pop()
 	{
-		if (m_divider != m_last)
+		if (m_divider != atomicLoad(&m_last) )
 		{
 			void* ptr = m_divider->m_next->m_ptr;
 			atomicExchangePtr( (void**)&m_divider, m_divider->m_next);

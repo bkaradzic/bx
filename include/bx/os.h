@@ -67,6 +67,25 @@ namespace bx
 	/// Yield remainder of the current thread's time slice to another runnable thread.
 	void yield();
 
+	/// Request OS timer resolution, which affects precision of `sleep` and wait timeouts.
+	/// Every call must be matched with `timerResolutionEnd` with the same value.
+	///
+	/// @param[in] _ms Timer resolution in milliseconds, 0 = no request.
+	///
+	void timerResolutionBegin(uint32_t _ms);
+
+	/// End request made with `timerResolutionBegin`.
+	///
+	/// @param[in] _ms Value passed to `timerResolutionBegin`.
+	///
+	void timerResolutionEnd(uint32_t _ms);
+
+	/// Get number of hardware threads available to the process.
+	///
+	/// @returns Number of hardware threads, at least 1.
+	///
+	uint32_t getHardwareThreads();
+
 	/// Get the OS-level identifier of the calling thread.
 	///
 	/// @returns Platform-specific thread id.
@@ -183,6 +202,13 @@ namespace bx
 	/// @returns Page size in bytes, or 0 when the requested page kind is unsupported.
 	///
 	size_t memoryPageSize(uint32_t _flags = 0);
+
+	/// Query granularity of base address of fresh reservation made by `memoryMap`. It's
+	/// larger than page size on Windows (64 KiB), and equal to page size elsewhere.
+	///
+	/// @returns Allocation granularity in bytes.
+	///
+	size_t memoryAllocationGranularity();
 
 } // namespace bx
 
