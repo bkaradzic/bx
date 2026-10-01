@@ -123,3 +123,120 @@ TEST_CASE("RingBufferControl resize", "")
 	REQUIRE(control.m_write   == 0);
 	REQUIRE(control.m_read    == 1);
 }
+
+TEST_CASE("RingBufferControl resize without reserved slots", "")
+{
+	{
+		bx::RingBufferControl control(8);
+
+		REQUIRE(5 == control.reserve(5) );
+		REQUIRE(5 == control.commit(5) );
+		REQUIRE(2 == control.consume(2) );
+
+		control.resize(8);
+		REQUIRE(16 == control.getSize() );
+		REQUIRE(3  == control.getNumUsed() );
+		REQUIRE(0  == control.getNumReserved() );
+		REQUIRE(12 == control.getNumEmpty() );
+
+		REQUIRE(control.m_current == 5);
+		REQUIRE(control.m_write   == 5);
+		REQUIRE(control.m_read    == 2);
+	}
+
+	{
+		bx::RingBufferControl control(8);
+
+		REQUIRE(6 == control.reserve(6) );
+		REQUIRE(6 == control.commit(6) );
+		REQUIRE(5 == control.consume(5) );
+		REQUIRE(4 == control.reserve(4) );
+		REQUIRE(4 == control.commit(4) );
+
+		REQUIRE(control.m_current == 2);
+		REQUIRE(control.m_write   == 2);
+		REQUIRE(control.m_read    == 5);
+
+		control.resize(8);
+		REQUIRE(16 == control.getSize() );
+		REQUIRE(5  == control.getNumUsed() );
+		REQUIRE(0  == control.getNumReserved() );
+		REQUIRE(10 == control.getNumEmpty() );
+
+		REQUIRE(control.m_current == 2);
+		REQUIRE(control.m_write   == 2);
+		REQUIRE(control.m_read    == 13);
+
+		control.resize(-8);
+		REQUIRE(8 == control.getSize() );
+		REQUIRE(5 == control.getNumUsed() );
+		REQUIRE(0 == control.getNumReserved() );
+		REQUIRE(2 == control.getNumEmpty() );
+
+		REQUIRE(control.m_current == 2);
+		REQUIRE(control.m_write   == 2);
+		REQUIRE(control.m_read    == 5);
+	}
+
+	{
+		bx::RingBufferControl control(8);
+
+		REQUIRE(3 == control.reserve(3) );
+		REQUIRE(3 == control.commit(3) );
+		REQUIRE(3 == control.consume(3) );
+
+		control.resize(8);
+		REQUIRE(16 == control.getSize() );
+		REQUIRE(0  == control.getNumUsed() );
+		REQUIRE(0  == control.getNumReserved() );
+		REQUIRE(15 == control.getNumEmpty() );
+		REQUIRE(control.isEmpty() );
+
+		REQUIRE(control.m_current == 3);
+		REQUIRE(control.m_write   == 3);
+		REQUIRE(control.m_read    == 3);
+	}
+}
+
+TEST_CASE("RingBufferControl shrink past the end of buffer", "")
+{
+	{
+		bx::RingBufferControl control(16);
+
+		REQUIRE(10 == control.reserve(10) );
+		REQUIRE(10 == control.commit(10) );
+		REQUIRE(8  == control.consume(8) );
+
+		REQUIRE(13 == control.getNumEmpty() );
+
+		control.resize(-13);
+		REQUIRE(3 == control.getSize() );
+		REQUIRE(2 == control.getNumUsed() );
+		REQUIRE(0 == control.getNumReserved() );
+		REQUIRE(0 == control.getNumEmpty() );
+
+		REQUIRE(control.m_current == 0);
+		REQUIRE(control.m_write   == 0);
+		REQUIRE(control.m_read    == 1);
+	}
+
+	{
+		bx::RingBufferControl control(32);
+
+		REQUIRE(29 == control.reserve(29) );
+		REQUIRE(29 == control.commit(29) );
+		REQUIRE(18 == control.consume(18) );
+
+		REQUIRE(20 == control.getNumEmpty() );
+
+		control.resize(-4);
+		REQUIRE(28 == control.getSize() );
+		REQUIRE(11 == control.getNumUsed() );
+		REQUIRE(0  == control.getNumReserved() );
+		REQUIRE(16 == control.getNumEmpty() );
+
+		REQUIRE(control.m_current == 0);
+		REQUIRE(control.m_write   == 0);
+		REQUIRE(control.m_read    == 17);
+	}
+}
