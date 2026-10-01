@@ -54,10 +54,16 @@ namespace bx
 			: _size
 			;
 
+		// empty slots past the end of buffer are removed from the start of buffer.
+		const int32_t  back  = bx::max(_size, int32_t(m_write) - int32_t(m_size) );
+		const int32_t  front = _size - back;
+		const uint32_t write = m_write;
+
 		m_size += _size;
 
-		m_current += m_current >= m_write ? _size : 0;
-		m_read    += m_read    >= m_write ? _size : 0;
+		m_current = (m_current + (m_current > write ? back : front) ) % m_size;
+		m_read    = (m_read    + (m_read    > write ? back : front) ) % m_size;
+		m_write   = (m_write   + front) % m_size;
 	}
 
 	inline uint32_t RingBufferControl::consume(uint32_t _size)
@@ -177,10 +183,16 @@ namespace bx
 			: _size
 			;
 
+		// empty slots past the end of buffer are removed from the start of buffer.
+		const int32_t  back  = bx::max(_size, int32_t(m_write) - int32_t(m_size) );
+		const int32_t  front = _size - back;
+		const uint32_t write = m_write;
+
 		m_size += _size;
 
-		m_current += m_current >= m_write ? _size : 0;
-		m_read    += m_read    >= m_write ? _size : 0;
+		m_current = (m_current + (m_current > write ? back : front) ) % m_size;
+		m_read    = (m_read    + (m_read    > write ? back : front) ) % m_size;
+		m_write   = (m_write   + front) % m_size;
 	}
 
 	inline uint32_t SpScRingBufferControl::consume(uint32_t _size)

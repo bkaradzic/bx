@@ -71,7 +71,9 @@ namespace bx
 		/// forward or backward if write head is behind them.
 		///
 		/// @param[in] _size Amount to resize. Value can be positive when growing size or negative
-		/// when shrinking size of buffer.
+		/// when shrinking size of buffer. Shrinking is limited to number of empty slots. Empty slots
+		/// are removed from write head to the end of buffer, and remainder is removed from the start
+		/// of buffer.
 		///
 		void resize(int32_t _size);
 
@@ -176,7 +178,9 @@ namespace bx
 		/// forward or backward if write head is behind them.
 		///
 		/// @param[in] _size Amount to resize. Value can be positive when growing size or negative
-		/// when shrinking size of buffer.
+		/// when shrinking size of buffer. Shrinking is limited to number of empty slots. Empty slots
+		/// are removed from write head to the end of buffer, and remainder is removed from the start
+		/// of buffer.
 		///
 		void resize(int32_t _size);
 
