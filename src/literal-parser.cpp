@@ -154,8 +154,9 @@ namespace bx
 		{
 			const bool anyHex = acceptDigits(_scanner, isHexNum, _profile.separator);
 
-			bool isFloat    = false;
-			bool anyHexFrac = false;
+			bool isFloat     = false;
+			bool anyHexFrac  = false;
+			bool anyExponent = false;
 			if (0 != (_profile.flags & LiteralParser::HexFloat) )
 			{
 				if (!_scanner.accept('.').isEmpty() )
@@ -168,7 +169,8 @@ namespace bx
 				if ('p' == ch
 				||  'P' == ch)
 				{
-					isFloat = true;
+					isFloat     = true;
+					anyExponent = true;
 					_scanner.accept();
 					_scanner.accept('-', '+');
 
@@ -188,7 +190,10 @@ namespace bx
 					return LiteralType::Unknown;
 				}
 
-				acceptSuffix(_scanner, _profile.floatSuffix);
+				if (anyExponent)
+				{
+					acceptSuffix(_scanner, _profile.floatSuffix);
+				}
 
 				return LiteralType::Float;
 			}
