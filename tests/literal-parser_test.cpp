@@ -212,17 +212,21 @@ TEST_CASE("LiteralParser WGSL profile", "[parser]")
 	REQUIRE(testWgsl("0xffu", LP::Hexadecimal) );
 
 	// floats: fraction/exponent, edge dots, suffixes, hex float
-	REQUIRE(testWgsl("1.0",     LP::Float) );
-	REQUIRE(testWgsl(".5",      LP::Float) );
-	REQUIRE(testWgsl("2.",      LP::Float) );
-	REQUIRE(testWgsl("1e5",     LP::Float) );
-	REQUIRE(testWgsl("3.14e-2", LP::Float) );
-	REQUIRE(testWgsl("1.5f",    LP::Float) );
-	REQUIRE(testWgsl("1f",      LP::Float) ); // bare integer + float suffix -> float
-	REQUIRE(testWgsl("1h",      LP::Float) );
-	REQUIRE(testWgsl("1lf",     LP::Float) );
-	REQUIRE(testWgsl("0x1p-3",  LP::Float) );
-	REQUIRE(testWgsl("0x1.8p3", LP::Float) );
+	REQUIRE(testWgsl("1.0",           LP::Float) );
+	REQUIRE(testWgsl(".5",            LP::Float) );
+	REQUIRE(testWgsl("2.",            LP::Float) );
+	REQUIRE(testWgsl("1e5",           LP::Float) );
+	REQUIRE(testWgsl("3.14e-2",       LP::Float) );
+	REQUIRE(testWgsl("1.5f",          LP::Float) );
+	REQUIRE(testWgsl("1f",            LP::Float) ); // bare integer + float suffix -> float
+	REQUIRE(testWgsl("1h",            LP::Float) );
+	REQUIRE(testWgsl("1lf",           LP::Float) );
+	REQUIRE(testWgsl("0x1p-3",        LP::Float) );
+	REQUIRE(testWgsl("0x1.8p3",       LP::Float) );
+	REQUIRE(testWgsl("0x1.8p3h",      LP::Float) );
+	REQUIRE(testWgsl("0x1.8p3f",      LP::Float) );
+	REQUIRE(testWgsl("0xf.h", "0xf.", LP::Float) );
+	REQUIRE(testWgsl("0xf.f",         LP::Float) );
 
 	// prefix match: trailing input is not part of the literal
 	REQUIRE(testWgsl("42;",    "42",    LP::Decimal) );
