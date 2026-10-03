@@ -24,6 +24,7 @@
 #include "settings.cpp"
 #include "sort.cpp"
 #include "string.cpp"
+#include "superluminal.cpp"
 #include "thread.cpp"
 #include "timer.cpp"
 #include "url.cpp"
