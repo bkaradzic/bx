@@ -88,6 +88,7 @@ project "bx"
 			path.join(BX_DIR, "src/settings.cpp"),
 			path.join(BX_DIR, "src/sort.cpp"),
 			path.join(BX_DIR, "src/string.cpp"),
+			path.join(BX_DIR, "src/superluminal.cpp"),
 			path.join(BX_DIR, "src/thread.cpp"),
 			path.join(BX_DIR, "src/timer.cpp"),
 			path.join(BX_DIR, "src/url.cpp"),
