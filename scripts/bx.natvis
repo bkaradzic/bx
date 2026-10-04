@@ -7,4 +7,129 @@
             <ExpandedItem>m_ptr,[m_len]</ExpandedItem>
         </Expand>
     </Type>
+	<Type Name="bx::HandleAlloc">
+		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
+		<Expand>
+			<Item Name="[numHandles]">m_numHandles</Item>
+			<Item Name="[maxHandles]">m_maxHandles</Item>
+			<ArrayItems>
+				<Size>m_numHandles</Size>
+				<ValuePointer>(unsigned short*)(this+1)</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HandleAlloc2">
+		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
+		<Expand>
+			<Item Name="[numHandles]">m_numHandles</Item>
+			<Item Name="[maxHandles]">m_maxHandles</Item>
+			<Item Name="[bits]">m_bits</Item>
+			<CustomListItems MaxItemsPerView="4096">
+				<Variable Name="idx" InitialValue="0" />
+				<Loop Condition="idx &lt; m_maxHandles">
+					<If Condition="(m_bits.m_ptr[idx / 64] &gt;&gt; (idx % 64)) &amp; 1">
+						<Item Name="[{idx}]">idx</Item>
+					</If>
+					<Exec>idx++</Exec>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HandleAlloc2T&lt;*&gt;">
+		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::HandleAlloc2*)this</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::FixedStorageT&lt;*,*&gt;">
+		<DisplayString>{{ Capacity={$T2} }}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>$T2</Size>
+				<ValuePointer>($T1*)m_data</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::DynamicStorageT&lt;*&gt;">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ Capacity={m_capacity} ptr={(void*)m_ptr} }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]">m_capacity</Item>
+			<Item Name="[allocator]">m_allocator</Item>
+			<ArrayItems Condition="m_ptr != 0">
+				<Size>m_capacity</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::StorageViewT&lt;*&gt;">
+		<DisplayString>{{ count={m_count} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]" ExcludeView="simple">m_count</Item>
+			<Item Name="[ptr]" ExcludeView="simple">m_ptr</Item>
+			<ArrayItems>
+				<Size>m_count</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::BitArrayViewBase">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[sizeInBytes]">m_sizeInBytes</Item>
+			<Item Name="[ptr]">m_ptr</Item>
+			<ArrayItems Condition="m_ptr != 0">
+				<Size>m_sizeInBytes / 8</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::BitArray">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[sizeInBytes]">m_sizeInBytes</Item>
+			<Item Name="[allocator]">m_storage.m_allocator</Item>
+			<Item Name="[capacity]">m_storage.m_capacity</Item>
+			<ArrayItems Condition="m_ptr != 0">
+				<Size>m_sizeInBytes / 8</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+
+	<Type Name="bx::MippedBitArrayBase">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[sizeInBytes]">m_sizeInBytes</Item>
+			<Item Name="[ptr]">m_ptr</Item>
+			<Item Name="[mip]">m_mip,[(m_sizeInBytes/8+63)/64]</Item>
+			<ArrayItems Condition="m_ptr != 0">
+				<Size>m_sizeInBytes / 8</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::MippedBitArrayT&lt;*&gt;">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::MippedBitArrayBase*)this</ExpandedItem>
+		</Expand>
+	</Type>
+
 </AutoVisualizer>

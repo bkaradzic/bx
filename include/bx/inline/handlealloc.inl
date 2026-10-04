@@ -713,4 +713,104 @@ namespace bx
 		m_alloc.reset();
 	}
 
+	inline HandleAlloc2::HandleAlloc2(MippedBitArrayBase& _bits, uint16_t _maxHandles)
+		: m_bits(_bits)
+		, m_maxHandles(_maxHandles)
+		, m_numHandles(0)
+	{
+		BX_ASSERT(_bits.getCount() >= _maxHandles, "Bit array holds %d bits, %d handles requested.", _bits.getCount(), _maxHandles);
+		reset();
+	}
+
+	inline HandleAlloc2::HandleAlloc2(InitNoneTag, MippedBitArrayBase& _bits, uint16_t _maxHandles)
+		: m_bits(_bits)
+		, m_maxHandles(_maxHandles)
+		, m_numHandles(0)
+	{
+	}
+
+	inline uint16_t HandleAlloc2::getNumHandles() const
+	{
+		return m_numHandles;
+	}
+
+	inline uint16_t HandleAlloc2::getMaxHandles() const
+	{
+		return m_maxHandles;
+	}
+
+	inline uint16_t HandleAlloc2::alloc()
+	{
+		const uint32_t idx = m_bits.findClear(0, m_maxHandles);
+
+		if (kInvalid == idx)
+		{
+			return kInvalidHandle;
+		}
+
+		m_bits.set(idx, true);
+		++m_numHandles;
+
+		return uint16_t(idx);
+	}
+
+	inline bool HandleAlloc2::isValid(uint16_t _handle) const
+	{
+		return true
+			&& _handle < m_maxHandles
+			&& m_bits.get(_handle)
+			;
+	}
+
+	inline void HandleAlloc2::free(uint16_t _handle)
+	{
+		if (isValid(_handle) )
+		{
+			m_bits.set(_handle, false);
+			--m_numHandles;
+		}
+	}
+
+	inline void HandleAlloc2::reset()
+	{
+		m_bits.set(0, m_maxHandles, false);
+		m_numHandles = 0;
+	}
+
+	inline uint16_t HandleAlloc2::findFirst() const
+	{
+		return findFrom(0);
+	}
+
+	inline uint16_t HandleAlloc2::findNext(uint16_t _handle) const
+	{
+		return findFrom(uint32_t(_handle) + 1);
+	}
+
+	inline const BitArrayViewBase& HandleAlloc2::getBits() const
+	{
+		return m_bits;
+	}
+
+	inline uint16_t HandleAlloc2::findFrom(uint32_t _start) const
+	{
+		const uint32_t idx = _start < m_maxHandles
+			? m_bits.findSet(_start, m_maxHandles)
+			: kInvalid
+			;
+
+		return kInvalid == idx
+			? kInvalidHandle
+			: uint16_t(idx)
+			;
+	}
+
+	template<uint16_t MaxHandlesT>
+	inline HandleAlloc2T<MaxHandlesT>::HandleAlloc2T()
+		: HandleAlloc2(InitNone, m_storage, MaxHandlesT)
+	{
+		m_storage.setCount(MaxHandlesT);
+	}
+
+
 } // namespace bx
