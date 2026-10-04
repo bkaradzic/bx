@@ -514,6 +514,156 @@ TEST_CASE("fromString hex float", "[string]")
 	REQUIRE(f == bx::kFloatSmallest);
 }
 
+TEST_CASE("fromString round half to even", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE(bx::fromString(&d, "1e23") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x44b52d02c7e14af6) );
+
+	REQUIRE(bx::fromString(&d, "9007199254740993") );
+	REQUIRE(d == 9007199254740992.0);
+
+	REQUIRE(bx::fromString(&d, "7.2057594037927933e16") );
+	REQUIRE(d == 72057594037927936.0);
+
+	REQUIRE(bx::fromString(&d, "9007199254740992.5") );
+	REQUIRE(d == 9007199254740992.0);
+
+	REQUIRE(bx::fromString(&d, "9007199254740993.5") );
+	REQUIRE(d == 9007199254740994.0);
+
+	REQUIRE(bx::fromString(&d, "1.00000000000000011102230246251565404236316680908203125") );
+	REQUIRE(d == 1.0);
+
+	REQUIRE(bx::fromString(&d, "1.000000000000000111022302462515654042363166809082031250000001") );
+	REQUIRE(d == 1.0000000000000002);
+
+	REQUIRE(bx::fromString(&d, "1.00000000000000011102230246251565404236316680908203124999999") );
+	REQUIRE(d == 1.0);
+}
+
+TEST_CASE("fromString subnormal", "[string]")
+{
+	double d = 1.0;
+
+	REQUIRE(bx::fromString(&d, "5e-324") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "2.5e-324") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "2e-324") );
+	REQUIRE(d == 0.0);
+
+	REQUIRE(bx::fromString(&d, "1e-320") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x00000000000007e8) );
+
+	REQUIRE(bx::fromString(&d, "1e-308") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x000730d67819e8d2) );
+
+	for (int32_t exp = -1022; exp >= -1074; --exp)
+	{
+		char tmp[1200];
+		const double value = bx::ldexp(1.0, exp);
+
+		bx::toString(tmp, BX_COUNTOF(tmp), value);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(read == value);
+	}
+
+	float f = 1.0f;
+
+	REQUIRE(bx::fromString(&f, "1e-45") );
+	REQUIRE(f == 0x1p-149f);
+
+	REQUIRE(bx::fromString(&f, "1e-46") );
+	REQUIRE(f == 0.0f);
+}
+
+TEST_CASE("fromString rejects malformed", "[string]")
+{
+	const char* bad[] = { "", "abc", "+", "-", ".", "e10", "   ", "0x", "-0x", "+.e5" };
+
+	for (const char* str : bad)
+	{
+		double d = 1234.5;
+		float  f = 1234.5f;
+
+		REQUIRE(!bx::fromString(&d, str) );
+		REQUIRE(!bx::fromString(&f, str) );
+	}
+
+	double d = 0.0;
+	REQUIRE(bx::fromString(&d, "12abc") );
+	REQUIRE(d == 12.0);
+}
+
+TEST_CASE("fromString float rounds once", "[string]")
+{
+	float f = 0.0f;
+
+	REQUIRE(bx::fromString(&f, "1e23") );
+	REQUIRE(bx::floatToBits(f) == UINT32_C(0x65a96816) );
+
+	REQUIRE(bx::fromString(&f, "0.1") );
+	REQUIRE(f == 0.1f);
+
+	REQUIRE(bx::fromString(&f, "16777217") );
+	REQUIRE(f == 16777216.0f);
+
+	REQUIRE(bx::fromString(&f, "3.4028234663852886e+38") );
+	REQUIRE(f == bx::kFloatLargest);
+
+	REQUIRE(bx::fromString(&f, "1e39") );
+	REQUIRE(bx::isInfinite(f) );
+}
+
+TEST_CASE("fromString long digit strings", "[string]")
+{
+	const double values[] =
+	{
+		1.0, 0.1, 1.0e-300, 1.0e300, 0x1p-1074, 2.2250738585072014e-308,
+		1.7976931348623157e308, 3.141592653589793, -79.39773355813419,
+	};
+
+	for (double value : values)
+	{
+		char tmp[1200];
+		bx::snprintf(tmp, BX_COUNTOF(tmp), "%.760e", value);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(read == value);
+	}
+
+	double d = 0.0;
+	REQUIRE(bx::fromString(&d, "1.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001") );
+	REQUIRE(d == 1.0);
+}
+
+TEST_CASE("fromString hex wide mantissa", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE(bx::fromString(&d, "0x1fffffffffffffp0") );
+	REQUIRE(d == 9007199254740991.0);
+
+	REQUIRE(bx::fromString(&d, "0x1ffffffffffffff80p0") );
+	REQUIRE(d == 36893488147419103232.0);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1074") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1075") );
+	REQUIRE(d == 0.0);
+
+	REQUIRE(bx::fromString(&d, "0x3p-1075") );
+	REQUIRE(d == 0x1p-1073);
+}
+
 static bool testFromString(int32_t _value, const char* _input)
 {
 	char tmp[1024];

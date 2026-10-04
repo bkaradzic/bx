@@ -168,6 +168,86 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC double bitsToDouble(uint64_t _a);
 
+	/// Format constants and bit access for a floating-point type.
+	template<typename Ty>
+	struct FloatT;
+
+	/// `FloatT` for `float`.
+	template<>
+	struct FloatT<float>
+	{
+		using Type = float;
+		using Bits = uint32_t;
+		using Int  = int32_t;
+
+		static constexpr int32_t kExponentBias      = int32_t(kFloatExponentBias);
+		static constexpr int32_t kExponentBitShift  = int32_t(kFloatExponentBitShift);
+		static constexpr int32_t kMantissaNumBits   = int32_t(kFloatMantissaNumBits);
+		static constexpr Bits    kSignMask          = kFloatSignMask;
+		static constexpr Bits    kExponentMask      = kFloatExponentMask;
+		static constexpr Bits    kMantissaMask      = kFloatMantissaMask;
+		static constexpr Type    kSmallest          = kFloatSmallest;
+		static constexpr Type    kLargest           = kFloatLargest;
+		static constexpr Type    kInfinity          = kFloatInfinity;
+		static constexpr Type    kInvLn2            = kFloatInvLn2;
+		static constexpr Type    kInvLn10           = kFloatInvLn10;
+		static constexpr Type    kLn2Hi             = kFloatLn2Hi;
+		static constexpr Type    kLn2Lo             = kFloatLn2Lo;
+		static constexpr Type    kExpOverflow       = kFloatExpOverflow;
+		static constexpr Type    kExpUnderflow      = kFloatExpUnderflow;
+		static constexpr int32_t kExpHalfShift      = kFloatExpHalfShift;
+		static constexpr Type    kExpHalfLn2        = kFloatExpHalfLn2;
+		static constexpr Type    kHypSmall          = kFloatHypSmall;
+		static constexpr Type    kHypBig            = kFloatHypBig;
+		static constexpr Type    kHypNoFit          = kFloatHypNoFit;
+		static constexpr Type    kTanhLarge         = kFloatTanhLarge;
+		static constexpr Type    kArcHypTiny        = kFloatArcHypTiny;
+		static constexpr Type    kArcHypHuge        = kFloatArcHypHuge;
+		static constexpr Bits    kRsqrtSeed         = kFloatRsqrtSeed;
+		static constexpr Type    kTanhPoly[]        = { -17.0f/315.0f, 2.0f/15.0f, -1.0f/3.0f };
+
+		static BX_CONSTEXPR_FUNC Bits toBits(Type _a)   { return floatToBits(_a); }
+		static BX_CONSTEXPR_FUNC Type fromBits(Bits _a) { return bitsToFloat(_a); }
+	};
+
+	/// `FloatT` for `double`.
+	template<>
+	struct FloatT<double>
+	{
+		using Type = double;
+		using Bits = uint64_t;
+		using Int  = int64_t;
+
+		static constexpr int32_t kExponentBias      = int32_t(kDoubleExponentBias);
+		static constexpr int32_t kExponentBitShift  = int32_t(kDoubleExponentShift);
+		static constexpr int32_t kMantissaNumBits   = int32_t(kDoubleMantissaNumBits);
+		static constexpr Bits    kSignMask          = kDoubleSignMask;
+		static constexpr Bits    kExponentMask      = kDoubleExponentMask;
+		static constexpr Bits    kMantissaMask      = kDoubleMantissaMask;
+		static constexpr Type    kSmallest          = kDoubleSmallest;
+		static constexpr Type    kLargest           = kDoubleLargest;
+		static constexpr Type    kInfinity          = kDoubleInfinity;
+		static constexpr Type    kInvLn2            = kDoubleInvLn2;
+		static constexpr Type    kInvLn10           = kDoubleInvLn10;
+		static constexpr Type    kLn2Hi             = kDoubleLn2Hi;
+		static constexpr Type    kLn2Lo             = kDoubleLn2Lo;
+		static constexpr Type    kExpOverflow       = kDoubleExpOverflow;
+		static constexpr Type    kExpUnderflow      = kDoubleExpUnderflow;
+		static constexpr int32_t kExpHalfShift      = kDoubleExpHalfShift;
+		static constexpr Type    kExpHalfLn2        = kDoubleExpHalfLn2;
+		static constexpr Type    kHypSmall          = kDoubleHypSmall;
+		static constexpr Type    kHypBig            = kDoubleHypBig;
+		static constexpr Type    kHypNoFit          = kDoubleHypNoFit;
+		static constexpr Type    kTanhLarge         = kDoubleTanhLarge;
+		static constexpr Type    kArcHypTiny        = kDoubleArcHypTiny;
+		static constexpr Type    kArcHypHuge        = kDoubleArcHypHuge;
+		static constexpr Bits    kRsqrtSeed         = kDoubleRsqrtSeed;
+		static constexpr Type    kTanhPoly[]        = { 62.0/2835.0, -17.0/315.0, 2.0/15.0, -1.0/3.0 };
+
+		static BX_CONSTEXPR_FUNC Bits toBits(Type _a)   { return doubleToBits(_a); }
+		static BX_CONSTEXPR_FUNC Type fromBits(Bits _a) { return bitsToDouble(_a); }
+	};
+
 	/// Returns sortable floating point value.
 	///
 	/// @param[in] _value Float bits as uint32_t.
@@ -232,6 +312,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float floor(float _f);
 
+	/// Returns the largest integer value not greater than _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Floor of _a.
+	///
+	BX_CONSTEXPR_FUNC double floor(double _a);
+
 	/// Returns the smallest integer value not less than _f.
 	///
 	/// @param[in] _f Input value.
@@ -240,13 +328,29 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float ceil(float _f);
 
-	/// Returns the nearest integer value to _f, rounding halfway cases away from zero.
+	/// Returns the smallest integer value not less than _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Ceiling of _a.
+	///
+	BX_CONSTEXPR_FUNC double ceil(double _a);
+
+	/// Returns the nearest integer value to _f, rounding halfway cases to even.
 	///
 	/// @param[in] _f Input value.
 	///
 	/// @returns Rounded value.
 	///
 	BX_CONSTEXPR_FUNC float round(float _f);
+
+	/// Returns the nearest integer value to _a, rounding halfway cases to even.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Rounded value.
+	///
+	BX_CONSTEXPR_FUNC double round(double _a);
 
 	/// Returns linear interpolation between two values _a and _b.
 	///
@@ -276,6 +380,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float sign(float _a);
 
+	/// Returns the sign of _a as -1.0, 0.0 or 1.0.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Sign of _a.
+	///
+	BX_CONSTEXPR_FUNC double sign(double _a);
+
 	/// Returns `true` if the velue `_a` is negative.
 	///
 	/// @param[in] _a Value.
@@ -293,6 +405,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float copySign(float _value, float _sign);
 
+	/// Returns the magnitude of _value with the sign of _sign.
+	///
+	/// @param[in] _value Value to take the magnitude from.
+	/// @param[in] _sign Value to take the sign from.
+	///
+	/// @returns |_value| with the sign of _sign.
+	///
+	BX_CONSTEXPR_FUNC double copySign(double _value, double _sign);
+
 	/// Returns the absolute of _a.
 	///
 	/// @param[in] _a Input value.
@@ -301,6 +422,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float abs(float _a);
 
+	/// Returns the absolute value of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns |_a|.
+	///
+	BX_CONSTEXPR_FUNC double abs(double _a);
+
 	/// Returns the square of _a.
 	///
 	/// @param[in] _a Input value.
@@ -308,6 +437,14 @@ namespace bx
 	/// @returns _a * _a.
 	///
 	BX_CONSTEXPR_FUNC float square(float _a);
+
+	/// Returns _a squared.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns _a * _a.
+	///
+	BX_CONSTEXPR_FUNC double square(double _a);
 
 	/// Returns the both sine and cosine of the argument _a.
 	///
@@ -328,6 +465,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float sin(float _a);
 
+	/// Returns the sine of _a.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns sin(_a).
+	///
+	BX_CONSTEXPR_FUNC double sin(double _a);
+
 	/// Returns hyperbolic sine of the argument _a.
 	///
 	/// @param[in] _a Input value.
@@ -335,6 +480,14 @@ namespace bx
 	/// @returns Hyperbolic sine of _a.
 	///
 	BX_CONSTEXPR_FUNC float sinh(float _a);
+
+	/// Returns the hyperbolic sine of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns sinh(_a).
+	///
+	BX_CONSTEXPR_FUNC double sinh(double _a);
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
 	///
@@ -344,6 +497,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float asin(float _a);
 
+	/// Returns the arc sine of _a.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns asin(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC double asin(double _a);
+
 	/// Returns the cosine of the argument _a.
 	///
 	/// @param[in] _a Angle in radians.
@@ -351,6 +512,14 @@ namespace bx
 	/// @returns Cosine of _a.
 	///
 	BX_CONSTEXPR_FUNC float cos(float _a);
+
+	/// Returns the cosine of _a.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns cos(_a).
+	///
+	BX_CONSTEXPR_FUNC double cos(double _a);
 
 	/// Returns hyperbolic cosine of the argument _a.
 	///
@@ -360,6 +529,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float cosh(float _a);
 
+	/// Returns the hyperbolic cosine of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns cosh(_a).
+	///
+	BX_CONSTEXPR_FUNC double cosh(double _a);
+
 	/// Returns radian angle between 0 and pi whose cosine is _a.
 	///
 	/// @param[in] _a Cosine value [-1, 1].
@@ -367,6 +544,14 @@ namespace bx
 	/// @returns Arccosine of _a in radians.
 	///
 	BX_CONSTEXPR_FUNC float acos(float _a);
+
+	/// Returns the arc cosine of _a.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns acos(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC double acos(double _a);
 
 	/// Returns the circular tangent of the radian argument _a.
 	///
@@ -376,6 +561,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float tan(float _a);
 
+	/// Returns the tangent of _a.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns tan(_a).
+	///
+	BX_CONSTEXPR_FUNC double tan(double _a);
+
 	/// Returns hyperbolic tangent of the argument _a.
 	///
 	/// @param[in] _a Input value.
@@ -384,6 +577,80 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float tanh(float _a);
 
+	/// Returns the hyperbolic tangent of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns tanh(_a).
+	///
+	BX_CONSTEXPR_FUNC double tanh(double _a);
+
+	/// Returns the natural logarithm of 1 + _a, without the precision loss that
+	/// log(1.0f + _a) has for a small _a.
+	///
+	/// @param[in] _a Input value (must be >= -1).
+	///
+	/// @returns ln(1 + _a).
+	///
+	BX_CONSTEXPR_FUNC float log1p(float _a);
+
+	/// Returns the natural logarithm of 1 + _a, without the precision loss that
+	/// log(1.0 + _a) has for a small _a.
+	///
+	/// @param[in] _a Input value (must be >= -1).
+	///
+	/// @returns ln(1 + _a).
+	///
+	BX_CONSTEXPR_FUNC double log1p(double _a);
+
+	/// Returns the inverse hyperbolic sine of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns asinh(_a).
+	///
+	BX_CONSTEXPR_FUNC float asinh(float _a);
+
+	/// Returns the inverse hyperbolic sine of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns asinh(_a).
+	///
+	BX_CONSTEXPR_FUNC double asinh(double _a);
+
+	/// Returns the inverse hyperbolic cosine of _a.
+	///
+	/// @param[in] _a Input value (must be >= 1).
+	///
+	/// @returns acosh(_a), or NaN if _a < 1.
+	///
+	BX_CONSTEXPR_FUNC float acosh(float _a);
+
+	/// Returns the inverse hyperbolic cosine of _a.
+	///
+	/// @param[in] _a Input value (must be >= 1).
+	///
+	/// @returns acosh(_a), or NaN if _a < 1.
+	///
+	BX_CONSTEXPR_FUNC double acosh(double _a);
+
+	/// Returns the inverse hyperbolic tangent of _a.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns atanh(_a), or NaN if |_a| > 1.
+	///
+	BX_CONSTEXPR_FUNC float atanh(float _a);
+
+	/// Returns the inverse hyperbolic tangent of _a.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns atanh(_a), or NaN if |_a| > 1.
+	///
+	BX_CONSTEXPR_FUNC double atanh(double _a);
+
 	/// Returns radian angle between -pi/2 and +pi/2 whose tangent is _a.
 	///
 	/// @param[in] _a Tangent value.
@@ -391,6 +658,14 @@ namespace bx
 	/// @returns Arctangent of _a in radians.
 	///
 	BX_CONSTEXPR_FUNC float atan(float _a);
+
+	/// Returns the arc tangent of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns atan(_a) in radians.
+	///
+	BX_CONSTEXPR_FUNC double atan(double _a);
 
 	/// Returns the inverse tangent of _y/_x.
 	///
@@ -401,6 +676,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float atan2(float _y, float _x);
 
+	/// Returns the arc tangent of _y / _x, using their signs to pick the quadrant.
+	///
+	/// @param[in] _y Numerator.
+	/// @param[in] _x Denominator.
+	///
+	/// @returns atan2(_y, _x) in radians.
+	///
+	BX_CONSTEXPR_FUNC double atan2(double _y, double _x);
+
 	/// Computes _a raised to the _b power.
 	///
 	/// @param[in] _a Base.
@@ -409,6 +693,16 @@ namespace bx
 	/// @returns _a^_b.
 	///
 	BX_CONSTEXPR_FUNC float pow(float _a, float _b);
+
+	/// Returns _a raised to the _b power. If _a is negative _b must be integral,
+	/// otherwise the result is NaN.
+	///
+	/// @param[in] _a Base.
+	/// @param[in] _b Exponent.
+	///
+	/// @returns _a^_b.
+	///
+	BX_CONSTEXPR_FUNC double pow(double _a, double _b);
 
 	/// Returns the result of multiplying _a by 2 raised to the power of the exponent `_a * (2^_b)`.
 	///
@@ -419,6 +713,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b);
 
+	/// Returns _a multiplied by 2 raised to the power _b.
+	///
+	/// @param[in] _a Significand.
+	/// @param[in] _b Exponent.
+	///
+	/// @returns _a * 2^_b.
+	///
+	BX_CONSTEXPR_FUNC double ldexp(double _a, int32_t _b);
+
 	/// Returns decomposed given floating point value _a into a normalized fraction and
 	/// an integral power of two.
 	///
@@ -427,7 +730,17 @@ namespace bx
 	///
 	/// @returns Normalized fraction in [0.5, 1.0).
 	///
-	float frexp(float _a, int32_t* _outExp);
+	constexpr float frexp(float _a, int32_t* _outExp);
+
+	/// Returns decomposed given floating point value _a into a normalized fraction and
+	/// an integral power of two.
+	///
+	/// @param[in] _a Input value.
+	/// @param[out] _outExp Output exponent.
+	///
+	/// @returns Normalized fraction in [0.5, 1.0).
+	///
+	constexpr double frexp(double _a, int32_t* _outExp);
 
 	/// Returns e (2.71828...) raised to the _a power.
 	///
@@ -437,6 +750,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float exp(float _a);
 
+	/// Returns e (2.71828...) raised to the _a power.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns e^_a.
+	///
+	BX_CONSTEXPR_FUNC double exp(double _a);
+
 	/// Returns 2 raised to the _a power.
 	///
 	/// @param[in] _a Exponent.
@@ -444,6 +765,14 @@ namespace bx
 	/// @returns 2^_a.
 	///
 	BX_CONSTEXPR_FUNC float exp2(float _a);
+
+	/// Returns 2 raised to the _a power.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns 2^_a.
+	///
+	BX_CONSTEXPR_FUNC double exp2(double _a);
 
 	/// Returns the base e (2.71828...) logarithm of _a.
 	///
@@ -453,6 +782,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float log(float _a);
 
+	/// Returns the base e (2.71828...) logarithm of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns ln(_a).
+	///
+	BX_CONSTEXPR_FUNC double log(double _a);
+
 	/// Returns the base 2 logarithm of _a.
 	///
 	/// @param[in] _a Input value (must be > 0).
@@ -460,6 +797,220 @@ namespace bx
 	/// @returns log2(_a).
 	///
 	BX_CONSTEXPR_FUNC float log2(float _a);
+
+	/// Returns the base 2 logarithm of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log2(_a).
+	///
+	BX_CONSTEXPR_FUNC double log2(double _a);
+
+	/// Returns the base 10 logarithm of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log10(_a).
+	///
+	BX_CONSTEXPR_FUNC float log10(float _a);
+
+	/// Returns the base 10 logarithm of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log10(_a).
+	///
+	BX_CONSTEXPR_FUNC double log10(double _a);
+
+	/// Returns the nearest integer not greater in magnitude than _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Truncated value.
+	///
+	BX_CONSTEXPR_FUNC float trunc(float _a);
+
+	/// Returns _a truncated towards zero.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Integer part of _a.
+	///
+	BX_CONSTEXPR_FUNC double trunc(double _a);
+
+	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
+	/// and less than 1.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Fractional part of _a.
+	///
+	BX_CONSTEXPR_FUNC float fract(float _a);
+
+	/// Returns the fractional part of _a, with the sign of _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns _a - trunc(_a).
+	///
+	BX_CONSTEXPR_FUNC double fract(double _a);
+
+	/// Returns the absolute of integer _a.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns Absolute value of _a.
+	///
+	template<typename Ty>
+	requires (isInteger<Ty>() )
+	constexpr Ty abs(Ty _a);
+
+	/// Returns true if the sign bit of _a is set.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns True if _a is negative, including negative zero.
+	///
+	BX_CONSTEXPR_FUNC bool signBit(double _a);
+
+	/// Returns true if _a and _b are equal within _epsilon tolerance.
+	///
+	/// @param[in] _a First value.
+	/// @param[in] _b Second value.
+	/// @param[in] _epsilon Tolerance.
+	///
+	/// @returns True if _a and _b are within _epsilon of each other.
+	///
+	BX_CONSTEXPR_FUNC bool isEqual(double _a, double _b, double _epsilon);
+
+	/// Returns the fractional part of _a, and stores the integral part in _outIntegral.
+	///
+	/// @param[in] _a Input value.
+	/// @param[out] _outIntegral Output integral part, truncated towards zero.
+	///
+	/// @returns Fractional part of _a, with the sign of _a.
+	///
+	constexpr float modf(float _a, float* _outIntegral);
+
+	/// Returns the fractional part of _a, and stores the integral part in _outIntegral.
+	///
+	/// @param[in] _a Input value.
+	/// @param[out] _outIntegral Output integral part, truncated towards zero.
+	///
+	/// @returns Fractional part of _a, with the sign of _a.
+	///
+	constexpr double modf(double _a, double* _outIntegral);
+
+	/// Returns the remainder of _a / _b, truncated towards zero. The result has the
+	/// sign of _a. Unlike mod, which truncates the quotient towards negative infinity.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * trunc(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC float fmod(float _a, float _b);
+
+	/// Returns the remainder of _a / _b, truncated towards zero. The result has the
+	/// sign of _a. Unlike mod, which truncates the quotient towards negative infinity.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * trunc(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC double fmod(double _a, double _b);
+
+	/// Returns the remainder of _a / _b, with the sign of _b.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * floor(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC float mod(float _a, float _b);
+
+	/// Returns the remainder of _a / _b, with the sign of _b.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * floor(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC double mod(double _a, double _b);
+
+	/// Returns the square root of _a.
+	///
+	/// @param[in] _a Input value (must be >= 0).
+	///
+	/// @returns Square root of _a.
+	///
+	BX_CONSTEXPR_FUNC float sqrt(float _a);
+
+	/// Returns the square root of _a.
+	///
+	/// @param[in] _a Input value (must be >= 0).
+	///
+	/// @returns sqrt(_a).
+	///
+	BX_CONSTEXPR_FUNC double sqrt(double _a);
+
+	/// Returns reciprocal square root of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns 1 / sqrt(_a).
+	///
+	BX_CONSTEXPR_FUNC float rsqrt(float _a);
+
+	/// Returns the reciprocal square root of _a.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns 1/sqrt(_a).
+	///
+	BX_CONSTEXPR_FUNC double rsqrt(double _a);
+
+	/// Returns result of multiply and add (_a * _b + _c).
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Addend.
+	///
+	/// @returns _a * _b + _c.
+	///
+	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);
+
+	/// Returns the result of multiply and add. (_a * _b + _c)
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Addend.
+	///
+	/// @returns _a * _b + _c.
+	///
+	BX_CONSTEXPR_FUNC double mad(double _a, double _b, double _c);
+
+	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b,
+	/// rounded like mad.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Value to subtract from.
+	///
+	/// @returns _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
+
+	/// Returns the result of negated multiply and add. (_c - _a * _b)
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Addend.
+	///
+	/// @returns _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC double nms(double _a, double _b, double _c);
 
 	/// Count number of bits set.
 	///
@@ -533,50 +1084,6 @@ namespace bx
 	template<typename Ty>
 	BX_CONSTEXPR_FUNC Ty nextPow2(Ty _a);
 
-	/// Returns the square root of _a.
-	///
-	/// @param[in] _a Input value (must be >= 0).
-	///
-	/// @returns Square root of _a.
-	///
-	BX_CONSTEXPR_FUNC float sqrt(float _a);
-
-	/// Returns reciprocal square root of _a.
-	///
-	/// @param[in] _a Input value (must be > 0).
-	///
-	/// @returns 1 / sqrt(_a).
-	///
-	BX_CONSTEXPR_FUNC float rsqrt(float _a);
-
-	/// Returns the nearest integer not greater in magnitude than _a.
-	///
-	/// @param[in] _a Input value.
-	///
-	/// @returns Truncated value.
-	///
-	BX_CONSTEXPR_FUNC float trunc(float _a);
-
-	/// Returns the fractional (or decimal) part of _a, which is greater than or equal to 0
-	/// and less than 1.
-	///
-	/// @param[in] _a Input value.
-	///
-	/// @returns Fractional part of _a.
-	///
-	BX_CONSTEXPR_FUNC float fract(float _a);
-
-	/// Returns result of negated multiply-sub operation -(_a * _b - _c) -> _c - _a * _b,
-	/// rounded like mad.
-	///
-	/// @param[in] _a First factor.
-	/// @param[in] _b Second factor.
-	/// @param[in] _c Value to subtract from.
-	///
-	/// @returns _c - _a * _b.
-	///
-	BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c);
-
 	/// Returns result of addition (_a + _b).
 	///
 	/// @param[in] _a First value.
@@ -628,16 +1135,6 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float mul(float _a, float _b);
 
-	/// Returns result of multiply and add (_a * _b + _c).
-	///
-	/// @param[in] _a First factor.
-	/// @param[in] _b Second factor.
-	/// @param[in] _c Addend.
-	///
-	/// @returns _a * _b + _c.
-	///
-	BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c);
-
 	/// Returns reciprocal of _a.
 	///
 	/// @param[in] _a Input value.
@@ -671,15 +1168,6 @@ namespace bx
 	/// @returns _a / _b, safe from division by zero.
 	///
 	BX_CONSTEXPR_FUNC float divSafe(float _a, float _b);
-
-	/// Returns the floating-point remainder of the division operation _a/_b.
-	///
-	/// @param[in] _a Numerator.
-	/// @param[in] _b Denominator.
-	///
-	/// @returns Remainder of _a / _b.
-	///
-	BX_CONSTEXPR_FUNC float mod(float _a, float _b);
 
 	/// Returns true if _a and _b are equal within _epsilon tolerance.
 	///

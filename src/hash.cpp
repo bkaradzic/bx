@@ -162,7 +162,7 @@ void mixTail32(Ty& _self, const uint8_t*& _data, int32_t& _len)
 
 		if (4 == _self.m_count)
 		{
-			uint32_t kk = *( (uint32_t*)&_self.m_tail[0]);
+			uint32_t kk = loadUnaligned<uint32_t>(&_self.m_tail[0]);
 			_self.mix(kk);
 			_self.m_count = 0;
 		}
@@ -217,8 +217,8 @@ void mixTail128(Ty& _self, const uint8_t*& _data, int32_t& _len)
 
 		if (16 == _self.m_count)
 		{
-			const uint64_t kk1 = *( (uint64_t*)&_self.m_tail[0]);
-			const uint64_t kk2 = *( (uint64_t*)&_self.m_tail[8]);
+			const uint64_t kk1 = loadUnaligned<uint64_t>(&_self.m_tail[0]);
+			const uint64_t kk2 = loadUnaligned<uint64_t>(&_self.m_tail[8]);
 			_self.mix(kk1, kk2);
 			_self.m_count = 0;
 		}

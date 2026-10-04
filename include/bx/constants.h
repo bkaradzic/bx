@@ -83,6 +83,51 @@ namespace bx
 	/// Floating-point infinity.
 //	constexpr float    kFloatInfinity;
 
+	/// The reciprocal of ln(2). 1/ln(2)
+	constexpr float    kFloatInvLn2       = kInvLogNat2;
+
+	/// The reciprocal of ln(10). 1/ln(10)
+	constexpr float    kFloatInvLn10      = 1.0f/kLogNat10;
+
+	/// Leading part of ln(2), with the trailing mantissa bits cleared.
+	constexpr float    kFloatLn2Hi        = 6.9314575195e-01f;
+
+	/// What is left of ln(2) after kFloatLn2Hi.
+	constexpr float    kFloatLn2Lo        = 1.4286067653e-06f;
+
+	/// Largest argument exp can answer with a finite number.
+	constexpr float    kFloatExpOverflow  =  88.7228394f;
+
+	/// Smallest argument exp can answer with a non-zero number.
+	constexpr float    kFloatExpUnderflow = -103.972084f;
+
+	/// Exponent of the square root of the scale expHalf splits its result by.
+	constexpr int32_t  kFloatExpHalfShift = 235;
+
+	/// Argument reduction expHalf pairs with kFloatExpHalfShift. ln(2)*kFloatExpHalfShift/2
+	constexpr float    kFloatExpHalfLn2   = 1.62889587431602213e+02f;
+
+	/// Below this the hyperbolic functions take their series instead of exp.
+	constexpr float    kFloatHypSmall     = 0.0625f;
+
+	/// Above this exp(-_a) no longer contributes to sinh and cosh.
+	constexpr float    kFloatHypBig       = 9.0f;
+
+	/// Above this half of exp(_a) overflows, and expHalf takes over.
+	constexpr float    kFloatHypNoFit     = 88.0f;
+
+	/// Above this tanh is 1.
+	constexpr float    kFloatTanhLarge    = 10.0f;
+
+	/// Below this the arc hyperbolic functions answer with the argument.
+	constexpr float    kFloatArcHypTiny   = 0.000244140625f;
+
+	/// Above this asinh and acosh are log(_a) + ln(2).
+	constexpr float    kFloatArcHypHuge   = 4096.0f;
+
+	/// Seed for the reciprocal square root iteration.
+	constexpr uint32_t kFloatRsqrtSeed    = UINT32_C(0x5f3759df);
+
 	///
 	constexpr uint8_t  kDoubleSignNumBits     = 1;
 	constexpr uint8_t  kDoubleSignBitShift    = 63;
@@ -103,6 +148,51 @@ namespace bx
 
 	// Double-precision floating-point infinity.
 //	constexpr double   kDoubleInfinity;
+
+	/// The reciprocal of ln(2). 1/ln(2)
+	constexpr double   kDoubleInvLn2       = 1.44269504088896338700;
+
+	/// The reciprocal of ln(10). 1/ln(10)
+	constexpr double   kDoubleInvLn10      = 4.34294481903251827651e-01;
+
+	/// Leading part of ln(2), with the trailing mantissa bits cleared.
+	constexpr double   kDoubleLn2Hi        = 6.93147180369123816490e-01;
+
+	/// What is left of ln(2) after kDoubleLn2Hi.
+	constexpr double   kDoubleLn2Lo        = 1.90821492927058770002e-10;
+
+	/// Largest argument exp can answer with a finite number.
+	constexpr double   kDoubleExpOverflow  =  7.09782712893383973096e+02;
+
+	/// Smallest argument exp can answer with a non-zero number.
+	constexpr double   kDoubleExpUnderflow = -7.45133219101941108420e+02;
+
+	/// Exponent of the square root of the scale expHalf splits its result by.
+	constexpr int32_t  kDoubleExpHalfShift = 2043;
+
+	/// Argument reduction expHalf pairs with kDoubleExpHalfShift. ln(2)*kDoubleExpHalfShift/2
+	constexpr double   kDoubleExpHalfLn2   = 1.41609968988396828e+03;
+
+	/// Below this the hyperbolic functions take their series instead of exp.
+	constexpr double   kDoubleHypSmall     = 0.03125;
+
+	/// Above this exp(-_a) no longer contributes to sinh and cosh.
+	constexpr double   kDoubleHypBig       = 22.0;
+
+	/// Above this half of exp(_a) overflows, and expHalf takes over.
+	constexpr double   kDoubleHypNoFit     = 709.0;
+
+	/// Above this tanh is 1.
+	constexpr double   kDoubleTanhLarge    = 20.0;
+
+	/// Below this the arc hyperbolic functions answer with the argument.
+	constexpr double   kDoubleArcHypTiny   = 3.72529029846191406250e-09;
+
+	/// Above this asinh and acosh are log(_a) + ln(2).
+	constexpr double   kDoubleArcHypHuge   = 2.68435456e+08;
+
+	/// Seed for the reciprocal square root iteration.
+	constexpr uint64_t kDoubleRsqrtSeed    = UINT64_C(0x5fe6eb50c7b537a9);
 
 } // namespace bx
 

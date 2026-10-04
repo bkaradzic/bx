@@ -151,10 +151,15 @@ extern "C" double fabs(double _x)
 
 extern "C" double ldexp(double _x, int _exp)
 {
-	return bx::ldexp(float(_x), _exp);
+	return bx::ldexp(_x, _exp);
 }
 
 extern "C" float expf(float _x)
+{
+	return bx::exp(_x);
+}
+
+extern "C" double exp(double _x)
 {
 	return bx::exp(_x);
 }
@@ -164,10 +169,19 @@ extern "C" float logf(float _x)
 	return bx::log(_x);
 }
 
+extern "C" double log(double _x)
+{
+	return bx::log(_x);
+}
+
 extern "C" float log10f(float _x)
 {
-	BX_UNUSED(_x);
-	return 0.0f;
+	return bx::log10(_x);
+}
+
+extern "C" double log10(double _x)
+{
+	return bx::log10(_x);
 }
 
 extern "C" float powf(float _x, float _y)
@@ -175,7 +189,7 @@ extern "C" float powf(float _x, float _y)
 	return bx::pow(_x, _y);
 }
 
-extern "C" double pow(double _x, float _y)
+extern "C" double pow(double _x, double _y)
 {
 	return bx::pow(_x, _y);
 }
@@ -185,7 +199,17 @@ extern "C" float sinf(float _x)
 	return bx::sin(_x);
 }
 
+extern "C" double sin(double _x)
+{
+	return bx::sin(_x);
+}
+
 extern "C" float cosf(float _x)
+{
+	return bx::cos(_x);
+}
+
+extern "C" double cos(double _x)
 {
 	return bx::cos(_x);
 }
@@ -195,7 +219,17 @@ extern "C" float tanf(float _x)
 	return bx::tan(_x);
 }
 
+extern "C" double tan(double _x)
+{
+	return bx::tan(_x);
+}
+
 extern "C" float atan2f(float _y, float _x)
+{
+	return bx::atan2(_y, _x);
+}
+
+extern "C" double atan2(double _y, double _x)
 {
 	return bx::atan2(_y, _x);
 }
@@ -235,9 +269,19 @@ extern "C" float acosf(float _x)
 	return bx::acos(_x);
 }
 
+extern "C" double acos(double _x)
+{
+	return bx::acos(_x);
+}
+
 extern "C" float fmodf(float _numer, float _denom)
 {
-	return bx::mod(_numer, _denom);
+	return bx::fmod(_numer, _denom);
+}
+
+extern "C" double fmod(double _numer, double _denom)
+{
+	return bx::fmod(_numer, _denom);
 }
 
 extern "C" int atoi(const char* _str)
