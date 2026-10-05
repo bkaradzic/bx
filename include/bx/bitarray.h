@@ -247,9 +247,6 @@ namespace bx
 		/// Default constructor. Constructs an empty bit array.
 		BitArrayBaseT();
 
-		/// Destructor. Releases storage.
-		~BitArrayBaseT();
-
 		/// Constructs a bit array by copying from a bit array view.
 		///
 		/// @param[in] _src Source bit array view to copy from.

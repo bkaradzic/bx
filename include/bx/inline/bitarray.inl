@@ -251,11 +251,17 @@ namespace bx
 	template<typename StorageT>
 	inline void BitArrayBaseT<StorageT>::set(const BitArrayViewBase& _src)
 	{
-		if (this != &_src)
+		if (this == &_src)
 		{
-			this->setCount(_src.getCount() );
+			return;
+		}
 
-			const uint32_t sizeInBytes = min(this->getCapacity(), _src.getCapacity() ) / 8;
+		this->setCount(_src.getCount() );
+
+		const uint32_t sizeInBytes = min(this->getCapacity(), _src.getCapacity() ) / 8;
+
+		if (0 != sizeInBytes)
+		{
 			bx::memCopy(this->m_ptr, _src.getPtr(), sizeInBytes);
 		}
 	}
@@ -276,12 +282,6 @@ namespace bx
 	inline void BitArrayBaseT<StorageT>::set(uint32_t _beginBit, uint32_t _endBit, uint64_t _value)
 	{
 		MutableBitArrayView::set(_beginBit, _endBit, _value);
-	}
-
-	template<typename StorageT>
-	inline BitArrayBaseT<StorageT>::~BitArrayBaseT()
-	{
-		this->clear();
 	}
 
 	template<typename StorageT>
@@ -400,7 +400,6 @@ namespace bx
 	{
 		if (NULL != this->m_storage.getAllocator() )
 		{
-			this->clear();
 			this->m_storage.setCapacity(0, 0);
 		}
 

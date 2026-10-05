@@ -149,7 +149,12 @@ namespace bx
 			const FilePath uri(_name);
 			const StringView path(strTrim(uri.getPath(), "/") );
 
-			_propertyName = uri.getFileName();
+			const StringView slash = strRFind(_name, '/');
+
+			_propertyName = slash.isEmpty()
+				? _name
+				: StringView(slash.getPtr()+1, _name.getTerm() )
+				;
 
 			if (path.isEmpty() )
 			{

@@ -903,3 +903,76 @@ TEST_CASE("MippedBitArray-dynamic", "[container]")
 	REQUIRE(65 == array.findClear(64, 300) );
 	REQUIRE(bx::kInvalid == array.findClear(64, 65) );
 }
+
+TEST_CASE("BitArray-ranges-ending-on-word-boundary", "[container]")
+{
+	uint64_t words[4];
+	bx::MutableBitArrayView bs(words, sizeof(words), 256);
+
+	bs.clear();
+	bs.set(0, 64, true);
+	REQUIRE(UINT64_MAX == words[0]);
+	REQUIRE(0 == words[1]);
+
+	bs.clear();
+	bs.set(10, 192, true);
+	REQUIRE( (UINT64_MAX >> 10) == (words[0] >> 10) );
+	REQUIRE(UINT64_MAX == words[1]);
+	REQUIRE(UINT64_MAX == words[2]);
+	REQUIRE(0 == words[3]);
+	REQUIRE(182 == bs.countBits(10, 192) );
+	REQUIRE(64  == bs.countBits(128, 192) );
+
+	bs.set(0, 256, true);
+	bs.set(0, 256, false);
+	REQUIRE(bs.testNone() );
+
+	bs.set(70, true);
+	REQUIRE( bs.testAny(64, 128) );
+	REQUIRE(!bs.testNone(64, 128) );
+	REQUIRE(!bs.testAll(64, 128) );
+	REQUIRE( bs.testNone(0, 64) );
+	REQUIRE(!bs.testAny(0, 64) );
+	REQUIRE(1 == bs.countBits(64, 128) );
+
+	bs.set(127, true);
+	REQUIRE( bs.testAny(64, 128) );
+	REQUIRE(2 == bs.countBits(64, 128) );
+
+	bs.set(64, 128, true);
+	REQUIRE( bs.testAll(64, 128) );
+	REQUIRE(!bs.testAll(0, 128) );
+
+	bs.set(0, 256, true);
+	REQUIRE( bs.testAll(0, 256) );
+	REQUIRE(256 == bs.countBits(0, 256) );
+
+	bs.set(255, false);
+	REQUIRE(!bs.testAll(0, 256) );
+	REQUIRE( bs.testAny(192, 256) );
+	REQUIRE( bs.testAll(192, 255) );
+
+	bs.set(192, 256, false);
+	REQUIRE( bs.testNone(192, 256) );
+	REQUIRE(!bs.testAny(192, 256) );
+	REQUIRE( bs.testAll(0, 192) );
+
+	bs.clear();
+	bs.set(60, 124, UINT64_MAX);
+	REQUIRE(0xf == (words[0] >> 60) );
+	REQUIRE( (UINT64_MAX >> 4) == words[1]);
+	REQUIRE(UINT64_MAX == bs.get(60, 124) );
+
+	bs.clear();
+	bs.set(64, 128, UINT64_C(0x1234567890abcdef) );
+	REQUIRE(UINT64_C(0x1234567890abcdef) == words[1]);
+	REQUIRE(UINT64_C(0x1234567890abcdef) == bs.get(64, 128) );
+	REQUIRE(0 == words[0]);
+	REQUIRE(0 == words[2]);
+
+	bs.clear();
+	bs.set(100, 164, UINT64_MAX);
+	REQUIRE(UINT64_MAX == bs.get(100, 164) );
+	REQUIRE( (UINT64_MAX >> 36) == (words[1] >> 36) );
+	REQUIRE( (UINT64_MAX >> 28) == words[2]);
+}
