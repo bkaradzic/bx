@@ -444,7 +444,10 @@ BX_FP_PRECISE_BEGIN()
 		const float scaled = _a * (2.0f*kInvPi);
 		const float real   = floor(scaled);
 		const float xx     = _a - real * kPiHalf;
-		const int32_t bits = int32_t(real) & 3;
+		const int32_t bits = isFinite(real)
+			? int32_t(mod(real, 4.0f) ) & 3
+			: 0
+			;
 
 		constexpr float kSinC2  = -0.16666667163372039794921875f;
 		constexpr float kSinC4  =  8.333347737789154052734375e-3f;
@@ -700,6 +703,18 @@ BX_FP_PRECISE_BEGIN()
 		if (isInfinite(_a) && _a < 0.0f)
 		{
 			return 0.0f;
+		}
+
+		constexpr float expMax = log(kFloatLargest);
+
+		if (_a >= expMax)
+		{
+			return kFloatInfinity;
+		}
+
+		if (isNan(_a) )
+		{
+			return _a;
 		}
 
 		constexpr float kExpC0  =  1.66666666666666019037e-01f;

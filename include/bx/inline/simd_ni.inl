@@ -856,6 +856,9 @@ BX_FP_PRECISE_BEGIN()
 		const Ty near_result = simd_f32_add(_a, one);
 		const Ty exp_min     = simd_splat<Ty>(-87.33654475f);
 		const Ty clamp_mask  = simd_f32_cmple(_a, exp_min);
+		const Ty exp_max     = simd_splat<Ty>(88.72283905f);
+		const Ty inf         = simd_splat<Ty>(kFloatInfinity);
+		const Ty inf_mask    = simd_f32_cmpge(_a, exp_max);
 		const Ty kC0         = simd_splat<Ty>( 1.66666666666666019037e-01f);
 		const Ty kC1         = simd_splat<Ty>(-2.77777777770155933842e-03f);
 		const Ty kC2         = simd_splat<Ty>( 6.61375632143793436117e-05f);
@@ -887,7 +890,8 @@ BX_FP_PRECISE_BEGIN()
 		const Ty ikk         = simd_f32_ftoi_trunc(kk);
 		const Ty raw         = simd_f32_ldexp_ni(tmp6, ikk);
 		const Ty rc          = simd_selb(clamp_mask, zero, raw);
-		const Ty result      = simd_selb(near_mask, near_result, rc);
+		const Ty ri          = simd_selb(inf_mask, inf, rc);
+		const Ty result      = simd_selb(near_mask, near_result, ri);
 
 		return result;
 	}

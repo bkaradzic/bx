@@ -478,7 +478,7 @@ namespace bx
 				return 0;
 			}
 
-			_max = toString(_dst + 1, _max - 1, asUnsigned(-_value), _base, _separator);
+			_max = toString(_dst + 1, _max - 1, 0 - asUnsigned(_value), _base, _separator);
 
 			if (_max == 0)
 			{

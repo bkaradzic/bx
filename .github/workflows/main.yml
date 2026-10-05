@@ -85,8 +85,9 @@ jobs:
           { compiler: gcc,   genie: linux-gcc,   bindir: linux64_gcc,   config: release, binsuffix: Release },
           { compiler: clang, genie: linux-clang, bindir: linux64_clang, config: debug,   binsuffix: Debug   },
           { compiler: clang, genie: linux-clang, bindir: linux64_clang, config: release, binsuffix: Release },
+          { compiler: clang, genie: linux-clang, bindir: linux64_clang, config: debug,   binsuffix: Debug,   genie-options: --with-sanitizers, suffix: -sanitizers },
         ]
-    name: linux-${{ matrix.compiler }}-${{ matrix.config }}64
+    name: linux-${{ matrix.compiler }}-${{ matrix.config }}64${{ matrix.suffix }}
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout bx
@@ -97,9 +98,12 @@ jobs:
       - name: Build
         run: |
           cd bx
-          tools/bin/linux/genie --gcc=${{ matrix.genie }} gmake
+          tools/bin/linux/genie ${{ matrix.genie-options }} --gcc=${{ matrix.genie }} gmake
           make -R -C .build/projects/gmake-${{ matrix.genie }} config=${{ matrix.config }}64 -j$(nproc)
       - name: Check
+        env:
+          ASAN_OPTIONS: halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
         run: |
           cd bx
           ".build/${{ matrix.bindir }}/bin/bx.test${{ matrix.binsuffix }}" -d yes
@@ -110,8 +114,9 @@ jobs:
         include: [
           { runs-on: macos-15, arch: osx-arm64, bindir: osx-arm64, config: debug,   binsuffix: Debug   },
           { runs-on: macos-15, arch: osx-arm64, bindir: osx-arm64, config: release, binsuffix: Release },
+          { runs-on: macos-15, arch: osx-arm64, bindir: osx-arm64, config: debug,   binsuffix: Debug,   genie-options: --with-sanitizers, suffix: -sanitizers },
         ]
-    name: osx-${{ matrix.arch }}-${{ matrix.config }}
+    name: osx-${{ matrix.arch }}-${{ matrix.config }}${{ matrix.suffix }}
     runs-on: ${{ matrix.runs-on }}
     steps:
       - name: Checkout bx
@@ -122,9 +127,12 @@ jobs:
       - name: Build
         run: |
           cd bx
-          tools/bin/darwin/genie --gcc=${{ matrix.arch }} gmake
+          tools/bin/darwin/genie ${{ matrix.genie-options }} --gcc=${{ matrix.arch }} gmake
           make -C .build/projects/gmake-${{ matrix.arch }} config=${{ matrix.config }} -j$(sysctl -n hw.physicalcpu)
       - name: Check
+        env:
+          ASAN_OPTIONS: halt_on_error=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
         run: |
           cd bx
           ".build/${{ matrix.bindir }}/bin/bx.test${{ matrix.binsuffix }}" -d yes

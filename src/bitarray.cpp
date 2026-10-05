@@ -54,7 +54,7 @@ namespace bx
 		const simd64_t zero      = simd64_zero();
 		const simd64_t allOnes   = simd64_splat(UINT64_MAX);
 		const simd64_t maskB     = simd64_x64_sll(allOnes, int(shiftB) );
-		const simd64_t maskE     = simd64_x64_srl(allOnes, int(64-shiftE) );
+		const simd64_t maskE     = simd64_x64_srl(allOnes, int( (64-shiftE) & 63) );
 		const simd64_t valVec    = simd64_splat(uint64_t(_value) );
 		const simd64_t orbits    = simd64_u64_sub(zero, valVec);
 		const simd64_t orbitsB   = simd64_and(maskB, orbits);
@@ -132,7 +132,7 @@ namespace bx
 		const uint32_t shiftE    = shiftEVec.u32;
 		const simd64_t allOnes   = simd64_splat(UINT64_MAX);
 		const simd64_t maskB     = simd64_x64_sll(allOnes, int(shiftB) );
-		const simd64_t maskE     = simd64_x64_srl(allOnes, int(64-shiftE) );
+		const simd64_t maskE     = simd64_x64_srl(allOnes, int( (64-shiftE) & 63) );
 
 		if (idxB == idxE)
 		{
@@ -180,8 +180,7 @@ namespace bx
 		const uint32_t shiftE    = shiftEVec.u32;
 		const simd64_t allOnes   = simd64_splat(UINT64_MAX);
 		const simd64_t maskB     = simd64_x64_sll(allOnes, int(shiftB) );
-		const simd64_t tmp0      = simd64_x64_srl(allOnes, int(63-shiftE) );
-		const simd64_t maskE     = simd64_x64_srl(tmp0, 1);
+		const simd64_t maskE     = simd64_x64_srl(allOnes, int( (64-shiftE) & 63) );
 
 		if (idxB == idxE)
 		{
@@ -235,8 +234,7 @@ namespace bx
 		const uint32_t shiftE    = shiftEVec.u32;
 		const simd64_t allOnes   = simd64_splat(UINT64_MAX);
 		const simd64_t maskB     = simd64_x64_sll(allOnes, int(shiftB) );
-		const simd64_t tmp0      = simd64_x64_srl(allOnes, int(63-shiftE) );
-		const simd64_t maskE     = simd64_x64_srl(tmp0, 1);
+		const simd64_t maskE     = simd64_x64_srl(allOnes, int( (64-shiftE) & 63) );
 
 		if (idxB == idxE)
 		{
@@ -290,8 +288,7 @@ namespace bx
 		const uint32_t shiftE    = shiftEVec.u32;
 		const simd64_t allOnes   = simd64_splat(UINT64_MAX);
 		const simd64_t maskB     = simd64_x64_sll(allOnes, int(shiftB) );
-		const simd64_t tmp0      = simd64_x64_srl(allOnes, int(63-shiftE) );
-		const simd64_t maskE     = simd64_x64_srl(tmp0, 1);
+		const simd64_t maskE     = simd64_x64_srl(allOnes, int( (64-shiftE) & 63) );
 
 		if (idxB == idxE)
 		{
@@ -362,7 +359,7 @@ namespace bx
 		_ptr[idxB] = replaceBits(_ptr[idxB], shiftB, maskB, _bits);
 
 		const uint64_t bitsE = _bits >> (64 - shiftB);
-		const uint64_t maskE = UINT64_MAX >> (64 - shiftE);
+		const uint64_t maskE = UINT64_MAX >> ( (64 - shiftE) & 63);
 		_ptr[idxE] = replaceBits(_ptr[idxE], 0, maskE, bitsE);
 	}
 
@@ -389,7 +386,7 @@ namespace bx
 		const uint64_t maskB  = UINT64_MAX >> shiftB;
 		const uint64_t bitsB  = extractBits(_ptr[idxB], shiftB, maskB);
 
-		const uint64_t maskE  = UINT64_MAX >> (64 - shiftE);
+		const uint64_t maskE  = UINT64_MAX >> ( (64 - shiftE) & 63);
 		const uint64_t bitsE  = extractBits(_ptr[idxE], 0, maskE);
 
 		return (bitsE << (64-shiftB) ) | bitsB;

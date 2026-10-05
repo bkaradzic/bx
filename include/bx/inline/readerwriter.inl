@@ -246,7 +246,12 @@ namespace bx
 
 		int64_t remainder = m_size-m_pos;
 		int32_t size = int32_t(max<int64_t>(0, min<int64_t>(_size, remainder, INT32_MAX) ) );
-		memCopy(&m_data[m_pos], _data, size);
+
+		if (0 < size)
+		{
+			memCopy(&m_data[m_pos], _data, size);
+		}
+
 		m_pos += size;
 		m_top = max(m_top, m_pos);
 		if (size != _size)

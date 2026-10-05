@@ -171,6 +171,11 @@ function toolchain(_buildDir, _libDir)
 		description = "Use AVX extension.",
 	}
 
+	newoption {
+		trigger     = "with-sanitizers",
+		description = "Build with address and undefined behavior sanitizers (gcc/clang).",
+	}
+
 	-- Avoid error when invoking genie --help.
 	if (_ACTION == nil) then return false end
 
@@ -514,6 +519,20 @@ function toolchain(_buildDir, _libDir)
 
 	if _OPTIONS["with-crtnone"] then
 		crtNone()
+	end
+
+	if _OPTIONS["with-sanitizers"] then
+		configuration { "linux-* or osx*" }
+			buildoptions {
+				"-fsanitize=address,undefined",
+				"-fno-sanitize-recover=all",
+				"-fno-omit-frame-pointer",
+			}
+			linkoptions {
+				"-fsanitize=address,undefined",
+			}
+
+		configuration {}
 	end
 
 	flags {
