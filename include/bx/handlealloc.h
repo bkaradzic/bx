@@ -9,6 +9,7 @@
 #include "bx.h"
 #include "allocator.h"
 #include "simd_t.h"
+#include "bitarray.h"
 
 namespace bx
 {
@@ -314,6 +315,73 @@ namespace bx
 		HandleHashMapT<MaxHandlesT+MaxHandlesT/2, KeyT> m_table;
 		HandleAllocT<MaxHandlesT> m_alloc;
 	};
+
+	/// Handle allocator backed by a bit set in caller-provided storage.
+	///
+	class HandleAlloc2
+	{
+	public:
+		/// `_bits` must hold at least `_maxHandles` bits; the allocator starts empty.
+		///
+		HandleAlloc2(MippedBitArrayBase& _bits, uint16_t _maxHandles);
+
+		///
+		uint16_t getNumHandles() const;
+
+		///
+		uint16_t getMaxHandles() const;
+
+		/// Allocates the lowest free handle, or returns `kInvalidHandle`.
+		///
+		uint16_t alloc();
+
+		///
+		bool isValid(uint16_t _handle) const;
+
+		///
+		void free(uint16_t _handle);
+
+		///
+		void reset();
+
+		/// Returns the lowest allocated handle, or `kInvalidHandle`.
+		///
+		uint16_t findFirst() const;
+
+		/// Returns the lowest allocated handle above `_handle`, or `kInvalidHandle`.
+		///
+		uint16_t findNext(uint16_t _handle) const;
+
+		///
+		const BitArrayViewBase& getBits() const;
+
+	protected:
+		///
+		HandleAlloc2(InitNoneTag, MippedBitArrayBase& _bits, uint16_t _maxHandles);
+
+	private:
+		HandleAlloc2();
+
+		uint16_t findFrom(uint32_t _start) const;
+
+		MippedBitArrayBase& m_bits;
+		uint16_t m_maxHandles;
+		uint16_t m_numHandles;
+	};
+
+	/// Bit set handle allocator with embedded storage.
+	///
+	template<uint16_t MaxHandlesT>
+	class HandleAlloc2T : public HandleAlloc2
+	{
+	public:
+		///
+		HandleAlloc2T();
+
+	private:
+		FixedMippedBitArrayT<MaxHandlesT> m_storage;
+	};
+
 
 } // namespace bx
 

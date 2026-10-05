@@ -54,6 +54,12 @@ namespace bx
 	/// Fields are initialized to identity value.
 	BX_DECLARE_TAG(InitIdentity);
 
+	/// Construct in place from arguments.
+	BX_DECLARE_TAG(Emplace);
+
+	/// Reinterpret data.
+	BX_DECLARE_TAG(Reinterpret);
+
 	/// Source location with file path, and file line.
 	///
 	struct Location
