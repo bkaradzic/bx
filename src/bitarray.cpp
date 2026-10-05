@@ -606,8 +606,32 @@ namespace bx
 		return _endBit;
 	}
 
+	inline uint32_t bitSetFindZero(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit)
+	{
+		const uint32_t begin = _beginBit/64;
+
+		for (uint32_t ii = begin, end = alignUp(_endBit, 64)/64; ii < end; ++ii)
+		{
+			uint64_t zeros = ~_ptr[ii];
+			zeros &= ii == begin ? UINT64_MAX << (_beginBit & 63) : UINT64_MAX;
+
+			if (0 != zeros)
+			{
+				const uint32_t idx = ii*64 + countTrailingZeros(zeros);
+				return idx < _endBit ? idx : kInvalid;
+			}
+		}
+
+		return kInvalid;
+	}
+
 	inline uint32_t bitSetFind(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits)
 	{
+		if (1 == _numBits)
+		{
+			return bitSetFindZero(_ptr, _beginBit, _endBit);
+		}
+
 		if (_numBits >= 127)
 		{
 			const uint32_t idx = bitSetFindT<uint64_t>(_ptr, _beginBit, _endBit, (_numBits+63)>>6);

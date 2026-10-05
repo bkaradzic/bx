@@ -293,6 +293,35 @@ TEST_CASE("BitArray-find-unset-bit", "[container]")
 	}
 }
 
+TEST_CASE("BitArray-find-unset-bit-in-range", "[container]")
+{
+	uint64_t bits[8];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	const uint32_t num = bs.getCount();
+
+	for (uint32_t ii = 0; ii < num; ++ii)
+	{
+		bs.set(0, num, true);
+		bs.set(ii, false);
+
+		for (uint32_t begin : { 0u, 1u, 63u, 64u, 65u, 200u })
+		{
+			for (uint32_t end : { 66u, 128u, 201u, 511u, 512u })
+			{
+				if (begin >= end)
+				{
+					continue;
+				}
+
+				const uint32_t expected = ii >= begin && ii < end ? ii : bx::kInvalid;
+				REQUIRE(expected == bs.find(begin, end, 1) );
+				REQUIRE(expected == bs.findClear(begin, end) );
+			}
+		}
+	}
+}
+
 TEST_CASE("BitArray-find-with-pattern", "[container]")
 {
 	uint64_t bits[8];
