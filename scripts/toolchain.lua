@@ -68,7 +68,6 @@ function toolchain(_buildDir, _libDir)
 			{ "android-arm64",   "Android - ARM64"            },
 			{ "android-x86",     "Android - x86"              },
 			{ "android-x86_64",  "Android - x86_64"           },
-			{ "wasm2js",         "Emscripten/Wasm2JS"         },
 			{ "wasm",            "Emscripten/Wasm"            },
 			{ "linux-gcc",       "Linux (GCC compiler)"       },
 			{ "linux-gcc-afl",   "Linux (GCC + AFL fuzzer)"   },
@@ -266,7 +265,7 @@ function toolchain(_buildDir, _libDir)
 			premake.gcc.llvm = true
 			location (path.join(_buildDir, "projects", _ACTION .. "-" .. _OPTIONS["gcc"]))
 
-		elseif "wasm2js" == _OPTIONS["gcc"] or "wasm" == _OPTIONS["gcc"] then
+		elseif "wasm" == _OPTIONS["gcc"] then
 
 			if not os.getenv("EMSCRIPTEN") then
 				print("Set EMSCRIPTEN environment variable to root directory of your Emscripten installation. (e.g. by entering the EMSDK command prompt)")
@@ -985,14 +984,6 @@ function toolchain(_buildDir, _libDir)
 		targetdir (path.join(_buildDir, "linux_loongarch64_gcc/bin"))
 		objdir (path.join(_buildDir, "linux_loongarch64_gcc/obj"))
 		libdirs { path.join(_libDir, "lib/linux_loongarch64_gcc") }
-
-	configuration { "wasm2js" }
-		targetdir (path.join(_buildDir, "wasm2js/bin"))
-		objdir (path.join(_buildDir, "wasm2js/obj"))
-		libdirs { path.join(_libDir, "lib/wasm2js") }
-		linkoptions {
-			"-s WASM=0",
-		}
 
 	configuration { "wasm" }
 		targetdir (path.join(_buildDir, "wasm/bin"))
