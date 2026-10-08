@@ -10,7 +10,7 @@
 
 #if BX_PLATFORM_WINDOWS
 #	include <direct.h>   // _wgetcwd
-#else
+#elif !BX_CRT_MSVC
 #	include <unistd.h>   // getcwd
 #endif // BX_PLATFORM_WINDOWS
 
