@@ -10,6 +10,7 @@
 
 namespace bx
 {
+	struct AllocatorI;
 	class  Error;
 	struct WriterI;
 
@@ -135,6 +136,34 @@ namespace bx
 		char const* const*       m_argv;
 		const CommandLineOption* m_options;
 		int32_t                  m_numOptions;
+	};
+
+	/// Process arguments as UTF-8.
+	///
+	/// On Windows `main` receives arguments converted to the ANSI code page, which loses every
+	/// character the code page can't represent, so they are taken from the process command line
+	/// instead. On other platforms, or when that fails, `_argv` is used as is.
+	///
+	class CommandLineArgs
+	{
+	public:
+		///
+		CommandLineArgs(AllocatorI* _allocator, int32_t _argc, const char* const* _argv);
+
+		///
+		~CommandLineArgs();
+
+		///
+		int32_t getArgc() const;
+
+		///
+		const char** getArgv() const;
+
+	private:
+		AllocatorI*  m_allocator;
+		void*        m_data;
+		int32_t      m_argc;
+		const char** m_argv;
 	};
 
 } // namespace bx

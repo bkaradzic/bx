@@ -549,6 +549,16 @@ namespace bx
 	/// Converts 64-bit unsigned integer value to string.
 	int32_t toString(char* _out, int32_t _max, uint64_t _value, uint32_t _base = 10, char _separator = '\0');
 
+	/// Converts UTF-8 string to NUL terminated UTF-16 string. Returns number of UTF-16 code units
+	/// written including the terminator, or 0 when the input is not valid UTF-8 or the output doesn't
+	/// fit. With `_max` 0 returns the size required.
+	int32_t toUtf16(uint16_t* _out, int32_t _max, const StringView& _str);
+
+	/// Converts NUL terminated UTF-16 string to NUL terminated UTF-8 string. Returns number of bytes
+	/// written including the terminator, or 0 when the input is not valid UTF-16 or the output
+	/// doesn't fit. With `_max` 0 returns the size required.
+	int32_t fromUtf16(char* _out, int32_t _max, const uint16_t* _str);
+
 	/// Converts string to bool value.
 	bool fromString(bool* _out, const StringView& _str);
 

@@ -97,6 +97,24 @@ namespace bx
 #		define ftello64 ftell
 #	endif // BX_
 
+	static FILE* openFile(const FilePath& _filePath, const char* _mode)
+	{
+#if BX_PLATFORM_WINDOWS
+		wchar_t filePath[kMaxFilePath];
+		wchar_t mode[4];
+
+		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath)
+		||  0 == toUtf16( (uint16_t*)mode,     BX_COUNTOF(mode),     _mode) )
+		{
+			return NULL;
+		}
+
+		return _wfopen(filePath, mode);
+#else
+		return fopen(_filePath.getCPtr(), _mode);
+#endif // BX_PLATFORM_WINDOWS
+	}
+
 	class FileReaderImpl : public FileReaderI
 	{
 	public:
@@ -121,7 +139,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.getCPtr(), "rb");
+			m_file = openFile(_filePath, "rb");
 			if (NULL == m_file)
 			{
 				BX_ERROR_SET(_err, kErrorReaderWriterOpen, "FileReader: Failed to open file.");
@@ -201,7 +219,7 @@ namespace bx
 				return false;
 			}
 
-			m_file = fopen(_filePath.getCPtr(), _append ? "ab" : "wb");
+			m_file = openFile(_filePath, _append ? "ab" : "wb");
 
 			if (NULL == m_file)
 			{
@@ -579,6 +597,48 @@ namespace bx
 
 #if BX_CONFIG_CRT_DIRECTORY_READER
 
+#	if BX_PLATFORM_WINDOWS
+	typedef _WDIR    DirHandle;
+	typedef _wdirent DirEntry;
+#	else
+	typedef DIR    DirHandle;
+	typedef dirent DirEntry;
+#	endif // BX_PLATFORM_WINDOWS
+
+	static DirHandle* openDir(const FilePath& _filePath)
+	{
+#if BX_PLATFORM_WINDOWS
+		wchar_t filePath[kMaxFilePath];
+
+		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
+		{
+			return NULL;
+		}
+
+		return _wopendir(filePath);
+#else
+		return opendir(_filePath.getCPtr() );
+#endif // BX_PLATFORM_WINDOWS
+	}
+
+	static DirEntry* readDir(DirHandle* _dir)
+	{
+#if BX_PLATFORM_WINDOWS
+		return _wreaddir(_dir);
+#else
+		return readdir(_dir);
+#endif // BX_PLATFORM_WINDOWS
+	}
+
+	static void closeDir(DirHandle* _dir)
+	{
+#if BX_PLATFORM_WINDOWS
+		_wclosedir(_dir);
+#else
+		closedir(_dir);
+#endif // BX_PLATFORM_WINDOWS
+	}
+
 	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
 	{
 	public:
@@ -597,7 +657,7 @@ namespace bx
 		{
 			BX_ASSERT(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
-			m_dir = opendir(_filePath.getCPtr() );
+			m_dir = openDir(_filePath);
 
 			if (NULL == m_dir)
 			{
@@ -614,7 +674,7 @@ namespace bx
 		{
 			if (NULL != m_dir)
 			{
-				closedir(m_dir);
+				closeDir(m_dir);
 				m_dir = NULL;
 			}
 		}
@@ -651,11 +711,11 @@ namespace bx
 			return total;
 		}
 
-		static bool fetch(FileInfo& _out, DIR* _dir)
+		static bool fetch(FileInfo& _out, DirHandle* _dir)
 		{
 			for (;;)
 			{
-				const dirent* item = readdir(_dir);
+				const DirEntry* item = readDir(_dir);
 
 				if (NULL == item)
 				{
@@ -665,26 +725,40 @@ namespace bx
 				if (0 != (item->d_type & DT_DIR) )
 				{
 					_out.type = FileType::Dir;
-					_out.size = UINT64_MAX;
-					_out.filePath.set(item->d_name);
-					return true;
 				}
-
-				if (0 != (item->d_type & DT_REG) )
+				else if (0 != (item->d_type & DT_REG) )
 				{
 					_out.type = FileType::File;
-					_out.size = UINT64_MAX;
-					_out.filePath.set(item->d_name);
-					return true;
 				}
+				else
+				{
+					continue;
+				}
+
+				_out.size = UINT64_MAX;
+
+#if BX_PLATFORM_WINDOWS
+				char name[kMaxFilePath];
+
+				if (0 == fromUtf16(name, BX_COUNTOF(name), (const uint16_t*)item->d_name) )
+				{
+					continue;
+				}
+
+				_out.filePath.set(name);
+#else
+				_out.filePath.set(item->d_name);
+#endif // BX_PLATFORM_WINDOWS
+
+				return true;
 			}
 
 			return false;
 		}
 
-		FileInfo m_cache;
-		DIR*     m_dir;
-		int32_t  m_pos;
+		FileInfo   m_cache;
+		DirHandle* m_dir;
+		int32_t    m_pos;
 	};
 
 #else
@@ -761,9 +835,16 @@ namespace bx
 		_outFileInfo.size = 0;
 		_outFileInfo.type = FileType::Count;
 
-#	if BX_COMPILER_MSVC
+#	if BX_PLATFORM_WINDOWS
+		wchar_t filePath[kMaxFilePath];
+
+		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
+		{
+			return false;
+		}
+
 		struct ::_stat64 st;
-		int32_t result = ::_stat64(_filePath.getCPtr(), &st);
+		int32_t result = ::_wstat64(filePath, &st);
 
 		if (0 != result)
 		{
@@ -794,7 +875,7 @@ namespace bx
 		{
 			_outFileInfo.type = FileType::Dir;
 		}
-#	endif // BX_COMPILER_MSVC
+#	endif // BX_PLATFORM_WINDOWS
 
 		_outFileInfo.size = st.st_size;
 
@@ -811,10 +892,12 @@ namespace bx
 			return false;
 		}
 
-#if BX_CRT_MSVC
-		int32_t result = ::_mkdir(_filePath.getCPtr() );
-#elif BX_CRT_MINGW
-		int32_t result = ::mkdir(_filePath.getCPtr() );
+#if BX_PLATFORM_WINDOWS
+		wchar_t filePath[kMaxFilePath];
+		int32_t result = 0 != toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath)
+			? ::_wmkdir(filePath)
+			: -1
+			;
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
@@ -878,23 +961,18 @@ namespace bx
 			return false;
 		}
 
-#if BX_CRT_MSVC || BX_CRT_MINGW
+#if BX_PLATFORM_WINDOWS
 		int32_t result = -1;
 		FileInfo fi;
-		if (stat(fi, _filePath) )
+		wchar_t filePath[kMaxFilePath];
+
+		if (stat(fi, _filePath)
+		&&  0 != toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
 		{
-			if (FileType::Dir == fi.type)
-			{
-#	if BX_CRT_MINGW
-				result = ::rmdir(_filePath.getCPtr() );
-#	else
-				result = ::_rmdir(_filePath.getCPtr() );
-#	endif // BX_CRT_MINGW
-			}
-			else
-			{
-				result = ::remove(_filePath.getCPtr() );
-			}
+			result = FileType::Dir == fi.type
+				? ::_wrmdir(filePath)
+				: ::_wremove(filePath)
+				;
 		}
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
@@ -973,13 +1051,6 @@ namespace bx
 		return remove(_filePath, _err);
 	}
 
-#if BX_PLATFORM_WINDOWS
-	static int32_t widen(wchar_t* _out, int32_t _max, const FilePath& _filePath)
-	{
-		return MultiByteToWideChar(CP_UTF8, 0, _filePath.getCPtr(), -1, _out, _max);
-	}
-#endif // BX_PLATFORM_WINDOWS
-
 	bool copy(const FilePath& _from, const FilePath& _to, Error* _err)
 	{
 		BX_ERROR_SCOPE(_err);
@@ -1049,8 +1120,8 @@ namespace bx
 		wchar_t from[kMaxFilePath+1];
 		wchar_t to[kMaxFilePath+1];
 
-		if (0 == widen(from, BX_COUNTOF(from), _from)
-		||  0 == widen(to,   BX_COUNTOF(to),   _to) )
+		if (0 == toUtf16( (uint16_t*)from, BX_COUNTOF(from), _from)
+		||  0 == toUtf16( (uint16_t*)to,   BX_COUNTOF(to),   _to) )
 		{
 			BX_ERROR_SET(_err, kErrorAccess, "Failed to convert file path.");
 			return false;
@@ -1121,7 +1192,7 @@ namespace bx
 	{
 		wchar_t from[kMaxFilePath+1] = {};
 
-		const int32_t num = widen(from, BX_COUNTOF(from)-1, _filePath);
+		const int32_t num = toUtf16( (uint16_t*)from, BX_COUNTOF(from)-1, _filePath);
 
 		if (0 == num)
 		{

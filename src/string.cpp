@@ -1432,4 +1432,194 @@ namespace bx
 		return formatHumanNumber(_out, _count, double(_value), 0, 1024.0, "iB", "BKMGTPEZY");
 	}
 
+	static uint32_t decodeUtf8(const uint8_t*& _ptr, const uint8_t* _end)
+	{
+		const uint8_t ch = *_ptr++;
+
+		if (ch < 0x80)
+		{
+			return ch;
+		}
+
+		uint32_t codePoint;
+		int32_t  num;
+
+		if (0xc0 == (ch & 0xe0) )
+		{
+			codePoint = ch & 0x1f;
+			num       = 1;
+		}
+		else if (0xe0 == (ch & 0xf0) )
+		{
+			codePoint = ch & 0x0f;
+			num       = 2;
+		}
+		else if (0xf0 == (ch & 0xf8) )
+		{
+			codePoint = ch & 0x07;
+			num       = 3;
+		}
+		else
+		{
+			return UINT32_MAX;
+		}
+
+		if (_end - _ptr < num)
+		{
+			return UINT32_MAX;
+		}
+
+		for (int32_t ii = 0; ii < num; ++ii)
+		{
+			const uint8_t cc = *_ptr++;
+
+			if (0x80 != (cc & 0xc0) )
+			{
+				return UINT32_MAX;
+			}
+
+			codePoint = (codePoint << 6) | (cc & 0x3f);
+		}
+
+		static const uint32_t kMinCodePoint[] = { 0x80, 0x800, 0x10000 };
+
+		if (codePoint <  kMinCodePoint[num-1]
+		||  codePoint >  0x10ffff
+		|| (codePoint >= 0xd800 && codePoint <= 0xdfff) )
+		{
+			return UINT32_MAX;
+		}
+
+		return codePoint;
+	}
+
+	int32_t toUtf16(uint16_t* _out, int32_t _max, const StringView& _str)
+	{
+		const uint8_t* ptr = (const uint8_t*)_str.getPtr();
+		const uint8_t* end = ptr + _str.getLength();
+
+		int32_t len = 0;
+
+		while (ptr < end)
+		{
+			const uint32_t codePoint = decodeUtf8(ptr, end);
+
+			if (UINT32_MAX == codePoint)
+			{
+				return 0;
+			}
+
+			const int32_t num = codePoint < 0x10000 ? 1 : 2;
+
+			if (0 != _max)
+			{
+				if (len + num >= _max)
+				{
+					return 0;
+				}
+
+				if (1 == num)
+				{
+					_out[len] = uint16_t(codePoint);
+				}
+				else
+				{
+					const uint32_t vv = codePoint - 0x10000;
+					_out[len+0] = uint16_t(0xd800 | (vv >>   10) );
+					_out[len+1] = uint16_t(0xdc00 | (vv & 0x3ff) );
+				}
+			}
+
+			len += num;
+		}
+
+		if (0 != _max)
+		{
+			_out[len] = 0;
+		}
+
+		return len+1;
+	}
+
+	int32_t fromUtf16(char* _out, int32_t _max, const uint16_t* _str)
+	{
+		int32_t len = 0;
+
+		for (const uint16_t* ptr = _str; 0 != *ptr;)
+		{
+			uint32_t codePoint = *ptr++;
+
+			if (codePoint >= 0xd800
+			&&  codePoint <= 0xdbff)
+			{
+				const uint32_t lo = *ptr;
+
+				if (lo < 0xdc00
+				||  lo > 0xdfff)
+				{
+					return 0;
+				}
+
+				++ptr;
+				codePoint = 0x10000 + ( (codePoint - 0xd800) << 10) + (lo - 0xdc00);
+			}
+			else if (codePoint >= 0xdc00
+			     &&  codePoint <= 0xdfff)
+			{
+				return 0;
+			}
+
+			const int32_t num =
+				  codePoint <    0x80 ? 1
+				: codePoint <   0x800 ? 2
+				: codePoint < 0x10000 ? 3
+				:                       4
+				;
+
+			if (0 != _max)
+			{
+				if (len + num >= _max)
+				{
+					return 0;
+				}
+
+				char* out = &_out[len];
+
+				switch (num)
+				{
+				case 1:
+					out[0] = char(codePoint);
+					break;
+
+				case 2:
+					out[0] = char(0xc0 | (codePoint >> 6) );
+					out[1] = char(0x80 | (codePoint & 0x3f) );
+					break;
+
+				case 3:
+					out[0] = char(0xe0 |   (codePoint >> 12) );
+					out[1] = char(0x80 | ( (codePoint >>  6) & 0x3f) );
+					out[2] = char(0x80 |   (codePoint        & 0x3f) );
+					break;
+
+				default:
+					out[0] = char(0xf0 |   (codePoint >> 18) );
+					out[1] = char(0x80 | ( (codePoint >> 12) & 0x3f) );
+					out[2] = char(0x80 | ( (codePoint >>  6) & 0x3f) );
+					out[3] = char(0x80 |   (codePoint        & 0x3f) );
+					break;
+				}
+			}
+
+			len += num;
+		}
+
+		if (0 != _max)
+		{
+			_out[len] = '\0';
+		}
+
+		return len+1;
+	}
+
 } // namespace bx

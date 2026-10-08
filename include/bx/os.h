@@ -128,7 +128,7 @@ namespace bx
 	template<typename ProtoT>
 	ProtoT dlsym(void* _handle, const StringView& _symbol);
 
-	/// Read an environment variable.
+	/// Read an environment variable. Name and value are UTF-8.
 	///
 	/// @param[out]    _out       Buffer that receives the value (may be NULL to query required size).
 	/// @param[in,out] _inOutSize On input the capacity of `_out`, on output the required size including terminator.
@@ -137,7 +137,7 @@ namespace bx
 	///
 	bool getEnv(char* _out, uint32_t* _inOutSize, const StringView& _name);
 
-	/// Set an environment variable.
+	/// Set an environment variable. Name and value are UTF-8.
 	///
 	/// @param[in] _name  Name of the environment variable.
 	/// @param[in] _value Value to assign.
@@ -146,7 +146,7 @@ namespace bx
 
 	/// Change current working directory of the process.
 	///
-	/// @param[in] _path Target directory path.
+	/// @param[in] _path Target directory path, UTF-8.
 	/// @returns 0 on success, non-zero on failure.
 	///
 	int chdir(const char* _path);

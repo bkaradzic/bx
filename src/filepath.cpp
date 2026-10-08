@@ -8,17 +8,17 @@
 #include <bx/readerwriter.h>
 #include <bx/scanner.h>
 
-#if BX_CRT_MSVC
-#	include <direct.h>   // _getcwd
+#if BX_PLATFORM_WINDOWS
+#	include <direct.h>   // _wgetcwd
 #else
 #	include <unistd.h>   // getcwd
-#endif // BX_CRT_MSVC
+#endif // BX_PLATFORM_WINDOWS
 
 #if BX_PLATFORM_WINDOWS
 #if !defined(GetModuleFileName)
-extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameA(void* _module, char* _outFilePath, unsigned long _size);
+extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameW(void* _module, wchar_t* _outFilePath, unsigned long _size);
 #endif
-extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathA(unsigned long _max, char* _outFilePath);
+extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathW(unsigned long _max, wchar_t* _outFilePath);
 #elif BX_PLATFORM_OSX
 extern "C" int _NSGetExecutablePath(char* _buf, uint32_t* _bufSize);
 #endif // BX_PLATFORM_WINDOWS
@@ -167,8 +167,16 @@ namespace bx
  || BX_CRT_NONE
 		BX_UNUSED(_buffer, _size);
 		return NULL;
-#elif BX_CRT_MSVC
-		return ::_getcwd(_buffer, (int32_t)_size);
+#elif BX_PLATFORM_WINDOWS
+		wchar_t tmp[kMaxFilePath];
+
+		if (NULL == ::_wgetcwd(tmp, BX_COUNTOF(tmp) )
+		||  0 == fromUtf16(_buffer, int32_t(_size), (const uint16_t*)tmp) )
+		{
+			return NULL;
+		}
+
+		return _buffer;
 #else
 		return ::getcwd(_buffer, _size);
 #endif // BX_PLATFORM_*
@@ -189,10 +197,18 @@ namespace bx
 	static bool getExecutablePath(char* _out, uint32_t* _inOutSize)
 	{
 #if BX_PLATFORM_WINDOWS
-		uint32_t len = ::GetModuleFileNameA(NULL, _out, *_inOutSize);
-		bool result = len != 0 && len < *_inOutSize;
-		*_inOutSize = len;
-		return result;
+		wchar_t tmp[kMaxFilePath];
+		const uint32_t len = ::GetModuleFileNameW(NULL, tmp, BX_COUNTOF(tmp) );
+
+		if (0 == len
+		||  BX_COUNTOF(tmp) <= len)
+		{
+			return false;
+		}
+
+		const int32_t num = fromUtf16(_out, int32_t(*_inOutSize), (const uint16_t*)tmp);
+		*_inOutSize = 0 != num ? num-1 : fromUtf16(NULL, 0, (const uint16_t*)tmp)-1;
+		return 0 != num;
 #elif BX_PLATFORM_LINUX
 		char tmp[64];
 		snprintf(tmp, sizeof(tmp), "/proc/%d/exe", getpid() );
@@ -228,10 +244,18 @@ namespace bx
 	static bool getTempPath(char* _out, uint32_t* _inOutSize)
 	{
 #if BX_PLATFORM_WINDOWS
-		uint32_t len = ::GetTempPathA(*_inOutSize, _out);
-		bool result = len != 0 && len < *_inOutSize;
-		*_inOutSize = len;
-		return result;
+		wchar_t tmp[kMaxFilePath];
+		const uint32_t len = ::GetTempPathW(BX_COUNTOF(tmp), tmp);
+
+		if (0 == len
+		||  BX_COUNTOF(tmp) <= len)
+		{
+			return false;
+		}
+
+		const int32_t num = fromUtf16(_out, int32_t(*_inOutSize), (const uint16_t*)tmp);
+		*_inOutSize = 0 != num ? num-1 : fromUtf16(NULL, 0, (const uint16_t*)tmp)-1;
+		return 0 != num;
 #else
 		static const StringView s_tmp[] =
 		{
