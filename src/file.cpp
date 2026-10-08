@@ -859,6 +859,23 @@ namespace bx
 		{
 			_outFileInfo.type = FileType::Dir;
 		}
+#	elif BX_CRT_MSVC
+		struct ::_stat64 st;
+		int32_t result = ::_stat64(_filePath.getCPtr(), &st);
+
+		if (0 != result)
+		{
+			return false;
+		}
+
+		if (0 != (st.st_mode & _S_IFREG) )
+		{
+			_outFileInfo.type = FileType::File;
+		}
+		else if (0 != (st.st_mode & _S_IFDIR) )
+		{
+			_outFileInfo.type = FileType::Dir;
+		}
 #	else
 		struct ::stat st;
 		int32_t result = ::stat(_filePath.getCPtr(), &st);
@@ -898,6 +915,8 @@ namespace bx
 			? ::_wmkdir(filePath)
 			: -1
 			;
+#elif BX_CRT_MSVC
+		int32_t result = ::_mkdir(_filePath.getCPtr() );
 #elif BX_CRT_NONE
 		BX_UNUSED(_filePath);
 		int32_t result = -1;
@@ -972,6 +991,17 @@ namespace bx
 			result = FileType::Dir == fi.type
 				? ::_wrmdir(filePath)
 				: ::_wremove(filePath)
+				;
+		}
+#elif BX_CRT_MSVC
+		int32_t result = -1;
+		FileInfo fi;
+
+		if (stat(fi, _filePath) )
+		{
+			result = FileType::Dir == fi.type
+				? ::_rmdir(_filePath.getCPtr() )
+				: ::remove(_filePath.getCPtr() )
 				;
 		}
 #elif BX_CRT_NONE
