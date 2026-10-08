@@ -3,10 +3,15 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
+#include <bx/allocator.h>
 #include <bx/commandline.h>
 #include <bx/readerwriter.h>
 #include <bx/scanner.h>
 #include <bx/string.h>
+
+#if BX_PLATFORM_WINDOWS
+extern "C" __declspec(dllimport) wchar_t* __stdcall GetCommandLineW();
+#endif // BX_PLATFORM_WINDOWS
 
 namespace bx
 {
@@ -660,6 +665,64 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	CommandLineArgs::CommandLineArgs(AllocatorI* _allocator, int32_t _argc, const char* const* _argv)
+		: m_allocator(_allocator)
+		, m_data(NULL)
+		, m_argc(_argc)
+		, m_argv(const_cast<const char**>(_argv) )
+	{
+#if BX_PLATFORM_WINDOWS
+		const uint16_t* cmdLine = (const uint16_t*)::GetCommandLineW();
+		const int32_t   size    = fromUtf16(NULL, 0, cmdLine);
+
+		if (0 == size)
+		{
+			return;
+		}
+
+		const int32_t maxArgs    = size/2 + 1;
+		const int32_t bufferSize = size*2 + 2;
+
+		uint8_t* data = (uint8_t*)alloc(m_allocator, maxArgs*sizeof(char*) + size + bufferSize);
+
+		const char** argv   = (const char**)data;
+		char*        utf8   = (char*)&data[maxArgs*sizeof(char*)];
+		char*        buffer = &utf8[size];
+
+		if (0 == fromUtf16(utf8, size, cmdLine) )
+		{
+			free(m_allocator, data);
+			return;
+		}
+
+		uint32_t len  = uint32_t(bufferSize);
+		int32_t  argc = 0;
+		tokenizeCommandLine(StringView(utf8, size-1), buffer, len, argc, (char**)argv, maxArgs);
+
+		m_data = data;
+		m_argc = argc;
+		m_argv = argv;
+#endif // BX_PLATFORM_WINDOWS
+	}
+
+	CommandLineArgs::~CommandLineArgs()
+	{
+		if (NULL != m_data)
+		{
+			free(m_allocator, m_data);
+		}
+	}
+
+	int32_t CommandLineArgs::getArgc() const
+	{
+		return m_argc;
+	}
+
+	const char** CommandLineArgs::getArgv() const
+	{
+		return m_argv;
 	}
 
 } // namespace bx

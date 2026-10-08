@@ -41,6 +41,9 @@ namespace bx
 	///                 ^^^^^^^
 	///                 +-filename
 	///
+	/// Paths are UTF-8 on every platform. On Windows they are converted to UTF-16 before reaching
+	/// the OS, so the process code page has no effect on them.
+	///
 	class FilePath
 	{
 	public:

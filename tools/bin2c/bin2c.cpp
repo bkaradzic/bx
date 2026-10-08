@@ -225,7 +225,10 @@ void help(const char* _error = NULL)
 
 int main(int _argc, const char* _argv[])
 {
-	bx::CommandLine cmdLine(_argc, _argv, s_options, BX_COUNTOF(s_options) );
+	bx::DefaultAllocator allocator;
+	bx::CommandLineArgs args(&allocator, _argc, _argv);
+
+	bx::CommandLine cmdLine(args.getArgc(), args.getArgv(), s_options, BX_COUNTOF(s_options) );
 
 	if (cmdLine.hasArg('h', "help") )
 	{
@@ -278,7 +281,6 @@ int main(int _argc, const char* _argv[])
 	{
 		size = uint32_t(bx::getSize(&fr) );
 
-		bx::DefaultAllocator allocator;
 		data = bx::alloc(&allocator, size);
 		bx::read(&fr, data, size, bx::ErrorAssert{});
 		bx::close(&fr);

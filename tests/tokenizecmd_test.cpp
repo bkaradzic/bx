@@ -4,6 +4,7 @@
  */
 
 #include "test.h"
+#include <bx/allocator.h>
 #include <bx/commandline.h>
 #include <bx/readerwriter.h>
 #include <bx/string.h>
@@ -435,4 +436,26 @@ TEST_CASE("tokenizeCommandLine maxArgvs", "")
 	REQUIRE(0 == bx::strCmp(argv[0], "a") );
 	REQUIRE(0 == bx::strCmp(argv[1], "b") );
 	REQUIRE(0 == bx::strCmp(next, "v g d") );
+}
+
+TEST_CASE("commandLine args", "")
+{
+	bx::DefaultAllocator allocator;
+
+	const char* argv[] = { "program", "--flag" };
+	bx::CommandLineArgs args(&allocator, BX_COUNTOF(argv), argv);
+
+	REQUIRE(0 < args.getArgc() );
+	REQUIRE(args.getArgv() != (const char**)NULL);
+
+	if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	{
+		// Taken from the process command line, so the program is this test executable.
+		REQUIRE(!bx::strFind(args.getArgv()[0], "bx.test").isEmpty() );
+	}
+	else
+	{
+		REQUIRE(BX_COUNTOF(argv) == args.getArgc() );
+		REQUIRE(argv == args.getArgv() );
+	}
 }

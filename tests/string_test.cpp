@@ -985,3 +985,41 @@ TEST_CASE("StringView is trivially copyable", "[string]")
 	REQUIRE(0 == bx::strCmp(copy.span, "span") );
 	REQUIRE(0 == bx::strCmp(copy.variant.named.name, "hello") );
 }
+
+TEST_CASE("UTF-16 conversion", "[string][utf8]")
+{
+	// "a", U+00FC, U+6D4B, U+1F600 (surrogate pair).
+	static const char*    kUtf8    = "a\xc3\xbc\xe6\xb5\x8b\xf0\x9f\x98\x80";
+	static const uint16_t kUtf16[] = { 0x0061, 0x00fc, 0x6d4b, 0xd83d, 0xde00, 0 };
+
+	uint16_t utf16[8];
+	REQUIRE(6 == bx::toUtf16(utf16, BX_COUNTOF(utf16), kUtf8) );
+	REQUIRE(0 == bx::memCmp(utf16, kUtf16, sizeof(kUtf16) ) );
+
+	char utf8[16];
+	REQUIRE(11 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kUtf16) );
+	REQUIRE(0 == bx::strCmp(utf8, kUtf8) );
+
+	// Required size, and a buffer one short of it.
+	REQUIRE(6  == bx::toUtf16(NULL, 0, kUtf8) );
+	REQUIRE(0  == bx::toUtf16(utf16, 5, kUtf8) );
+	REQUIRE(11 == bx::fromUtf16(NULL, 0, kUtf16) );
+	REQUIRE(0  == bx::fromUtf16(utf8, 10, kUtf16) );
+
+	// Empty.
+	REQUIRE(1 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "") );
+	REQUIRE(0 == utf16[0]);
+	static const uint16_t kEmpty[] = { 0 };
+	REQUIRE(1 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kEmpty) );
+	REQUIRE('\0' == utf8[0]);
+
+	// Invalid input is rejected rather than replaced.
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xc3") );                 // truncated sequence
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xc0\x80") );             // overlong NUL
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xed\xa0\x80") );         // encoded surrogate
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xff") );                 // not a lead byte
+	static const uint16_t kLoneHigh[] = { 0xd83d, 0x0061, 0 };
+	static const uint16_t kLoneLow[]  = { 0xde00, 0 };
+	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneHigh) );
+	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneLow) );
+}

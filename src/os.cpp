@@ -6,11 +6,11 @@
 #include <bx/string.h>
 #include <bx/os.h>
 
-#if BX_CRT_MSVC
-#	include <direct.h>
-#else
+#if BX_PLATFORM_WINDOWS
+#	include <direct.h> // _wchdir
+#elif !BX_CRT_MSVC
 #	include <unistd.h> // syscall, _SC_PAGESIZE
-#endif // BX_CRT_MSVC
+#endif // BX_PLATFORM_WINDOWS
 
 #if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 #	ifndef WIN32_LEAN_AND_MEAN
@@ -216,8 +216,15 @@ namespace bx
 	void* dlopen(const FilePath& _filePath)
 	{
 #if BX_PLATFORM_WINDOWS
+		wchar_t filePath[kMaxFilePath];
+
+		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
+		{
+			return NULL;
+		}
+
 		// LOAD_LIBRARY_SEARCH_DEFAULT_DIRS excludes CWD and %PATH% from the search order.
-		HMODULE handle = ::LoadLibraryExA(_filePath.getCPtr(), NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+		HMODULE handle = ::LoadLibraryExW(filePath, NULL, LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
 
 		BX_WARN(NULL != handle, "dlopen failed: \"%s\" 0x%x.", _filePath.getCPtr(), ::GetLastError() );
 
@@ -289,8 +296,27 @@ namespace bx
 		strCopy(name, nameMax, _name);
 
 #if BX_PLATFORM_WINDOWS
-		DWORD len = ::GetEnvironmentVariableA(name, _out, *_inOutSize);
-		bool result = len != 0 && len < *_inOutSize;
+		wchar_t* wname = (wchar_t*)BX_STACK_ALLOC(nameMax*sizeof(wchar_t) );
+
+		if (0 == toUtf16( (uint16_t*)wname, nameMax, name) )
+		{
+			*_inOutSize = 0;
+			return false;
+		}
+
+		const uint32_t max = NULL != _out ? *_inOutSize : 0;
+		wchar_t* value = (wchar_t*)BX_STACK_ALLOC(max*sizeof(wchar_t) );
+
+		DWORD len = ::GetEnvironmentVariableW(wname, value, max);
+		bool result = len != 0 && len < max;
+
+		if (result)
+		{
+			const int32_t num = fromUtf16(_out, int32_t(max), (const uint16_t*)value);
+			result = 0 != num;
+			len    = 0 != num ? num-1 : fromUtf16(NULL, 0, (const uint16_t*)value);
+		}
+
 		*_inOutSize = len;
 		return result;
 #elif  BX_PLATFORM_EMSCRIPTEN \
@@ -337,7 +363,26 @@ namespace bx
 		}
 
 #if BX_PLATFORM_WINDOWS
-		::SetEnvironmentVariableA(name, value);
+		wchar_t* wname  = (wchar_t*)BX_STACK_ALLOC(nameMax*sizeof(wchar_t) );
+		wchar_t* wvalue = NULL;
+
+		if (0 == toUtf16( (uint16_t*)wname, nameMax, name) )
+		{
+			return;
+		}
+
+		if (NULL != value)
+		{
+			const int32_t valueMax = _value.getLength()+1;
+			wvalue = (wchar_t*)BX_STACK_ALLOC(valueMax*sizeof(wchar_t) );
+
+			if (0 == toUtf16( (uint16_t*)wvalue, valueMax, value) )
+			{
+				return;
+			}
+		}
+
+		::SetEnvironmentVariableW(wname, wvalue);
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_PS5        \
@@ -367,8 +412,15 @@ namespace bx
  || BX_CRT_NONE
 		BX_UNUSED(_path);
 		return -1;
-#elif BX_CRT_MSVC
-		return ::_chdir(_path);
+#elif BX_PLATFORM_WINDOWS
+		wchar_t path[kMaxFilePath];
+
+		if (0 == toUtf16( (uint16_t*)path, BX_COUNTOF(path), _path) )
+		{
+			return -1;
+		}
+
+		return ::_wchdir(path);
 #else
 		return ::chdir(_path);
 #endif // BX_COMPILER_

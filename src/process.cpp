@@ -23,9 +23,26 @@ namespace bx
 #if BX_CONFIG_CRT_PROCESS
 
 #if BX_CRT_MSVC
-#	define popen  _popen
 #	define pclose _pclose
 #endif // BX_CRT_MSVC
+
+	static FILE* openProcess(const char* _cmd, const char* _mode)
+	{
+#if BX_PLATFORM_WINDOWS
+		wchar_t cmd[kMaxFilePath*2];
+		wchar_t mode[4];
+
+		if (0 == toUtf16( (uint16_t*)cmd,  BX_COUNTOF(cmd),  _cmd)
+		||  0 == toUtf16( (uint16_t*)mode, BX_COUNTOF(mode), _mode) )
+		{
+			return NULL;
+		}
+
+		return _wpopen(cmd, mode);
+#else
+		return popen(_cmd, _mode);
+#endif // BX_PLATFORM_WINDOWS
+	}
 
 	ProcessReader::ProcessReader()
 		: m_file(NULL)
@@ -52,7 +69,7 @@ namespace bx
 		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 
-		m_file = popen(tmp, "r");
+		m_file = openProcess(tmp, "r");
 		if (NULL == m_file)
 		{
 			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessReader: Failed to open process.");
@@ -123,7 +140,7 @@ namespace bx
 		strCat(tmp, BX_COUNTOF(tmp), "\" ");
 		strCat(tmp, BX_COUNTOF(tmp), _args);
 
-		m_file = popen(tmp, "w");
+		m_file = openProcess(tmp, "w");
 		if (NULL == m_file)
 		{
 			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessWriter: Failed to open process.");
