@@ -562,479 +562,244 @@ namespace bx
 		return toStringUnsigned(_dst, _max, _value, _base, _separator);
 	}
 
-	/*
-	 * https://github.com/grzegorz-kraszewski/stringtofloat/
-	 *
-	 * MIT License
-	 *
-	 * Copyright (c) 2016 Grzegorz Kraszewski
-	 *
-	 * Permission is hereby granted, free of charge, to any person obtaining a copy
-	 * of this software and associated documentation files (the "Software"), to deal
-	 * in the Software without restriction, including without limitation the rights
-	 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	 * copies of the Software, and to permit persons to whom the Software is
-	 * furnished to do so, subject to the following conditions:
-	 *
-	 * The above copyright notice and this permission notice shall be included in all
-	 * copies or substantial portions of the Software.
-	 *
-	 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	 * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	 * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	 * SOFTWARE.
-	 */
+	constexpr uint32_t kFromStringMaxDigits = 768;
 
-	/*
-	 * IMPORTANT
-	 *
-	 * The code works in "round towards zero" mode. This is different from
-	 * GCC standard library strtod(), which uses "round half to even" rule.
-	 * Therefore it cannot be used as a direct drop-in replacement, as in
-	 * some cases results will be different on the least significant bit of
-	 * mantissa. Read more in the README.md file.
-	 */
+	constexpr uint32_t kFromStringNumLimbs = 96;
 
-#define DIGITS 18
-
-#define DOUBLE_PLUS_ZERO      UINT64_C(0x0000000000000000)
-#define DOUBLE_MINUS_ZERO     UINT64_C(0x8000000000000000)
-#define DOUBLE_PLUS_INFINITY  UINT64_C(0x7ff0000000000000)
-#define DOUBLE_MINUS_INFINITY UINT64_C(0xfff0000000000000)
-
-#define lsr96(s2, s1, s0, d2, d1, d0)      \
-	d0 = ( (s0) >> 1) | ( ( (s1) & 1) << 31); \
-	d1 = ( (s1) >> 1) | ( ( (s2) & 1) << 31); \
-	d2 = (s2) >> 1;
-
-#define lsl96(s2, s1, s0, d2, d1, d0)              \
-	d2 = ( (s2) << 1) | ( ( (s1) & (1 << 31) ) >> 31); \
-	d1 = ( (s1) << 1) | ( ( (s0) & (1 << 31) ) >> 31); \
-	d0 = (s0) << 1;
-
-	/*
-	 * Undefine the below constant if your processor or compiler is slow
-	 * at 64-bit arithmetic. This is a rare case however. 64-bit macros are
-	 * better for deeply pipelined CPUs (no conditional execution), are
-	 * very efficient for 64-bit processors and also fast on 32-bit processors
-	 * featuring extended precision arithmetic (x86, PowerPC_32, M68k and probably
-	 * more).
-	 */
-
-#define USE_64BIT_FOR_ADDSUB_MACROS 0
-
-#if USE_64BIT_FOR_ADDSUB_MACROS
-
-#define add96(s2, s1, s0, d2, d1, d0) {   \
-	uint64_t w;                           \
-	w = (uint64_t)(s0) + (uint64_t)(d0);  \
-	(s0) = w;                             \
-	w >>= 32;                             \
-	w += (uint64_t)(s1) + (uint64_t)(d1); \
-	(s1) = w;                             \
-	w >>= 32;                             \
-	w += (uint64_t)(s2) + (uint64_t)(d2); \
-	(s2) = w; }
-
-#define sub96(s2, s1, s0, d2, d1, d0) {   \
-	uint64_t w;                           \
-	w = (uint64_t)(s0) - (uint64_t)(d0);  \
-	(s0) = w;                             \
-	w >>= 32;                             \
-	w += (uint64_t)(s1) - (uint64_t)(d1); \
-	(s1) = w;                             \
-	w >>= 32;                             \
-	w += (uint64_t)(s2) - (uint64_t)(d2); \
-	(s2) = w; }
-
-#else
-
-#define add96(s2, s1, s0, d2, d1, d0) {                                \
-	uint32_t _x, _c;                                                   \
-	_x = (s0); (s0) += (d0);                                           \
-	if ( (s0) < _x) _c = 1; else _c = 0;                               \
-	_x = (s1); (s1) += (d1) + _c;                                      \
-	if ( ( (s1) < _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
-	(s2) += (d2) + _c; }
-
-#define sub96(s2, s1, s0, d2, d1, d0) {                                \
-	uint32_t _x, _c;                                                   \
-	_x = (s0); (s0) -= (d0);                                           \
-	if ( (s0) > _x) _c = 1; else _c = 0;                               \
-	_x = (s1); (s1) -= (d1) + _c;                                      \
-	if ( ( (s1) > _x) || ( ( (s1) == _x) && _c) ) _c = 1; else _c = 0; \
-	(s2) -= (d2) + _c; }
-
-#endif   /* USE_64BIT_FOR_ADDSUB_MACROS */
-
-	/* parser state machine states */
-
-#define FSM_A    0
-#define FSM_B    1
-#define FSM_C    2
-#define FSM_D    3
-#define FSM_E    4
-#define FSM_F    5
-#define FSM_G    6
-#define FSM_H    7
-#define FSM_I    8
-#define FSM_STOP 9
-
-	/* The structure is filled by parser, then given to converter. */
-	struct PrepNumber
+	struct FloatBig
 	{
-		int negative;      /* 0 if positive number, 1 if negative */
-		int32_t exponent;  /* power of 10 exponent */
-		uint64_t mantissa; /* integer mantissa */
+		uint32_t num;
+		uint64_t limb[kFromStringNumLimbs];
 	};
 
-	/* Possible parser return values. */
-
-#define PARSER_OK     0  // parser finished OK
-#define PARSER_PZERO  1  // no digits or number is smaller than +-2^-1022
-#define PARSER_MZERO  2  // number is negative, module smaller
-#define PARSER_PINF   3  // number is higher than +HUGE_VAL
-#define PARSER_MINF   4  // number is lower than -HUGE_VAL
-
-	inline char next(const char*& _s, const char* _term)
+	static bool floatBigMulAdd(FloatBig& _big, uint32_t _mul, uint32_t _add)
 	{
-		return _s != _term
-			? *_s++
-			: '\0'
-			;
+		uint64_t carry = _add;
+
+		for (uint32_t ii = 0; ii < _big.num; ++ii)
+		{
+			const uint64_t lo = (_big.limb[ii] & UINT32_MAX) * _mul + (carry & UINT32_MAX);
+			const uint64_t hi = (_big.limb[ii] >> 32)        * _mul + (carry >> 32) + (lo >> 32);
+
+			_big.limb[ii] = (hi << 32) | (lo & UINT32_MAX);
+			carry = hi >> 32;
+		}
+
+		if (0 != carry)
+		{
+			if (kFromStringNumLimbs <= _big.num)
+			{
+				return false;
+			}
+
+			_big.limb[_big.num] = carry;
+			++_big.num;
+		}
+
+		return true;
 	}
 
-	static int parser(const char* _s, const char* _term, PrepNumber* _pn)
+	static bool floatBigShiftLeft(FloatBig& _big, uint32_t _bits)
 	{
-		int state = FSM_A;
-		int digx = 0;
-		char c = ' ';            /* initial value for kicking off the state machine */
-		int result = PARSER_OK;
-		int expneg = 0;
-		int32_t expexp = 0;
-
-		while (state != FSM_STOP) // && _s != _term)
+		if (0 == _big.num)
 		{
-			switch (state)
+			return true;
+		}
+
+		const uint32_t words = _bits / 64;
+		const uint32_t bits  = _bits % 64;
+		const uint32_t extra = 0 != bits ? 1 : 0;
+
+		if (kFromStringNumLimbs < _big.num + words + extra)
+		{
+			return false;
+		}
+
+		if (0 != bits)
+		{
+			uint64_t carry = 0;
+
+			for (uint32_t ii = 0; ii < _big.num; ++ii)
 			{
-			case FSM_A:
-				if (isSpace(c) )
-				{
-					c = next(_s, _term);
-				}
-				else
-				{
-					state = FSM_B;
-				}
-				break;
+				const uint64_t value = _big.limb[ii];
 
-			case FSM_B:
-				state = FSM_C;
+				_big.limb[ii] = (value << bits) | carry;
+				carry = value >> (64 - bits);
+			}
 
-				if (c == '+')
-				{
-					c = next(_s, _term);
-				}
-				else if (c == '-')
-				{
-					_pn->negative = 1;
-					c = next(_s, _term);
-				}
-				else if (isNumeric(c) )
-				{
-				}
-				else if (c == '.')
-				{
-				}
-				else
-				{
-					state = FSM_STOP;
-				}
-				break;
-
-			case FSM_C:
-				if (c == '0')
-				{
-					c = next(_s, _term);
-				}
-				else if (c == '.')
-				{
-					c = next(_s, _term);
-					state = FSM_D;
-				}
-				else
-				{
-					state = FSM_E;
-				}
-				break;
-
-			case FSM_D:
-				if (c == '0')
-				{
-					c = next(_s, _term);
-					if (_pn->exponent > -2147483647) _pn->exponent--;
-				}
-				else
-				{
-					state = FSM_F;
-				}
-				break;
-
-			case FSM_E:
-				if (isNumeric(c) )
-				{
-					if (digx < DIGITS)
-					{
-						_pn->mantissa *= 10;
-						_pn->mantissa += c - '0';
-						digx++;
-					}
-					else if (_pn->exponent < 2147483647)
-					{
-						_pn->exponent++;
-					}
-
-					c = next(_s, _term);
-				}
-				else if (c == '.')
-				{
-					c = next(_s, _term);
-					state = FSM_F;
-				}
-				else
-				{
-					state = FSM_F;
-				}
-				break;
-
-			case FSM_F:
-				if (isNumeric(c) )
-				{
-					if (digx < DIGITS)
-					{
-						_pn->mantissa *= 10;
-						_pn->mantissa += c - '0';
-						_pn->exponent--;
-						digx++;
-					}
-
-					c = next(_s, _term);
-				}
-				else if ('e' == toLower(c) )
-				{
-					c = next(_s, _term);
-					state = FSM_G;
-				}
-				else
-				{
-					state = FSM_G;
-				}
-				break;
-
-			case FSM_G:
-				if (c == '+')
-				{
-					c = next(_s, _term);
-				}
-				else if (c == '-')
-				{
-					expneg = 1;
-					c = next(_s, _term);
-				}
-
-				state = FSM_H;
-				break;
-
-			case FSM_H:
-				if (c == '0')
-				{
-					c = next(_s, _term);
-				}
-				else
-				{
-					state = FSM_I;
-				}
-				break;
-
-			case FSM_I:
-				if (isNumeric(c) )
-				{
-					if (expexp < 214748364)
-					{
-						expexp *= 10;
-						expexp += c - '0';
-					}
-
-					c = next(_s, _term);
-				}
-				else
-				{
-					state = FSM_STOP;
-				}
-				break;
+			if (0 != carry)
+			{
+				_big.limb[_big.num] = carry;
+				++_big.num;
 			}
 		}
 
-		if (expneg)
+		if (0 != words)
 		{
-			expexp = -expexp;
+			for (uint32_t ii = _big.num; ii > 0; --ii)
+			{
+				_big.limb[ii - 1 + words] = _big.limb[ii - 1];
+			}
+
+			for (uint32_t ii = 0; ii < words; ++ii)
+			{
+				_big.limb[ii] = 0;
+			}
+
+			_big.num += words;
 		}
 
-		_pn->exponent += expexp;
+		return true;
+	}
 
-		if (_pn->mantissa == 0)
+	static uint32_t floatBigDivSmall(FloatBig& _big, uint32_t _div)
+	{
+		uint64_t rem = 0;
+
+		for (uint32_t ii = _big.num; ii > 0; --ii)
 		{
-			if (_pn->negative)
+			const uint64_t value = _big.limb[ii - 1];
+
+			const uint64_t hiNum = (rem << 32) | (value >> 32);
+			const uint64_t hiQ   = hiNum / _div;
+			const uint64_t hiR   = hiNum % _div;
+
+			const uint64_t loNum = (hiR << 32) | (value & UINT32_MAX);
+			const uint64_t loQ   = loNum / _div;
+
+			rem = loNum % _div;
+
+			_big.limb[ii - 1] = (hiQ << 32) | loQ;
+		}
+
+		while (0 != _big.num
+		&&     0 == _big.limb[_big.num - 1])
+		{
+			--_big.num;
+		}
+
+		return uint32_t(rem);
+	}
+
+	static uint32_t floatBigBitLength(const FloatBig& _big)
+	{
+		if (0 == _big.num)
+		{
+			return 0;
+		}
+
+		return (_big.num - 1)*64 + 64 - countLeadingZeros(_big.limb[_big.num - 1]);
+	}
+
+	static bool floatBigBit(const FloatBig& _big, uint32_t _bit)
+	{
+		const uint32_t word = _bit / 64;
+
+		if (_big.num <= word)
+		{
+			return false;
+		}
+
+		return 0 != ( (_big.limb[word] >> (_bit % 64) ) & 1);
+	}
+
+	static bool floatBigAnyBitBelow(const FloatBig& _big, uint32_t _bit)
+	{
+		const uint32_t word = _bit / 64;
+		const uint32_t bits = _bit % 64;
+
+		for (uint32_t ii = 0; ii < word && ii < _big.num; ++ii)
+		{
+			if (0 != _big.limb[ii])
 			{
-				result = PARSER_MZERO;
-			}
-			else
-			{
-				result = PARSER_PZERO;
+				return true;
 			}
 		}
-		else if (_pn->exponent > 309)
+
+		if (word < _big.num
+		&&  0 != bits)
 		{
-			if (_pn->negative)
+			const uint64_t mask = (UINT64_C(1) << bits) - 1;
+
+			if (0 != (_big.limb[word] & mask) )
 			{
-				result = PARSER_MINF;
-			}
-			else
-			{
-				result = PARSER_PINF;
+				return true;
 			}
 		}
-		else if (_pn->exponent < -328)
+
+		return false;
+	}
+
+	static uint64_t floatBigBits(const FloatBig& _big, uint32_t _from, uint32_t _count)
+	{
+		uint64_t result = 0;
+
+		for (uint32_t ii = 0; ii < _count; ++ii)
 		{
-			if (_pn->negative)
+			if (floatBigBit(_big, _from + ii) )
 			{
-				result = PARSER_MZERO;
-			}
-			else
-			{
-				result = PARSER_PZERO;
+				result |= UINT64_C(1) << ii;
 			}
 		}
 
 		return result;
 	}
 
-	static double converter(PrepNumber* _pn)
+	static double floatBigRound(const FloatBig& _big, int32_t _binExp, bool _sticky, bool _negative, int32_t _mantBits, int32_t _minExp)
 	{
-		int binexp = 92;
-		uint32_t s2, s1, s0; /* 96-bit precision integer */
-		uint32_t q2, q1, q0; /* 96-bit precision integer */
-		uint32_t r2, r1, r0; /* 96-bit precision integer */
-		uint32_t mask28 = UINT32_C(0xf) << 28;
+		const uint32_t length = floatBigBitLength(_big);
 
-		uint64_t hdu = 0;
-
-		s0 = (uint32_t)(_pn->mantissa & UINT32_MAX);
-		s1 = (uint32_t)(_pn->mantissa >> 32);
-		s2 = 0;
-
-		while (_pn->exponent > 0)
+		if (0 == length)
 		{
-			lsl96(s2, s1, s0, q2, q1, q0); // q = p << 1
-			lsl96(q2, q1, q0, r2, r1, r0); // r = p << 2
-			lsl96(r2, r1, r0, s2, s1, s0); // p = p << 3
-			add96(s2, s1, s0, q2, q1, q0); // p = (p << 3) + (p << 1)
-
-			_pn->exponent--;
-
-			while (s2 & mask28)
-			{
-				lsr96(s2, s1, s0, q2, q1, q0);
-				binexp++;
-				s2 = q2;
-				s1 = q1;
-				s0 = q0;
-			}
+			return _negative ? -0.0 : 0.0;
 		}
 
-		while (_pn->exponent < 0)
+		const int32_t unbiased = int32_t(length) - 1 + _binExp;
+		const int32_t smallest = _minExp - _mantBits + 1;
+
+		int32_t keep = _mantBits;
+
+		if (_minExp > unbiased)
 		{
-			while (!(s2 & (1 << 31) ) )
-			{
-				lsl96(s2, s1, s0, q2, q1, q0);
-				binexp--;
-				s2 = q2;
-				s1 = q1;
-				s0 = q0;
-			}
-
-			q2 = s2 / 10;
-			r1 = s2 % 10;
-			r2 = (s1 >> 8) | (r1 << 24);
-			q1 = r2 / 10;
-			r1 = r2 % 10;
-			r2 = ( (s1 & 0xFF) << 16) | (s0 >> 16) | (r1 << 24);
-			r0 = r2 / 10;
-			r1 = r2 % 10;
-			q1 = (q1 << 8) | ( (r0 & 0x00FF0000) >> 16);
-			q0 = r0 << 16;
-			r2 = (s0 & UINT16_MAX) | (r1 << 16);
-			q0 |= r2 / 10;
-			s2 = q2;
-			s1 = q1;
-			s0 = q0;
-
-			_pn->exponent++;
+			keep = _mantBits + (unbiased - _minExp);
 		}
 
-		if (s2 || s1 || s0)
+		if (0 >= keep)
 		{
-			while (!(s2 & mask28) )
-			{
-				lsl96(s2, s1, s0, q2, q1, q0);
-				binexp--;
-				s2 = q2;
-				s1 = q1;
-				s0 = q0;
-			}
+			const bool half = 0 == keep && floatBigBit(_big, length - 1);
+			const bool more = _sticky || floatBigAnyBitBelow(_big, length - 1);
+			const double tiny = (half && more) ? ldexp(1.0, smallest) : 0.0;
+
+			return _negative ? -tiny : tiny;
 		}
 
-		binexp += 1023;
+		const int32_t shift = int32_t(length) - keep;
 
-		if (binexp > 2046)
+		uint64_t mantissa = 0;
+		bool     roundBit = false;
+		bool     tail     = _sticky;
+
+		if (0 < shift)
 		{
-			if (_pn->negative)
-			{
-				hdu = DOUBLE_MINUS_INFINITY;
-			}
-			else
-			{
-				hdu = DOUBLE_PLUS_INFINITY;
-			}
+			mantissa = floatBigBits(_big, uint32_t(shift), uint32_t(keep) );
+			roundBit = floatBigBit(_big, uint32_t(shift) - 1);
+			tail     = tail || (1 < shift && floatBigAnyBitBelow(_big, uint32_t(shift) - 1) );
 		}
-		else if (binexp < 1)
+		else
 		{
-			if (_pn->negative)
-			{
-				hdu = DOUBLE_MINUS_ZERO;
-			}
-		}
-		else if (s2)
-		{
-			uint64_t q;
-			uint64_t binexs2 = (uint64_t)binexp;
-
-			binexs2 <<= 52;
-			q =   ( (uint64_t)(s2 & ~mask28) << 24)
-			  | ( ( (uint64_t)s1 + 128) >> 8) | binexs2;
-
-			if (_pn->negative)
-			{
-				q |= (1ULL << 63);
-			}
-
-			hdu = q;
+			mantissa  = floatBigBits(_big, 0, length);
+			mantissa <<= uint32_t(-shift);
 		}
 
-		return bitCast<double>(hdu);
+		if (roundBit
+		&& (tail || 0 != (mantissa & 1) ) )
+		{
+			++mantissa;
+		}
+
+		const double scaled = ldexp(double(mantissa), _binExp + shift);
+
+		return _negative ? -scaled : scaled;
 	}
 
 	int32_t toString(char* _out, int32_t _max, bool _value)
@@ -1049,14 +814,6 @@ namespace bx
 		char ch = toLower(_str.getPtr()[0]);
 		*_out = ch == 't' ||  ch == '1';
 		return 0 != _str.getLength();
-	}
-
-	bool fromString(float* _out, const StringView& _str)
-	{
-		double dbl;
-		bool result = fromString(&dbl, _str);
-		*_out = float(dbl);
-		return result;
 	}
 
 	static bool toHexDigit(uint32_t* _out, char _ch)
@@ -1082,130 +839,256 @@ namespace bx
 		return false;
 	}
 
-	static bool fromStringHex(double* _out, const StringView& _str)
+	static bool fromStringFloating(double* _out, const StringView& _str, int32_t _mantBits, int32_t _minExp)
 	{
-		const char* ptr = _str.getPtr();
-		const char* end = _str.getTerm();
+		const char* ptr  = _str.getPtr();
+		const char* term = _str.getTerm();
+
+		while (ptr != term
+		&&     isSpace(*ptr) )
+		{
+			++ptr;
+		}
 
 		bool negative = false;
 
-		if (ptr < end
-		&& ('-' == *ptr || '+' == *ptr) )
+		if (ptr != term
+		&& ('+' == *ptr || '-' == *ptr) )
 		{
-			negative = ('-' == *ptr);
+			negative = '-' == *ptr;
 			++ptr;
 		}
 
-		if ( (end - ptr) < 2
-		||  '0' != ptr[0]
-		|| ('x' != ptr[1] && 'X' != ptr[1]) )
+		const bool hex = (term - ptr) >= 2
+			&& '0' == ptr[0]
+			&& ('x' == ptr[1] || 'X' == ptr[1])
+			;
+
+		if (hex)
 		{
-			return false;
+			ptr += 2;
 		}
 
-		ptr += 2;
+		const uint32_t radix    = hex ? 16 : 10;
+		const int32_t  bitsEach = hex ?  4 :  1;
 
-		double   mantissa = 0.0;
-		bool     anyDigit = false;
-		uint32_t digit;
+		FloatBig big;
+		big.num     = 0;
+		big.limb[0] = 0;
 
-		for (; ptr < end && toHexDigit(&digit, *ptr); ++ptr)
+		uint32_t numDigits = 0;
+		int32_t  pointExp  = 0;
+		int32_t  dropped   = 0;
+		bool     sticky    = false;
+		bool     anyDigit  = false;
+		bool     fraction  = false;
+
+		for (; ptr != term; ++ptr)
 		{
-			mantissa  = mantissa * 16.0 + double(digit);
-			anyDigit  = true;
-		}
+			const char ch = *ptr;
 
-		if (ptr < end && '.' == *ptr)
-		{
-			++ptr;
-			double scale = 1.0 / 16.0;
-			for (; ptr < end && toHexDigit(&digit, *ptr); ++ptr)
+			if ('.' == ch)
 			{
-				mantissa += double(digit) * scale;
-				scale    *= 1.0 / 16.0;
-				anyDigit  = true;
+				if (fraction)
+				{
+					break;
+				}
+
+				fraction = true;
+				continue;
+			}
+
+			uint32_t digit = 0;
+
+			if (hex)
+			{
+				if (!toHexDigit(&digit, ch) )
+				{
+					break;
+				}
+			}
+			else
+			{
+				if (!isNumeric(ch) )
+				{
+					break;
+				}
+
+				digit = uint32_t(ch - '0');
+			}
+
+			anyDigit = true;
+
+			if (0 == numDigits
+			&&  0 == digit)
+			{
+				if (fraction)
+				{
+					pointExp -= bitsEach;
+				}
+
+				continue;
+			}
+
+			if (kFromStringMaxDigits > numDigits)
+			{
+				if (!floatBigMulAdd(big, radix, digit) )
+				{
+					return false;
+				}
+
+				++numDigits;
+
+				if (fraction)
+				{
+					pointExp -= bitsEach;
+				}
+			}
+			else
+			{
+				sticky = sticky || (0 != digit);
+
+				if (!fraction)
+				{
+					dropped += bitsEach;
+				}
 			}
 		}
 
 		if (!anyDigit)
 		{
-			return false; // "0x" with no hex digits
+			return false;
 		}
 
-		int32_t exponent = 0;
-		if (ptr < end
-		&& ('p' == *ptr || 'P' == *ptr) )
+		int32_t expPart = 0;
+
+		const bool expMark = ptr != term
+			&& ( hex
+				? ('p' == *ptr || 'P' == *ptr)
+				: ('e' == *ptr || 'E' == *ptr)
+				)
+			;
+
+		if (expMark)
 		{
+			const char* save = ptr;
+
 			++ptr;
 
-			int32_t expSign = 1;
-			if (ptr < end && ('+' == *ptr || '-' == *ptr) )
+			bool expNeg = false;
+
+			if (ptr != term
+			&& ('+' == *ptr || '-' == *ptr) )
 			{
-				expSign = ('-' == *ptr) ? -1 : 1; ++ptr;
+				expNeg = '-' == *ptr;
+				++ptr;
 			}
 
-			int32_t magnitude = 0;
-			for (; ptr < end && *ptr >= '0' && *ptr <= '9'; ++ptr)
+			if (ptr == term
+			|| !isNumeric(*ptr) )
 			{
-				magnitude = magnitude * 10 + int32_t(*ptr - '0');
+				ptr = save;
+			}
+			else
+			{
+				for (; ptr != term && isNumeric(*ptr); ++ptr)
+				{
+					if (100000 > expPart)
+					{
+						expPart = expPart*10 + (*ptr - '0');
+					}
+				}
+
+				if (expNeg)
+				{
+					expPart = -expPart;
+				}
+			}
+		}
+
+		if (0 == big.num)
+		{
+			*_out = negative ? -0.0 : 0.0;
+			return true;
+		}
+
+		if (hex)
+		{
+			*_out = floatBigRound(big, expPart + pointExp + dropped, sticky, negative, _mantBits, _minExp);
+			return true;
+		}
+
+		const int32_t decExp = expPart + pointExp + dropped;
+
+		const int32_t magnitude = decExp + int32_t(numDigits);
+		const int32_t maxBinExp = 1 - _minExp;
+		const int32_t minBinExp = _minExp - _mantBits + 1;
+
+		if (magnitude > (maxBinExp + 1)*10/33 + 2)
+		{
+			*_out = negative ? -kDoubleInfinity : kDoubleInfinity;
+			return true;
+		}
+
+		if (magnitude < minBinExp*10/33 - 2)
+		{
+			*_out = negative ? -0.0 : 0.0;
+			return true;
+		}
+
+		int32_t binExp = decExp;
+
+		if (0 <= decExp)
+		{
+			for (int32_t ii = 0; ii < decExp; ++ii)
+			{
+				if (!floatBigMulAdd(big, 5, 0) )
+				{
+					*_out = negative ? -kDoubleInfinity : kDoubleInfinity;
+					return true;
+				}
+			}
+		}
+		else
+		{
+			const int32_t count = -decExp;
+
+			const uint32_t prescale = uint32_t(count)*7/3 + 70;
+
+			if (!floatBigShiftLeft(big, prescale) )
+			{
+				return false;
 			}
 
-			exponent = expSign * magnitude;
+			binExp -= int32_t(prescale);
+
+			for (int32_t ii = 0; ii < count; ++ii)
+			{
+				const uint32_t rem = floatBigDivSmall(big, 5);
+
+				sticky = sticky || (0 != rem);
+			}
 		}
 
-		double value = mantissa;
-
-		for (int32_t ii = 0; ii < exponent; ++ii)
-		{
-			value *= 2.0;
-		}
-
-		for (int32_t ii = 0; ii > exponent; --ii)
-		{
-			value *= 0.5;
-		}
-
-		*_out = negative ? -value : value;
+		*_out = floatBigRound(big, binExp, sticky, negative, _mantBits, _minExp);
 
 		return true;
 	}
 
+	bool fromString(float* _out, const StringView& _str)
+	{
+		double value;
+
+		const bool result = fromStringFloating(&value, _str, 24, -126);
+
+		*_out = float(value);
+
+		return result;
+	}
+
 	bool fromString(double* _out, const StringView& _str)
 	{
-		if (fromStringHex(_out, _str) )
-		{
-			return true;
-		}
-
-		PrepNumber pn;
-		pn.mantissa = 0;
-		pn.negative = 0;
-		pn.exponent = 0;
-
-		switch (parser(_str.getPtr(), _str.getTerm(), &pn) )
-		{
-		case PARSER_OK:
-			*_out = converter(&pn);
-			break;
-
-		case PARSER_PZERO:
-			*_out = bitCast<double>(DOUBLE_PLUS_ZERO);
-			break;
-
-		case PARSER_MZERO:
-			*_out = bitCast<double>(DOUBLE_MINUS_ZERO);
-			break;
-
-		case PARSER_PINF:
-			*_out = bitCast<double>(DOUBLE_PLUS_INFINITY);
-			break;
-
-		case PARSER_MINF:
-			*_out = bitCast<double>(DOUBLE_MINUS_INFINITY);
-			break;
-		}
-
-		return true;
+		return fromStringFloating(_out, _str, 53, -1022);
 	}
 
 	bool fromString(long long* _out, const StringView& _str)

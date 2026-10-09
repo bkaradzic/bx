@@ -710,6 +710,116 @@ static void parity2(const char* _name, SimdFn _simd, ScalarFn _scalar, float _lo
 	CHECK(0 == bad);
 }
 
+static float accuracyInput(bx::RngMwc& _rng, float _lo, float _hi)
+{
+	const uint32_t r = _rng.gen();
+
+	switch (r & 31)
+	{
+	case  0: return 0.0f;
+	case  1: return clamp( 1.0f, _lo, _hi);
+	case  2: return clamp(-1.0f, _lo, _hi);
+	case  3: return clamp( 0.5f, _lo, _hi);
+	case  4: return _lo;
+	case  5: return _hi;
+	default: break;
+	}
+
+	const float t = float(_rng.gen() & 0xffffff) * (1.0f/16777216.0f);
+
+	return _lo + (_hi - _lo) * t;
+}
+
+template<typename Ty, typename SimdFn, typename RefFn, typename ScaleFn>
+static void accuracy1(const char* _name, SimdFn _simd, RefFn _ref, ScaleFn _scale, double _tol, float _lo, float _hi)
+{
+	constexpr uint32_t kNumLanes = sizeof(Ty)/sizeof(float);
+	bx::RngMwc rng;
+	double maxErr = 0.0;
+	float  badIn  = 0.0f;
+
+	for (uint32_t ii = 0; ii < 2048; ++ii)
+	{
+		alignas(sizeof(Ty) ) float in[kNumLanes];
+		alignas(sizeof(Ty) ) float out[kNumLanes];
+
+		for (uint32_t jj = 0; jj < kNumLanes; ++jj)
+		{
+			in[jj] = accuracyInput(rng, _lo, _hi);
+		}
+
+		simd_st(out, _simd(simd_ld<Ty>(in) ) );
+
+		for (uint32_t jj = 0; jj < kNumLanes; ++jj)
+		{
+			const double ref = _ref(double(in[jj]) );
+
+			if (bx::abs(ref) > double(bx::kFloatLargest) )
+			{
+				continue;
+			}
+
+			const double err = bx::abs(double(out[jj]) - ref) / _scale(ref);
+
+			if (err > maxErr)
+			{
+				maxErr = err;
+				badIn  = in[jj];
+			}
+		}
+	}
+
+	INFO(_name << " lanes=" << kNumLanes << ": worst " << maxErr << " at " << badIn << ", budget " << _tol);
+	CHECK(maxErr <= _tol);
+}
+
+template<typename Ty, typename SimdFn, typename RefFn, typename ScaleFn>
+static void accuracy2(const char* _name, SimdFn _simd, RefFn _ref, ScaleFn _scale, double _tol, float _lo0, float _hi0, float _lo1, float _hi1)
+{
+	constexpr uint32_t kNumLanes = sizeof(Ty)/sizeof(float);
+	bx::RngMwc rng;
+	double maxErr = 0.0;
+	float  badIn0 = 0.0f;
+	float  badIn1 = 0.0f;
+
+	for (uint32_t ii = 0; ii < 2048; ++ii)
+	{
+		alignas(sizeof(Ty) ) float in0[kNumLanes];
+		alignas(sizeof(Ty) ) float in1[kNumLanes];
+		alignas(sizeof(Ty) ) float out[kNumLanes];
+
+		for (uint32_t jj = 0; jj < kNumLanes; ++jj)
+		{
+			in0[jj] = accuracyInput(rng, _lo0, _hi0);
+			in1[jj] = accuracyInput(rng, _lo1, _hi1);
+		}
+
+		simd_st(out, _simd(simd_ld<Ty>(in0), simd_ld<Ty>(in1) ) );
+
+		for (uint32_t jj = 0; jj < kNumLanes; ++jj)
+		{
+			const double ref = _ref(double(in0[jj]), double(in1[jj]) );
+
+			if (bx::abs(ref) > double(bx::kFloatLargest) )
+			{
+				continue;
+			}
+
+			const double err = bx::abs(double(out[jj]) - ref) / _scale(ref);
+
+			if (err > maxErr)
+			{
+				maxErr = err;
+				badIn0 = in0[jj];
+				badIn1 = in1[jj];
+			}
+		}
+	}
+
+	INFO(_name << " lanes=" << kNumLanes << ": worst " << maxErr << " at " << badIn0 << ", " << badIn1 << ", budget " << _tol);
+	CHECK(maxErr <= _tol);
+}
+
 template<typename Ty>
 static void parityAll()
 {
@@ -721,21 +831,21 @@ static void parityAll()
 	parity1<Ty>("fract",      [](Ty a      ) { return simd_f32_fract(a);      }, [](float a         ) { return bx::fract(a);      },  -1.0e6f,  1.0e6f);
 	parity1<Ty>("sign",       [](Ty a      ) { return simd_f32_sign(a);       }, [](float a         ) { return bx::sign(a);       },   -10.0f,   10.0f, false);
 	parity1<Ty>("smoothstep", [](Ty a      ) { return simd_f32_smoothstep(a); }, [](float a         ) { return bx::smoothStep(a); },    -2.0f,    2.0f);
-	parity1<Ty>("cos",        [](Ty a      ) { return simd_f32_cos(a);        }, [](float a         ) { return bx::cos(a);        },  -100.0f,  100.0f);
-	parity1<Ty>("sin",        [](Ty a      ) { return simd_f32_sin(a);        }, [](float a         ) { return bx::sin(a);        },  -100.0f,  100.0f);
-	parity1<Ty>("tan",        [](Ty a      ) { return simd_f32_tan(a);        }, [](float a         ) { return bx::tan(a);        },  -100.0f,  100.0f);
+	accuracy1<Ty>("cos",   [](Ty a) { return simd_f32_cos(a);  }, [](double a) { return bx::cos(a);  }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
+	accuracy1<Ty>("sin",   [](Ty a) { return simd_f32_sin(a);  }, [](double a) { return bx::sin(a);  }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
+	accuracy1<Ty>("tan",   [](Ty a) { return simd_f32_tan(a);  }, [](double a) { return bx::tan(a);  }, [](double _r ) { return 1.0 + _r*_r;   }, 1.0e-5, -100.0f, 100.0f);
 	parity1<Ty>("exp",        [](Ty a      ) { return simd_f32_exp(a);        }, [](float a         ) { return bx::exp(a);        },   -90.0f,   90.0f);
 	parity1<Ty>("log",        [](Ty a      ) { return simd_f32_log(a);        }, [](float a         ) { return bx::log(a);        }, 1.0e-30f, 1.0e30f, false);
 	parity1<Ty>("exp2",       [](Ty a      ) { return simd_f32_exp2(a);       }, [](float a         ) { return bx::exp2(a);       },  -120.0f,  120.0f, false);
 	parity1<Ty>("log2",       [](Ty a      ) { return simd_f32_log2(a);       }, [](float a         ) { return bx::log2(a);       }, 1.0e-30f, 1.0e30f, false);
-	parity1<Ty>("acos",       [](Ty a      ) { return simd_f32_acos(a);       }, [](float a         ) { return bx::acos(a);       },    -1.5f,    1.5f);
-	parity1<Ty>("asin",       [](Ty a      ) { return simd_f32_asin(a);       }, [](float a         ) { return bx::asin(a);       },    -1.5f,    1.5f);
-	parity1<Ty>("atan",       [](Ty a      ) { return simd_f32_atan(a);       }, [](float a         ) { return bx::atan(a);       }, -1000.0f, 1000.0f, false);
+	accuracy1<Ty>("acos",  [](Ty a) { return simd_f32_acos(a); }, [](double a) { return bx::acos(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
+	accuracy1<Ty>("asin",  [](Ty a) { return simd_f32_asin(a); }, [](double a) { return bx::asin(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
+	accuracy1<Ty>("atan",  [](Ty a) { return simd_f32_atan(a); }, [](double a) { return bx::atan(a); }, [](double    ) { return 1.0;           }, 5.0e-6, -1000.0f, 1000.0f);
 	parity1<Ty>("sinh",       [](Ty a      ) { return simd_f32_sinh(a);       }, [](float a         ) { return bx::sinh(a);       },   -30.0f,   30.0f);
 	parity1<Ty>("cosh",       [](Ty a      ) { return simd_f32_cosh(a);       }, [](float a         ) { return bx::cosh(a);       },   -30.0f,   30.0f);
 	parity1<Ty>("tanh",       [](Ty a      ) { return simd_f32_tanh(a);       }, [](float a         ) { return bx::tanh(a);       },   -30.0f,   30.0f);
-	parity2<Ty>("pow",        [](Ty a, Ty b) { return simd_f32_pow(a, b);     }, [](float a, float b) { return bx::pow(a, b);     },    0.01f,  100.0f,  -10.0f,  10.0f, false);
-	parity2<Ty>("atan2",      [](Ty y, Ty x) { return simd_f32_atan2(y, x);   }, [](float y, float x) { return bx::atan2(y, x);   },  -100.0f,  100.0f, -100.0f, 100.0f, false);
+	accuracy2<Ty>("pow",   [](Ty a, Ty b) { return simd_f32_pow(a, b);   }, [](double a, double b) { return bx::pow(a, b);   }, [](double _r) { return bx::abs(_r); }, 1.0e-5, 0.01f, 100.0f, -10.0f, 10.0f);
+	accuracy2<Ty>("atan2", [](Ty y, Ty x) { return simd_f32_atan2(y, x); }, [](double y, double x) { return bx::atan2(y, x); }, [](double    ) { return 1.0;         }, 5.0e-6, -100.0f, 100.0f, -100.0f, 100.0f);
 	parity2<Ty>("step",       [](Ty e, Ty a) { return simd_f32_step(e, a);    }, [](float e, float a) { return bx::step(e, a);    },   -10.0f,   10.0f,  -10.0f,  10.0f);
 	parity2<Ty>("mod",        [](Ty a, Ty b) { return simd_f32_mod(a, b);     }, [](float a, float b) { return bx::mod(a, b);     },  -100.0f,  100.0f,  -10.0f,  10.0f);
 }

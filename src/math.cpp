@@ -8,24 +8,6 @@
 
 namespace bx
 {
-	float frexp(float _a, int32_t* _outExp)
-	{
-		const simd32_t expMask   = simd32_splat(kFloatExponentMask);
-		const simd32_t ftob      = simd32_splat(_a);
-		const simd32_t masked0   = simd_and(ftob, expMask);
-		const simd32_t exp0      = simd_x32_srl(masked0, kFloatExponentBitShift);
-
-		const simd32_t sMantMask = simd32_splat(kFloatSignMask | kFloatMantissaMask);
-		const simd32_t masked1   = simd_and(ftob, sMantMask);
-		const simd32_t half      = simd32_splat(0x3f000000u);
-		const simd32_t bits      = simd_or(masked1, half);
-		const float    result    = bitsToFloat(bits.u32);
-
-		*_outExp = int32_t(exp0.u32 - 0x7e);
-
-		return result;
-	}
-
 	void mtxLookAt(float* _result, const Vec3& _eye, const Vec3& _at, const Vec3& _up, Handedness::Enum _handedness)
 	{
 		const Vec3 view = normalize(

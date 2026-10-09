@@ -520,9 +520,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i32_add(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i32_langext_t a      = bitCast<simd256_i32_langext_t>(_a);
-		const simd256_i32_langext_t b      = bitCast<simd256_i32_langext_t>(_b);
-		const simd256_i32_langext_t sum    = a + b;
+		const simd256_u32_langext_t a      = bitCast<simd256_u32_langext_t>(_a);
+		const simd256_u32_langext_t b      = bitCast<simd256_u32_langext_t>(_b);
+		const simd256_u32_langext_t sum    = a + b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(sum);
 		return result;
 #else
@@ -537,9 +537,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i32_sub(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i32_langext_t a      = bitCast<simd256_i32_langext_t>(_a);
-		const simd256_i32_langext_t b      = bitCast<simd256_i32_langext_t>(_b);
-		const simd256_i32_langext_t diff   = a - b;
+		const simd256_u32_langext_t a      = bitCast<simd256_u32_langext_t>(_a);
+		const simd256_u32_langext_t b      = bitCast<simd256_u32_langext_t>(_b);
+		const simd256_u32_langext_t diff   = a - b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(diff);
 		return result;
 #else
@@ -554,8 +554,8 @@ namespace bx
 	inline BX_CONST_FUNC simd256_ref_t simd256_i32_neg(simd256_ref_t _a)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i32_langext_t a      = bitCast<simd256_i32_langext_t>(_a);
-		const simd256_i32_langext_t neg    = -a;
+		const simd256_u32_langext_t a      = bitCast<simd256_u32_langext_t>(_a);
+		const simd256_u32_langext_t neg    = -a;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(neg);
 		return result;
 #else
@@ -1315,9 +1315,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i64_add(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i64_langext_t a      = bitCast<simd256_i64_langext_t>(_a);
-		const simd256_i64_langext_t b      = bitCast<simd256_i64_langext_t>(_b);
-		const simd256_i64_langext_t sum    = a + b;
+		const simd256_u64_langext_t a      = bitCast<simd256_u64_langext_t>(_a);
+		const simd256_u64_langext_t b      = bitCast<simd256_u64_langext_t>(_b);
+		const simd256_u64_langext_t sum    = a + b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(sum);
 		return result;
 #else
@@ -1332,9 +1332,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i64_sub(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i64_langext_t a      = bitCast<simd256_i64_langext_t>(_a);
-		const simd256_i64_langext_t b      = bitCast<simd256_i64_langext_t>(_b);
-		const simd256_i64_langext_t diff   = a - b;
+		const simd256_u64_langext_t a      = bitCast<simd256_u64_langext_t>(_a);
+		const simd256_u64_langext_t b      = bitCast<simd256_u64_langext_t>(_b);
+		const simd256_u64_langext_t diff   = a - b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(diff);
 		return result;
 #else
@@ -1383,9 +1383,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i16_add(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i16_langext_t a      = bitCast<simd256_i16_langext_t>(_a);
-		const simd256_i16_langext_t b      = bitCast<simd256_i16_langext_t>(_b);
-		const simd256_i16_langext_t sum    = a + b;
+		const simd256_u16_langext_t a      = bitCast<simd256_u16_langext_t>(_a);
+		const simd256_u16_langext_t b      = bitCast<simd256_u16_langext_t>(_b);
+		const simd256_u16_langext_t sum    = a + b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(sum);
 		return result;
 #else
@@ -1400,9 +1400,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i16_sub(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i16_langext_t a      = bitCast<simd256_i16_langext_t>(_a);
-		const simd256_i16_langext_t b      = bitCast<simd256_i16_langext_t>(_b);
-		const simd256_i16_langext_t diff   = a - b;
+		const simd256_u16_langext_t a      = bitCast<simd256_u16_langext_t>(_a);
+		const simd256_u16_langext_t b      = bitCast<simd256_u16_langext_t>(_b);
+		const simd256_u16_langext_t diff   = a - b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(diff);
 		return result;
 #else
@@ -1417,9 +1417,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i16_mullo(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i16_langext_t a      = bitCast<simd256_i16_langext_t>(_a);
-		const simd256_i16_langext_t b      = bitCast<simd256_i16_langext_t>(_b);
-		const simd256_i16_langext_t prod   = a * b;
+		const simd256_u16_langext_t a      = bitCast<simd256_u16_langext_t>(_a);
+		const simd256_u16_langext_t b      = bitCast<simd256_u16_langext_t>(_b);
+		const simd256_u16_langext_t prod   = a * b;
 		const simd256_ref_t         result = bitCast<simd256_ref_t>(prod);
 		return result;
 #else
@@ -1483,9 +1483,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i8_add(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i8_langext_t a      = bitCast<simd256_i8_langext_t>(_a);
-		const simd256_i8_langext_t b      = bitCast<simd256_i8_langext_t>(_b);
-		const simd256_i8_langext_t sum    = a + b;
+		const simd256_u8_langext_t a      = bitCast<simd256_u8_langext_t>(_a);
+		const simd256_u8_langext_t b      = bitCast<simd256_u8_langext_t>(_b);
+		const simd256_u8_langext_t sum    = a + b;
 		const simd256_ref_t        result = bitCast<simd256_ref_t>(sum);
 		return result;
 #else
@@ -1500,9 +1500,9 @@ namespace bx
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i8_sub(simd256_ref_t _a, simd256_ref_t _b)
 	{
 #if BX_SIMD256_LANGEXT
-		const simd256_i8_langext_t a      = bitCast<simd256_i8_langext_t>(_a);
-		const simd256_i8_langext_t b      = bitCast<simd256_i8_langext_t>(_b);
-		const simd256_i8_langext_t diff   = a - b;
+		const simd256_u8_langext_t a      = bitCast<simd256_u8_langext_t>(_a);
+		const simd256_u8_langext_t b      = bitCast<simd256_u8_langext_t>(_b);
+		const simd256_u8_langext_t diff   = a - b;
 		const simd256_ref_t        result = bitCast<simd256_ref_t>(diff);
 		return result;
 #else

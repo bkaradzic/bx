@@ -949,12 +949,18 @@ namespace bx
 				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
 				const int32_t curPrec = int32_t(fracEnd - fracBegin);
 
-				const int32_t outPrec = 'g' == _param.fmt ? min(prec, curPrec) : prec;
+				const int32_t exponentLen = int32_t(strEnd - fracEnd);
+				const int32_t maxPrec     = int32_t(sizeof(str) ) - 1
+					- int32_t(fracBegin - str)
+					- exponentLen
+					;
+
+				const int32_t reqPrec = 'g' == _param.fmt ? min(prec, curPrec) : prec;
+				const int32_t outPrec = min(reqPrec, maxPrec);
 
 				// Move exponent to its final location after trimming or adding extra 0s.
 				if (fracEnd != strEnd)
 				{
-					const int32_t exponentLen = int32_t(strEnd - fracEnd);
 					char* finalExponentPtr = &fracBegin[outPrec];
 					memMove(finalExponentPtr, fracEnd, exponentLen);
 

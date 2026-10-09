@@ -109,48 +109,127 @@ namespace bx
 		return tmp == kDoubleExponentMask;
 	}
 
-	inline BX_CONSTEXPR_FUNC float truncRef(float _a)
+	/// True for an argument whose magnitude has no fractional part left.
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC bool isIntegralMagnitude(Ty _a)
 	{
-		const uint32_t bits      = floatToBits(_a);
-		const uint32_t sign      = bits &  kFloatSignMask;
-		const uint32_t magnitude = bits & ~kFloatSignMask;
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
 
-		if (0x4b000000u <= magnitude)
+		constexpr Bits kIntegralExp = Bits(Traits::kExponentBias + Traits::kMantissaNumBits);
+		constexpr Bits kIntegral    = kIntegralExp << Traits::kExponentBitShift;
+
+		const Bits bits      = Traits::toBits(_a);
+		const Bits magnitude = bits & ~Traits::kSignMask;
+
+		return kIntegral <= magnitude;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty truncT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+		using Int    = typename Traits::Int;
+
+		if (isIntegralMagnitude(_a) )
 		{
 			return _a;
 		}
 
-		const float    tr     = float(int(_a) );
-		const uint32_t trBits = floatToBits(tr) | sign;
-		const float    result = bitsToFloat(trBits);
+		const Bits sign     = Traits::toBits(_a) & Traits::kSignMask;
+		const Int  integral = Int(_a);
+		const Ty   tr       = Ty(integral);
+		const Bits trBits   = Traits::toBits(tr) | sign;
+		const Ty   result   = Traits::fromBits(trBits);
+
 		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty floorT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+		using Int    = typename Traits::Int;
+
+		if (isIntegralMagnitude(_a) )
+		{
+			return _a;
+		}
+
+		const Bits sign     = Traits::toBits(_a) & Traits::kSignMask;
+		const Int  integral = Int(_a);
+		const Ty   tr       = Ty(integral);
+		const Ty   fl       = tr > _a ? tr - Ty(1.0) : tr;
+		const Bits flBits   = Traits::toBits(fl) | sign;
+		const Ty   result   = Traits::fromBits(flBits);
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty ceilT(Ty _a)
+	{
+		const Ty na     = -_a;
+		const Ty fl     = floorT<Ty>(na);
+		const Ty result = -fl;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty roundT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (isIntegralMagnitude(_a) )
+		{
+			return _a;
+		}
+
+		constexpr Ty kMagic = Ty(Bits(1) << Traits::kMantissaNumBits);
+
+		const Bits bits   = Traits::toBits(_a);
+		const Bits sign   = bits & Traits::kSignMask;
+		const Ty   absA   = Traits::fromBits(bits & ~Traits::kSignMask);
+		const Ty   raised = absA + kMagic;
+		const Ty   rd     = raised - kMagic;
+		const Bits rdBits = Traits::toBits(rd) | sign;
+		const Ty   result = Traits::fromBits(rdBits);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float truncRef(float _a)
+	{
+		return truncT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double truncRef(double _a)
+	{
+		return truncT<double>(_a);
 	}
 
 	inline BX_CONSTEXPR_FUNC float floorRef(float _a)
 	{
-		const uint32_t bits      = floatToBits(_a);
-		const uint32_t sign      = bits &  kFloatSignMask;
-		const uint32_t magnitude = bits & ~kFloatSignMask;
+		return floorT<float>(_a);
+	}
 
-		if (0x4b000000u <= magnitude)
-		{
-			return _a;
-		}
-
-		const float    tr     = float(int(_a) );
-		const float    fl     = tr > _a ? tr - 1.0f : tr;
-		const uint32_t flBits = floatToBits(fl) | sign;
-		const float    result = bitsToFloat(flBits);
-
-		return result;
+	inline BX_CONSTEXPR_FUNC double floorRef(double _a)
+	{
+		return floorT<double>(_a);
 	}
 
 	inline BX_CONSTEXPR_FUNC float ceilRef(float _a)
 	{
-		const float na     = -_a;
-		const float fl     = floorRef(na);
-		const float result = -fl;
-		return result;
+		return ceilT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double ceilRef(double _a)
+	{
+		return ceilT<double>(_a);
 	}
 
 #if BX_SIMD_SUPPORTED
@@ -176,6 +255,17 @@ namespace bx
 		return out;
 	}
 
+	inline BX_CONST_FUNC double floorSimd(double _a)
+	{
+		const simd128_t aa     = simd_splat<simd128_t>(_a);
+		const simd128_t result = simd_f64_floor<simd128_t>(aa);
+
+		alignas(16) double out[2] = { 0.0, 0.0 };
+		simd_st<simd128_t>(out, result);
+
+		return out[0];
+	}
+
 	inline BX_CONST_FUNC float ceilSimd(float _a)
 	{
 		const simd128_t aa     = simd_splat<simd128_t>(_a);
@@ -186,55 +276,27 @@ namespace bx
 
 		return out;
 	}
-#endif // BX_SIMD_SUPPORTED
 
-	inline BX_CONSTEXPR_FUNC float floor(float _a)
+	inline BX_CONST_FUNC double ceilSimd(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
-		{
-			return floorRef(_a);
-		}
+		const simd128_t aa     = simd_splat<simd128_t>(_a);
+		const simd128_t result = simd_f64_ceil<simd128_t>(aa);
 
-		return floorSimd(_a);
-#else
-		return floorRef(_a);
-#endif // BX_SIMD_SUPPORTED
+		alignas(16) double out[2] = { 0.0, 0.0 };
+		simd_st<simd128_t>(out, result);
+
+		return out[0];
 	}
-
-	inline BX_CONSTEXPR_FUNC float ceil(float _a)
-	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
-		{
-			return ceilRef(_a);
-		}
-
-		return ceilSimd(_a);
-#else
-		return ceilRef(_a);
 #endif // BX_SIMD_SUPPORTED
-	}
 
 	inline BX_CONSTEXPR_FUNC float roundRef(float _a)
 	{
-		const uint32_t bits      = floatToBits(_a);
-		const uint32_t sign      = bits &  kFloatSignMask;
-		const uint32_t magnitude = bits & ~kFloatSignMask;
+		return roundT<float>(_a);
+	}
 
-		if (0x4b000000u <= magnitude)
-		{
-			return _a;
-		}
-
-		const float    fl     = floorRef(_a);
-		const float    fr     = _a - fl;
-		const bool     odd    = 0 != (int32_t(fl) & 1);
-		const bool     up     = fr > 0.5f || (fr == 0.5f && odd);
-		const float    rd     = up ? fl + 1.0f : fl;
-		const uint32_t rdBits = floatToBits(rd) | sign;
-		const float    result = bitsToFloat(rdBits);
-		return result;
+	inline BX_CONSTEXPR_FUNC double roundRef(double _a)
+	{
+		return roundT<double>(_a);
 	}
 
 #if BX_SIMD_SUPPORTED
@@ -248,21 +310,18 @@ namespace bx
 
 		return out;
 	}
-#endif // BX_SIMD_SUPPORTED
 
-	inline BX_CONSTEXPR_FUNC float round(float _a)
+	inline BX_CONST_FUNC double roundSimd(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
-		{
-			return roundRef(_a);
-		}
+		const simd128_t aa     = simd_splat<simd128_t>(_a);
+		const simd128_t result = simd_f64_round<simd128_t>(aa);
 
-		return roundSimd(_a);
-#else
-		return roundRef(_a);
-#endif // BX_SIMD_SUPPORTED
+		alignas(16) double out[2] = { 0.0, 0.0 };
+		simd_st<simd128_t>(out, result);
+
+		return out[0];
 	}
+#endif // BX_SIMD_SUPPORTED
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
 	{
@@ -278,63 +337,53 @@ namespace bx
 		return (_value - _a) / (_b - _a);
 	}
 
-	inline BX_CONSTEXPR_FUNC float sign(float _a)
-	{
-		return float( (0.0f < _a) - (0.0f > _a) );
-	}
-
 	inline BX_CONSTEXPR_FUNC bool signBit(float _a)
 	{
 		const uint32_t bits = floatToBits(_a);
 		return 0 != (bits & kFloatSignMask);
 	}
 
-	inline BX_CONSTEXPR_FUNC float copySign(float _value, float _sign)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty fractT(Ty _a)
 	{
-#if BX_COMPILER_MSVC
-		const uint32_t magnitude = floatToBits(_value) & ~kFloatSignMask;
-		const uint32_t sign      = floatToBits(_sign)  &  kFloatSignMask;
-		const uint32_t bits      = magnitude | sign;
-		const float    result    = bitsToFloat(bits);
+		const Ty tr     = trunc(_a);
+		const Ty result = _a - tr;
+
 		return result;
-#else
-		return __builtin_copysign(_value, _sign);
-#endif // BX_COMPILER_MSVC
 	}
 
-	inline BX_CONSTEXPR_FUNC float abs(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty fmodT(Ty _a, Ty _b)
 	{
-		return _a < 0.0f ? -_a : _a;
+		const Ty quotient = _a / _b;
+		const Ty whole    = trunc(quotient);
+		const Ty result   = nms(_b, whole, _a);
+
+		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float square(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty modT(Ty _a, Ty _b)
 	{
-		return _a * _a;
+		const Ty quotient = _a / _b;
+		const Ty whole    = floor(quotient);
+		const Ty result   = nms(_b, whole, _a);
+
+		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float trunc(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty exp2T(Ty _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
-		{
-			return truncRef(_a);
-		}
-
-		return truncSimd(_a);
-#else
-		return truncRef(_a);
-#endif // BX_SIMD_SUPPORTED
+		return pow(Ty(2.0), _a);
 	}
 
-	inline BX_CONSTEXPR_FUNC float fract(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty tanT(Ty _a)
 	{
-		return _a - trunc(_a);
-	}
-
-	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
-	{
-		const float na     = -_a;
-		const float result = mad(na, _b, _c);
+		const Ty sn     = sin(_a);
+		const Ty cs     = cos(_a);
+		const Ty result = sn / cs;
 
 		return result;
 	}
@@ -399,16 +448,6 @@ namespace bx
 		return _a * _b;
 	}
 
-	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
-	{
-		const simd32_t aa     = simd32_ld(_a);
-		const simd32_t bb     = simd32_ld(_b);
-		const simd32_t cc     = simd32_ld(_c);
-		const simd32_t result = simd32_f32_madd(aa, bb, cc);
-
-		return bitCast<float>(result);
-	}
-
 	inline BX_CONSTEXPR_FUNC float rcp(float _a)
 	{
 		return 1.0f / _a;
@@ -431,87 +470,6 @@ namespace bx
 
 BX_FP_PRECISE_BEGIN()
 
-	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
-	{
-		const float quotient = _a / _b;
-		const float whole    = floor(quotient);
-		const float result   = nms(_b, whole, _a);
-		return result;
-	}
-
-	inline BX_CONSTEXPR_FUNC float cos(float _a)
-	{
-		const float scaled = _a * (2.0f*kInvPi);
-		const float real   = floor(scaled);
-		const float xx     = _a - real * kPiHalf;
-		const int32_t bits = isFinite(real)
-			? int32_t(mod(real, 4.0f) ) & 3
-			: 0
-			;
-
-		constexpr float kSinC2  = -0.16666667163372039794921875f;
-		constexpr float kSinC4  =  8.333347737789154052734375e-3f;
-		constexpr float kSinC6  = -1.9842604524455964565277099609375e-4f;
-		constexpr float kSinC8  =  2.760012648650445044040679931640625e-6f;
-		constexpr float kSinC10 = -2.50293279435709337121807038784027099609375e-8f;
-
-		constexpr float kCosC2  = -0.5f;
-		constexpr float kCosC4  =  4.166664183139801025390625e-2f;
-		constexpr float kCosC6  = -1.388833043165504932403564453125e-3f;
-		constexpr float kCosC8  =  2.47562347794882953166961669921875e-5f;
-		constexpr float kCosC10 = -2.59630184018533327616751194000244140625e-7f;
-
-		float c0  = xx;
-		float c2  = kSinC2;
-		float c4  = kSinC4;
-		float c6  = kSinC6;
-		float c8  = kSinC8;
-		float c10 = kSinC10;
-
-		if (bits == 0
-		||  bits == 2)
-		{
-			c0  = 1.0f;
-			c2  = kCosC2;
-			c4  = kCosC4;
-			c6  = kCosC6;
-			c8  = kCosC8;
-			c10 = kCosC10;
-		}
-
-		const float xsq    = square(xx);
-		const float tmp0   = mad(c10,  xsq, c8 );
-		const float tmp1   = mad(tmp0, xsq, c6 );
-		const float tmp2   = mad(tmp1, xsq, c4 );
-		const float tmp3   = mad(tmp2, xsq, c2 );
-		const float tmp4   = mad(tmp3, xsq, 1.0);
-		const float result = tmp4 * c0;
-
-		return bits == 1 || bits == 2
-			? -result
-			:  result
-			;
-	}
-
-	inline BX_CONSTEXPR_FUNC float acos(float _a)
-	{
-		constexpr float kAcosC0 =  1.5707288f;
-		constexpr float kAcosC1 = -0.2121144f;
-		constexpr float kAcosC2 =  0.0742610f;
-		constexpr float kAcosC3 = -0.0187293f;
-
-		const float absa   = abs(_a);
-		const float tmp0   = mad(kAcosC3, absa, kAcosC2);
-		const float tmp1   = mad(tmp0,    absa, kAcosC1);
-		const float tmp2   = mad(tmp1,    absa, kAcosC0);
-		const float tmp3   = tmp2 * sqrt(1.0f - absa);
-		const float negate = float(_a < 0.0f);
-		const float tmp4   = tmp3 - 2.0f*negate*tmp3;
-		const float result = negate*kPi + tmp4;
-
-		return result;
-	}
-
 	inline void sinCosApprox(float& _outSinApprox, float& _outCos, float _a)
 	{
 		const float aa     = _a - floor(_a*kInvPi2)*kPi2;
@@ -527,243 +485,1956 @@ BX_FP_PRECISE_BEGIN()
 		_outCos = cosA;
 	}
 
-	inline BX_CONSTEXPR_FUNC float sin(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty expHalfT(Ty _a)
 	{
-		return cos(_a - kPiHalf);
-	}
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
 
-	inline BX_CONSTEXPR_FUNC float sinh(float _a)
-	{
-		return 0.5f*(exp(_a) - exp(-_a) );
-	}
+		constexpr Bits kBits  = Bits(Traits::kExponentBias + Traits::kExpHalfShift/2) << Traits::kExponentBitShift;
+		constexpr Ty   kScale = Traits::fromBits(kBits);
 
-	inline BX_CONSTEXPR_FUNC float asin(float _a)
-	{
-		return kPiHalf - acos(_a);
-	}
-
-	inline BX_CONSTEXPR_FUNC float cosh(float _a)
-	{
-		return 0.5f*(exp(_a) + exp(-_a) );
-	}
-
-	inline BX_CONSTEXPR_FUNC float tan(float _a)
-	{
-		return sin(_a) / cos(_a);
-	}
-
-	inline BX_CONSTEXPR_FUNC float tanh(float _a)
-	{
-		const float tmp0   = exp(2.0f*_a);
-		const float tmp1   = tmp0 - 1.0f;
-		const float tmp2   = tmp0 + 1.0f;
-		const float result = tmp1 / tmp2;
+		const Ty reduced = _a - Traits::kExpHalfLn2;
+		const Ty ee      = exp(reduced);
+		const Ty once    = ee * kScale;
+		const Ty result  = once * kScale;
 
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float atan(float _a)
+	inline BX_CONSTEXPR_FUNC float expHalf(float _a)
 	{
-		return atan2(_a, 1.0f);
+		return expHalfT<float>(_a);
 	}
 
-	inline BX_CONSTEXPR_FUNC float atan2(float _y, float _x)
+	inline BX_CONSTEXPR_FUNC double expHalf(double _a)
 	{
-		const float ax     = abs(_x);
-		const float ay     = abs(_y);
-		const float maxaxy = max(ax, ay);
-		const float minaxy = min(ax, ay);
-
-		const uint32_t ysign = floatToBits(_y) & kFloatSignMask;
-
-		if (maxaxy == 0.0f)
-		{
-			return bitsToFloat(ysign);
-		}
-
-		constexpr float kAtan2C0 = -0.013480470f;
-		constexpr float kAtan2C1 =  0.057477314f;
-		constexpr float kAtan2C2 = -0.121239071f;
-		constexpr float kAtan2C3 =  0.195635925f;
-		constexpr float kAtan2C4 = -0.332994597f;
-		constexpr float kAtan2C5 =  0.999995630f;
-
-		const float mxy   = minaxy / maxaxy;
-		const float mxysq = square(mxy);
-		const float tmp0  = mad(kAtan2C0, mxysq, kAtan2C1);
-		const float tmp1  = mad(tmp0,     mxysq, kAtan2C2);
-		const float tmp2  = mad(tmp1,     mxysq, kAtan2C3);
-		const float tmp3  = mad(tmp2,     mxysq, kAtan2C4);
-		const float tmp4  = mad(tmp3,     mxysq, kAtan2C5);
-		const float tmp5  = tmp4 * mxy;
-		const float tmp6  = ay > ax   ? kPiHalf - tmp5 : tmp5;
-		const float tmp7  = _x < 0.0f ? kPi     - tmp6 : tmp6;
-
-		const uint32_t bits = floatToBits(tmp7) | ysign;
-		const float  result = bitsToFloat(bits);
-
-		return result;
+		return expHalfT<double>(_a);
 	}
 
-	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty sinhT(Ty _a)
 	{
-		const simd32_t ftob        = simd32_splat(floatToBits(_a));
-		const simd32_t signexpmask = simd32_splat(kFloatSignMask | kFloatExponentMask);
-		const simd32_t mantmask    = simd32_splat(kFloatMantissaMask);
-		const simd32_t b           = simd32_splat(_b);
-		const simd32_t masked      = simd32_and(ftob, signexpmask);
-		const simd32_t expsign0    = simd32_x32_sra(masked, kFloatExponentBitShift);
-		const simd32_t tmp         = simd32_i32_add(expsign0, b);
-		const simd32_t expsign1    = simd32_x32_sll(tmp, kFloatExponentBitShift);
-		const simd32_t mantissa    = simd32_and(ftob, mantmask);
-		const simd32_t bits        = simd32_or(mantissa, expsign1);
+		using Traits = FloatT<Ty>;
 
-		return bitsToFloat(bits.u32);
+		constexpr Ty kSinhC3 = Ty(1.0)/Ty(6.0);
+		constexpr Ty kSinhC5 = Ty(1.0)/Ty(120.0);
+		constexpr Ty kSinhC7 = Ty(1.0)/Ty(5040.0);
+
+		const Ty absA = abs(_a);
+
+		Ty magnitude = Ty(0.0);
+
+		if (absA < Traits::kHypSmall)
+		{
+			const Ty zz   = square(absA);
+			const Ty inn0 = mad(zz, kSinhC7, kSinhC5);
+			const Ty inn1 = mad(zz, inn0,    kSinhC3);
+			const Ty poly = mad(zz, inn1,    Ty(1.0) );
+
+			magnitude = absA * poly;
+		}
+		else if (absA < Traits::kHypBig)
+		{
+			const Ty ep   = exp(absA);
+			const Ty en   = exp(-absA);
+			const Ty diff = ep - en;
+
+			magnitude = Ty(0.5) * diff;
+		}
+		else if (absA < Traits::kHypNoFit)
+		{
+			const Ty ep = exp(absA);
+
+			magnitude = Ty(0.5) * ep;
+		}
+		else
+		{
+			magnitude = expHalfT<Ty>(absA);
+		}
+
+		return signBit(_a) ? -magnitude : magnitude;
 	}
 
-	inline BX_CONSTEXPR_FUNC float log(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty coshT(Ty _a)
 	{
-		if (_a < 0.0f)
+		using Traits = FloatT<Ty>;
+
+		const Ty absA = abs(_a);
+
+		if (absA < Traits::kHypBig)
 		{
-			return bitsToFloat(kFloatSignMask | kFloatExponentMask | kFloatMantissaMask);
+			const Ty ep  = exp(absA);
+			const Ty en  = exp(-absA);
+			const Ty sum = ep + en;
+
+			return Ty(0.5) * sum;
 		}
 
-		if (_a == 0.0f)
+		if (absA < Traits::kHypNoFit)
 		{
-			return -kFloatInfinity;
+			const Ty ep = exp(absA);
+
+			return Ty(0.5) * ep;
 		}
 
-		const simd32_t ftob         = simd32_splat(floatToBits(_a));
-		const simd32_t expmask      = simd32_splat(kFloatExponentMask);
-		const simd32_t signmantmask = simd32_splat(kFloatSignMask | kFloatMantissaMask);
-		const simd32_t half         = simd32_splat(UINT32_C(0x3f000000));
-
-		const simd32_t masked0  = simd32_and(ftob, expmask);
-		const simd32_t exp0     = simd32_x32_srl(masked0, kFloatExponentBitShift);
-
-		int32_t exp = int32_t(exp0.u32) - 0x7e;
-
-		const simd32_t masked1  = simd32_and(ftob, signmantmask);
-		const simd32_t bits     = simd32_or(masked1, half);
-		float ff = bitsToFloat(bits.u32);
-
-		if (ff < kSqrt2*0.5f)
-		{
-			ff *= 2.0f;
-			--exp;
-		}
-
-		constexpr float kLogC0     = 6.666666666666735130e-01f;
-		constexpr float kLogC1     = 3.999999999940941908e-01f;
-		constexpr float kLogC2     = 2.857142874366239149e-01f;
-		constexpr float kLogC3     = 2.222219843214978396e-01f;
-		constexpr float kLogC4     = 1.818357216161805012e-01f;
-		constexpr float kLogC5     = 1.531383769920937332e-01f;
-		constexpr float kLogC6     = 1.479819860511658591e-01f;
-		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
-
-		ff -= 1.0f;
-		const float kk     = float(exp);
-		const float hi     = kk*kLogNat2;
-		const float lo     = kk*kLogNat2Lo;
-		const float ss     = ff / (2.0f + ff);
-		const float s2     = square(ss);
-		const float s4     = square(s2);
-
-		const float tmp0   = mad(kLogC6, s4, kLogC4);
-		const float tmp1   = mad(tmp0,   s4, kLogC2);
-		const float tmp2   = mad(tmp1,   s4, kLogC0);
-		const float t1     = s2*tmp2;
-
-		const float tmp3   = mad(kLogC5, s4, kLogC3);
-		const float tmp4   = mad(tmp3,   s4, kLogC1);
-		const float t2     = s4*tmp4;
-
-		const float t12    = t1 + t2;
-		const float hfsq   = 0.5f*square(ff);
-		const float result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
-
-		return result;
+		return expHalfT<Ty>(absA);
 	}
 
-	inline BX_CONSTEXPR_FUNC float exp(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty tanhT(Ty _a)
 	{
-		if (abs(_a) <= kNearZero)
-		{
-			return _a + 1.0f;
-		}
-
-		constexpr float expMin = log(kFloatSmallest);
-
-		if (_a <= expMin)
-		{
-			return 0.0f;
-		}
-
-		if (isInfinite(_a) && _a < 0.0f)
-		{
-			return 0.0f;
-		}
-
-		constexpr float expMax = log(kFloatLargest);
-
-		if (_a >= expMax)
-		{
-			return kFloatInfinity;
-		}
+		using Traits = FloatT<Ty>;
 
 		if (isNan(_a) )
 		{
 			return _a;
 		}
 
-		constexpr float kExpC0  =  1.66666666666666019037e-01f;
-		constexpr float kExpC1  = -2.77777777770155933842e-03f;
-		constexpr float kExpC2  =  6.61375632143793436117e-05f;
-		constexpr float kExpC3  = -1.65339022054652515390e-06f;
-		constexpr float kExpC4  =  4.13813679705723846039e-08f;
-		constexpr float kLogNat2Lo = 1.90821492927058770002e-10f;
+		const Ty absA = abs(_a);
 
-		const float kk     = round(_a*kInvLogNat2);
-		const float hi     = _a - kk*kLogNat2;
-		const float lo     =      kk*kLogNat2Lo;
-		const float hml    = hi - lo;
-		const float hmlsq  = square(hml);
-		const float tmp0   = mad(kExpC4, hmlsq, kExpC3);
-		const float tmp1   = mad(tmp0,   hmlsq, kExpC2);
-		const float tmp2   = mad(tmp1,   hmlsq, kExpC1);
-		const float tmp3   = mad(tmp2,   hmlsq, kExpC0);
-		const float tmp4   = hml - hmlsq * tmp3;
-		const float tmp5   = hml*tmp4/(2.0f-tmp4);
-		const float tmp6   = 1.0f - ( (lo - tmp5) - hi);
-		const float result = ldexp(tmp6, int32_t(kk) );
+		Ty magnitude = Ty(1.0);
+
+		if (absA < Traits::kHypSmall)
+		{
+			const Ty zz = square(absA);
+
+			Ty acc = Traits::kTanhPoly[0];
+
+			for (uint32_t ii = 1, num = uint32_t(BX_COUNTOF(Traits::kTanhPoly) ); ii < num; ++ii)
+			{
+				acc = mad(zz, acc, Traits::kTanhPoly[ii]);
+			}
+
+			const Ty poly = mad(zz, acc, Ty(1.0) );
+
+			magnitude = absA * poly;
+		}
+		else if (absA < Traits::kTanhLarge)
+		{
+			const Ty ee  = exp(Ty(2.0)*absA);
+			const Ty num = ee - Ty(1.0);
+			const Ty den = ee + Ty(1.0);
+
+			magnitude = num / den;
+		}
+
+		return signBit(_a) ? -magnitude : magnitude;
+	}
+
+	inline BX_CONSTEXPR_FUNC float sinh(float _a)
+	{
+		return sinhT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double sinh(double _a)
+	{
+		return sinhT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float cosh(float _a)
+	{
+		return coshT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double cosh(double _a)
+	{
+		return coshT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float tanh(float _a)
+	{
+		return tanhT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double tanh(double _a)
+	{
+		return tanhT<double>(_a);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty ldexpT(Ty _a, int32_t _b)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr int32_t kMinStep = 1 - Traits::kExponentBias;
+		constexpr int32_t kMaxStep =     Traits::kExponentBias;
+		constexpr int32_t kLimit   = 2*Traits::kExponentBias + Traits::kMantissaNumBits + 2;
+
+		const int32_t total = clamp(_b, -kLimit, kLimit);
+
+		if (Ty(0.0) == _a
+		||  isNan(_a)
+		||  isInfinite(_a) )
+		{
+			return _a;
+		}
+
+		int32_t expA = 0;
+		frexp(_a, &expA);
+
+		if (expA + total > Traits::kExponentBias + 1)
+		{
+			return signBit(_a) ? -Traits::kInfinity : Traits::kInfinity;
+		}
+
+		const int32_t step0 = clamp(total, kMinStep, kMaxStep);
+		const int32_t rest0 = total - step0;
+		const int32_t step1 = clamp(rest0, kMinStep, kMaxStep);
+		const int32_t rest1 = rest0 - step1;
+		const int32_t step2 = clamp(rest1, kMinStep, kMaxStep);
+
+		const Bits exp0 = Bits(step0 + Traits::kExponentBias);
+		const Bits exp1 = Bits(step1 + Traits::kExponentBias);
+		const Bits exp2 = Bits(step2 + Traits::kExponentBias);
+
+		const Bits bits0 = exp0 << Traits::kExponentBitShift;
+		const Bits bits1 = exp1 << Traits::kExponentBitShift;
+		const Bits bits2 = exp2 << Traits::kExponentBitShift;
+
+		const Ty scale0 = Traits::fromBits(bits0);
+		const Ty scale1 = Traits::fromBits(bits1);
+		const Ty scale2 = Traits::fromBits(bits2);
+
+		const Ty tmp0   = _a   * scale0;
+		const Ty tmp1   = tmp0 * scale1;
+		const Ty result = tmp1 * scale2;
 
 		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float pow(float _a, float _b)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty logT(Ty _a)
 	{
-		if (abs(_b) < kFloatSmallest)
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (isNan(_a) )
 		{
-			return 1.0f;
+			return _a;
 		}
 
-		if (abs(_a) < kFloatSmallest)
+		if (_a < Ty(0.0) )
 		{
-			return 0.0f;
+			constexpr Bits kNanBits = Traits::kSignMask | Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
 		}
 
-		return copySign(exp(_b * log(abs(_a) ) ), _a);
+		if (Ty(0.0) == _a)
+		{
+			return -Traits::kInfinity;
+		}
+
+		if (isInfinite(_a) )
+		{
+			return _a;
+		}
+
+		constexpr Ty kSqrt2Half = Ty(7.07106781186547524401e-01);
+		constexpr Ty kLogC0     = Ty(6.666666666666735130e-01);
+		constexpr Ty kLogC1     = Ty(3.999999999940941908e-01);
+		constexpr Ty kLogC2     = Ty(2.857142874366239149e-01);
+		constexpr Ty kLogC3     = Ty(2.222219843214978396e-01);
+		constexpr Ty kLogC4     = Ty(1.818357216161805012e-01);
+		constexpr Ty kLogC5     = Ty(1.531383769920937332e-01);
+		constexpr Ty kLogC6     = Ty(1.479819860511658591e-01);
+
+		int32_t exp = 0;
+		Ty      ff  = frexp(_a, &exp);
+
+		if (ff < kSqrt2Half)
+		{
+			ff += ff;
+			--exp;
+		}
+
+		ff -= Ty(1.0);
+
+		const Ty kk   = Ty(exp);
+		const Ty hi   = kk * Traits::kLn2Hi;
+		const Ty lo   = kk * Traits::kLn2Lo;
+		const Ty ss   = ff / (Ty(2.0) + ff);
+		const Ty s2   = square(ss);
+		const Ty s4   = square(s2);
+
+		const Ty tmp0 = mad(kLogC6, s4, kLogC4);
+		const Ty tmp1 = mad(tmp0,   s4, kLogC2);
+		const Ty tmp2 = mad(tmp1,   s4, kLogC0);
+		const Ty t1   = s2*tmp2;
+
+		const Ty tmp3 = mad(kLogC5, s4, kLogC3);
+		const Ty tmp4 = mad(tmp3,   s4, kLogC1);
+		const Ty t2   = s4*tmp4;
+
+		const Ty t12    = t1 + t2;
+		const Ty fsq    = square(ff);
+		const Ty hfsq   = Ty(0.5)*fsq;
+		const Ty result = hi - ( (hfsq - (ss*(hfsq+t12) + lo) ) - ff);
+
+		return result;
 	}
 
-	inline BX_CONSTEXPR_FUNC float exp2(float _a)
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty log2T(Ty _a)
 	{
-		return pow(2.0f, _a);
+		using Traits = FloatT<Ty>;
+
+		const Ty ln     = log(_a);
+		const Ty result = ln * Traits::kInvLn2;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty log10T(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+
+		const Ty ln     = log(_a);
+		const Ty result = ln * Traits::kInvLn10;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty log1pT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (Ty(0.0) == _a)
+		{
+			return _a;
+		}
+
+		if (Ty(-1.0) > _a)
+		{
+			constexpr Bits kNanBits = Traits::kSignMask | Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (Ty(-1.0) == _a)
+		{
+			return -Traits::kInfinity;
+		}
+
+		const Ty yy     = Ty(1.0) + _a;
+		const Ty zz     = yy - Ty(1.0);
+		const Ty ln     = log(yy);
+		const Ty err    = (zz - _a) / yy;
+		const Ty result = ln - err;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty expT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		if (_a > Traits::kExpOverflow)
+		{
+			return Traits::kInfinity;
+		}
+
+		if (_a < Traits::kExpUnderflow)
+		{
+			return Ty(0.0);
+		}
+
+		const Ty absA = abs(_a);
+
+		if (absA <= Ty(kNearZero) )
+		{
+			return _a + Ty(1.0);
+		}
+
+		constexpr Ty kExpC0 = Ty( 1.66666666666666019037e-01);
+		constexpr Ty kExpC1 = Ty(-2.77777777770155933842e-03);
+		constexpr Ty kExpC2 = Ty( 6.61375632143793436117e-05);
+		constexpr Ty kExpC3 = Ty(-1.65339022054652515390e-06);
+		constexpr Ty kExpC4 = Ty( 4.13813679705723846039e-08);
+
+		const Ty scaled = _a * Traits::kInvLn2;
+		const Ty kk     = round(scaled);
+		const Ty hi     = _a - kk*Traits::kLn2Hi;
+		const Ty lo     =      kk*Traits::kLn2Lo;
+		const Ty hml    = hi - lo;
+		const Ty hmlsq  = square(hml);
+		const Ty tmp0   = mad(kExpC4, hmlsq, kExpC3);
+		const Ty tmp1   = mad(tmp0,   hmlsq, kExpC2);
+		const Ty tmp2   = mad(tmp1,   hmlsq, kExpC1);
+		const Ty tmp3   = mad(tmp2,   hmlsq, kExpC0);
+		const Ty tmp4   = hml - hmlsq * tmp3;
+		const Ty tmp5   = hml*tmp4/(Ty(2.0) - tmp4);
+		const Ty tmp6   = Ty(1.0) - ( (lo - tmp5) - hi);
+		const Ty result = ldexpT<Ty>(tmp6, int32_t(kk) );
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty powT(Ty _a, Ty _b)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+		if (Ty(0.0) == _b)
+		{
+			return Ty(1.0);
+		}
+
+		if (isNan(_a)
+		||  isNan(_b) )
+		{
+			return Traits::fromBits(kNanBits);
+		}
+
+		const Ty   magnitude = abs(_a);
+		const Ty   halfB     = Ty(0.5) * _b;
+		const Ty   truncB    = trunc(_b);
+		const Ty   truncHalf = trunc(halfB);
+		const bool integral  = _b == truncB;
+		const bool odd       = halfB != truncHalf;
+
+		if (_a < Ty(0.0)
+		&& !integral)
+		{
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (Ty(0.0) == magnitude)
+		{
+			return _b < Ty(0.0) ? Traits::kInfinity : Ty(0.0);
+		}
+
+		constexpr Ty kMaxIntegral = Ty(2147483648.0);
+
+		const Ty absB = abs(_b);
+
+		Ty mag = Ty(0.0);
+
+		if (integral
+		&&  absB < kMaxIntegral)
+		{
+			Ty      acc   = Ty(1.0);
+			Ty      base  = magnitude;
+			int32_t count = int32_t(absB);
+
+			while (count > 0)
+			{
+				if (0 != (count & 1) )
+				{
+					acc = acc * base;
+				}
+
+				base    = base * base;
+				count >>= 1;
+			}
+
+			mag = _b < Ty(0.0) ? Ty(1.0) / acc : acc;
+		}
+		else
+		{
+			const Ty ln     = log(magnitude);
+			const Ty scaled = _b * ln;
+
+			mag = exp(scaled);
+		}
+
+		if (_a >= Ty(0.0) )
+		{
+			return mag;
+		}
+
+		return odd ? -mag : mag;
+	}
+
+	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
+	{
+		const simd32_t aa     = simd32_ld(_a);
+		const simd32_t bb     = simd32_ld(_b);
+		const simd32_t cc     = simd32_ld(_c);
+		const simd32_t result = simd32_f32_madd(aa, bb, cc);
+
+		return bitCast<float>(result);
+	}
+
+	inline BX_CONSTEXPR_FUNC double mad(double _a, double _b, double _c)
+	{
+		return _a*_b + _c;
+	}
+
+	inline BX_CONSTEXPR_FUNC float nms(float _a, float _b, float _c)
+	{
+		const float na     = -_a;
+		const float result = mad(na, _b, _c);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC double nms(double _a, double _b, double _c)
+	{
+		const double na     = -_a;
+		const double result = mad(na, _b, _c);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float abs(float _a)
+	{
+		const uint32_t bits      = floatToBits(_a);
+		const uint32_t magnitude = bits & ~kFloatSignMask;
+		const float    result    = bitsToFloat(magnitude);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC double abs(double _a)
+	{
+		const uint64_t bits      = doubleToBits(_a);
+		const uint64_t magnitude = bits & ~kDoubleSignMask;
+		const double   result    = bitsToDouble(magnitude);
+
+		return result;
+	}
+
+	template<typename Ty>
+	requires (isInteger<Ty>() )
+	inline constexpr Ty abs(Ty _a)
+	{
+		if constexpr (isSigned<Ty>() )
+		{
+			const Ty negated = Ty(-_a);
+			const Ty result  = _a < Ty(0) ? negated : _a;
+
+			return result;
+		}
+		else
+		{
+			return _a;
+		}
+	}
+
+	inline BX_CONSTEXPR_FUNC float square(float _a)
+	{
+		return _a * _a;
+	}
+
+	inline BX_CONSTEXPR_FUNC double square(double _a)
+	{
+		return _a * _a;
+	}
+
+	inline BX_CONSTEXPR_FUNC float sign(float _a)
+	{
+		return float( (0.0f < _a) - (0.0f > _a) );
+	}
+
+	inline BX_CONSTEXPR_FUNC double sign(double _a)
+	{
+		const int32_t positive = 0.0 < _a;
+		const int32_t negative = 0.0 > _a;
+		const int32_t signum   = positive - negative;
+		const double  result   = double(signum);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC bool signBit(double _a)
+	{
+		const uint64_t bits = doubleToBits(_a);
+
+		return 0 != (bits & kDoubleSignMask);
+	}
+
+	inline BX_CONSTEXPR_FUNC float copySign(float _value, float _sign)
+	{
+#if BX_COMPILER_MSVC
+		const uint32_t magnitude = floatToBits(_value) & ~kFloatSignMask;
+		const uint32_t sign      = floatToBits(_sign)  &  kFloatSignMask;
+		const uint32_t bits      = magnitude | sign;
+		const float    result    = bitsToFloat(bits);
+		return result;
+#else
+		return __builtin_copysign(_value, _sign);
+#endif // BX_COMPILER_MSVC
+	}
+
+	inline BX_CONSTEXPR_FUNC double copySign(double _value, double _sign)
+	{
+		const uint64_t magnitude = doubleToBits(_value) & ~kDoubleSignMask;
+		const uint64_t sign      = doubleToBits(_sign)  &  kDoubleSignMask;
+		const uint64_t bits      = magnitude | sign;
+		const double   result    = bitsToDouble(bits);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC float trunc(float _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return truncRef(_a);
+		}
+
+		return truncSimd(_a);
+#else
+		return truncRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC double trunc(double _a)
+	{
+		return truncRef(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float floor(float _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return floorRef(_a);
+		}
+
+		return floorSimd(_a);
+#else
+		return floorRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC double floor(double _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return floorRef(_a);
+		}
+
+		return floorSimd(_a);
+#else
+		return floorRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC float ceil(float _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return ceilRef(_a);
+		}
+
+		return ceilSimd(_a);
+#else
+		return ceilRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC double ceil(double _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return ceilRef(_a);
+		}
+
+		return ceilSimd(_a);
+#else
+		return ceilRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC float round(float _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return roundRef(_a);
+		}
+
+		return roundSimd(_a);
+#else
+		return roundRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC double round(double _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return roundRef(_a);
+		}
+
+		return roundSimd(_a);
+#else
+		return roundRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC float fract(float _a)
+	{
+		return fractT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double fract(double _a)
+	{
+		return fractT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC bool isEqual(double _a, double _b, double _epsilon)
+	{
+		const double diff  = _a - _b;
+		const double lhs   = abs(diff);
+		const double absA  = abs(_a);
+		const double absB  = abs(_b);
+		const double scale = max(1.0, absA, absB);
+		const double rhs   = _epsilon * scale;
+
+		return lhs <= rhs;
+	}
+
+	inline BX_CONSTEXPR_FUNC float ldexp(float _a, int32_t _b)
+	{
+		return ldexpT<float>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC double ldexp(double _a, int32_t _b)
+	{
+		return ldexpT<double>(_a, _b);
+	}
+
+	inline constexpr float frexp(float _a, int32_t* _outExp)
+	{
+		const uint32_t bits      = floatToBits(_a);
+		const uint32_t magnitude = bits & ~kFloatSignMask;
+
+		if (0 == magnitude
+		||  kFloatExponentMask <= magnitude)
+		{
+			*_outExp = 0;
+
+			return _a;
+		}
+
+		constexpr int32_t  kSubnormalShift = int32_t(kFloatMantissaNumBits) + 2;
+		constexpr uint32_t kSubnormalExp   = uint32_t(int32_t(kFloatExponentBias) + kSubnormalShift);
+		constexpr uint32_t kSubnormalBits  = kSubnormalExp << kFloatExponentBitShift;
+		constexpr uint32_t kNormalSmallest = uint32_t(1) << kFloatExponentBitShift;
+		constexpr uint32_t kHalfExp        = kFloatExponentBias - 1;
+		constexpr uint32_t kHalfBits       = kHalfExp << kFloatExponentBitShift;
+
+		const bool    subnormal = magnitude < kNormalSmallest;
+		const float   scale     = bitsToFloat(kSubnormalBits);
+		const float   scaled    = _a * scale;
+		const float   value     = subnormal ? scaled : _a;
+		const int32_t bias      = subnormal ? -kSubnormalShift : 0;
+
+		const uint32_t valueBits = floatToBits(value);
+		const uint32_t expBits   = valueBits & kFloatExponentMask;
+		const int32_t  raw       = int32_t(expBits >> kFloatExponentBitShift);
+		const int32_t  exp       = raw - int32_t(kFloatExponentBias) + 1;
+		const uint32_t kept      = valueBits & (kFloatSignMask | kFloatMantissaMask);
+		const uint32_t resBits   = kept | kHalfBits;
+		const float    result    = bitsToFloat(resBits);
+
+		*_outExp = exp + bias;
+
+		return result;
+	}
+
+	inline constexpr double frexp(double _a, int32_t* _outExp)
+	{
+		const uint64_t bits      = doubleToBits(_a);
+		const uint64_t magnitude = bits & ~kDoubleSignMask;
+
+		if (0 == magnitude
+		||  kDoubleExponentMask <= magnitude)
+		{
+			*_outExp = 0;
+
+			return _a;
+		}
+
+		constexpr int32_t  kSubnormalShift = int32_t(kDoubleMantissaNumBits) + 2;
+		constexpr uint64_t kSubnormalExp   = uint64_t(int32_t(kDoubleExponentBias) + kSubnormalShift);
+		constexpr uint64_t kSubnormalBits  = kSubnormalExp << kDoubleExponentShift;
+		constexpr uint64_t kNormalSmallest = uint64_t(1) << kDoubleExponentShift;
+		constexpr uint64_t kHalfExp        = kDoubleExponentBias - 1;
+		constexpr uint64_t kHalfBits       = kHalfExp << kDoubleExponentShift;
+
+		const bool    subnormal = magnitude < kNormalSmallest;
+		const double  scale     = bitsToDouble(kSubnormalBits);
+		const double  scaled    = _a * scale;
+		const double  value     = subnormal ? scaled : _a;
+		const int32_t bias      = subnormal ? -kSubnormalShift : 0;
+
+		const uint64_t valueBits = doubleToBits(value);
+		const uint64_t expBits   = valueBits & kDoubleExponentMask;
+		const int32_t  raw       = int32_t(expBits >> kDoubleExponentShift);
+		const int32_t  exp       = raw - int32_t(kDoubleExponentBias) + 1;
+		const uint64_t kept      = valueBits & (kDoubleSignMask | kDoubleMantissaMask);
+		const uint64_t resBits   = kept | kHalfBits;
+		const double   result    = bitsToDouble(resBits);
+
+		*_outExp = exp + bias;
+
+		return result;
+	}
+
+	inline constexpr float modf(float _a, float* _outIntegral)
+	{
+		if (isInfinite(_a) )
+		{
+			const uint32_t sign = floatToBits(_a) & kFloatSignMask;
+
+			*_outIntegral = _a;
+
+			return bitsToFloat(sign);
+		}
+
+		const float integral = trunc(_a);
+		const float fraction = _a - integral;
+
+		*_outIntegral = integral;
+
+		return fraction;
+	}
+
+	inline constexpr double modf(double _a, double* _outIntegral)
+	{
+		if (isInfinite(_a) )
+		{
+			const uint64_t sign = doubleToBits(_a) & kDoubleSignMask;
+
+			*_outIntegral = _a;
+
+			return bitsToDouble(sign);
+		}
+
+		const double integral = trunc(_a);
+		const double fraction = _a - integral;
+
+		*_outIntegral = integral;
+
+		return fraction;
+	}
+
+	inline BX_CONSTEXPR_FUNC float fmod(float _a, float _b)
+	{
+		return fmodT<float>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC double fmod(double _a, double _b)
+	{
+		return fmodT<double>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float mod(float _a, float _b)
+	{
+		return modT<float>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC double mod(double _a, double _b)
+	{
+		return modT<double>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float log(float _a)
+	{
+		return logT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double log(double _a)
+	{
+		return logT<double>(_a);
 	}
 
 	inline BX_CONSTEXPR_FUNC float log2(float _a)
 	{
-		return log(_a) * kInvLogNat2;
+		return log2T<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double log2(double _a)
+	{
+		return log2T<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float exp(float _a)
+	{
+		return expT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double exp(double _a)
+	{
+		return expT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float pow(float _a, float _b)
+	{
+		return powT<float>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC double pow(double _a, double _b)
+	{
+		return powT<double>(_a, _b);
+	}
+
+	inline BX_CONSTEXPR_FUNC float exp2(float _a)
+	{
+		return exp2T<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double exp2(double _a)
+	{
+		return exp2T<double>(_a);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty sqrtT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		if (_a < Ty(0.0) )
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (Ty(0.0) == _a)
+		{
+			return _a;
+		}
+
+		if (isInfinite(_a) )
+		{
+			return _a;
+		}
+
+		int32_t  exp  = 0;
+		const Ty frac = frexp(_a, &exp);
+
+		const bool    odd  = 0 != (exp & 1);
+		const Ty      mant = odd ? frac + frac : frac;
+		const int32_t rest = odd ? (exp - 1) >> 1 : exp >> 1;
+
+		const Bits mantBits = Traits::toBits(mant);
+		const Bits seedBits = Traits::kRsqrtSeed - (mantBits >> 1);
+
+		Ty rsq = Traits::fromBits(seedBits);
+
+		for (uint32_t ii = 0; ii < 5; ++ii)
+		{
+			const Ty rsqSq  = square(rsq);
+			const Ty scaled = mant * rsqSq;
+			const Ty halved = Ty(0.5) * scaled;
+			const Ty corr   = Ty(1.5) - halved;
+
+			rsq = rsq * corr;
+		}
+
+		const Ty approx = mant * rsq;
+		const Ty quot   = mant / approx;
+		const Ty sum    = approx + quot;
+		const Ty root   = Ty(0.5) * sum;
+		const Ty result = ldexpT<Ty>(root, rest);
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty rsqrtT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+
+		if (Ty(0.0) == _a)
+		{
+			return Traits::kInfinity;
+		}
+
+		const Ty root   = sqrt(_a);
+		const Ty result = Ty(1.0) / root;
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC uint64_t mulHi64(uint64_t _a, uint64_t _b)
+	{
+		constexpr uint64_t kLoMask = UINT64_C(0xffffffff);
+
+		const uint64_t aLo = _a & kLoMask;
+		const uint64_t aHi = _a >> 32;
+		const uint64_t bLo = _b & kLoMask;
+		const uint64_t bHi = _b >> 32;
+
+		const uint64_t ll = aLo * bLo;
+		const uint64_t lh = aLo * bHi;
+		const uint64_t hl = aHi * bLo;
+		const uint64_t hh = aHi * bHi;
+
+		const uint64_t mid    = (ll >> 32) + (lh & kLoMask) + (hl & kLoMask);
+		const uint64_t result = hh + (lh >> 32) + (hl >> 32) + (mid >> 32);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC uint64_t twoOverPiWord(int32_t _index)
+	{
+		constexpr uint64_t kTwoOverPi[] =
+		{
+			UINT64_C(0xa2f9836e4e441529),
+			UINT64_C(0xfc2757d1f534ddc0),
+			UINT64_C(0xdb6295993c439041),
+			UINT64_C(0xfe5163abdebbc561),
+			UINT64_C(0xb7246e3a424dd2e0),
+			UINT64_C(0x06492eea09d1921c),
+			UINT64_C(0xfe1deb1cb129a73e),
+			UINT64_C(0xe88235f52ebb4484),
+			UINT64_C(0xe99c7026b45f7e41),
+			UINT64_C(0x3991d639835339f4),
+			UINT64_C(0x9c845f8bbdf9283b),
+			UINT64_C(0x1ff897ffde05980f),
+			UINT64_C(0xef2f118b5a0a6d1f),
+			UINT64_C(0x6d367ecf27cb09b7),
+			UINT64_C(0x4f463f669e5fea2d),
+			UINT64_C(0x7527bac7ebe5f17b),
+			UINT64_C(0x3d0739f78a5292ea),
+			UINT64_C(0x6bfb5fb11f8d5d08),
+			UINT64_C(0x56033046fc7b6bab),
+			UINT64_C(0xf0cfbc209af4361d),
+			UINT64_C(0xa9e391615ee61b08),
+			UINT64_C(0x6599855f14a06840),
+			UINT64_C(0x8dffd8804d732731),
+			UINT64_C(0x06061556ca73a8c9),
+		};
+		constexpr int32_t kNumWords = 24;
+
+		if (0 > _index
+		||  kNumWords <= _index)
+		{
+			return 0;
+		}
+
+		return kTwoOverPi[uint32_t(_index)];
+	}
+
+	inline BX_CONSTEXPR_FUNC uint64_t twoOverPiBit(int32_t _bit)
+	{
+		if (1 > _bit)
+		{
+			return 0;
+		}
+
+		const int32_t  index = (_bit - 1) / 64;
+		const int32_t  shift = 63 - ( (_bit - 1) % 64);
+		const uint64_t word  = twoOverPiWord(index);
+
+		return (word >> shift) & 1;
+	}
+
+	inline BX_CONSTEXPR_FUNC uint64_t twoOverPiWindow(int32_t _bit, int32_t _which)
+	{
+		const int32_t start = _bit + 64*_which;
+		const int32_t index = (0 < start) ? (start - 1) / 64 : -( (1 - start) / 64 + 1);
+		const int32_t shift = start - 1 - 64*index;
+
+		const uint64_t lo = twoOverPiWord(index);
+		const uint64_t hi = twoOverPiWord(index + 1);
+
+		if (0 == shift)
+		{
+			return lo;
+		}
+
+		return (lo << shift) | (hi >> (64 - shift) );
+	}
+
+	inline constexpr double reducePiHalfLarge(double _absA, int32_t* _outQuadrant)
+	{
+		constexpr double kPiHalfHi = 1.57079632679489655800e+00;
+		constexpr double kPiHalfLo = 6.12323399573676603587e-17;
+
+		int32_t exp = 0;
+
+		const double  frac  = frexp(_absA, &exp);
+		const double  mantF = ldexp(frac, 53);
+		const uint64_t mant = uint64_t(mantF);
+		const int32_t  scale = exp - 53;
+
+		const uint64_t intBit1 = twoOverPiBit(scale - 1);
+		const uint64_t intBit0 = twoOverPiBit(scale);
+		const uint64_t intMod4 = 2*intBit1 + intBit0;
+
+		const uint64_t v0 = twoOverPiWindow(scale + 1, 0);
+		const uint64_t v1 = twoOverPiWindow(scale + 1, 1);
+		const uint64_t v2 = twoOverPiWindow(scale + 1, 2);
+
+		const uint64_t h0 = mulHi64(mant, v0);
+		const uint64_t l0 = mant * v0;
+		const uint64_t h1 = mulHi64(mant, v1);
+		const uint64_t l1 = mant * v1;
+		const uint64_t h2 = mulHi64(mant, v2);
+
+		const uint64_t s2    = l1 + h2;
+		const uint64_t c2    = (s2 < l1) ? 1 : 0;
+		const uint64_t t1    = l0 + h1;
+		const uint64_t k1    = (t1 < l0) ? 1 : 0;
+		const uint64_t s1    = t1 + c2;
+		const uint64_t k2    = (s1 < t1) ? 1 : 0;
+		const uint64_t carry = h0 + k1 + k2;
+
+		const uint64_t quad = mant*intMod4 + carry;
+
+		constexpr uint64_t kLowMask = UINT64_C(0x7ff);
+
+		const double hiPart = double(s1 >> 11) * 0x1p-53;
+		const double loPart = double(s1 & kLowMask) * 0x1p-64 + double(s2 >> 11) * 0x1p-117;
+
+		double fracHi   = hiPart;
+		int32_t quadrant = int32_t(quad & 3);
+
+		if (0.5 <= fracHi + loPart)
+		{
+			fracHi   -= 1.0;
+			quadrant += 1;
+		}
+
+		const double term0 = fracHi * kPiHalfHi;
+		const double term1 = loPart * kPiHalfHi;
+		const double term2 = fracHi * kPiHalfLo;
+		const double result = term0 + (term1 + term2);
+
+		*_outQuadrant = quadrant & 3;
+
+		return result;
+	}
+
+	inline constexpr double reducePiHalf(double _a, int32_t* _outQuadrant)
+	{
+		constexpr double kInvPiHalf = 6.36619772367581382433e-01;
+		constexpr double kPiHalf1   = 1.57079632673412561417e+00;
+		constexpr double kPiHalf2   = 6.07710050630396597660e-11;
+		constexpr double kPiHalf3   = 2.02226624871116645580e-21;
+		constexpr double kPiHalf3t  = 8.47842766036889956997e-32;
+		constexpr double kLimit     = 1647099.0;
+
+		const double absA = abs(_a);
+
+		if (kLimit <= absA)
+		{
+			int32_t quadrant = 0;
+
+			const double reduced = reducePiHalfLarge(absA, &quadrant);
+
+			if (signBit(_a) )
+			{
+				*_outQuadrant = (-quadrant) & 3;
+
+				return -reduced;
+			}
+
+			*_outQuadrant = quadrant;
+
+			return reduced;
+		}
+
+		const double value = _a;
+
+		const double scaled   = value * kInvPiHalf;
+		const double quadrant = round(scaled);
+
+		const double r0 = value - quadrant*kPiHalf1;
+
+		const double w2 = quadrant*kPiHalf2;
+		const double r2 = r0 - w2;
+		const double e2 = (r0 - r2) - w2;
+
+		const double w3 = quadrant*kPiHalf3;
+		const double r3 = r2 - w3;
+		const double e3 = (r2 - r3) - w3;
+
+		const double tail = quadrant*kPiHalf3t;
+		const double acc  = e2 + e3;
+		const double cc   = tail - acc;
+
+		const double result = r3 - cc;
+
+		*_outQuadrant = int32_t(quadrant) & 3;
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC double sinPiQuarter(double _a)
+	{
+		constexpr double kSinC0 = -1.66666666666666324348e-01;
+		constexpr double kSinC1 =  8.33333333332248946124e-03;
+		constexpr double kSinC2 = -1.98412698298579493134e-04;
+		constexpr double kSinC3 =  2.75573137070700676789e-06;
+		constexpr double kSinC4 = -2.50507602534068634195e-08;
+		constexpr double kSinC5 =  1.58969099521155010221e-10;
+
+		const double zz   = square(_a);
+		const double vv   = zz * _a;
+		const double zz2  = square(zz);
+		const double zz4  = square(zz2);
+		const double p01  = mad(kSinC1, zz, kSinC0);
+		const double p23  = mad(kSinC3, zz, kSinC2);
+		const double p45  = mad(kSinC5, zz, kSinC4);
+		const double plo  = mad(p23, zz2, p01);
+		const double poly = mad(p45, zz4, plo);
+
+		const double result = mad(vv, poly, _a);
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC double cosPiQuarter(double _a)
+	{
+		constexpr double kCosC0 =  4.16666666666666019037e-02;
+		constexpr double kCosC1 = -1.38888888888741095749e-03;
+		constexpr double kCosC2 =  2.48015872894767294178e-05;
+		constexpr double kCosC3 = -2.75573143513906633035e-07;
+		constexpr double kCosC4 =  2.08757232129817482790e-09;
+		constexpr double kCosC5 = -1.13596475577881948265e-11;
+
+		const double zz   = square(_a);
+		const double zz2  = square(zz);
+		const double zz4  = square(zz2);
+		const double q01  = mad(kCosC1, zz, kCosC0);
+		const double q23  = mad(kCosC3, zz, kCosC2);
+		const double q45  = mad(kCosC5, zz, kCosC4);
+		const double qlo  = mad(q23, zz2, q01);
+		const double qq   = mad(q45, zz4, qlo);
+		const double zq   = zz * qq;
+		const double poly = zz * zq;
+
+		const double halfZz = 0.5 * zz;
+		const double ww     = 1.0 - halfZz;
+		const double err    = (1.0 - ww) - halfZz;
+		const double corr   = err + poly;
+
+		const double result = ww + corr;
+
+		return result;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty sinT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (Ty(0.0) == _a)
+		{
+			return _a;
+		}
+
+		if (isNan(_a)
+		||  isInfinite(_a) )
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		int32_t quadrant = 0;
+
+		const double rr = reducePiHalf(double(_a), &quadrant);
+
+		switch (quadrant)
+		{
+			case  0: return Ty( sinPiQuarter(rr) );
+			case  1: return Ty( cosPiQuarter(rr) );
+			case  2: return Ty(-sinPiQuarter(rr) );
+			default: return Ty(-cosPiQuarter(rr) );
+		}
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty cosT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (isNan(_a)
+		||  isInfinite(_a) )
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		int32_t quadrant = 0;
+
+		const double rr = reducePiHalf(double(_a), &quadrant);
+
+		switch (quadrant)
+		{
+			case  0: return Ty( cosPiQuarter(rr) );
+			case  1: return Ty(-sinPiQuarter(rr) );
+			case  2: return Ty(-cosPiQuarter(rr) );
+			default: return Ty( sinPiQuarter(rr) );
+		}
+	}
+
+	inline BX_CONSTEXPR_FUNC float sin(float _a)
+	{
+		return sinT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double sin(double _a)
+	{
+		return sinT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float cos(float _a)
+	{
+		return cosT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double cos(double _a)
+	{
+		return cosT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float tan(float _a)
+	{
+		return tanT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double tan(double _a)
+	{
+		return tanT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double asinRational(double _t)
+	{
+		constexpr double kPs0 =  1.66666666666666657415e-01;
+		constexpr double kPs1 = -3.25565818622400915405e-01;
+		constexpr double kPs2 =  2.01212532134862925881e-01;
+		constexpr double kPs3 = -4.00555345006794114027e-02;
+		constexpr double kPs4 =  7.91534994289814532176e-04;
+		constexpr double kPs5 =  3.47933107596021167570e-05;
+		constexpr double kQs1 = -2.40339491173441421878e+00;
+		constexpr double kQs2 =  2.02094576023350569471e+00;
+		constexpr double kQs3 = -6.88283971605453293030e-01;
+		constexpr double kQs4 =  7.70381505559019352791e-02;
+
+		const double p0 = mad(kPs5, _t, kPs4);
+		const double p1 = mad(p0,   _t, kPs3);
+		const double p2 = mad(p1,   _t, kPs2);
+		const double p3 = mad(p2,   _t, kPs1);
+		const double p4 = mad(p3,   _t, kPs0);
+		const double pp = _t * p4;
+
+		const double q0 = mad(kQs4, _t, kQs3);
+		const double q1 = mad(q0,   _t, kQs2);
+		const double q2 = mad(q1,   _t, kQs1);
+		const double qq = mad(q2,   _t, 1.0);
+
+		const double result = pp / qq;
+
+		return result;
+	}
+
+	inline BX_CONSTEXPR_FUNC double clearLowWord(double _a)
+	{
+		constexpr uint64_t kHighMask = UINT64_C(0xffffffff00000000);
+
+		const uint64_t bits = doubleToBits(_a);
+		const uint64_t high = bits & kHighMask;
+
+		return bitsToDouble(high);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty asinT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr double kPiHalfHi  = 1.57079632679489655800e+00;
+		constexpr double kPiHalfLo  = 6.12323399573676603587e-17;
+		constexpr double kPiQuartHi = 7.85398163397448278999e-01;
+		constexpr double kTiny      = 7.45058059692383e-09;
+		constexpr double kNearOne   = 0.975;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		const double aa   = double(_a);
+		const double absA = abs(aa);
+
+		if (absA > 1.0)
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (1.0 == absA)
+		{
+			const double hi = aa * kPiHalfHi;
+			const double lo = aa * kPiHalfLo;
+
+			return Ty(hi + lo);
+		}
+
+		if (absA < 0.5)
+		{
+			if (absA < kTiny)
+			{
+				return _a;
+			}
+
+			const double tt = square(aa);
+			const double ww = asinRational(tt);
+
+			return Ty(mad(aa, ww, aa) );
+		}
+
+		const double ww = 1.0 - absA;
+		const double tt = 0.5 * ww;
+		const double rr = asinRational(tt);
+		const double ss = sqrt(tt);
+
+		double result = 0.0;
+
+		if (absA >= kNearOne)
+		{
+			const double sw   = mad(ss, rr, ss);
+			const double tmp0 = 2.0*sw - kPiHalfLo;
+
+			result = kPiHalfHi - tmp0;
+		}
+		else
+		{
+			const double df = clearLowWord(ss);
+			const double cc = (tt - df*df) / (ss + df);
+			const double pp = 2.0*ss*rr - (kPiHalfLo - 2.0*cc);
+			const double qq = kPiQuartHi - 2.0*df;
+
+			result = kPiQuartHi - (pp - qq);
+		}
+
+		return aa > 0.0 ? Ty(result) : Ty(-result);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty acosT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr double kPiHalfHi = 1.57079632679489655800e+00;
+		constexpr double kPiHalfLo = 6.12323399573676603587e-17;
+		constexpr double kPiFull   = 3.14159265358979311600e+00;
+		constexpr double kTiny     = 6.93889390390722838e-18;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		const double aa   = double(_a);
+		const double absA = abs(aa);
+
+		if (absA > 1.0)
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (1.0 == absA)
+		{
+			return aa > 0.0 ? Ty(0.0) : Ty(kPiFull);
+		}
+
+		if (absA < 0.5)
+		{
+			if (absA <= kTiny)
+			{
+				return Ty(kPiHalfHi + kPiHalfLo);
+			}
+
+			const double zz = square(aa);
+			const double rr = asinRational(zz);
+			const double xr = aa * rr;
+
+			return Ty(kPiHalfHi - (aa - (kPiHalfLo - xr) ) );
+		}
+
+		if (aa < 0.0)
+		{
+			const double zz = 0.5 * (1.0 + aa);
+			const double rr = asinRational(zz);
+			const double ss = sqrt(zz);
+			const double ww = rr*ss - kPiHalfLo;
+			const double sw = ss + ww;
+
+			return Ty(kPiFull - 2.0*sw);
+		}
+
+		const double zz = 0.5 * (1.0 - aa);
+		const double ss = sqrt(zz);
+		const double df = clearLowWord(ss);
+		const double cc = (zz - df*df) / (ss + df);
+		const double rr = asinRational(zz);
+		const double ww = mad(rr, ss, cc);
+		const double dw = df + ww;
+
+		return Ty(2.0 * dw);
+	}
+
+	inline BX_CONSTEXPR_FUNC float asin(float _a)
+	{
+		return asinT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double asin(double _a)
+	{
+		return asinT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float acos(float _a)
+	{
+		return acosT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double acos(double _a)
+	{
+		return acosT<double>(_a);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty atanT(Ty _a)
+	{
+		constexpr double kAtanHi[] =
+		{
+			4.63647609000806093515e-01,
+			7.85398163397448278999e-01,
+			9.82793723247329054082e-01,
+			1.57079632679489655800e+00,
+		};
+		constexpr double kAtanLo[] =
+		{
+			2.26987774529616870924e-17,
+			3.06161699786838301793e-17,
+			1.39033110312309984516e-17,
+			6.12323399573676603587e-17,
+		};
+
+		constexpr double kAt0  =  3.33333333333329318027e-01;
+		constexpr double kAt1  = -1.99999999998764832476e-01;
+		constexpr double kAt2  =  1.42857142725034663711e-01;
+		constexpr double kAt3  = -1.11111104054623557880e-01;
+		constexpr double kAt4  =  9.09088713343650656196e-02;
+		constexpr double kAt5  = -7.69187620504482999495e-02;
+		constexpr double kAt6  =  6.66107313738753120669e-02;
+		constexpr double kAt7  = -5.83357013379057348645e-02;
+		constexpr double kAt8  =  4.97687799461593236017e-02;
+		constexpr double kAt9  = -3.65315727442169155270e-02;
+		constexpr double kAt10 =  1.62858201153657823623e-02;
+
+		constexpr double kHuge = 7.37869762948382e+19;
+		constexpr double kTiny = 1.86264514923096e-09;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		const double aa   = double(_a);
+		const double absA = abs(aa);
+
+		if (absA > kHuge)
+		{
+			const double big = kAtanHi[3] + kAtanLo[3];
+
+			return aa > 0.0 ? Ty(big) : Ty(-big);
+		}
+
+		int32_t id = -1;
+		double  xx = aa;
+
+		if (absA >= 0.4375)
+		{
+			if (absA < 1.1875)
+			{
+				if (absA < 0.6875)
+				{
+					id = 0;
+					xx = (2.0*absA - 1.0) / (2.0 + absA);
+				}
+				else
+				{
+					id = 1;
+					xx = (absA - 1.0) / (absA + 1.0);
+				}
+			}
+			else
+			{
+				if (absA < 2.4375)
+				{
+					id = 2;
+					xx = (absA - 1.5) / (1.0 + 1.5*absA);
+				}
+				else
+				{
+					id = 3;
+					xx = -1.0 / absA;
+				}
+			}
+		}
+		else if (absA < kTiny)
+		{
+			return _a;
+		}
+
+		const double zz = square(xx);
+		const double ww = square(zz);
+
+		const double o0 = mad(kAt10, ww, kAt8);
+		const double o1 = mad(o0,    ww, kAt6);
+		const double o2 = mad(o1,    ww, kAt4);
+		const double o3 = mad(o2,    ww, kAt2);
+		const double o4 = mad(o3,    ww, kAt0);
+		const double s1 = zz * o4;
+
+		const double e0 = mad(kAt9, ww, kAt7);
+		const double e1 = mad(e0,   ww, kAt5);
+		const double e2 = mad(e1,   ww, kAt3);
+		const double e3 = mad(e2,   ww, kAt1);
+		const double s2 = ww * e3;
+
+		const double sum = s1 + s2;
+
+		if (id < 0)
+		{
+			return Ty(xx - xx*sum);
+		}
+
+		const double hi = kAtanHi[id];
+		const double lo = kAtanLo[id];
+
+		const double corr   = (xx*sum - lo) - xx;
+		const double result = hi - corr;
+
+		return aa < 0.0 ? Ty(-result) : Ty(result);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty atan2T(Ty _y, Ty _x)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr double kPiFull    = 3.14159265358979311600e+00;
+		constexpr double kPiLo      = 1.22464679914735317722e-16;
+		constexpr double kHalfPi    = 1.57079632679489655800e+00;
+		constexpr double kQuarterPi = 7.85398163397448278999e-01;
+
+		if (isNan(_x)
+		||  isNan(_y) )
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		const bool signY = signBit(_y);
+		const bool signX = signBit(_x);
+
+		if (Ty(0.0) == _y)
+		{
+			if (!signX)
+			{
+				return signY ? Ty(-0.0) : Ty(0.0);
+			}
+
+			return signY ? Ty(-kPiFull) : Ty(kPiFull);
+		}
+
+		if (Ty(0.0) == _x)
+		{
+			return signY ? Ty(-kHalfPi) : Ty(kHalfPi);
+		}
+
+		if (isInfinite(_x) )
+		{
+			if (isInfinite(_y) )
+			{
+				const double quarter = signX ? 3.0*kQuarterPi : kQuarterPi;
+
+				return signY ? Ty(-quarter) : Ty(quarter);
+			}
+
+			const double straight = signX ? kPiFull : 0.0;
+
+			return signY ? Ty(-straight) : Ty(straight);
+		}
+
+		if (isInfinite(_y) )
+		{
+			return signY ? Ty(-kHalfPi) : Ty(kHalfPi);
+		}
+
+		const double ratio = double(_y) / double(_x);
+		const double zz    = atanT<double>(abs(ratio) );
+
+		if (!signX)
+		{
+			return signY ? Ty(-zz) : Ty(zz);
+		}
+
+		const double folded = kPiFull - (zz - kPiLo);
+
+		return signY ? Ty(-folded) : Ty(folded);
+	}
+
+	inline BX_CONSTEXPR_FUNC float atan(float _a)
+	{
+		return atanT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double atan(double _a)
+	{
+		return atanT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float atan2(float _y, float _x)
+	{
+		return atan2T<float>(_y, _x);
+	}
+
+	inline BX_CONSTEXPR_FUNC double atan2(double _y, double _x)
+	{
+		return atan2T<double>(_y, _x);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty asinhT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+
+		constexpr Ty kLn2 = Ty(6.93147180559945286227e-01);
+
+		if (isNan(_a)
+		||  isInfinite(_a) )
+		{
+			return _a;
+		}
+
+		const Ty absA = abs(_a);
+
+		if (absA < Traits::kArcHypTiny)
+		{
+			return _a;
+		}
+
+		Ty magnitude = Ty(0.0);
+
+		if (absA > Traits::kArcHypHuge)
+		{
+			const Ty ln = log(absA);
+
+			magnitude = ln + kLn2;
+		}
+		else if (absA > Ty(2.0) )
+		{
+			const Ty tt   = mad(absA, absA, Ty(1.0) );
+			const Ty root = sqrt(tt);
+			const Ty tail = Ty(1.0) / (root + absA);
+			const Ty arg  = Ty(2.0)*absA + tail;
+
+			magnitude = log(arg);
+		}
+		else
+		{
+			const Ty tt   = square(absA);
+			const Ty root = sqrt(Ty(1.0) + tt);
+			const Ty tail = tt / (Ty(1.0) + root);
+
+			magnitude = log1p(absA + tail);
+		}
+
+		return signBit(_a) ? -magnitude : magnitude;
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty acoshT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		constexpr Ty kLn2 = Ty(6.93147180559945286227e-01);
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		if (Ty(1.0) > _a)
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (Ty(1.0) == _a)
+		{
+			return Ty(0.0);
+		}
+
+		if (isInfinite(_a) )
+		{
+			return _a;
+		}
+
+		if (_a > Traits::kArcHypHuge)
+		{
+			const Ty ln = log(_a);
+
+			return ln + kLn2;
+		}
+
+		if (_a > Ty(2.0) )
+		{
+			const Ty tt   = square(_a);
+			const Ty root = sqrt(tt - Ty(1.0) );
+			const Ty tail = Ty(1.0) / (_a + root);
+			const Ty arg  = Ty(2.0)*_a - tail;
+
+			return log(arg);
+		}
+
+		const Ty tt   = _a - Ty(1.0);
+		const Ty root = sqrt(Ty(2.0)*tt + square(tt) );
+
+		return log1p(tt + root);
+	}
+
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty atanhT(Ty _a)
+	{
+		using Traits = FloatT<Ty>;
+		using Bits   = typename Traits::Bits;
+
+		if (isNan(_a) )
+		{
+			return _a;
+		}
+
+		const Ty absA = abs(_a);
+
+		if (absA > Ty(1.0) )
+		{
+			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
+
+			return Traits::fromBits(kNanBits);
+		}
+
+		if (Ty(1.0) == absA)
+		{
+			return signBit(_a) ? -Traits::kInfinity : Traits::kInfinity;
+		}
+
+		if (absA < Traits::kArcHypTiny)
+		{
+			return _a;
+		}
+
+		Ty magnitude = Ty(0.0);
+
+		if (absA < Ty(0.5) )
+		{
+			const Ty twice = absA + absA;
+			const Ty tail  = twice*absA / (Ty(1.0) - absA);
+			const Ty half  = log1p(twice + tail);
+
+			magnitude = Ty(0.5) * half;
+		}
+		else
+		{
+			const Ty twice = absA + absA;
+			const Ty ratio = twice / (Ty(1.0) - absA);
+
+			magnitude = Ty(0.5) * log1p(ratio);
+		}
+
+		return signBit(_a) ? -magnitude : magnitude;
+	}
+
+	inline BX_CONSTEXPR_FUNC float log10(float _a)
+	{
+		return log10T<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double log10(double _a)
+	{
+		return log10T<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float log1p(float _a)
+	{
+		return log1pT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double log1p(double _a)
+	{
+		return log1pT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float asinh(float _a)
+	{
+		return asinhT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double asinh(double _a)
+	{
+		return asinhT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float acosh(float _a)
+	{
+		return acoshT<float>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC double acosh(double _a)
+	{
+		return acoshT<double>(_a);
+	}
+
+	inline BX_CONSTEXPR_FUNC float atanh(float _a)
+	{
+		return atanhT<float>(_a);
+	}
+	inline BX_CONSTEXPR_FUNC double atanh(double _a)
+	{
+		return atanhT<double>(_a);
 	}
 
 BX_FP_PRECISE_END()
@@ -999,12 +2670,7 @@ BX_FP_PRECISE_END()
 
 	inline BX_CONSTEXPR_FUNC float rsqrtRef(float _a)
 	{
-		if (_a < kFloatSmallest)
-		{
-			return kFloatInfinity;
-		}
-
-		return pow(_a, -0.5f);
+		return rsqrtT<float>(_a);
 	}
 
 	inline BX_CONST_FUNC float rsqrtSimd(float _a)
@@ -1025,12 +2691,12 @@ BX_FP_PRECISE_END()
 
 	inline BX_CONSTEXPR_FUNC float sqrtRef(float _a)
 	{
-		if (_a < 0.0f)
-		{
-			return bitsToFloat(kFloatExponentMask | kFloatMantissaMask);
-		}
+		return sqrtT<float>(_a);
+	}
 
-		return _a * pow(_a, -0.5f);
+	inline BX_CONSTEXPR_FUNC double sqrtRef(double _a)
+	{
+		return sqrtT<double>(_a);
 	}
 
 	inline BX_CONST_FUNC float sqrtSimd(float _a)
@@ -1053,6 +2719,22 @@ BX_FP_PRECISE_END()
 		return result;
 	}
 
+	inline BX_CONST_FUNC double sqrtSimd(double _a)
+	{
+		if (_a < 0.0)
+		{
+			return bitsToDouble(kDoubleExponentMask | kDoubleMantissaMask);
+		}
+
+		const simd128_t aa   = simd_splat<simd128_t>(_a);
+		const simd128_t sqrt = simd_f64_sqrt<simd128_t>(aa);
+
+		alignas(16) double result[2] = { 0.0, 0.0 };
+		simd_st<simd128_t>(result, sqrt);
+
+		return result[0];
+	}
+
 	inline BX_CONSTEXPR_FUNC float rsqrt(float _a)
 	{
 #if BX_SIMD_SUPPORTED
@@ -1067,7 +2749,26 @@ BX_FP_PRECISE_END()
 #endif // BX_SIMD_SUPPORTED
 	}
 
+	inline BX_CONSTEXPR_FUNC double rsqrt(double _a)
+	{
+		return rsqrtT<double>(_a);
+	}
+
 	inline BX_CONSTEXPR_FUNC float sqrt(float _a)
+	{
+#if BX_SIMD_SUPPORTED
+		if (isConstantEvaluated() )
+		{
+			return sqrtRef(_a);
+		}
+
+		return sqrtSimd(_a);
+#else
+		return sqrtRef(_a);
+#endif // BX_SIMD_SUPPORTED
+	}
+
+	inline BX_CONSTEXPR_FUNC double sqrt(double _a)
 	{
 #if BX_SIMD_SUPPORTED
 		if (isConstantEvaluated() )
