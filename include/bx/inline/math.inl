@@ -381,9 +381,9 @@ namespace bx
 	template<typename Ty>
 	inline BX_CONSTEXPR_FUNC Ty tanT(Ty _a)
 	{
-		const Ty sn     = sin(_a);
-		const Ty cs     = cos(_a);
-		const Ty result = sn / cs;
+		const Ty tmp0   = sin(_a);
+		const Ty tmp1   = cos(_a);
+		const Ty result = tmp0 / tmp1;
 
 		return result;
 	}
