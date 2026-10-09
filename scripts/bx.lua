@@ -68,6 +68,7 @@ project "bx"
 	if _OPTIONS["with-amalgamated"] then
 		excludes {
 			path.join(BX_DIR, "src/allocator.cpp"),
+			path.join(BX_DIR, "src/bitarray.cpp"),
 			path.join(BX_DIR, "src/bounds.cpp"),
 			path.join(BX_DIR, "src/bx.cpp"),
 			path.join(BX_DIR, "src/commandline.cpp"),
