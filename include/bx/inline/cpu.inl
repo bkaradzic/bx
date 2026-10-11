@@ -40,7 +40,7 @@ extern "C" long _InterlockedCompareExchange(long volatile* _ptr, long _exchange,
 extern "C" int64_t _InterlockedCompareExchange64(int64_t volatile* _ptr, int64_t _exchange, int64_t _comparand);
 #	pragma intrinsic(_InterlockedCompareExchange64)
 
-#if (_MSC_VER == 1800) && !defined(FIXED_592562) && defined (_M_IX86) && !defined (_M_CEE_PURE)
+#if (_MSC_VER == 1800) && !defined(FIXED_592562) && defined (BX_CPU_X86) && !defined (_M_CEE_PURE)
 
 extern "C" long _InterlockedExchange(long volatile* _ptr, long _value);
 #	pragma intrinsic(_InterlockedExchange)
@@ -62,7 +62,9 @@ extern "C" long _InterlockedExchange(long volatile* _ptr, long _value);
 #	pragma intrinsic(_InterlockedExchange)
 
 extern "C" int64_t _InterlockedExchange64(int64_t volatile* _ptr, int64_t _value);
+#	if !defined(BX_CPU_X86)
 #	pragma intrinsic(_InterlockedExchange64)
+#	endif // !BX_CPU_X86
 
 extern "C" void* _InterlockedCompareExchangePointer(void* volatile* _ptr, void* _exchange, void* _comparand);
 #	pragma intrinsic(_InterlockedCompareExchangePointer)
@@ -410,7 +412,21 @@ namespace bx
 #if BX_COMPILER_MSVC
 		if constexpr (8 == sizeof(Ty) )
 		{
+#if defined(BX_CPU_X86)
+			int64_t old = _InterlockedCompareExchange64( (volatile int64_t*)_ptr, 0, 0);
+			for (;;)
+			{
+				const int64_t previous = _InterlockedCompareExchange64( (volatile int64_t*)_ptr, int64_t(_new), old);
+				if (previous == old)
+				{
+					return Ty(previous);
+				}
+
+				old = previous;
+			}
+#else
 			return Ty(_InterlockedExchange64( (volatile int64_t*)_ptr, int64_t(_new) ) );
+#endif // BX_CPU_X86
 		}
 		else
 		{

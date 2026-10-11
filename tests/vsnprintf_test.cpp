@@ -344,14 +344,11 @@ TEST_CASE("Format %td", "[string][printf]")
 
 	REQUIRE(test("-1", "%td", size) );
 
-	if constexpr (4 == sizeof(ptrdiff_t) )
-	{
-		REQUIRE(test("-1073741824", "%td", ptrdiff_t(3221225472) ) );
-	}
-	else
-	{
-		REQUIRE(test("3221225472", "%td", ptrdiff_t(3221225472) ) );
-	}
+#if BX_ARCH_32BIT
+	REQUIRE(test("-1073741824", "%td", ptrdiff_t(-1073741824) ) );
+#else
+	REQUIRE(test("3221225472", "%td", ptrdiff_t(3221225472) ) );
+#endif // BX_ARCH_32BIT
 }
 
 TEST_CASE("Format %n", "[string][printf]")
