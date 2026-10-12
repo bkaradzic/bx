@@ -114,8 +114,13 @@ namespace bx
 		constexpr size_t kSimdSize = sizeof(SimdT);
 
 #if BX_COMPILER_MSVC
+#	if BX_CPU_X86 && BX_ARCH_32BIT
+		typedef uint32_t UnalignedU32;
+		typedef uint64_t UnalignedU64;
+#	else
 		typedef __unaligned uint32_t UnalignedU32;
 		typedef __unaligned uint64_t UnalignedU64;
+#	endif // BX_CPU_X86 && BX_ARCH_32BIT
 #else
 		typedef uint32_t __attribute__( (aligned(1), may_alias) ) UnalignedU32;
 		typedef uint64_t __attribute__( (aligned(1), may_alias) ) UnalignedU64;
