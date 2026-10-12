@@ -1100,7 +1100,7 @@ static void intParityAll()
 	intParity1<Ty>("ftoi_sat",   [](Ty a      ) { return simd_f32_ftoi_sat(a);   }, [](uint32_t a) { return uint32_t(refFtoiSat(bx::bitCast<float>(a) ) ); }, true);
 	intParity1<Ty>("ftou_sat",   [](Ty a      ) { return simd_f32_ftou_sat(a);   }, [](uint32_t a) { return refFtouSat(bx::bitCast<float>(a) ); }, true);
 	intParity1<Ty>("f16_fromf32",[](Ty a      ) { return simd_f16_fromf32(a);    }, [](uint32_t a) { return uint32_t(bx::halfFromFloat(bx::bitCast<float>(a) ) ); }, true);
-	intParity1<Ty>("f16_tof32",  [](Ty a      ) { return simd_f16_tof32(a);      }, [](uint32_t a) { return bx::bitCast<uint32_t>(bx::halfToFloat(uint16_t(a & 0xffff) ) ); }, false);
+	intParity1<Ty>("f16_tof32",  [](Ty a      ) { return simd_f16_tof32(a);      }, [](uint32_t a) { return bx::simd_f16_tof32_ni(bx::simd32_splat(a & 0xffff) ).u32; }, false);
 }
 
 TEST_CASE("simd_int_scalar_parity", "[simd]")

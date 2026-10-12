@@ -61,8 +61,10 @@ extern "C" void* _InterlockedExchangePointer(void* volatile* _ptr, void* _value)
 extern "C" long _InterlockedExchange(long volatile* _ptr, long _value);
 #	pragma intrinsic(_InterlockedExchange)
 
+#	if !(BX_CPU_X86 && BX_ARCH_32BIT)
 extern "C" int64_t _InterlockedExchange64(int64_t volatile* _ptr, int64_t _value);
-#	pragma intrinsic(_InterlockedExchange64)
+#		pragma intrinsic(_InterlockedExchange64)
+#	endif // !(BX_CPU_X86 && BX_ARCH_32BIT)
 
 extern "C" void* _InterlockedCompareExchangePointer(void* volatile* _ptr, void* _exchange, void* _comparand);
 #	pragma intrinsic(_InterlockedCompareExchangePointer)
@@ -410,7 +412,20 @@ namespace bx
 #if BX_COMPILER_MSVC
 		if constexpr (8 == sizeof(Ty) )
 		{
+#	if BX_CPU_X86 && BX_ARCH_32BIT
+			int64_t oldVal;
+			int64_t newVal = *(int64_t volatile*)_ptr;
+			do
+			{
+				oldVal = newVal;
+				newVal = _InterlockedCompareExchange64( (volatile int64_t*)_ptr, int64_t(_new), oldVal);
+
+			} while (oldVal != newVal);
+
+			return Ty(oldVal);
+#	else
 			return Ty(_InterlockedExchange64( (volatile int64_t*)_ptr, int64_t(_new) ) );
+#	endif // BX_CPU_X86 && BX_ARCH_32BIT
 		}
 		else
 		{

@@ -16,6 +16,8 @@ jobs:
         include: [
           { config: Debug,   platform: x64,   runs-on: windows-latest, bindir: 'win64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
           { config: Release, platform: x64,   runs-on: windows-latest, bindir: 'win64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
+          { config: Debug,   platform: Win32, runs-on: windows-latest, bindir: 'win32_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
+          { config: Release, platform: Win32, runs-on: windows-latest, bindir: 'win32_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
           { config: Debug,   platform: ARM64, runs-on: windows-11-arm, bindir: 'arm64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
           { config: Release, platform: ARM64, runs-on: windows-11-arm, bindir: 'arm64_vs2022', genie-action: 'vs2022', solution-ext: 'sln' },
 #          { config: Debug,   platform: x64, bindir: 'win64_vs2026', genie-action: 'vs2026', solution-ext: 'slnx' },
