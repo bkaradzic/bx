@@ -36,6 +36,23 @@ TEST_CASE("gcd", "[bx]")
 	REQUIRE(9 == bx::gcd(18u, 81u) );
 }
 
+TEST_CASE("isInRange", "[bx]")
+{
+	REQUIRE( bx::isInRange(5, 0, 10) );
+	REQUIRE( bx::isInRange(0, 0, 10) );
+	REQUIRE( bx::isInRange(10, 0, 10) );
+	REQUIRE(!bx::isInRange(-1, 0, 10) );
+	REQUIRE(!bx::isInRange(11, 0, 10) );
+	REQUIRE( bx::isInRange(uint8_t(255), 0, 255) );
+	REQUIRE(!bx::isInRange(uint8_t(0), 1, 255) );
+	REQUIRE( bx::isInRange('m', 'a', 'z') );
+	REQUIRE(!bx::isInRange('M', 'a', 'z') );
+	REQUIRE( bx::isInRange(0.5f, 0.0f, 1.0f) );
+	REQUIRE(!bx::isInRange(1.5f, 0.0f, 1.0f) );
+
+	STATIC_REQUIRE(bx::isInRange(3, 1, 3) );
+}
+
 TEST_CASE("lcm", "[bx]")
 {
 	REQUIRE(1157 == bx::lcm(13u, 89u) );

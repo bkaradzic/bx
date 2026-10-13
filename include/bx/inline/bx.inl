@@ -217,6 +217,12 @@ namespace bx
 	}
 
 	template<typename Ty>
+	inline constexpr bool isInRange(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max)
+	{
+		return _min <= _a && _a <= _max;
+	}
+
+	template<typename Ty>
 	inline constexpr bool isPowerOf2(Ty _a)
 	{
 		return _a && !(_a & (_a - 1) );

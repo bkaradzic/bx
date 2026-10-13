@@ -450,11 +450,6 @@ namespace bx
 		return StringView(m_ptr, m_len);
 	}
 
-	inline BX_CONSTEXPR_FUNC bool isInRange(char _ch, char _from, char _to)
-	{
-		return unsigned(_ch - _from) <= unsigned(_to-_from);
-	}
-
 	inline BX_CONSTEXPR_FUNC bool isSpace(char _ch)
 	{
 		return ' '  == _ch // Space.
