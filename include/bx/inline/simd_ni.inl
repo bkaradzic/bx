@@ -780,7 +780,7 @@ BX_FP_PRECISE_BEGIN()
 	{
 		const Ty half      = simd_splat<Ty>(0.5f);
 		const Ty one       = simd_splat<Ty>(1.0f);
-		const Ty small     = simd_splat<Ty>(0.0625f);
+		const Ty tiny      = simd_splat<Ty>(0.0625f);
 		const Ty big       = simd_splat<Ty>(9.0f);
 		const Ty noFit     = simd_splat<Ty>(88.0f);
 		const Ty kC3       = simd_splat<Ty>(1.0f/6.0f);
@@ -814,7 +814,7 @@ BX_FP_PRECISE_BEGIN()
 		const Ty once      = simd_f32_mul(ee, kScale);
 		const Ty magNoFit  = simd_f32_mul(once, kScale);
 
-		const Ty smallMask = simd_f32_cmplt(absA, small);
+		const Ty smallMask = simd_f32_cmplt(absA, tiny);
 		const Ty bigMask   = simd_f32_cmplt(absA, big);
 		const Ty noFitMask = simd_f32_cmplt(absA, noFit);
 		const Ty mag0      = simd_selb(noFitMask, magBig, magNoFit);
@@ -844,7 +844,7 @@ BX_FP_PRECISE_BEGIN()
 	{
 		const Ty one       = simd_splat<Ty>(1.0f);
 		const Ty two       = simd_splat<Ty>(2.0f);
-		const Ty small     = simd_splat<Ty>(0.0625f);
+		const Ty tiny      = simd_splat<Ty>(0.0625f);
 		const Ty large     = simd_splat<Ty>(10.0f);
 		const Ty kC3       = simd_splat<Ty>( -1.0f/3.0f);
 		const Ty kC5       = simd_splat<Ty>(  2.0f/15.0f);
@@ -864,7 +864,7 @@ BX_FP_PRECISE_BEGIN()
 		const Ty den       = simd_f32_add(ee, one);
 		const Ty magMid    = simd_f32_div(num, den);
 
-		const Ty smallMask = simd_f32_cmplt(absA, small);
+		const Ty smallMask = simd_f32_cmplt(absA, tiny);
 		const Ty largeMask = simd_f32_cmplt(absA, large);
 		const Ty mag0      = simd_selb(largeMask, magMid, one);
 		const Ty magnitude = simd_selb(smallMask, magSmall, mag0);
