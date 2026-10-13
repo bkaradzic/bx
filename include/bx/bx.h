@@ -251,6 +251,10 @@ namespace bx
 	template<typename Ty>
 	constexpr Ty clamp(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max);
 
+	/// Returns true if value `_a` is in inclusive range [`_min`, `_max`].
+	template<typename Ty>
+	constexpr bool isInRange(const Ty& _a, const TypeIdentityType<Ty>& _min, const TypeIdentityType<Ty>& _max);
+
 	/// Returns true if value `_a` is power of 2.
 	template<typename Ty>
 	constexpr bool isPowerOf2(Ty _a);
