@@ -358,11 +358,13 @@ namespace bx
 		BX_ASSERT(0 != result, "Failed to free TLS index (err: 0x%08x).", GetLastError() ); BX_UNUSED(result);
 	}
 
+#if !BX_TLS_DATA_TEB
 	void* TlsData::get() const
 	{
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		return TlsGetValue(ti->m_id);
 	}
+#endif // !BX_TLS_DATA_TEB
 
 	void TlsData::set(void* _ptr)
 	{

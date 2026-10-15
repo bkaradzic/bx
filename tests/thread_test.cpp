@@ -72,4 +72,97 @@ TEST_CASE("Thread", "")
 	}
 }
 
+static constexpr uint32_t kNumTlsData = 80;
+
+struct TlsDataCtx
+{
+	bx::TlsData* tls;
+	uint32_t     seed;
+	uint32_t     numErrors;
+};
+
+static int32_t tlsDataThread(bx::Thread* _thread, void* _userData)
+{
+	BX_UNUSED(_thread);
+
+	TlsDataCtx& ctx = *(TlsDataCtx*)_userData;
+
+	for (uint32_t ii = 0; ii < kNumTlsData; ++ii)
+	{
+		ctx.numErrors += NULL != ctx.tls[ii].get();
+		ctx.tls[ii].set( (void*)uintptr_t(ctx.seed + ii) );
+	}
+
+	for (uint32_t jj = 0; jj < 1000; ++jj)
+	{
+		for (uint32_t ii = 0; ii < kNumTlsData; ++ii)
+		{
+			ctx.numErrors += uintptr_t(ctx.seed + ii) != uintptr_t(ctx.tls[ii].get() );
+		}
+	}
+
+	return bx::kExitSuccess;
+}
+
+TEST_CASE("TlsData", "")
+{
+	bx::TlsData* tls = new bx::TlsData[kNumTlsData];
+
+	for (uint32_t ii = 0; ii < kNumTlsData; ++ii)
+	{
+		tls[ii].set( (void*)uintptr_t(0x1000 + ii) );
+	}
+
+	TlsDataCtx ctx[4];
+	bx::Thread thread[4];
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(thread); ++ii)
+	{
+		ctx[ii] = { tls, (ii + 1) << 16, 0 };
+		thread[ii].init(tlsDataThread, &ctx[ii]);
+	}
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(thread); ++ii)
+	{
+		thread[ii].shutdown();
+		REQUIRE(0 == ctx[ii].numErrors);
+	}
+
+	for (uint32_t ii = 0; ii < kNumTlsData; ++ii)
+	{
+		REQUIRE(uintptr_t(0x1000 + ii) == uintptr_t(tls[ii].get() ) );
+	}
+
+	delete [] tls;
+}
+
+static thread_local void* s_threadLocal;
+
+BX_NO_INLINE void* getTlsData(const bx::TlsData& _tls)
+{
+	return _tls.get();
+}
+
+BX_NO_INLINE void* getThreadLocal()
+{
+	return s_threadLocal;
+}
+
+TEST_CASE("TlsData-bench", "[.][!benchmark]")
+{
+	bx::TlsData tls;
+	tls.set(&tls);
+	s_threadLocal = &tls;
+
+	BENCHMARK("TlsData::get")
+	{
+		return getTlsData(tls);
+	};
+
+	BENCHMARK("thread_local")
+	{
+		return getThreadLocal();
+	};
+}
+
 #endif // BX_CONFIG_SUPPORTS_THREADING
