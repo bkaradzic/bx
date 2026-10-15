@@ -472,13 +472,12 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline uint32_t bitSetFindT(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit, uint32_t _numSteps)
+	inline uint32_t bitSetFindT(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits)
 	{
 		const Ty* bits = (const Ty*)_ptr;
 		constexpr uint32_t numBitsPerStep = sizeof(Ty)*8;
-		const uint32_t numBits = _numSteps*numBitsPerStep;
 
-		for (uint32_t ii = _beginBit/numBitsPerStep, end = alignUp(_endBit, numBitsPerStep)/numBitsPerStep; ii < end; ++ii)
+		for (uint32_t ii = alignUp(_beginBit, numBitsPerStep)/numBitsPerStep, end = alignUp(_endBit, numBitsPerStep)/numBitsPerStep; ii < end; ++ii)
 		{
 			if (bits[ii] != Ty(0) )
 			{
@@ -499,7 +498,7 @@ namespace bx
 
 			for (++ii; ii < end; ++ii)
 			{
-				if (num >= numBits)
+				if (num >= _numBits)
 				{
 					return idx;
 				}
@@ -514,7 +513,7 @@ namespace bx
 				}
 			}
 
-			if (num >= numBits)
+			if (num >= _numBits)
 			{
 				return idx;
 			}
@@ -538,6 +537,7 @@ namespace bx
 
 			if (0xff == test)
 			{
+				lz = 0;
 				continue;
 			}
 
@@ -553,7 +553,8 @@ namespace bx
 
 			const uint32_t idx = pos + 8;
 			const uint32_t newIdx = max(idx - lz, _beginBit);
-			lz = min(idx, _endBit) - newIdx;
+			const uint32_t endIdx = min(idx, _endBit);
+			lz = endIdx > newIdx ? endIdx - newIdx : 0;
 
 			if (lz >= _numBits)
 			{
@@ -629,70 +630,39 @@ namespace bx
 			return bitSetFindZero(_ptr, _beginBit, _endBit);
 		}
 
+		// Run of 2*N-1 or more zero bits always contains whole N-bit aligned zero word.
+		uint32_t idx;
+
 		if (_numBits >= 127)
 		{
-			const uint32_t idx = bitSetFindT<uint64_t>(_ptr, _beginBit, _endBit, (_numBits+63)>>6);
-			if (idx != _endBit)
+			idx = bitSetFindT<uint64_t>(_ptr, _beginBit, _endBit, _numBits);
+		}
+		else if (_numBits >= 63)
+		{
+			idx = bitSetFindT<uint32_t>(_ptr, _beginBit, _endBit, _numBits);
+		}
+		else if (_numBits >= 31)
+		{
+			idx = bitSetFindT<uint16_t>(_ptr, _beginBit, _endBit, _numBits);
+		}
+		else
+		{
+			idx = bitSetFindT<uint8_t>(_ptr, _beginBit, _endBit, _numBits);
+
+			if (idx == _endBit
+			&&  _numBits < 15)
 			{
-				return idx;
-			}
-		}
+				idx = bitSetFindUpto14(_ptr, _beginBit, _endBit, _numBits);
 
-		if (_numBits >= 63)
-		{
-			const uint32_t idx = bitSetFindT<uint32_t>(_ptr, _beginBit, _endBit, (_numBits+31)>>5);
-			if (idx != _endBit)
-			{
-				return idx;
-			}
-		}
-
-		if (_numBits >= 128)
-		{
-			return kInvalid;
-		}
-
-		if (_numBits >= 31)
-		{
-			const uint32_t idx = bitSetFindT<uint16_t>(_ptr, _beginBit, _endBit, (_numBits+15)>>4);
-			if (idx != _endBit)
-			{
-				return idx;
-			}
-		}
-
-		if (_numBits >= 64)
-		{
-			return kInvalid;
-		}
-
-		uint32_t idx = bitSetFindT<uint8_t>(_ptr, _beginBit, _endBit, (_numBits+7)>>3);
-		if (idx != _endBit)
-		{
-			return idx;
-		}
-
-		if (_numBits < 15)
-		{
-			idx = bitSetFindUpto14(_ptr, _beginBit, _endBit, _numBits);
-
-			if (idx != _endBit)
-			{
-				return idx;
-			}
-
-			if (_numBits < 7)
-			{
-				idx = bitSetFindUpto6(_ptr, _beginBit, _endBit, _numBits);
-
-				if (idx != _endBit)
+				if (idx == _endBit
+				&&  _numBits < 7)
 				{
-					return idx;
+					idx = bitSetFindUpto6(_ptr, _beginBit, _endBit, _numBits);
 				}
 			}
 		}
 
-		return kInvalid;
+		return idx != _endBit ? idx : kInvalid;
 	}
 
 	uint64_t BitArrayViewBase::get(uint32_t _beginBit, uint32_t _endBit) const

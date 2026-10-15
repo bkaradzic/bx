@@ -8,6 +8,8 @@
 #include <bx/allocator.h>
 #include <bx/bitarray.h>
 #include <bx/math.h>
+#include <bx/rng.h>
+#include <bx/string.h>
 
 static void testRange(bx::MutableBitArrayView& _bs, uint32_t _beginBit, uint32_t _endBit)
 {
@@ -975,4 +977,113 @@ TEST_CASE("BitArray-ranges-ending-on-word-boundary", "[container]")
 	REQUIRE(UINT64_MAX == bs.get(100, 164) );
 	REQUIRE( (UINT64_MAX >> 36) == (words[1] >> 36) );
 	REQUIRE( (UINT64_MAX >> 28) == words[2]);
+}
+
+static uint32_t findRef(const bx::MutableBitArrayView& _bs, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits)
+{
+	for (uint32_t ii = _beginBit; ii + _numBits <= _endBit; ++ii)
+	{
+		if (_bs.testNone(ii, ii + _numBits) )
+		{
+			return ii;
+		}
+	}
+
+	return bx::kInvalid;
+}
+
+TEST_CASE("BitArray-find-random", "[container]")
+{
+	constexpr uint32_t kNumBits = 1024;
+
+	uint64_t bits[kNumBits/64];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 20000; ++iter)
+	{
+		const uint32_t density = rng.gen() % 4;
+
+		bs.clear();
+
+		for (uint32_t ii = 0, num = 4 + rng.gen() % 64; ii < num; ++ii)
+		{
+			const uint32_t begin = rng.gen() % kNumBits;
+			const uint32_t end   = bx::min(kNumBits, begin + 1 + rng.gen() % (8 << density) );
+			bs.set(begin, end, true);
+		}
+
+		for (uint32_t ii = 0, num = rng.gen() % 32; ii < num; ++ii)
+		{
+			const uint32_t begin = rng.gen() % kNumBits;
+			const uint32_t end   = bx::min(kNumBits, begin + 1 + rng.gen() % 64);
+			bs.set(begin, end, false);
+		}
+
+		const uint32_t numBits  = 1 + rng.gen() % 160;
+		const bool     full     = 0 == (rng.gen() & 3);
+		const uint32_t beginBit = full ? 0        : rng.gen() % (kNumBits - numBits);
+		const uint32_t endBit   = full ? kNumBits : beginBit + numBits + rng.gen() % (kNumBits - beginBit - numBits + 1);
+
+		const uint32_t expected = findRef(bs, beginBit, endBit, numBits);
+		const uint32_t idx      = full ? bs.find(numBits) : bs.find(beginBit, endBit, numBits);
+
+		INFO("Iteration " << iter << ", range [" << beginBit << ", " << endBit << "), num bits " << numBits << ", found " << idx << ", expected " << expected);
+
+		REQUIRE( (bx::kInvalid == idx) == (bx::kInvalid == expected) );
+
+		if (bx::kInvalid != idx)
+		{
+			REQUIRE(beginBit <= idx);
+			REQUIRE(idx + numBits <= endBit);
+			REQUIRE(bs.testNone(idx, idx + numBits) );
+		}
+	}
+}
+
+TEST_CASE("BitArray-find-skips-full-byte", "[container]")
+{
+	uint64_t bits[1];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	bs.set(0, 64, true);
+	bs.set(5, 8, false);
+	bs.set(16, 23, false);
+
+	REQUIRE(bx::kInvalid == bs.find(10) );
+	REQUIRE(16 == bs.find(7) );
+}
+
+TEST_CASE("BitArray-find-bench", "[.][!benchmark]")
+{
+	constexpr uint32_t kNumBits = 4096;
+
+	uint64_t bits[kNumBits/64];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < kNumBits; ii += 1 + rng.gen() % 12)
+	{
+		bs.set(ii, true);
+	}
+
+	bs.set(kNumBits - 256, kNumBits, false);
+
+	char name[64];
+
+	for (uint32_t numBits : { 4u, 12u, 40u, 200u, 300u })
+	{
+		uint32_t idx = 0;
+
+		bx::snprintf(name, sizeof(name), "find %u", numBits);
+		BENCHMARK(name)
+		{
+			idx = bs.find(numBits);
+			return idx;
+		};
+
+		REQUIRE( (bx::kInvalid == idx) == (bx::kInvalid == findRef(bs, 0, kNumBits, numBits) ) );
+	}
 }
