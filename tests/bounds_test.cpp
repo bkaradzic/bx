@@ -961,6 +961,23 @@ TEST_CASE("calcMinBoundingSphere", "[bounds]")
 	REQUIRE(sphere.radius >= 1.73f - 0.05f);
 }
 
+TEST_CASE("calcMinBoundingSphere far from origin", "[bounds]")
+{
+	const bx::Vec3 verts[] = {
+		{10000000.0f - 10.0f, 0.0f, 0.0f},
+		{10000000.0f + 10.0f, 0.0f, 0.0f},
+		{10000000.0f + 11.0f, 0.0f, 0.0f},
+	};
+
+	bx::Sphere sphere;
+	bx::calcMinBoundingSphere(sphere, verts, BX_COUNTOF(verts), sizeof(bx::Vec3) );
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(verts); ++ii)
+	{
+		REQUIRE(bx::distanceSq(sphere.center, verts[ii]) <= bx::square(sphere.radius) );
+	}
+}
+
 TEST_CASE("calcObb from cube vertices", "[bounds]")
 {
 	const bx::Vec3 verts[] = {

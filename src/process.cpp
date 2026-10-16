@@ -44,6 +44,39 @@ namespace bx
 #endif // BX_PLATFORM_WINDOWS
 	}
 
+	static bool makeCommandLine(char* _out, int32_t _outSize, const StringView& _filePath, const StringView& _args)
+	{
+#if BX_PLATFORM_WINDOWS
+		// cmd.exe /c strips the first and the last quote of the command line.
+		const StringView prefix = "\"\"";
+		const StringView suffix = "\"";
+#else
+		const StringView prefix = "\"";
+		const StringView suffix = "";
+#endif // BX_PLATFORM_WINDOWS
+
+		const int32_t len = 0
+			+ prefix.getLength()
+			+ _filePath.getLength()
+			+ 2
+			+ _args.getLength()
+			+ suffix.getLength()
+			;
+
+		if (len >= _outSize)
+		{
+			return false;
+		}
+
+		strCopy(_out, _outSize, prefix);
+		strCat(_out, _outSize, _filePath);
+		strCat(_out, _outSize, "\" ");
+		strCat(_out, _outSize, _args);
+		strCat(_out, _outSize, suffix);
+
+		return true;
+	}
+
 	ProcessReader::ProcessReader()
 		: m_file(NULL)
 	{
@@ -64,10 +97,12 @@ namespace bx
 			return false;
 		}
 
-		char tmp[kMaxFilePath*2] = "\"";
-		strCat(tmp, BX_COUNTOF(tmp), _filePath);
-		strCat(tmp, BX_COUNTOF(tmp), "\" ");
-		strCat(tmp, BX_COUNTOF(tmp), _args);
+		char tmp[kMaxFilePath*2];
+		if (!makeCommandLine(tmp, BX_COUNTOF(tmp), _filePath, _args) )
+		{
+			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessReader: Command line is too long.");
+			return false;
+		}
 
 		m_file = openProcess(tmp, "r");
 		if (NULL == m_file)
@@ -135,10 +170,12 @@ namespace bx
 			return false;
 		}
 
-		char tmp[kMaxFilePath*2] = "\"";
-		strCat(tmp, BX_COUNTOF(tmp), _filePath);
-		strCat(tmp, BX_COUNTOF(tmp), "\" ");
-		strCat(tmp, BX_COUNTOF(tmp), _args);
+		char tmp[kMaxFilePath*2];
+		if (!makeCommandLine(tmp, BX_COUNTOF(tmp), _filePath, _args) )
+		{
+			BX_ERROR_SET(_err, kErrorReaderWriterOpen, "ProcessWriter: Command line is too long.");
+			return false;
+		}
 
 		m_file = openProcess(tmp, "w");
 		if (NULL == m_file)
