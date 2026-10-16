@@ -326,7 +326,11 @@ namespace bx
 					center.x += xx * radiusStep;
 					center.y += yy * radiusStep;
 					center.z += zz * radiusStep;
-					maxDistSq = lerp(maxDistSq, distSq, _step);
+					const float newMaxDistSq = lerp(maxDistSq, distSq, _step);
+					maxDistSq = newMaxDistSq > maxDistSq
+						? newMaxDistSq
+						: distSq
+						;
 
 					break;
 				}
