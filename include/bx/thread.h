@@ -97,6 +97,8 @@ namespace bx
 
 } // namespace bx
 
+#include "inline/thread.inl"
+
 #endif
 
 #endif // BX_THREAD_H_HEADER_GUARD
