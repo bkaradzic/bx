@@ -153,6 +153,14 @@ namespace bx
 		/// usage asserts in caller's code.
 		uint32_t findRange(uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits) const;
 
+		/// `findSet` continued after inline check of the first word. `_beginBit` is aligned down to
+		/// multiple of 64.
+		uint32_t findSetFrom(uint32_t _beginBit, uint32_t _endBit) const;
+
+		/// `findClear` continued after inline check of the first word. `_beginBit` is aligned down to
+		/// multiple of 64.
+		uint32_t findClearFrom(uint32_t _beginBit, uint32_t _endBit) const;
+
 		uint64_t* m_ptr;
 		uint32_t  m_sizeInBytes;
 		uint32_t  m_count;
@@ -480,6 +488,15 @@ namespace bx
 		/// @param[in] _endWord   Last word index (exclusive).
 		///
 		void updateMip(uint32_t _beginWord, uint32_t _endWord);
+
+		/// Updates the mip bits for words [_beginWord, _endWord) after a range set, where all
+		/// words except the first and the last one are filled with `_value`.
+		///
+		/// @param[in] _beginWord First word index (inclusive).
+		/// @param[in] _endWord   Last word index (exclusive).
+		/// @param[in] _value     Value the bits were set to.
+		///
+		void updateMipFilled(uint32_t _beginWord, uint32_t _endWord, bool _value);
 
 		/// Marks the mip bits past the last word as full, so searches stop there.
 		void setMipTail();

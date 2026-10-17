@@ -979,6 +979,38 @@ TEST_CASE("BitArray-ranges-ending-on-word-boundary", "[container]")
 	REQUIRE( (UINT64_MAX >> 28) == words[2]);
 }
 
+namespace bx
+{
+	uint32_t bitSetFindRef(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits);
+	uint32_t bitSetFindSimd(const uint64_t* _ptr, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits);
+	uint32_t bitSetFindWordRef(const uint64_t* _ptr, uint32_t _beginWord, uint32_t _endWord, uint32_t _match);
+	uint32_t bitSetFindWordSimd(const uint64_t* _ptr, uint32_t _beginWord, uint32_t _endWord, uint32_t _match);
+	uint32_t bitSetFindLastWordRef(const uint64_t* _ptr, uint32_t _beginWord, uint32_t _endWord, uint32_t _match);
+	uint32_t bitSetFindLastWordSimd(const uint64_t* _ptr, uint32_t _beginWord, uint32_t _endWord, uint32_t _match);
+}
+
+static bool getBit(const uint64_t* _bits, uint32_t _idx)
+{
+	return 0 != ( (_bits[_idx/64] >> (_idx & 63) ) & 1);
+}
+
+static uint32_t findFirstFit(const uint64_t* _bits, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits)
+{
+	uint32_t run = 0;
+
+	for (uint32_t ii = _beginBit; ii < _endBit; ++ii)
+	{
+		run = getBit(_bits, ii) ? 0 : run + 1;
+
+		if (run == _numBits)
+		{
+			return ii + 1 - _numBits;
+		}
+	}
+
+	return bx::kInvalid;
+}
+
 static uint32_t findRef(const bx::MutableBitArrayView& _bs, uint32_t _beginBit, uint32_t _endBit, uint32_t _numBits)
 {
 	for (uint32_t ii = _beginBit; ii + _numBits <= _endBit; ++ii)
@@ -1073,7 +1105,7 @@ TEST_CASE("BitArray-find-bench", "[.][!benchmark]")
 
 	char name[64];
 
-	for (uint32_t numBits : { 4u, 12u, 40u, 200u, 300u })
+	for (uint32_t numBits : { 1u, 2u, 4u, 6u, 7u, 12u, 14u, 15u, 24u, 31u, 40u, 63u, 64u, 127u, 200u, 300u })
 	{
 		uint32_t idx = 0;
 
@@ -1084,6 +1116,399 @@ TEST_CASE("BitArray-find-bench", "[.][!benchmark]")
 			return idx;
 		};
 
+		bx::snprintf(name, sizeof(name), "find ref %u", numBits);
+		BENCHMARK(name)
+		{
+			return bx::bitSetFindRef(bits, 0, kNumBits, numBits);
+		};
+
 		REQUIRE( (bx::kInvalid == idx) == (bx::kInvalid == findRef(bs, 0, kNumBits, numBits) ) );
+	}
+}
+
+TEST_CASE("BitArray-find-simd-matches-ref", "[container]")
+{
+	constexpr uint32_t kMaxWords = 80;
+
+	uint64_t bits[kMaxWords];
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 50000; ++iter)
+	{
+		const uint32_t numWords = 1 + rng.gen() % kMaxWords;
+		const uint32_t numBits  = numWords*64;
+		bx::MutableBitArrayView bs(bits, numWords*sizeof(uint64_t) );
+
+		const uint32_t density = rng.gen() % 6;
+
+		bs.clear();
+
+		for (uint32_t ii = 0, num = rng.gen() % (4 + numWords*4); ii < num; ++ii)
+		{
+			const uint32_t begin = rng.gen() % numBits;
+			const uint32_t end   = bx::min(numBits, begin + 1 + rng.gen() % (4 << density) );
+			bs.set(begin, end, true);
+		}
+
+		if (0 == (rng.gen() & 3) )
+		{
+			bs.set(0, numBits, true);
+
+			for (uint32_t ii = 0, num = rng.gen() % 4; ii < num; ++ii)
+			{
+				const uint32_t begin = rng.gen() % numBits;
+				const uint32_t end   = bx::min(numBits, begin + 1 + rng.gen() % 320);
+				bs.set(begin, end, false);
+			}
+		}
+
+		const uint32_t runBits  = 0 == (rng.gen() & 1) ? 1 + rng.gen() % 8 : 1 + rng.gen() % 300;
+		const uint32_t beginBit = rng.gen() % numBits;
+		const uint32_t endBit   = beginBit + 1 + rng.gen() % (numBits - beginBit);
+
+		const uint32_t ref  = bx::bitSetFindRef (bits, beginBit, endBit, runBits);
+		const uint32_t simd = bx::bitSetFindSimd(bits, beginBit, endBit, runBits);
+
+		INFO("Iteration " << iter << ", words " << numWords << ", range [" << beginBit << ", " << endBit << "), num bits " << runBits << ", simd " << simd << ", ref " << ref);
+
+		REQUIRE(ref == simd);
+		REQUIRE(findFirstFit(bits, beginBit, endBit, runBits) == simd);
+	}
+}
+
+TEST_CASE("BitArray-ops-bench", "[.][!benchmark]")
+{
+	constexpr uint32_t kNumBits = 64<<10;
+
+	alignas(64) static uint64_t bits[kNumBits/64];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	char name[64];
+
+	for (uint32_t numBits : { 7u, 64u, 300u, 4096u })
+	{
+		bs.clear();
+
+		bx::snprintf(name, sizeof(name), "set %u", numBits);
+		BENCHMARK(name)
+		{
+			bs.set(13, 13 + numBits, true);
+			bs.set(13, 13 + numBits, false);
+			return bits[0];
+		};
+	}
+
+	bs.clear();
+
+	BENCHMARK("countBits 64K")
+	{
+		return bs.countBits(1, kNumBits - 1);
+	};
+
+	BENCHMARK("testNone 64K")
+	{
+		return bs.testNone(1, kNumBits - 1);
+	};
+
+	BENCHMARK("testAny 64K")
+	{
+		return bs.testAny(1, kNumBits - 1);
+	};
+
+	BENCHMARK("findSet first 64K")
+	{
+		return bs.findSet(bx::kFirst);
+	};
+
+	BENCHMARK("findSet range 64K")
+	{
+		return bs.findSet(1, kNumBits - 1);
+	};
+
+	bs.set(0, kNumBits, true);
+
+	BENCHMARK("testAll 64K")
+	{
+		return bs.testAll(1, kNumBits - 1);
+	};
+
+	BENCHMARK("findClear range 64K")
+	{
+		return bs.findClear(1, kNumBits - 1);
+	};
+
+	BENCHMARK("find 1 64K")
+	{
+		return bs.find(1);
+	};
+
+	BENCHMARK("find 12 64K")
+	{
+		return bs.find(12);
+	};
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < kNumBits; ++ii)
+	{
+		bits[ii/64] = (uint64_t(rng.gen() ) << 32) | rng.gen();
+	}
+
+	BENCHMARK("countBits random 64K")
+	{
+		return bs.countBits(1, kNumBits - 1);
+	};
+
+	for (uint32_t numBits : { 300u, 4096u })
+	{
+		bx::snprintf(name, sizeof(name), "blit %u", numBits);
+		BENCHMARK(name)
+		{
+			bs.blit(1000, 3, numBits);
+			return bits[20];
+		};
+
+		bx::snprintf(name, sizeof(name), "blit aligned %u", numBits);
+		BENCHMARK(name)
+		{
+			bs.blit(1024, 128, numBits);
+			return bits[20];
+		};
+	}
+}
+
+static void fillRandom(bx::RngMwc& _rng, uint64_t* _bits, uint32_t _numWords)
+{
+	const uint32_t mode = _rng.gen() % 4;
+
+	for (uint32_t ii = 0; ii < _numWords; ++ii)
+	{
+		const uint64_t word = (uint64_t(_rng.gen() ) << 32) | _rng.gen();
+		const uint32_t pick = _rng.gen() % 8;
+
+		switch (mode)
+		{
+		case 0:  _bits[ii] = word; break;
+		case 1:  _bits[ii] = 0 == pick ? word : 0; break;
+		case 2:  _bits[ii] = 0 == pick ? word : UINT64_MAX; break;
+		default: _bits[ii] = 0 == pick ? word : 1 == pick ? 0 : UINT64_MAX; break;
+		}
+	}
+}
+
+TEST_CASE("BitArray-find-word-simd-matches-ref", "[container]")
+{
+	constexpr uint32_t kMaxWords = 80;
+
+	uint64_t bits[kMaxWords];
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 50000; ++iter)
+	{
+		const uint32_t numWords = 1 + rng.gen() % kMaxWords;
+		fillRandom(rng, bits, numWords);
+
+		const uint32_t begin = rng.gen() % (numWords + 1);
+		const uint32_t end   = begin + rng.gen() % (numWords - begin + 1);
+		const uint32_t match = rng.gen() % 3;
+
+		INFO("Iteration " << iter << ", words " << numWords << ", range [" << begin << ", " << end << "), match " << match);
+
+		REQUIRE(bx::bitSetFindWordRef(bits, begin, end, match) == bx::bitSetFindWordSimd(bits, begin, end, match) );
+		REQUIRE(bx::bitSetFindLastWordRef(bits, begin, end, match) == bx::bitSetFindLastWordSimd(bits, begin, end, match) );
+	}
+}
+
+TEST_CASE("BitArray-range-ops-random", "[container]")
+{
+	constexpr uint32_t kMaxWords = 80;
+
+	uint64_t bits[kMaxWords];
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 50000; ++iter)
+	{
+		const uint32_t numWords = 1 + rng.gen() % kMaxWords;
+		const uint32_t numBits  = numWords*64;
+		fillRandom(rng, bits, numWords);
+
+		bx::MutableBitArrayView bs(bits, numWords*sizeof(uint64_t) );
+
+		const uint32_t beginBit = rng.gen() % (numBits + 1);
+		const uint32_t endBit   = beginBit + rng.gen() % (numBits - beginBit + 1);
+
+		uint32_t count    = 0;
+		uint32_t firstSet = bx::kInvalid;
+		uint32_t firstClr = bx::kInvalid;
+
+		for (uint32_t ii = beginBit; ii < endBit; ++ii)
+		{
+			const bool bit = getBit(bits, ii);
+			count += bit;
+			firstSet = bit  && bx::kInvalid == firstSet ? ii : firstSet;
+			firstClr = !bit && bx::kInvalid == firstClr ? ii : firstClr;
+		}
+
+		const uint32_t numRange = endBit - beginBit;
+
+		INFO("Iteration " << iter << ", words " << numWords << ", range [" << beginBit << ", " << endBit << ")");
+
+		REQUIRE(count == bs.countBits(beginBit, endBit) );
+		REQUIRE( (0 != count) == bs.testAny(beginBit, endBit) );
+		REQUIRE( (0 == count) == bs.testNone(beginBit, endBit) );
+		REQUIRE( (numRange == count) == bs.testAll(beginBit, endBit) );
+		REQUIRE(firstSet == bs.findSet(beginBit, endBit) );
+		REQUIRE(firstClr == bs.findClear(beginBit, endBit) );
+
+		uint32_t first = bx::kInvalid;
+		uint32_t last  = bx::kInvalid;
+
+		for (uint32_t ii = 0; ii < numBits; ++ii)
+		{
+			if (getBit(bits, ii) )
+			{
+				first = bx::kInvalid == first ? ii : first;
+				last  = ii;
+			}
+		}
+
+		REQUIRE(first == bs.findSet(bx::kFirst) );
+		REQUIRE(last  == bs.findSet(bx::kLast) );
+	}
+}
+
+TEST_CASE("BitArray-blit-random", "[container]")
+{
+	constexpr uint32_t kNumWords = 40;
+	constexpr uint32_t kNumBits  = kNumWords*64;
+
+	uint64_t bits[kNumWords];
+	uint64_t expected[kNumWords];
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 50000; ++iter)
+	{
+		fillRandom(rng, bits, kNumWords);
+		bx::memCopy(expected, bits, sizeof(bits) );
+
+		const uint32_t numBits = 1 + rng.gen() % (0 == (rng.gen() & 1) ? 160 : kNumBits/2);
+		const uint32_t srcBit  = rng.gen() % (kNumBits - numBits + 1);
+		const uint32_t dstBit  = 0 == (rng.gen() & 3)
+			? bx::min(kNumBits - numBits, (srcBit & ~7u) + (rng.gen() % 64)*8)
+			: rng.gen() % (kNumBits - numBits + 1)
+			;
+
+		bool tmp[kNumBits];
+
+		for (uint32_t ii = 0; ii < numBits; ++ii)
+		{
+			tmp[ii] = getBit(expected, srcBit + ii);
+		}
+
+		for (uint32_t ii = 0; ii < numBits; ++ii)
+		{
+			const uint32_t idx = dstBit + ii;
+			expected[idx/64] = (expected[idx/64] & ~(UINT64_C(1) << (idx & 63) ) ) | (uint64_t(tmp[ii]) << (idx & 63) );
+		}
+
+		bx::MutableBitArrayView bs(bits, sizeof(bits) );
+		bs.blit(dstBit, srcBit, numBits);
+
+		INFO("Iteration " << iter << ", dst " << dstBit << ", src " << srcBit << ", num bits " << numBits);
+
+		REQUIRE(0 == bx::memCmp(bits, expected, sizeof(bits) ) );
+	}
+}
+
+TEST_CASE("BitArray-set-random", "[container]")
+{
+	constexpr uint32_t kNumWords = 40;
+	constexpr uint32_t kNumBits  = kNumWords*64;
+
+	uint64_t bits[kNumWords];
+	uint64_t expected[kNumWords];
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 50000; ++iter)
+	{
+		fillRandom(rng, bits, kNumWords);
+		bx::memCopy(expected, bits, sizeof(bits) );
+
+		const uint32_t beginBit = rng.gen() % (kNumBits + 1);
+		const uint32_t endBit   = beginBit + rng.gen() % (kNumBits - beginBit + 1);
+		const bool     value    = 0 != (rng.gen() & 1);
+
+		for (uint32_t idx = beginBit; idx < endBit; ++idx)
+		{
+			expected[idx/64] = (expected[idx/64] & ~(UINT64_C(1) << (idx & 63) ) ) | (uint64_t(value) << (idx & 63) );
+		}
+
+		bx::MutableBitArrayView bs(bits, sizeof(bits) );
+		bs.set(beginBit, endBit, value);
+
+		INFO("Iteration " << iter << ", range [" << beginBit << ", " << endBit << "), value " << value);
+
+		REQUIRE(0 == bx::memCmp(bits, expected, sizeof(bits) ) );
+	}
+}
+
+TEST_CASE("MippedBitArray-random", "[container]")
+{
+	constexpr uint32_t kNumBits  = 64*130;
+	constexpr uint32_t kNumWords = kNumBits/64;
+
+	bx::FixedMippedBitArrayT<kNumBits> array;
+	array.setCount(kNumBits);
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 20000; ++iter)
+	{
+		const uint32_t op       = rng.gen() % 6;
+		const uint32_t beginBit = rng.gen() % kNumBits;
+		const uint32_t numBits  = 1 + rng.gen() % (0 == (rng.gen() & 3) ? kNumBits - beginBit : bx::min<uint32_t>(kNumBits - beginBit, 300) );
+		const uint32_t endBit   = beginBit + numBits;
+
+		switch (op)
+		{
+		case 0:  array.set(beginBit, endBit, true);  break;
+		case 1:  array.set(beginBit, endBit, false); break;
+		case 2:  array.set(beginBit, 0 != (rng.gen() & 1) ); break;
+		case 3:  array.set(beginBit, bx::min(endBit, beginBit + 64), (uint64_t(rng.gen() ) << 32) | rng.gen() ); break;
+		case 4:  array.blit(rng.gen() % (kNumBits - numBits + 1), beginBit, numBits); break;
+		default: if (0 == rng.gen() % 64) { array.clear(); } break;
+		}
+
+		const uint64_t* words = (const uint64_t*)array.getPtr();
+		const uint64_t* mip   = array.getMip();
+
+		INFO("Iteration " << iter << ", op " << op << ", range [" << beginBit << ", " << endBit << ")");
+
+		for (uint32_t ii = 0; ii < kNumWords; ++ii)
+		{
+			const bool full    = UINT64_MAX == words[ii];
+			const bool mipFull = 0 != ( (mip[ii/64] >> (ii & 63) ) & 1);
+			REQUIRE(full == mipFull);
+		}
+
+		for (uint32_t ii = kNumWords; ii < bx::alignUp(kNumWords, 64u); ++ii)
+		{
+			REQUIRE(0 != ( (mip[ii/64] >> (ii & 63) ) & 1) );
+		}
+
+		const uint32_t findBegin = rng.gen() % kNumBits;
+		uint32_t expected = bx::kInvalid;
+
+		for (uint32_t ii = findBegin; ii < kNumBits && bx::kInvalid == expected; ++ii)
+		{
+			expected = getBit(words, ii) ? bx::kInvalid : ii;
+		}
+
+		REQUIRE(expected == array.findClear(findBegin, kNumBits) );
 	}
 }

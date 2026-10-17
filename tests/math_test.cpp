@@ -205,6 +205,65 @@ TEST_CASE("countTrailingZeros", "[math]")
 	STATIC_REQUIRE(64 == bx::countTrailingZeros<uint64_t>(0) );
 }
 
+template<typename Ty>
+static uint8_t countLeadingZerosRef(Ty _val)
+{
+	uint8_t count = 0;
+
+	for (int32_t ii = sizeof(Ty)*8 - 1; ii >= 0 && 0 == ( (_val >> ii) & 1); --ii)
+	{
+		++count;
+	}
+
+	return count;
+}
+
+template<typename Ty>
+static uint8_t countTrailingZerosRef(Ty _val)
+{
+	uint8_t count = 0;
+
+	for (uint32_t ii = 0; ii < sizeof(Ty)*8 && 0 == ( (_val >> ii) & 1); ++ii)
+	{
+		++count;
+	}
+
+	return count;
+}
+
+template<typename Ty>
+static void testCountZeros(Ty _val)
+{
+	volatile Ty val = _val;
+	REQUIRE(countLeadingZerosRef<Ty>(_val)  == bx::countLeadingZeros<Ty>(val) );
+	REQUIRE(countTrailingZerosRef<Ty>(_val) == bx::countTrailingZeros<Ty>(val) );
+}
+
+TEST_CASE("countLeadingZeros/countTrailingZeros runtime", "[math]")
+{
+	testCountZeros<uint32_t>(0);
+	testCountZeros<uint64_t>(0);
+
+	for (uint32_t ii = 0; ii < 64; ++ii)
+	{
+		testCountZeros<uint32_t>(uint32_t(1) << (ii & 31) );
+		testCountZeros<uint64_t>(uint64_t(1) << ii);
+		testCountZeros<uint64_t>(UINT64_MAX << ii);
+		testCountZeros<uint64_t>(UINT64_MAX >> ii);
+	}
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 10000; ++ii)
+	{
+		const uint64_t val   = (uint64_t(rng.gen() ) << 32) | rng.gen();
+		const uint32_t shift = rng.gen() % 64;
+		testCountZeros<uint32_t>(uint32_t(val) >> (shift & 31) );
+		testCountZeros<uint64_t>(val >> shift);
+		testCountZeros<uint64_t>(val << shift);
+	}
+}
+
 TEST_CASE("countLeadingZeros", "[math]")
 {
 	STATIC_REQUIRE( 7 == bx::countLeadingZeros<uint8_t >(1) );

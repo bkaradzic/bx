@@ -93,27 +93,25 @@ namespace bx
 			, m_count
 			);
 
-		uint32_t idx = _beginBit;
-
-		while (idx < _endBit)
+		if (_beginBit >= _endBit)
 		{
-			const uint32_t word = idx/64;
-			const uint64_t bits = m_ptr[word] & (~UINT64_C(0) << (idx & 63) );
-
-			if (0 != bits)
-			{
-				const uint32_t found = word*64 + findFirstSet(bits) - 1;
-
-				return found < _endBit
-					? found
-					: kInvalid
-					;
-			}
-
-			idx = (word + 1)*64;
+			return kInvalid;
 		}
 
-		return kInvalid;
+		const uint32_t word = _beginBit/64;
+		const uint64_t bits = m_ptr[word] & (~UINT64_C(0) << (_beginBit & 63) );
+
+		if (0 != bits)
+		{
+			const uint32_t found = word*64 + findFirstSet(bits) - 1;
+
+			return found < _endBit
+				? found
+				: kInvalid
+				;
+		}
+
+		return findSetFrom( (word + 1)*64, _endBit);
 	}
 
 	inline uint32_t BitArrayViewBase::findClear(uint32_t _beginBit, uint32_t _endBit) const
@@ -125,27 +123,25 @@ namespace bx
 			, m_count
 			);
 
-		uint32_t idx = _beginBit;
-
-		while (idx < _endBit)
+		if (_beginBit >= _endBit)
 		{
-			const uint32_t word = idx/64;
-			const uint64_t bits = ~m_ptr[word] & (~UINT64_C(0) << (idx & 63) );
-
-			if (0 != bits)
-			{
-				const uint32_t found = word*64 + findFirstSet(bits) - 1;
-
-				return found < _endBit
-					? found
-					: kInvalid
-					;
-			}
-
-			idx = (word + 1)*64;
+			return kInvalid;
 		}
 
-		return kInvalid;
+		const uint32_t word = _beginBit/64;
+		const uint64_t bits = ~m_ptr[word] & (~UINT64_C(0) << (_beginBit & 63) );
+
+		if (0 != bits)
+		{
+			const uint32_t found = word*64 + findFirstSet(bits) - 1;
+
+			return found < _endBit
+				? found
+				: kInvalid
+				;
+		}
+
+		return findClearFrom( (word + 1)*64, _endBit);
 	}
 
 	inline uint32_t BitArrayViewBase::countBits() const
@@ -462,7 +458,19 @@ namespace bx
 		if (_beginBit < _endBit)
 		{
 			MutableBitArrayView(m_ptr, m_sizeInBytes, m_count).set(_beginBit, _endBit, _value);
-			updateMip(_beginBit/64, alignUp(_endBit, 64)/64);
+
+			const uint32_t beginWord = _beginBit/64;
+			const uint32_t lastWord  = (_endBit - 1)/64;
+
+			if (beginWord == lastWord)
+			{
+				const uint64_t mipMask = UINT64_C(1) << (beginWord & 63);
+				const uint64_t full    = ~UINT64_C(0) == m_ptr[beginWord] ? mipMask : 0;
+				m_mip[beginWord/64] = (m_mip[beginWord/64] & ~mipMask) | full;
+				return;
+			}
+
+			updateMipFilled(beginWord, lastWord + 1, _value);
 		}
 	}
 
@@ -489,7 +497,8 @@ namespace bx
 		if (NULL != m_ptr)
 		{
 			MutableBitArrayView(m_ptr, m_sizeInBytes, m_count).clear();
-			updateMip(0, m_sizeInBytes/8);
+			memSet(m_mip, 0, getNumMipWords(m_sizeInBytes/8) * sizeof(uint64_t) );
+			setMipTail();
 		}
 	}
 
@@ -602,18 +611,30 @@ namespace bx
 
 	inline void MippedBitArrayBase::updateMip(uint32_t _beginWord, uint32_t _endWord)
 	{
-		for (uint32_t ii = _beginWord; ii < _endWord; ++ii)
+		if (_beginWord + 1 == _endWord)
 		{
-			const uint64_t mipMask = UINT64_C(1) << (ii & 63);
+			const uint64_t mipMask = UINT64_C(1) << (_beginWord & 63);
+			const uint64_t full    = ~UINT64_C(0) == m_ptr[_beginWord] ? mipMask : 0;
+			m_mip[_beginWord/64] = (m_mip[_beginWord/64] & ~mipMask) | full;
+			return;
+		}
 
-			if (~UINT64_C(0) == m_ptr[ii])
+		for (uint32_t ii = _beginWord; ii < _endWord;)
+		{
+			const uint32_t mipWord = ii/64;
+			const uint32_t end     = min(_endWord, (mipWord + 1)*64);
+
+			uint64_t mask = 0;
+			uint64_t full = 0;
+
+			for (; ii < end; ++ii)
 			{
-				m_mip[ii/64] |= mipMask;
+				const uint64_t bit = UINT64_C(1) << (ii & 63);
+				mask |= bit;
+				full |= ~UINT64_C(0) == m_ptr[ii] ? bit : 0;
 			}
-			else
-			{
-				m_mip[ii/64] &= ~mipMask;
-			}
+
+			m_mip[mipWord] = (m_mip[mipWord] & ~mask) | full;
 		}
 	}
 
