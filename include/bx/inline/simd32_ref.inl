@@ -571,6 +571,21 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		             | (uint32_t(uint8_t(int8_t(_a.u32 >> 24) - int8_t(_b.u32 >> 24) ) ) << 24) };
 	}
 
+	inline BX_CONSTEXPR_FUNC simd32_t simd32_i8_cmpeq(simd32_t _a, simd32_t _b)
+	{
+		const simd32_t mask7   = simd32_splat(uint8_t(0x7f) );
+		const simd32_t diff    = simd32_xor(_a, _b);
+		const simd32_t low7    = simd32_and(diff, mask7);
+		const simd32_t carry   = simd32_u32_add(low7, mask7);
+		const simd32_t tmp0    = simd32_or(carry, diff);
+		const simd32_t nonZero = simd32_or(tmp0, mask7);
+		const simd32_t msbs    = simd32_not(nonZero);
+		const simd32_t lsbs    = simd32_x32_srl(msbs, 7);
+		const simd32_t low7s   = simd32_u32_sub(msbs, lsbs);
+		const simd32_t result  = simd32_or(msbs, low7s);
+		return result;
+	}
+
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_u8_satadd(simd32_t _a, simd32_t _b)
 	{
 		simd32_t result{ .u32 = 0 };

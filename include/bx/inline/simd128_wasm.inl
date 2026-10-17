@@ -609,6 +609,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_i8_cmpeq(simd128_wasm_t _a, simd128_wasm_t _b)
+	{
+		return wasm_i8x16_eq(_a, _b);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_u8_satadd(simd128_wasm_t _a, simd128_wasm_t _b)
 	{
 		return wasm_u8x16_add_sat(_a, _b);

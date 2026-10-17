@@ -1275,6 +1275,13 @@ TEST_CASE("simd128_i32_cmpeq", "[simd]")
 	check_u32("i32_cmpeq", simd128_i32_cmpeq(a, b), 0xffffffff, 0, 0xffffffff, 0);
 }
 
+TEST_CASE("simd128_i8_cmpeq", "[simd]")
+{
+	const simd128_t a = simd128_ld<simd128_t>(0x00ff7f01u, 0x80808080u, 0xfefefefeu, 0x10204080u);
+	const simd128_t b = simd128_ld<simd128_t>(0x00fe7f80u, 0x80008080u, 0xfefeffffu, 0x10204081u);
+	check_u32("i8_cmpeq", simd128_i8_cmpeq(a, b), 0xff00ff00u, 0xff00ffffu, 0xffff0000u, 0xffffff00u);
+}
+
 TEST_CASE("simd128_i32_cmpgt", "[simd]")
 {
 	const simd128_t a = simd128_ld<simd128_t>(5u, 2u, 7u, 4u);
@@ -2001,6 +2008,13 @@ TEST_CASE("simd32_i8_add_sub", "[simd]")
 	const simd32_t b = make_u32(0x10101010);
 	REQUIRE(simd32_i8_add(a, b).u32 == 0x11121314);
 	REQUIRE(simd32_i8_sub(a, b).u32 == 0xf1f2f3f4);
+}
+
+TEST_CASE("simd32_i8_cmpeq", "[simd]")
+{
+	REQUIRE(simd32_i8_cmpeq(make_u32(0x00ff7f01), make_u32(0x00fe7f80)).u32 == 0xff00ff00);
+	REQUIRE(simd32_i8_cmpeq(make_u32(0x80808080), make_u32(0x80808080)).u32 == 0xffffffff);
+	REQUIRE(simd32_i8_cmpeq(make_u32(0x01020304), make_u32(0x10203040)).u32 == 0);
 }
 
 TEST_CASE("simd32_u8_sat", "[simd]")

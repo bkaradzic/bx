@@ -217,7 +217,7 @@ namespace bx
 			return findLastWordRef<MatchT>(_ptr, _begin, _end);
 		}
 
-		constexpr uint32_t kSimdByteMask = 32 == sizeof(SimdWideT) ? UINT32_MAX : (1u << sizeof(SimdWideT) ) - 1;
+		constexpr uint32_t kSimdByteMask = uint32_t( (UINT64_C(1) << sizeof(SimdWideT) ) - 1);
 
 		template<typename Ty>
 		constexpr uint64_t kElementLowBits = 1 == sizeof(Ty) ? UINT64_C(0x0101010101010101)

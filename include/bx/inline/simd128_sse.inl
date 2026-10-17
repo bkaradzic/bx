@@ -761,6 +761,15 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_i8_cmpeq(simd128_sse_t _a, simd128_sse_t _b)
+	{
+		const __m128i a      = _mm_castps_si128(_a);
+		const __m128i b      = _mm_castps_si128(_b);
+		const __m128i result = _mm_cmpeq_epi8(a, b);
+		return _mm_castsi128_ps(result);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_u8_satadd(simd128_sse_t _a, simd128_sse_t _b)
 	{
 		const __m128i a      = _mm_castps_si128(_a);
