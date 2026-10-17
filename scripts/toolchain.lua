@@ -229,6 +229,10 @@ function toolchain(_buildDir, _libDir)
 		xrosPlatform = _OPTIONS["with-xros"]
 	end
 
+	local iosSdk  = _OPTIONS["with-ios"]  or ""
+	local tvosSdk = _OPTIONS["with-tvos"] or ""
+	local xrosSdk = _OPTIONS["with-xros"] or ""
+
 	local windowsPlatform = nil
 	if _OPTIONS["with-windows"] then
 		windowsPlatform = _OPTIONS["with-windows"]
@@ -1046,7 +1050,7 @@ function toolchain(_buildDir, _libDir)
 		buildoptions {
 			"-arch arm64",
 			"-mios-version-min=16.0",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" .. iosSdk .. ".sdk",
 
 			"-fembed-bitcode",
 			"-Wfatal-errors",
@@ -1056,8 +1060,8 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-arch arm64",
 			"-mios-version-min=16.0",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" ..iosPlatform .. ".sdk/System/Library/Frameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" .. iosSdk .. ".sdk",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS" .. iosSdk .. ".sdk/System/Library/Frameworks",
 		}
 
 	configuration { "xros*" }
@@ -1076,13 +1080,13 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "xros-arm64/obj"))
 		libdirs { path.join(_libDir, "lib/xros-arm64") }
 		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform.. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..xrosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" .. xrosSdk .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" .. xrosSdk .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" .. xrosSdk .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" .. xrosSdk .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" ..tvosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XROS.platform/Developer/SDKs/XROS" .. xrosSdk .. ".sdk",
 		}
 
 	configuration { "xros-simulator" }
@@ -1091,12 +1095,12 @@ function toolchain(_buildDir, _libDir)
 		libdirs { path.join(_libDir, "lib/xros-simulator") }
 
 		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform.. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk/System/Library/Frameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" .. xrosSdk .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" .. xrosSdk .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" .. xrosSdk .. ".sdk/System/Library/Frameworks",
 		}
 		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" ..xrosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/XRSimulator.platform/Developer/SDKs/XRSimulator" .. xrosSdk .. ".sdk",
 		}
 
 	configuration { "ios-simulator" }
@@ -1104,13 +1108,13 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "ios-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/ios-simulator") }
 		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" .. iosSdk .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" .. iosSdk .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" .. iosSdk .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" .. iosSdk .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" ..iosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator" .. iosSdk .. ".sdk",
 		}
 
 	configuration { "tvos*" }
@@ -1135,15 +1139,15 @@ function toolchain(_buildDir, _libDir)
 		linkoptions {
 			"-mtvos-version-min=9.0",
 			"-arch arm64",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" .. tvosSdk .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" .. tvosSdk .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" .. tvosSdk .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" .. tvosSdk .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
 			"-mtvos-version-min=9.0",
 			"-arch arm64",
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" ..tvosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS" .. tvosSdk .. ".sdk",
 		}
 
 	configuration { "tvos-simulator" }
@@ -1151,13 +1155,13 @@ function toolchain(_buildDir, _libDir)
 		objdir (path.join(_buildDir, "tvos-simulator/obj"))
 		libdirs { path.join(_libDir, "lib/tvos-simulator") }
 		linkoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
-			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/usr/lib/system",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/Frameworks",
-			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk/System/Library/PrivateFrameworks",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" .. tvosSdk .. ".sdk",
+			"-L/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" .. tvosSdk .. ".sdk/usr/lib/system",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" .. tvosSdk .. ".sdk/System/Library/Frameworks",
+			"-F/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" .. tvosSdk .. ".sdk/System/Library/PrivateFrameworks",
 		}
 		buildoptions {
-			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" ..tvosPlatform .. ".sdk",
+			"--sysroot=/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/SDKs/AppleTVSimulator" .. tvosSdk .. ".sdk",
 		}
 
 	configuration { "orbis" }
