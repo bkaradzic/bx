@@ -2445,6 +2445,13 @@ BX_FP_PRECISE_END()
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcount(_val);
 #else
+#	if BX_COMPILER_MSVC && BX_SIMD_SSE
+		if (!isConstantEvaluated() )
+		{
+			return uint8_t(_mm_popcnt_u32(_val) );
+		}
+#	endif // BX_COMPILER_MSVC && BX_SIMD_SSE
+
 		const uint32_t tmp0   = (_val >> 1);
 		const uint32_t tmp1   = (tmp0 & 0x55555555);
 		const uint32_t tmp2   = (_val - tmp1);
@@ -2473,6 +2480,13 @@ BX_FP_PRECISE_END()
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return __builtin_popcountll(_val);
 #else
+#	if BX_COMPILER_MSVC && BX_SIMD_SSE && BX_ARCH_64BIT
+		if (!isConstantEvaluated() )
+		{
+			return uint8_t(_mm_popcnt_u64(_val) );
+		}
+#	endif // BX_COMPILER_MSVC && BX_SIMD_SSE && BX_ARCH_64BIT
+
 		const uint32_t lo = uint32_t(_val&UINT32_MAX);
 		const uint32_t hi = uint32_t(_val>>32);
 
