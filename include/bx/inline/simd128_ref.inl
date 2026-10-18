@@ -1137,6 +1137,27 @@ namespace bx
 	}
 
 	template<>
+	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_i8_cmpeq(simd128_ref_t _a, simd128_ref_t _b)
+	{
+#if BX_SIMD_LANGEXT
+		const simd128_i8_langext_t a      = bitCast<simd128_i8_langext_t>(_a);
+		const simd128_i8_langext_t b      = bitCast<simd128_i8_langext_t>(_b);
+		const auto                 mask   = a == b;
+		const simd128_ref_t        result = bitCast<simd128_ref_t>(mask);
+		return result;
+#else
+		const simd128_u8_ref_t a = bitCast<simd128_u8_ref_t>(_a);
+		const simd128_u8_ref_t b = bitCast<simd128_u8_ref_t>(_b);
+		simd128_u8_ref_t result;
+		for (int ii = 0; ii < 16; ++ii)
+		{
+			result.u8[ii] = a.u8[ii] == b.u8[ii] ? 0xff : 0;
+		}
+		return bitCast<simd128_ref_t>(result);
+#endif // BX_SIMD_LANGEXT
+	}
+
+	template<>
 	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_u8_satadd(simd128_ref_t _a, simd128_ref_t _b)
 	{
 		const simd128_u8_ref_t a = bitCast<simd128_u8_ref_t>(_a);

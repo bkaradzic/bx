@@ -979,6 +979,21 @@ namespace bx
 		return result;
 	}
 
+	inline BX_CONSTEXPR_FUNC simd64_t simd64_i8_cmpeq(simd64_t _a, simd64_t _b)
+	{
+		const simd64_t mask7   = simd64_splat(uint8_t(0x7f) );
+		const simd64_t diff    = simd64_xor(_a, _b);
+		const simd64_t low7    = simd64_and(diff, mask7);
+		const simd64_t carry   = simd64_u64_add(low7, mask7);
+		const simd64_t tmp0    = simd64_or(carry, diff);
+		const simd64_t nonZero = simd64_or(tmp0, mask7);
+		const simd64_t msbs    = simd64_not(nonZero);
+		const simd64_t lsbs    = simd64_x64_srl(msbs, 7);
+		const simd64_t low7s   = simd64_u64_sub(msbs, lsbs);
+		const simd64_t result  = simd64_or(msbs, low7s);
+		return result;
+	}
+
 	inline BX_CONSTEXPR_FUNC simd64_t simd64_u8_satadd(simd64_t _a, simd64_t _b)
 	{
 		simd64_t result{ .u64 = 0 };

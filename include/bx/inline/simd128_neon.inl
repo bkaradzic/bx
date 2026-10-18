@@ -751,6 +751,15 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_i8_cmpeq(simd128_neon_t _a, simd128_neon_t _b)
+	{
+		const int8x16_t  a      = vreinterpretq_s8_f32(_a);
+		const int8x16_t  b      = vreinterpretq_s8_f32(_b);
+		const uint8x16_t result = vceqq_s8(a, b);
+		return vreinterpretq_f32_u8(result);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_u8_satadd(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		const uint8x16_t a      = vreinterpretq_u8_f32(_a);

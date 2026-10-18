@@ -1514,6 +1514,15 @@ namespace bx
 	}
 
 	template<>
+	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_i8_cmpeq(simd256_ref_t _a, simd256_ref_t _b)
+	{
+		simd256_ref_t result;
+		result.lo = simd128_i8_cmpeq(_a.lo, _b.lo);
+		result.hi = simd128_i8_cmpeq(_a.hi, _b.hi);
+		return result;
+	}
+
+	template<>
 	inline BX_CONSTEXPR_FUNC simd256_ref_t simd256_u8_satadd(simd256_ref_t _a, simd256_ref_t _b)
 	{
 		simd256_ref_t result;

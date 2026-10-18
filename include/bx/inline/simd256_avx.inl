@@ -747,6 +747,16 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i8_cmpeq(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const __m256i a = _mm256_castps_si256(_a);
+		const __m256i b = _mm256_castps_si256(_b);
+		const __m256i cmp    = _mm256_cmpeq_epi8(a, b);
+		const __m256  result = _mm256_castsi256_ps(cmp);
+		return result;
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_u8_satadd(simd256_avx_t _a, simd256_avx_t _b)
 	{
 		const __m256i a = _mm256_castps_si256(_a);
@@ -1415,6 +1425,26 @@ namespace bx
 		const __m128i diffhi  = _mm_sub_epi8(ahii, bhii);
 		const __m128  rlo    = _mm_castsi128_ps(difflo);
 		const __m128  rhi    = _mm_castsi128_ps(diffhi);
+		const __m256  rlo256 = _mm256_castps128_ps256(rlo);
+		const __m256  result = _mm256_insertf128_ps(rlo256, rhi, 1);
+		return result;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd256_avx_t simd256_i8_cmpeq(simd256_avx_t _a, simd256_avx_t _b)
+	{
+		const __m128  alo    = _mm256_castps256_ps128(_a);
+		const __m128  ahi    = _mm256_extractf128_ps(_a, 1);
+		const __m128  blo    = _mm256_castps256_ps128(_b);
+		const __m128  bhi    = _mm256_extractf128_ps(_b, 1);
+		const __m128i aloi   = _mm_castps_si128(alo);
+		const __m128i ahii   = _mm_castps_si128(ahi);
+		const __m128i bloi   = _mm_castps_si128(blo);
+		const __m128i bhii   = _mm_castps_si128(bhi);
+		const __m128i cmplo  = _mm_cmpeq_epi8(aloi, bloi);
+		const __m128i cmphi  = _mm_cmpeq_epi8(ahii, bhii);
+		const __m128  rlo    = _mm_castsi128_ps(cmplo);
+		const __m128  rhi    = _mm_castsi128_ps(cmphi);
 		const __m256  rlo256 = _mm256_castps128_ps256(rlo);
 		const __m256  result = _mm256_insertf128_ps(rlo256, rhi, 1);
 		return result;

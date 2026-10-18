@@ -404,6 +404,18 @@ namespace bx
 	template<typename Ty>
 	Ty simd_u8_satadd(Ty _a, Ty _b);
 
+	/// Per-lane i8 compare equal. Lanes set to all-ones if equal.
+	///
+	/// @param[in] _a First operand.
+	/// @param[in] _b Second operand.
+	///
+	/// @returns Per-lane comparison mask.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	Ty simd_i8_cmpeq(Ty _a, Ty _b);
+
 	/// Per-lane unsigned 8-bit saturating subtract: `max(_a - _b, 0)`.
 	///
 	/// @param[in] _a Minuend.

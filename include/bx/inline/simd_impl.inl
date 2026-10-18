@@ -93,6 +93,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC simd32_t simd32_x16_srl(simd32_t _a, int _count);
 	BX_CONSTEXPR_FUNC simd32_t simd32_i8_add(simd32_t _a, simd32_t _b);
 	BX_CONSTEXPR_FUNC simd32_t simd32_i8_sub(simd32_t _a, simd32_t _b);
+	BX_CONSTEXPR_FUNC simd32_t simd32_i8_cmpeq(simd32_t _a, simd32_t _b);
 	BX_CONSTEXPR_FUNC simd32_t simd32_u8_satadd(simd32_t _a, simd32_t _b);
 	BX_CONSTEXPR_FUNC simd32_t simd32_u8_satsub(simd32_t _a, simd32_t _b);
 	BX_CONSTEXPR_FUNC simd32_t simd32_u16_satadd(simd32_t _a, simd32_t _b);
@@ -223,6 +224,7 @@ namespace bx
 	BX_CONSTEXPR_FUNC simd64_t simd64_x16_srl(simd64_t _a, int _count);
 	BX_CONSTEXPR_FUNC simd64_t simd64_i8_add(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_i8_sub(simd64_t _a, simd64_t _b);
+	BX_CONSTEXPR_FUNC simd64_t simd64_i8_cmpeq(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_u8_satadd(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_u8_satsub(simd64_t _a, simd64_t _b);
 	BX_CONSTEXPR_FUNC simd64_t simd64_u16_satadd(simd64_t _a, simd64_t _b);
@@ -728,6 +730,10 @@ namespace bx
 	template<typename Ty>
 	Ty simd128_u8_satadd(Ty _a, Ty _b);
 
+	///
+	template<typename Ty>
+	Ty simd128_i8_cmpeq(Ty _a, Ty _b);
+
 	/// 16xu8 saturating subtract.
 	///
 	template<typename Ty>
@@ -1067,6 +1073,7 @@ namespace bx
 	template<typename Ty> Ty simd256_i8_add(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_i8_sub(Ty _a, Ty _b);
 
+	template<typename Ty> Ty simd256_i8_cmpeq(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u8_satadd(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u8_satsub(Ty _a, Ty _b);
 	template<typename Ty> Ty simd256_u16_satadd(Ty _a, Ty _b);
@@ -1954,6 +1961,8 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_t simd_i32_mul(simd128_t _a, simd128_t _b) { return simd128_u32_mul(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_i8_cmpeq(simd128_t _a, simd128_t _b) { return simd128_i8_cmpeq(_a, _b); }
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_u8_satadd(simd128_t _a, simd128_t _b) { return simd128_u8_satadd(_a, _b); }
 
 	template<>
@@ -2367,6 +2376,8 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd256_t simd_i32_mul(simd256_t _a, simd256_t _b) { return simd256_u32_mul(_a, _b); }
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd256_t simd_i8_cmpeq(simd256_t _a, simd256_t _b) { return simd256_i8_cmpeq(_a, _b); }
+	template<>
 	BX_SIMD_FORCE_INLINE simd256_t simd_u8_satadd(simd256_t _a, simd256_t _b) { return simd256_u8_satadd(_a, _b); }
 
 	template<>
@@ -2446,6 +2457,8 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd32_t simd_i32_mul(simd32_t _a, simd32_t _b) { return simd32_u32_mul(_a, _b); }
 
+	template<>
+	BX_SIMD_FORCE_INLINE simd32_t simd_i8_cmpeq(simd32_t _a, simd32_t _b) { return simd32_i8_cmpeq(_a, _b); }
 	template<>
 	BX_SIMD_FORCE_INLINE simd32_t simd_u8_satadd(simd32_t _a, simd32_t _b) { return simd32_u8_satadd(_a, _b); }
 
@@ -2826,6 +2839,8 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd64_t simd_i32_mul(simd64_t _a, simd64_t _b) { return simd64_u32_mul(_a, _b); }
 
+	template<>
+	BX_SIMD_FORCE_INLINE simd64_t simd_i8_cmpeq(simd64_t _a, simd64_t _b) { return simd64_i8_cmpeq(_a, _b); }
 	template<>
 	BX_SIMD_FORCE_INLINE simd64_t simd_u8_satadd(simd64_t _a, simd64_t _b) { return simd64_u8_satadd(_a, _b); }
 
