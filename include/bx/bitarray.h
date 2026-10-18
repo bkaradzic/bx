@@ -12,6 +12,66 @@
 
 namespace bx
 {
+	class BitArrayViewBase;
+
+	/// Walks set bits of a mask, lowest first, by shifting the mask down to the next set bit.
+	///
+	/// @tparam MaskT Unsigned integer type of the mask.
+	///
+	template<typename MaskT>
+	struct BitMaskToIndexIteratorT
+	{
+		///
+		BitMaskToIndexIteratorT(MaskT _mask);
+
+		/// Advances to the next set bit.
+		void next();
+
+		/// Returns true when no set bits remain.
+		bool isDone() const;
+
+		/// Returns index of the current set bit.
+		uint32_t getIndex() const;
+
+		/// Returns remaining mask, shifted so that the current set bit is bit 0.
+		MaskT getMask() const;
+
+	private:
+		MaskT    m_mask;
+		uint32_t m_idx;
+	};
+
+	/// Range-for iterator over set bits of a bit array, in index order. Dereferences to the bit
+	/// index. The current word is cached and walked with BitMaskToIndexIteratorT; the next word is
+	/// looked up with findSet only when the cached one runs out. Clearing the bit under the
+	/// iterator keeps it valid. Other bits changed during iteration are seen only once the walk
+	/// reaches their word.
+	struct BitArrayIterator
+	{
+		///
+		BitArrayIterator(const BitArrayViewBase& _view, uint32_t _idx);
+
+		///
+		uint32_t operator*() const;
+
+		///
+		bool operator!=(const BitArrayIterator& _rhs) const;
+
+		///
+		const BitArrayIterator& operator++();
+
+		/// Advances to the next set bit. Returns false at the end.
+		bool next();
+
+	private:
+		void load(uint32_t _idx);
+
+		const BitArrayViewBase& m_view;
+		BitMaskToIndexIteratorT<uint64_t> m_bits;
+		uint32_t m_word;
+		uint32_t m_idx;
+	};
+
 	/// Base class for immutable bit array views providing read-only access to a contiguous bit set.
 	class BitArrayViewBase
 	{
@@ -61,6 +121,12 @@ namespace bx
 
 		/// Returns the maximum number of bits the bit set can hold.
 		uint32_t getCapacity() const;
+
+		/// Returns iterator to the first set bit.
+		BitArrayIterator begin() const;
+
+		/// Returns iterator past the last set bit.
+		BitArrayIterator end() const;
 
 		/// Finds a contiguous run of zero bits.
 		///
