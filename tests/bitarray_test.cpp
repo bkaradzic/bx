@@ -1512,3 +1512,143 @@ TEST_CASE("MippedBitArray-random", "[container]")
 		REQUIRE(expected == array.findClear(findBegin, kNumBits) );
 	}
 }
+
+TEST_CASE("BitArray-iterator", "[container]")
+{
+	constexpr uint32_t kNumWords = 40;
+	constexpr uint32_t kNumBits  = kNumWords*64;
+
+	uint64_t bits[kNumWords];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	bs.clear();
+
+	{
+		uint32_t numVisited = 0;
+
+		for (const uint32_t idx : bs)
+		{
+			BX_UNUSED(idx);
+			++numVisited;
+		}
+
+		REQUIRE(0 == numVisited);
+	}
+
+	bs.set(0, true);
+	bs.set(63, true);
+	bs.set(64, true);
+	bs.set(1000, true);
+	bs.set(kNumBits - 1, true);
+
+	{
+		const uint32_t expected[] = { 0, 63, 64, 1000, kNumBits - 1 };
+
+		uint32_t numVisited = 0;
+
+		for (const uint32_t idx : bs)
+		{
+			REQUIRE(numVisited < BX_COUNTOF(expected) );
+			REQUIRE(expected[numVisited] == idx);
+			++numVisited;
+		}
+
+		REQUIRE(BX_COUNTOF(expected) == numVisited);
+	}
+
+	bx::RngMwc rng;
+
+	for (uint32_t iter = 0; iter < 1000; ++iter)
+	{
+		fillRandom(rng, bits, kNumWords);
+
+		const uint32_t count = 1 + rng.gen() % kNumBits;
+		bx::MutableBitArrayView view(bits, sizeof(bits), count);
+
+		uint32_t expected = view.findSet(0, count);
+
+		for (const uint32_t idx : view)
+		{
+			REQUIRE(expected == idx);
+			REQUIRE(view.get(idx) );
+			expected = view.findSet(idx + 1, count);
+		}
+
+		REQUIRE(bx::kInvalid == expected);
+	}
+
+	fillRandom(rng, bits, kNumWords);
+
+	{
+		const uint32_t numSet = bs.countBits();
+
+		uint32_t numVisited = 0;
+
+		for (const uint32_t idx : bs)
+		{
+			++numVisited;
+
+			if (0 == (idx & 1) )
+			{
+				bs.set(idx, false);
+			}
+		}
+
+		REQUIRE(numSet == numVisited);
+
+		for (const uint32_t idx : bs)
+		{
+			REQUIRE(1 == (idx & 1) );
+			bs.set(idx, false);
+		}
+
+		REQUIRE(bs.testNone() );
+	}
+}
+
+template<typename MaskT>
+static void testBitMaskToIndexIterator(MaskT _mask)
+{
+	uint32_t numVisited = 0;
+	uint32_t prevIdx    = 0;
+
+	for (bx::BitMaskToIndexIteratorT<MaskT> it(_mask); !it.isDone(); it.next() )
+	{
+		const uint32_t idx = it.getIndex();
+
+		REQUIRE(idx < sizeof(MaskT)*8);
+		REQUIRE( (0 == numVisited || prevIdx < idx) );
+		REQUIRE(0 != ( (_mask >> idx) & 1) );
+		REQUIRE(1 == (it.getMask() & 1) );
+
+		prevIdx = idx;
+		++numVisited;
+	}
+
+	REQUIRE(bx::countBits<uint64_t>(uint64_t(_mask) ) == numVisited);
+}
+
+TEST_CASE("BitMaskToIndexIteratorT", "[container]")
+{
+	testBitMaskToIndexIterator<uint8_t>(0);
+	testBitMaskToIndexIterator<uint8_t>(1);
+	testBitMaskToIndexIterator<uint8_t>(0x80);
+	testBitMaskToIndexIterator<uint8_t>(0xff);
+	testBitMaskToIndexIterator<uint8_t>(0xa5);
+	testBitMaskToIndexIterator<uint16_t>(0x8001);
+	testBitMaskToIndexIterator<uint32_t>(0);
+	testBitMaskToIndexIterator<uint32_t>(0x80000001);
+	testBitMaskToIndexIterator<uint32_t>(UINT32_MAX);
+	testBitMaskToIndexIterator<uint64_t>(0);
+	testBitMaskToIndexIterator<uint64_t>(1);
+	testBitMaskToIndexIterator<uint64_t>(UINT64_C(0x8000000000000000) );
+	testBitMaskToIndexIterator<uint64_t>(UINT64_MAX);
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 1000; ++ii)
+	{
+		testBitMaskToIndexIterator<uint32_t>(rng.gen() );
+		testBitMaskToIndexIterator<uint64_t>( (uint64_t(rng.gen() ) << 32) | rng.gen() );
+	}
+}

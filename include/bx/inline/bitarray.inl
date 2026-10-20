@@ -53,6 +53,118 @@ namespace bx
 		return m_sizeInBytes * 8;
 	}
 
+	inline BitArrayIterator BitArrayViewBase::begin() const
+	{
+		return BitArrayIterator(*this, findSet(0, m_count) );
+	}
+
+	inline BitArrayIterator BitArrayViewBase::end() const
+	{
+		return BitArrayIterator(*this, kInvalid);
+	}
+
+	template<typename MaskT>
+	inline BitMaskToIndexIteratorT<MaskT>::BitMaskToIndexIteratorT(MaskT _mask)
+		: m_mask(0)
+		, m_idx(0)
+	{
+		const uint8_t ntz = countTrailingZeros<MaskT>(_mask);
+		m_mask = 0 == _mask ? MaskT(0) : MaskT(_mask >> ntz);
+		m_idx  = ntz;
+	}
+
+	template<typename MaskT>
+	inline void BitMaskToIndexIteratorT<MaskT>::next()
+	{
+		m_mask  = MaskT(m_mask >> 1);
+		m_idx  += 1;
+
+		const uint8_t ntz = countTrailingZeros<MaskT>(m_mask);
+		m_mask = 0 == m_mask ? MaskT(0) : MaskT(m_mask >> ntz);
+		m_idx += ntz;
+	}
+
+	template<typename MaskT>
+	inline bool BitMaskToIndexIteratorT<MaskT>::isDone() const
+	{
+		return 0 == m_mask;
+	}
+
+	template<typename MaskT>
+	inline uint32_t BitMaskToIndexIteratorT<MaskT>::getIndex() const
+	{
+		return m_idx;
+	}
+
+	template<typename MaskT>
+	inline MaskT BitMaskToIndexIteratorT<MaskT>::getMask() const
+	{
+		return m_mask;
+	}
+
+	inline BitArrayIterator::BitArrayIterator(const BitArrayViewBase& _view, uint32_t _idx)
+		: m_view(_view)
+		, m_bits(0)
+		, m_word(0)
+		, m_idx(kInvalid)
+	{
+		load(_idx);
+	}
+
+	inline uint32_t BitArrayIterator::operator*() const
+	{
+		return m_idx;
+	}
+
+	inline bool BitArrayIterator::operator!=(const BitArrayIterator& _rhs) const
+	{
+		return m_idx != _rhs.m_idx;
+	}
+
+	inline const BitArrayIterator& BitArrayIterator::operator++()
+	{
+		next();
+		return *this;
+	}
+
+	inline void BitArrayIterator::load(uint32_t _idx)
+	{
+		m_idx = _idx;
+
+		if (kInvalid != _idx)
+		{
+			m_word = _idx/64;
+
+			const uint64_t word = reinterpret_cast<const uint64_t*>(m_view.getPtr() )[m_word];
+			m_bits = BitMaskToIndexIteratorT<uint64_t>(word & (~UINT64_C(0) << (_idx & 63) ) );
+		}
+	}
+
+	inline bool BitArrayIterator::next()
+	{
+		if (kInvalid == m_idx)
+		{
+			return false;
+		}
+
+		const uint32_t count = m_view.getCount();
+
+		m_bits.next();
+
+		if (!m_bits.isDone() )
+		{
+			const uint32_t idx = m_word*64 + m_bits.getIndex();
+			m_idx = idx < count ? idx : kInvalid;
+		}
+		else
+		{
+			const uint32_t begin = (m_word + 1)*64;
+			load(begin < count ? m_view.findSet(begin, count) : kInvalid);
+		}
+
+		return kInvalid != m_idx;
+	}
+
 	inline uint32_t BitArrayViewBase::find(uint32_t _numBits) const
 	{
 		return find(0, m_count, _numBits);
