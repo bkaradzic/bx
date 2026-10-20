@@ -31,14 +31,14 @@ namespace bx
 		bool isDone() const;
 
 		/// Returns index of the current set bit.
-		uint32_t getIndex() const;
+		uint8_t getIndex() const;
 
 		/// Returns remaining mask, shifted so that the current set bit is bit 0.
 		MaskT getMask() const;
 
 	private:
-		MaskT    m_mask;
-		uint32_t m_idx;
+		MaskT   m_mask;
+		uint8_t m_idx;
 	};
 
 	/// Range-for iterator over set bits of a bit array, in index order. Dereferences to the bit

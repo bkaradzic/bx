@@ -91,7 +91,7 @@ namespace bx
 	}
 
 	template<typename MaskT>
-	inline uint32_t BitMaskToIndexIteratorT<MaskT>::getIndex() const
+	inline uint8_t BitMaskToIndexIteratorT<MaskT>::getIndex() const
 	{
 		return m_idx;
 	}
