@@ -218,6 +218,21 @@ namespace bx
 		return isSorted(_data, _num, _stride, _fn);
 	}
 
+	template<typename Ty, typename LessFn>
+	requires (isSame<decltype(declVal<LessFn>()(declVal<const Ty&>(), declVal<const Ty&>() ) ), bool>() )
+	inline constexpr bool isSorted(const Ty* _data, uint32_t _num, LessFn _less)
+	{
+		for (uint32_t ii = 1; ii < _num; ++ii)
+		{
+			if (_less(_data[ii], _data[ii-1]) )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	template<typename Ty>
 	inline int32_t binarySearch(const Ty& _key, const Ty* _data, uint32_t _num, const ComparisonFn _fn)
 	{

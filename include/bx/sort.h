@@ -203,6 +203,21 @@ namespace bx
 	template<typename Ty>
 	bool isSorted(const Ty* _data, uint32_t _num, const ComparisonFn _fn = compareAscending<Ty>);
 
+	/// Performs check if array is sorted. Usable in constant expressions, e.g. to `static_assert`
+	/// that a lookup table is in key order.
+	///
+	/// @param _data Pointer to array data.
+	/// @param _num Number of elements.
+	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. With `<=`
+	///   instead of `<` the check is for strictly ascending elements, no two equal.
+	///
+	/// @returns Returns `true` if no element sorts before the one ahead of it, otherwise returns
+	///   `false`.
+	///
+	template<typename Ty, typename LessFn>
+	requires (isSame<decltype(declVal<LessFn>()(declVal<const Ty&>(), declVal<const Ty&>() ) ), bool>() )
+	constexpr bool isSorted(const Ty* _data, uint32_t _num, LessFn _less);
+
 	/// Returns an index to the first element greater or equal than the `_key` value.
 	///
 	/// @param _key Pointer to the key to search for.

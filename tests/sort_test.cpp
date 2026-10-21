@@ -49,6 +49,63 @@ TEST_CASE("quickSort", "[sort]")
 	REQUIRE(bx::isSorted(byte, BX_COUNTOF(byte) ) );
 }
 
+namespace
+{
+	struct KeyedRow
+	{
+		uint32_t key;
+		uint32_t value;
+	};
+
+	constexpr KeyedRow s_dense[] =
+	{
+		{ 0, 10 },
+		{ 1, 11 },
+		{ 2, 12 },
+		{ 3, 13 },
+	};
+
+	constexpr KeyedRow s_repeated[] =
+	{
+		{ 0, 10 },
+		{ 1, 11 },
+		{ 1, 12 },
+		{ 3, 13 },
+	};
+
+	constexpr bool keyLess(const KeyedRow& _lhs, const KeyedRow& _rhs)
+	{
+		return _lhs.key < _rhs.key;
+	}
+
+	constexpr bool keyLessEqual(const KeyedRow& _lhs, const KeyedRow& _rhs)
+	{
+		return _lhs.key <= _rhs.key;
+	}
+
+} // namespace
+
+TEST_CASE("isSorted with a less function", "[sort]")
+{
+	STATIC_REQUIRE( bx::isSorted(s_dense,    BX_COUNTOF(s_dense),    keyLess) );
+	STATIC_REQUIRE( bx::isSorted(s_repeated, BX_COUNTOF(s_repeated), keyLess) );
+	STATIC_REQUIRE( bx::isSorted(s_dense,    BX_COUNTOF(s_dense),    keyLessEqual) );
+	STATIC_REQUIRE(!bx::isSorted(s_repeated, BX_COUNTOF(s_repeated), keyLessEqual) );
+	STATIC_REQUIRE( bx::isSorted(s_dense, 0, keyLess) );
+	STATIC_REQUIRE( bx::isSorted(s_dense, 1, keyLess) );
+
+	int32_t data[] = { 3, 1, 2 };
+	const uint32_t num = BX_COUNTOF(data);
+
+	REQUIRE(!bx::isSorted(data, num, [](const int32_t& _lhs, const int32_t& _rhs) { return _lhs < _rhs; }) );
+
+	bx::quickSort(data, num);
+
+	REQUIRE( bx::isSorted(data, num, [](const int32_t& _lhs, const int32_t& _rhs) { return _lhs < _rhs; }) );
+	REQUIRE( bx::isSorted(data, num, bx::compareAscending<int32_t>) );
+	REQUIRE(!bx::isSorted(data, num, bx::compareDescending<int32_t>) );
+}
+
 TEST_CASE("binarySearch", "[sort]")
 {
 	const char* str[] =
