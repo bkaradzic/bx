@@ -132,6 +132,30 @@ TEST_CASE("memoryMap-protection-change", "[os]")
 	REQUIRE(err.isOk() );
 }
 
+TEST_CASE("memoryMap-dont-need", "[os]")
+{
+	const size_t size = 16*bx::memoryPageSize();
+
+	bx::Error err;
+	void* addr = bx::memoryMap(NULL, size, 0, bx::Memory::ReadWrite, &err);
+	REQUIRE(err.isOk() );
+	REQUIRE(nullptr != addr);
+
+	uint8_t* bytes = (uint8_t*)addr;
+	bx::memSet(bytes, 0xab, size);
+
+	// Pages stay accessible after their contents are dropped.
+	bx::memoryMap(addr, size, 0, bx::Memory::DontNeed, &err);
+	REQUIRE(err.isOk() );
+
+	bx::memSet(bytes, 0xcd, size);
+	REQUIRE(0xcd == bytes[0]);
+	REQUIRE(0xcd == bytes[size-1]);
+
+	bx::memoryUnmap(addr, size, &err);
+	REQUIRE(err.isOk() );
+}
+
 TEST_CASE("memoryAllocationGranularity", "[os]")
 {
 	const size_t pageSize    = bx::memoryPageSize();

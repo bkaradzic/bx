@@ -719,7 +719,12 @@ namespace bx
 			}
 		}
 
-		BX_UNUSED(advise);
+		if (Memory::DontNeed == advise)
+		{
+			VirtualAlloc(_address, _size, MEM_RESET, PAGE_NOACCESS);
+			VirtualUnlock(_address, _size);
+		}
+
 		return _address;
 #else
 		BX_UNUSED(_address, _size, _alignment, _flags, state, protect, advise, page, granularity);
