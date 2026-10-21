@@ -174,6 +174,23 @@ TEST_CASE("isEqual constexpr", "[string]")
 	STATIC_REQUIRE( bx::isEqual(bx::StringLiteral("pod"), bx::StringView("POD"), false) );
 }
 
+TEST_CASE("strCmp constexpr", "[string]")
+{
+	STATIC_REQUIRE(0 == bx::strCmp("abvgd", "abvgd") );
+	STATIC_REQUIRE(0  < bx::strCmp("abvgd", "abv") );
+	STATIC_REQUIRE(0  > bx::strCmp("", "abvgd") );
+	STATIC_REQUIRE(0 == bx::strCmp("abvgd", "abvgx", 4) );
+
+	STATIC_REQUIRE(0 == bx::strCmpI("abvgd", "ABVGD") );
+	STATIC_REQUIRE(0  > bx::strCmpI("abvgd", "ABVGX") );
+
+	STATIC_REQUIRE(0  > bx::strCmpV("test_2.txt", "test_10.txt") );
+
+	constexpr bx::StringLiteral sorted[] = { "dds", "exr", "ktx", "ktx2", "png" };
+	STATIC_REQUIRE( bx::isSorted(sorted, BX_COUNTOF(sorted), [](const bx::StringLiteral& _lhs, const bx::StringLiteral& _rhs) { return 0 > bx::strCmp(_lhs, _rhs); }) );
+	STATIC_REQUIRE(!bx::isSorted(sorted, BX_COUNTOF(sorted), [](const bx::StringLiteral& _lhs, const bx::StringLiteral& _rhs) { return 0 < bx::strCmp(_lhs, _rhs); }) );
+}
+
 TEST_CASE("strCmpV", "[string]")
 {
 	REQUIRE(0 == bx::strCmpV("test", "test") );

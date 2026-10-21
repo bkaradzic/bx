@@ -375,13 +375,13 @@ namespace bx
 	void toUpper(char* _inOutStr, int32_t _max = INT32_MAX);
 
 	/// String compare.
-	int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
+	constexpr int32_t strCmp(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
 
 	/// Case insensitive string compare.
-	int32_t strCmpI(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
+	constexpr int32_t strCmpI(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
 
 	// Compare as strings holding indices/version numbers.
-	int32_t strCmpV(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
+	constexpr int32_t strCmpV(const StringView& _lhs, const StringView& _rhs, int32_t _max = INT32_MAX);
 
 	/// Get string length.
 	constexpr int32_t strLen(const char* _str, int32_t _max = INT32_MAX);
