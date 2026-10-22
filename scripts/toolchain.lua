@@ -778,6 +778,7 @@ function toolchain(_buildDir, _libDir)
 	configuration { "linux-gcc*" }
 		buildoptions {
 			"-Wlogical-op",
+			"-Wno-psabi",
 		}
 
 	configuration { "linux-gcc*", "x32" }
