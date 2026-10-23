@@ -14,7 +14,7 @@ namespace bx
 {
 	class BitArrayViewBase;
 
-	/// Walks set bits of a mask, lowest first, by shifting the mask down to the next set bit.
+	/// Walks set bits of a mask, lowest first, by clearing the lowest set bit.
 	///
 	/// @tparam MaskT Unsigned integer type of the mask.
 	///
@@ -37,8 +37,7 @@ namespace bx
 		MaskT getMask() const;
 
 	private:
-		MaskT   m_mask;
-		uint8_t m_idx;
+		MaskT m_mask;
 	};
 
 	/// Range-for iterator over set bits of a bit array, in index order. Dereferences to the bit

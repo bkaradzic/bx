@@ -65,23 +65,14 @@ namespace bx
 
 	template<typename MaskT>
 	inline BitMaskToIndexIteratorT<MaskT>::BitMaskToIndexIteratorT(MaskT _mask)
-		: m_mask(0)
-		, m_idx(0)
+		: m_mask(_mask)
 	{
-		const uint8_t ntz = countTrailingZeros<MaskT>(_mask);
-		m_mask = 0 == _mask ? MaskT(0) : MaskT(_mask >> ntz);
-		m_idx  = ntz;
 	}
 
 	template<typename MaskT>
 	inline void BitMaskToIndexIteratorT<MaskT>::next()
 	{
-		m_mask  = MaskT(m_mask >> 1);
-		m_idx  += 1;
-
-		const uint8_t ntz = countTrailingZeros<MaskT>(m_mask);
-		m_mask = 0 == m_mask ? MaskT(0) : MaskT(m_mask >> ntz);
-		m_idx += ntz;
+		m_mask = MaskT(m_mask & (m_mask - 1) );
 	}
 
 	template<typename MaskT>
@@ -93,13 +84,13 @@ namespace bx
 	template<typename MaskT>
 	inline uint8_t BitMaskToIndexIteratorT<MaskT>::getIndex() const
 	{
-		return m_idx;
+		return countTrailingZeros<MaskT>(m_mask);
 	}
 
 	template<typename MaskT>
 	inline MaskT BitMaskToIndexIteratorT<MaskT>::getMask() const
 	{
-		return m_mask;
+		return MaskT(m_mask >> getIndex() );
 	}
 
 	inline BitArrayIterator::BitArrayIterator(const BitArrayViewBase& _view, uint32_t _idx)
