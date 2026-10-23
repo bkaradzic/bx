@@ -1278,6 +1278,107 @@ TEST_CASE("BitArray-ops-bench", "[.][!benchmark]")
 	}
 }
 
+template<typename MaskT>
+static uint32_t sumMaskIndices(const MaskT* _masks, uint32_t _numMasks, const uint32_t* _table)
+{
+	uint32_t sum = 0;
+
+	for (uint32_t ii = 0; ii < _numMasks; ++ii)
+	{
+		for (bx::BitMaskToIndexIteratorT<MaskT> it(_masks[ii]); !it.isDone(); it.next() )
+		{
+			sum += _table[it.getIndex()];
+		}
+	}
+
+	return sum;
+}
+
+static uint32_t sumSetBits(const bx::BitArrayViewBase& _bs)
+{
+	uint32_t sum = 0;
+
+	for (const uint32_t idx : _bs)
+	{
+		sum += idx;
+	}
+
+	return sum;
+}
+
+TEST_CASE("BitArray-iterate-bench", "[.][!benchmark]")
+{
+	constexpr uint32_t kNumMasks = 4096;
+	constexpr uint32_t kNumBits  = 64<<10;
+
+	bx::RngMwc rng;
+
+	uint32_t table[64];
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(table); ++ii)
+	{
+		table[ii] = rng.gen();
+	}
+
+	static uint32_t streamMasks[kNumMasks];
+	static uint32_t bindingMasks[kNumMasks];
+	static uint64_t randomMasks[kNumMasks];
+
+	for (uint32_t ii = 0; ii < kNumMasks; ++ii)
+	{
+		streamMasks[ii]  = rng.gen() & 0xf;
+		bindingMasks[ii] = rng.gen() & rng.gen() & 0xffff;
+		randomMasks[ii]  = (uint64_t(rng.gen() ) << 32) | rng.gen();
+	}
+
+	BENCHMARK("mask streams 4 bits 4K")
+	{
+		return sumMaskIndices(streamMasks, kNumMasks, table);
+	};
+
+	BENCHMARK("mask bindings 16 bits 4K")
+	{
+		return sumMaskIndices(bindingMasks, kNumMasks, table);
+	};
+
+	BENCHMARK("mask random 64 bits 4K")
+	{
+		return sumMaskIndices(randomMasks, kNumMasks, table);
+	};
+
+	alignas(64) static uint64_t bits[kNumBits/64];
+	bx::MutableBitArrayView bs(bits, sizeof(bits) );
+
+	bs.set(0, kNumBits, true);
+
+	BENCHMARK("iterate dense 64K")
+	{
+		return sumSetBits(bs);
+	};
+
+	for (uint32_t ii = 0; ii < kNumBits/64; ++ii)
+	{
+		bits[ii] = (uint64_t(rng.gen() ) << 32) | rng.gen();
+	}
+
+	BENCHMARK("iterate random 64K")
+	{
+		return sumSetBits(bs);
+	};
+
+	bs.clear();
+
+	for (uint32_t ii = 0; ii < kNumBits; ii += 64)
+	{
+		bs.set(ii + rng.gen() % 64, true);
+	}
+
+	BENCHMARK("iterate 1/64 64K")
+	{
+		return sumSetBits(bs);
+	};
+}
+
 static void fillRandom(bx::RngMwc& _rng, uint64_t* _bits, uint32_t _numWords)
 {
 	const uint32_t mode = _rng.gen() % 4;
