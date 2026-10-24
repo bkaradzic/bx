@@ -203,9 +203,28 @@ namespace bx
 		'9', '0', '9', '1', '9', '2', '9', '3', '9', '4', '9', '5', '9', '6', '9', '7', '9', '8', '9', '9'
 	};
 
-	static const uint32_t s_kPow10[] =
+	static const uint64_t s_kPow10[] =
 	{
-		1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000
+		UINT64_C(1),
+		UINT64_C(10),
+		UINT64_C(100),
+		UINT64_C(1000),
+		UINT64_C(10000),
+		UINT64_C(100000),
+		UINT64_C(1000000),
+		UINT64_C(10000000),
+		UINT64_C(100000000),
+		UINT64_C(1000000000),
+		UINT64_C(10000000000),
+		UINT64_C(100000000000),
+		UINT64_C(1000000000000),
+		UINT64_C(10000000000000),
+		UINT64_C(100000000000000),
+		UINT64_C(1000000000000000),
+		UINT64_C(10000000000000000),
+		UINT64_C(100000000000000000),
+		UINT64_C(1000000000000000000),
+		UINT64_C(10000000000000000000),
 	};
 
 	DiyFp GetCachedPower(int32_t e, int32_t* K)
@@ -289,7 +308,7 @@ namespace bx
 			if (tmp <= delta)
 			{
 				*K += kappa;
-				GrisuRound(buffer, *len, delta, tmp, static_cast<uint64_t>(s_kPow10[kappa]) << -one.e, wp_w.f);
+				GrisuRound(buffer, *len, delta, tmp, s_kPow10[kappa] << -one.e, wp_w.f);
 				return;
 			}
 		}
@@ -311,7 +330,7 @@ namespace bx
 			{
 				*K += kappa;
 				const int index = -static_cast<int>(kappa);
-				GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < 9 ? s_kPow10[-static_cast<int>(kappa)] : 0));
+				GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < int32_t(BX_COUNTOF(s_kPow10) ) ? s_kPow10[index] : 0));
 				return;
 			}
 		}

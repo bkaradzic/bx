@@ -421,6 +421,8 @@ TEST_CASE("toString double", "[string]")
 	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
 	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
 	REQUIRE(testToString(-1.234567e-9,            "-1.234567e-9") );
+	REQUIRE(testToString(0.1 + 0.2,               "0.30000000000000004") );
+	REQUIRE(testToString(1.0000000000000002,      "1.0000000000000002") );
 }
 
 template<typename Ty>
