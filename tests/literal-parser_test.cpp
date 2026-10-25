@@ -238,3 +238,25 @@ TEST_CASE("LiteralParser WGSL profile", "[parser]")
 	REQUIRE(testWgsl("0b1", "0", LP::Decimal) );            // "0" then "b1"
 	REQUIRE(testWgsl("5_5", "5", LP::Decimal) );            // "5" then "_5"
 }
+
+static bool testHlsl(const bx::StringView& _input, const bx::StringView& _output, bx::LiteralParser::Type _type)
+{
+	bx::LiteralParser p(_input, bx::LiteralParser::hlsl() );
+
+	return p.isOk()
+		&& _type == p.getType()
+		&& bx::isEqual(p.getLiteral(), _output)
+		;
+}
+
+TEST_CASE("LiteralParser HLSL profile", "[parser]")
+{
+	typedef bx::LiteralParser LP;
+
+	REQUIRE(testHlsl("1.5f",  "1.5f",  LP::Float) );
+	REQUIRE(testHlsl("1.5h",  "1.5h",  LP::Float) );
+	REQUIRE(testHlsl("1.5L",  "1.5L",  LP::Float) ); // double
+	REQUIRE(testHlsl("1.5l;", "1.5l",  LP::Float) );
+	REQUIRE(testHlsl("5L",    "5L",    LP::Decimal) ); // int64_t
+	REQUIRE(testHlsl("5UL",   "5UL",   LP::Decimal) );
+}

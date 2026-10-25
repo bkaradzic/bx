@@ -15,7 +15,7 @@ namespace bx
 		static constexpr StringView kGlslInt[]   = { "u", "U", "lu", "LU" };
 		static constexpr StringView kGlslFloat[] = { "f", "F", "lf", "LF" };
 		static constexpr StringView kHlslInt[]   = { "u", "U", "l", "L", "ll", "LL", "ul", "lu", "uL", "Lu", "UL", "ull", "llu", "ULL", "LLU" };
-		static constexpr StringView kHlslFloat[] = { "f", "F", "h", "H" };
+		static constexpr StringView kHlslFloat[] = { "f", "F", "h", "H", "l", "L" };
 		static constexpr StringView kCInt[]      = { "u", "U", "l", "L", "ll", "LL", "ul", "lu", "uL", "Lu", "ull", "llu", "ULL", "LLU" };
 		static constexpr StringView kCFloat[]    = { "f", "F", "l", "L" };
 		static constexpr StringView kMslFloat[]  = { "f", "F", "h", "H" };
@@ -139,13 +139,16 @@ namespace bx
 				return parseDecimalFloat(_scanner, _profile);
 			}
 
+			if (acceptSuffix(_scanner, _profile.intSuffix) )
+			{
+				return LiteralType::Decimal;
+			}
+
 			if (0 != (_profile.flags & LiteralParser::PromoteFloatSuffix)
 			&&  acceptSuffix(_scanner, _profile.floatSuffix) )
 			{
 				return LiteralType::Float;
 			}
-
-			acceptSuffix(_scanner, _profile.intSuffix);
 
 			return LiteralType::Decimal;
 		}
