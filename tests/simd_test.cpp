@@ -2234,6 +2234,25 @@ TEST_CASE("simd128_orc_orx_sels", "[simd]")
 	check_u32("sels", simd128_sels(neg, sa, sb), 1, 2, 1, 2);
 }
 
+TEST_CASE("simd64_x8_signbitsmask", "[simd]")
+{
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 256; ++ii)
+	{
+		uint64_t value = 0;
+
+		for (uint32_t jj = 0; jj < 8; ++jj)
+		{
+			const uint64_t low  = rng.gen() & 0x7f;
+			const uint64_t sign = (ii >> jj) & 1;
+			value |= (low | (sign << 7) ) << (jj * 8);
+		}
+
+		REQUIRE(int(ii) == simd64_x8_signbitsmask(simd64_splat(value) ) );
+	}
+}
+
 TEST_CASE("simd128_signbits", "[simd]")
 {
 	REQUIRE(simd128_x32_signbitsmask(simd128_ld<simd128_t>(0x80000000u, 0u, 0x80000000u, 0u)) == 0x5);

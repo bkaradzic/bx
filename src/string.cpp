@@ -6,6 +6,8 @@
 #include <bx/allocator.h>
 #include <bx/file.h>
 #include <bx/hash.h>
+#include <bx/math.h>
+#include <bx/simd_t.h>
 #include <bx/string.h>
 
 namespace bx
@@ -130,8 +132,109 @@ namespace bx
 		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
+	inline uint32_t matchBytes(const char* _str, simd64_t _pattern)
+	{
+		const uint64_t word    = loadUnaligned<uint64_t>(_str);
+		const simd64_t chunk   = simd64_splat(word);
+		const simd64_t low7    = simd64_splat(uint8_t(0x7f) );
+		const simd64_t diff    = simd64_xor(chunk, _pattern);
+		const simd64_t lowBits = simd64_and(diff, low7);
+		const simd64_t carry   = simd64_u64_add(lowBits, low7);
+		const simd64_t nonZero = simd64_or(carry, diff);
+		const simd64_t equal   = simd64_not(nonZero);
+		const int      mask    = simd64_x8_signbitsmask(equal);
+		return uint32_t(mask);
+	}
+
+	inline uint32_t matchBytes(const char* _str, simd128_t _pattern)
+	{
+		const simd128_t chunk = simd_ldu<simd128_t>(_str);
+		const simd128_t equal = simd_i8_cmpeq(chunk, _pattern);
+		const int       mask  = simd_x8_signbitsmask(equal);
+		return uint32_t(mask);
+	}
+
+	inline bool matchAny(const char* _str, simd128_t _pattern)
+	{
+		const simd128_t chunk0 = simd_ldu<simd128_t>(&_str[ 0]);
+		const simd128_t chunk1 = simd_ldu<simd128_t>(&_str[16]);
+		const simd128_t chunk2 = simd_ldu<simd128_t>(&_str[32]);
+		const simd128_t chunk3 = simd_ldu<simd128_t>(&_str[48]);
+		const simd128_t equal0 = simd_i8_cmpeq(chunk0, _pattern);
+		const simd128_t equal1 = simd_i8_cmpeq(chunk1, _pattern);
+		const simd128_t equal2 = simd_i8_cmpeq(chunk2, _pattern);
+		const simd128_t equal3 = simd_i8_cmpeq(chunk3, _pattern);
+		const simd128_t any01  = simd_or(equal0, equal1);
+		const simd128_t any23  = simd_or(equal2, equal3);
+		const simd128_t any    = simd_or(any01, any23);
+		const int       mask   = simd_x8_signbitsmask(any);
+		return 0 != mask;
+	}
+
 	inline const char* strFindUnsafe(const char* _str, int32_t _len, char _ch)
 	{
+		if constexpr (kSimdSupported)
+		{
+			if (16 <= _len)
+			{
+				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
+				const simd128_t pattern = simd_splat<simd128_t>(splat);
+
+				int32_t ii = 0;
+
+				for (; ii + 64 <= _len && !matchAny(&_str[ii], pattern); ii += 64)
+				{
+				}
+
+				for (; ii + 16 <= _len; ii += 16)
+				{
+					const uint32_t mask = matchBytes(&_str[ii], pattern);
+
+					if (0 != mask)
+					{
+						return &_str[ii + countTrailingZeros(mask)];
+					}
+				}
+
+				if (ii == _len)
+				{
+					return NULL;
+				}
+
+				const int32_t  at   = _len - 16;
+				const uint32_t mask = matchBytes(&_str[at], pattern);
+
+				return 0 != mask ? &_str[at + countTrailingZeros(mask)] : NULL;
+			}
+		}
+
+		if (8 <= _len)
+		{
+			const simd64_t pattern = simd64_splat(uint8_t(_ch) );
+
+			int32_t ii = 0;
+
+			for (; ii + 8 <= _len; ii += 8)
+			{
+				const uint32_t mask = matchBytes(&_str[ii], pattern);
+
+				if (0 != mask)
+				{
+					return &_str[ii + countTrailingZeros(mask)];
+				}
+			}
+
+			if (ii == _len)
+			{
+				return NULL;
+			}
+
+			const int32_t  at   = _len - 8;
+			const uint32_t mask = matchBytes(&_str[at], pattern);
+
+			return 0 != mask ? &_str[at + countTrailingZeros(mask)] : NULL;
+		}
+
 		for (int32_t ii = 0; ii < _len; ++ii)
 		{
 			if (_str[ii] == _ch)
@@ -161,6 +264,66 @@ namespace bx
 
 	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
 	{
+		if constexpr (kSimdSupported)
+		{
+			if (16 <= _len)
+			{
+				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
+				const simd128_t pattern = simd_splat<simd128_t>(splat);
+
+				int32_t end = _len;
+
+				for (; 64 <= end && !matchAny(&_str[end - 64], pattern); end -= 64)
+				{
+				}
+
+				for (; 16 <= end; end -= 16)
+				{
+					const uint32_t mask = matchBytes(&_str[end - 16], pattern);
+
+					if (0 != mask)
+					{
+						return &_str[end - 16 + 31 - countLeadingZeros(mask)];
+					}
+				}
+
+				if (0 == end)
+				{
+					return NULL;
+				}
+
+				const uint32_t mask = matchBytes(_str, pattern);
+
+				return 0 != mask ? &_str[31 - countLeadingZeros(mask)] : NULL;
+			}
+		}
+
+		if (8 <= _len)
+		{
+			const simd64_t pattern = simd64_splat(uint8_t(_ch) );
+
+			int32_t end = _len;
+
+			for (; 8 <= end; end -= 8)
+			{
+				const uint32_t mask = matchBytes(&_str[end - 8], pattern);
+
+				if (0 != mask)
+				{
+					return &_str[end - 8 + 31 - countLeadingZeros(mask)];
+				}
+			}
+
+			if (0 == end)
+			{
+				return NULL;
+			}
+
+			const uint32_t mask = matchBytes(_str, pattern);
+
+			return 0 != mask ? &_str[31 - countLeadingZeros(mask)] : NULL;
+		}
+
 		for (int32_t ii = _len-1; 0 <= ii; --ii)
 		{
 			if (_str[ii] == _ch)
@@ -215,11 +378,41 @@ namespace bx
 		return NULL;
 	}
 
+	inline const char* strFindExact(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
+	{
+		if (0 >= _findLen
+		||  _findLen > _strLen)
+		{
+			return NULL;
+		}
+
+		const char* term = _str + _strLen;
+		const char* last = term - _findLen;
+
+		for (const char* ptr = _str; ptr <= last; ++ptr)
+		{
+			ptr = strFindUnsafe(ptr, int32_t(term - ptr), _find[0]);
+
+			if (NULL == ptr
+			||  ptr > last)
+			{
+				return NULL;
+			}
+
+			if (0 == memCmp(ptr, _find, _findLen) )
+			{
+				return ptr;
+			}
+		}
+
+		return NULL;
+	}
+
 	StringView strFind(const StringView& _str, const StringView& _find, int32_t _num)
 	{
 		int32_t len = min(_find.getLength(), _num);
 
-		const char* ptr = strFind<toNoop>(
+		const char* ptr = strFindExact(
 			  _str.getPtr()
 			, _str.getLength()
 			, _find.getPtr()
@@ -535,6 +728,8 @@ namespace bx
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
+	int32_t toStringFormatted(char* _out, int32_t _max, double _value, char _fmt, int32_t _prec, bool _alt);
+
 	namespace
 	{
 		struct Param
@@ -801,60 +996,24 @@ namespace bx
 
 		static int32_t write(WriterI* _writer, double _d, const Param& _param, Error* _err)
 		{
-			char str[1024];
-			int32_t len = toString(str, sizeof(str), _d);
+			char str[1152];
+			const int32_t prec = INT32_MAX == _param.prec ? 6 : _param.prec;
+			const int32_t len  = toStringFormatted(str, sizeof(str), _d, _param.fmt, prec, _param.spec);
 
 			if (len == 0)
 			{
 				return 0;
 			}
 
-			const char* dot = strFind(str, INT32_MAX, '.');
-			if (NULL != dot)
+			Param param = _param;
+			param.prec  = INT32_MAX;
+
+			if (!isFinite(_d) )
 			{
-				const int32_t defaultPrec = ('g' == _param.fmt) ? 6 : 6;
-				int32_t prec = INT32_MAX == _param.prec ? defaultPrec : _param.prec;
-
-				const char* strEnd   = str + len;
-				const char* exponent = strFind(str, INT32_MAX, 'e');
-				const char* fracEnd  = NULL != exponent ? exponent : strEnd;
-
-				char* fracBegin = &str[dot - str + min(prec + _param.spec, 1)];
-				const int32_t curPrec = int32_t(fracEnd - fracBegin);
-
-				const int32_t exponentLen = int32_t(strEnd - fracEnd);
-				const int32_t maxPrec     = int32_t(sizeof(str) ) - 1
-					- int32_t(fracBegin - str)
-					- exponentLen
-					;
-
-				const int32_t reqPrec = 'g' == _param.fmt ? min(prec, curPrec) : prec;
-				const int32_t outPrec = min(reqPrec, maxPrec);
-
-				// Move exponent to its final location after trimming or adding extra 0s.
-				if (fracEnd != strEnd)
-				{
-					char* finalExponentPtr = &fracBegin[outPrec];
-					memMove(finalExponentPtr, fracEnd, exponentLen);
-
-					finalExponentPtr[exponentLen] = '\0';
-					len = int32_t(&finalExponentPtr[exponentLen] - str);
-				}
-				else
-				{
-					len = (int32_t)(fracBegin + outPrec - str);
-				}
-
-				if (curPrec < outPrec)
-				{
-					for (int32_t ii = curPrec; ii < outPrec; ++ii)
-					{
-						fracBegin[ii] = '0';
-					}
-				}
+				param.fill = ' ';
 			}
 
-			return write(_writer, str, len, _param, _err);
+			return write(_writer, str, len, param, _err);
 		}
 
 		static int32_t write(WriterI* _writer, const void* _ptr, const Param& _param, Error* _err)

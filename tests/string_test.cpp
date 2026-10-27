@@ -8,6 +8,7 @@
 #include <bx/filepath.h>
 #include <bx/string.h>
 #include <bx/handlealloc.h>
+#include <bx/rng.h>
 #include <bx/sort.h>
 #include <string>
 #include <tinystl/string.h>
@@ -322,6 +323,98 @@ TEST_CASE("strFind", "[string]")
 		bx::StringView test = bx::strFind("a", bx::StringView("a ", 1) );
 		REQUIRE(test.getLength() == 1);
 		REQUIRE(*test.getPtr() == 'a');
+	}
+}
+
+TEST_CASE("strFind edges", "[string]")
+{
+	const char* test = "0123456789abcdefXYZ0123456789abcdefghij";
+	const bx::StringView view(test);
+
+	REQUIRE(&test[0]  == bx::strFind(view, "0123").getPtr() );
+	REQUIRE(&test[35] == bx::strFind(view, "ghij").getPtr() );
+	REQUIRE(&test[38] == bx::strFind(view, 'j').getPtr() );
+	REQUIRE(&test[19] == bx::strRFind(view, '0').getPtr() );
+	REQUIRE(&test[15] == bx::strFind(view, "fXY").getPtr() );
+	REQUIRE(&test[16] == bx::strFind(view, 'X').getPtr() );
+	REQUIRE(&test[16] == bx::strRFind(view, 'X').getPtr() );
+
+	REQUIRE(bx::strFind(bx::StringView(test, 4), "01234").isEmpty() );
+	REQUIRE(bx::strFind(view, "").isEmpty() );
+	REQUIRE(bx::strFind(bx::StringView(), "a").isEmpty() );
+	REQUIRE(bx::strFind(view, 'q').isEmpty() );
+	REQUIRE(bx::strRFind(view, 'q').isEmpty() );
+
+	REQUIRE(&test[16] == bx::strFind(view, "XYQ", 2).getPtr() );
+	REQUIRE(2 == bx::strFind(view, "XYQ", 2).getLength() );
+	REQUIRE(bx::strFind(view, "XYQ").isEmpty() );
+
+	REQUIRE(&test[21] == bx::strFind(bx::StringView(&test[3], 36), "2345").getPtr() );
+	REQUIRE(&test[3]  == bx::strFind(bx::StringView(&test[3], 36), "3456").getPtr() );
+}
+
+static const char* strFindRef(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
+{
+	for (int32_t ii = 0; 0 < _findLen && ii + _findLen <= _strLen; ++ii)
+	{
+		if (0 == bx::memCmp(&_str[ii], _find, _findLen) )
+		{
+			return &_str[ii];
+		}
+	}
+
+	return NULL;
+}
+
+static const char* strRFindRef(const char* _str, int32_t _strLen, char _ch)
+{
+	for (int32_t ii = _strLen - 1; 0 <= ii; --ii)
+	{
+		if (_ch == _str[ii])
+		{
+			return &_str[ii];
+		}
+	}
+
+	return NULL;
+}
+
+TEST_CASE("strFind matches a byte loop", "[string]")
+{
+	bx::RngMwc rng;
+
+	char buffer[176];
+
+	for (uint32_t ii = 0; ii < 100000; ++ii)
+	{
+		const int32_t offset  = int32_t(rng.gen() % 16);
+		const int32_t len     = int32_t(rng.gen() % 151);
+		const int32_t findLen = int32_t(rng.gen() % 5);
+
+		for (int32_t jj = 0; jj < len; ++jj)
+		{
+			buffer[offset + jj] = char('a' + rng.gen() % 3);
+		}
+
+		char find[4];
+		for (int32_t jj = 0; jj < findLen; ++jj)
+		{
+			find[jj] = char('a' + rng.gen() % 3);
+		}
+
+		const char* str = &buffer[offset];
+		const bx::StringView view(str, len);
+
+		const char* expected = strFindRef(str, len, find, findLen);
+		const bx::StringView found = bx::strFind(view, bx::StringView(find, findLen) );
+		REQUIRE( (NULL == expected ? view.getTerm() : expected) == found.getPtr() );
+
+		const char ch = char('a' + rng.gen() % 4);
+		const char* expectedCh = strFindRef(str, len, &ch, 1);
+		REQUIRE( (NULL == expectedCh ? view.getTerm() : expectedCh) == bx::strFind(view, ch).getPtr() );
+
+		const char* expectedRCh = strRFindRef(str, len, ch);
+		REQUIRE( (NULL == expectedRCh ? view.getTerm() : expectedRCh) == bx::strRFind(view, ch).getPtr() );
 	}
 }
 
@@ -661,6 +754,32 @@ TEST_CASE("fromString long digit strings", "[string]")
 	double d = 0.0;
 	REQUIRE(bx::fromString(&d, "1.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001") );
 	REQUIRE(d == 1.0);
+}
+
+TEST_CASE("fromString round trip across every exponent", "[string]")
+{
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 100000; ++ii)
+	{
+		const uint64_t hi   = rng.gen();
+		const uint64_t lo   = rng.gen();
+		const uint64_t bits = (hi << 32) | lo;
+		const double value  = bx::bitsToDouble(bits);
+
+		if (!bx::isFinite(value) )
+		{
+			continue;
+		}
+
+		char tmp[64];
+		bx::toString(tmp, BX_COUNTOF(tmp), value);
+		INFO(tmp);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(bx::doubleToBits(read) == bits);
+	}
 }
 
 TEST_CASE("fromString hex wide mantissa", "[string]")
@@ -1191,4 +1310,75 @@ TEST_CASE("UTF-16 conversion", "[string][utf8]")
 	static const uint16_t kLoneLow[]  = { 0xde00, 0 };
 	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneHigh) );
 	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneLow) );
+}
+
+TEST_CASE("strFind-bench", "[.][!benchmark]")
+{
+	char haystack[1025];
+	bx::memSet(haystack, 'a', sizeof(haystack) - 1);
+	haystack[sizeof(haystack) - 1] = '\0';
+
+	for (int32_t len : { 12, 16, 1024 })
+	{
+		haystack[1]       = 'W';
+		haystack[len - 2] = 'X';
+		haystack[len - 1] = 'Y';
+
+		const bx::StringView view(haystack, len);
+		const std::string    str(haystack, len);
+
+		char name[64];
+
+		bx::snprintf(name, sizeof(name), "bx::strFind %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, "XY").getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find %d", len);
+		BENCHMARK(name)
+		{
+			return str.find("XY");
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strFind not found %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, "ZY").getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find not found %d", len);
+		BENCHMARK(name)
+		{
+			return str.find("ZY");
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strFind char %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, 'Y').getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find char %d", len);
+		BENCHMARK(name)
+		{
+			return str.find('Y');
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strRFind char %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strRFind(view, 'W').getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::rfind char %d", len);
+		BENCHMARK(name)
+		{
+			return str.rfind('W');
+		};
+
+		haystack[1]       = 'a';
+		haystack[len - 2] = 'a';
+		haystack[len - 1] = 'a';
+	}
 }
