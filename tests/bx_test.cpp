@@ -99,3 +99,29 @@ TEST_CASE("align", "[bx]")
 	REQUIRE(-16 == bx::alignDown(-1,  16) );
 	REQUIRE(-32 == bx::alignDown(-31, 16) );
 }
+
+TEST_CASE("loadUnaligned, storeUnaligned", "[bx]")
+{
+	uint8_t bytes[24];
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(bytes); ++ii)
+	{
+		bytes[ii] = uint8_t(ii + 1);
+	}
+
+	for (uint32_t ii = 0; ii < 8; ++ii)
+	{
+		REQUIRE(bx::loadUnalignedRef<uint32_t>(&bytes[ii]) == bx::loadUnaligned<uint32_t>(&bytes[ii]) );
+		REQUIRE(bx::loadUnalignedRef<uint64_t>(&bytes[ii]) == bx::loadUnaligned<uint64_t>(&bytes[ii]) );
+	}
+
+	for (uint32_t ii = 0; ii < 8; ++ii)
+	{
+		bx::memSet(bytes, 0, sizeof(bytes) );
+		bx::storeUnaligned<uint64_t>(&bytes[ii], UINT64_C(0x0807060504030201) );
+
+		REQUIRE(UINT64_C(0x0807060504030201) == bx::loadUnalignedRef<uint64_t>(&bytes[ii]) );
+		REQUIRE(0 == bx::loadUnalignedRef<uint64_t>(&bytes[ii+8]) );
+		REQUIRE(0 == bytes[ii+16]);
+	}
+}
