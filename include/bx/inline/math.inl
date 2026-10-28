@@ -24,6 +24,9 @@ extern "C" unsigned char _BitScanReverse64(unsigned long* _Index, unsigned __int
 
 extern "C" unsigned char _BitScanForward64(unsigned long* _Index, unsigned __int64 _Mask);
 #		pragma intrinsic(_BitScanForward64)
+
+extern "C" unsigned __int64 __umulh(unsigned __int64 _a, unsigned __int64 _b);
+#		pragma intrinsic(__umulh)
 #	endif // BX_ARCH_64BIT
 #endif // BX_COMPILER_MSVC
 
@@ -232,7 +235,6 @@ namespace bx
 		return ceilT<double>(_a);
 	}
 
-#if BX_SIMD_SUPPORTED
 	inline BX_CONST_FUNC float truncSimd(float _a)
 	{
 		const simd128_t aa     = simd_splat<simd128_t>(_a);
@@ -287,7 +289,6 @@ namespace bx
 
 		return out[0];
 	}
-#endif // BX_SIMD_SUPPORTED
 
 	inline BX_CONSTEXPR_FUNC float roundRef(float _a)
 	{
@@ -299,7 +300,6 @@ namespace bx
 		return roundT<double>(_a);
 	}
 
-#if BX_SIMD_SUPPORTED
 	inline BX_CONST_FUNC float roundSimd(float _a)
 	{
 		const simd128_t aa     = simd_splat<simd128_t>(_a);
@@ -321,7 +321,6 @@ namespace bx
 
 		return out[0];
 	}
-#endif // BX_SIMD_SUPPORTED
 
 	inline BX_CONSTEXPR_FUNC float lerp(float _a, float _b, float _t)
 	{
@@ -1084,16 +1083,15 @@ BX_FP_PRECISE_BEGIN()
 
 	inline BX_CONSTEXPR_FUNC float trunc(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return truncRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return truncSimd(_a);
+			}
 		}
 
-		return truncSimd(_a);
-#else
 		return truncRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double trunc(double _a)
@@ -1103,86 +1101,80 @@ BX_FP_PRECISE_BEGIN()
 
 	inline BX_CONSTEXPR_FUNC float floor(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return floorRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return floorSimd(_a);
+			}
 		}
 
-		return floorSimd(_a);
-#else
 		return floorRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double floor(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return floorRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return floorSimd(_a);
+			}
 		}
 
-		return floorSimd(_a);
-#else
 		return floorRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC float ceil(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return ceilRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return ceilSimd(_a);
+			}
 		}
 
-		return ceilSimd(_a);
-#else
 		return ceilRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double ceil(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return ceilRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return ceilSimd(_a);
+			}
 		}
 
-		return ceilSimd(_a);
-#else
 		return ceilRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC float round(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return roundRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return roundSimd(_a);
+			}
 		}
 
-		return roundSimd(_a);
-#else
 		return roundRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double round(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return roundRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return roundSimd(_a);
+			}
 		}
 
-		return roundSimd(_a);
-#else
 		return roundRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC float fract(float _a)
@@ -1478,24 +1470,46 @@ BX_FP_PRECISE_BEGIN()
 		return result;
 	}
 
+	inline BX_CONSTEXPR_FUNC uint64_t mulHi64Ref(uint64_t _a, uint64_t _b)
+	{
+		const simd64_t loMask = simd64_splat(uint64_t(UINT32_MAX) );
+		const simd64_t aa     = simd64_splat(_a);
+		const simd64_t bb     = simd64_splat(_b);
+		const simd64_t aLo    = simd64_and(aa, loMask);
+		const simd64_t aHi    = simd64_x64_srl(aa, 32);
+		const simd64_t bLo    = simd64_and(bb, loMask);
+		const simd64_t bHi    = simd64_x64_srl(bb, 32);
+		const simd64_t ll     = simd64_u64_mul(aLo, bLo);
+		const simd64_t lh     = simd64_u64_mul(aLo, bHi);
+		const simd64_t hl     = simd64_u64_mul(aHi, bLo);
+		const simd64_t hh     = simd64_u64_mul(aHi, bHi);
+		const simd64_t llHi   = simd64_x64_srl(ll, 32);
+		const simd64_t lhLo   = simd64_and(lh, loMask);
+		const simd64_t hlLo   = simd64_and(hl, loMask);
+		const simd64_t mid0   = simd64_u64_add(llHi, lhLo);
+		const simd64_t mid    = simd64_u64_add(mid0, hlLo);
+		const simd64_t lhHi   = simd64_x64_srl(lh, 32);
+		const simd64_t hlHi   = simd64_x64_srl(hl, 32);
+		const simd64_t midHi  = simd64_x64_srl(mid, 32);
+		const simd64_t sum0   = simd64_u64_add(hh, lhHi);
+		const simd64_t sum1   = simd64_u64_add(sum0, hlHi);
+		const simd64_t result = simd64_u64_add(sum1, midHi);
+
+		return result.u64;
+	}
+
 	inline BX_CONSTEXPR_FUNC uint64_t mulHi64(uint64_t _a, uint64_t _b)
 	{
-		constexpr uint64_t kLoMask = UINT64_C(0xffffffff);
+		if (!isConstantEvaluated() )
+		{
+#if BX_COMPILER_MSVC && BX_ARCH_64BIT
+			return __umulh(_a, _b);
+#elif (BX_COMPILER_GCC || BX_COMPILER_CLANG) && BX_ARCH_64BIT
+			return uint64_t( ( (unsigned __int128)_a * _b)>>64);
+#endif // BX_COMPILER_*
+		}
 
-		const uint64_t aLo = _a & kLoMask;
-		const uint64_t aHi = _a >> 32;
-		const uint64_t bLo = _b & kLoMask;
-		const uint64_t bHi = _b >> 32;
-
-		const uint64_t ll = aLo * bLo;
-		const uint64_t lh = aLo * bHi;
-		const uint64_t hl = aHi * bLo;
-		const uint64_t hh = aHi * bHi;
-
-		const uint64_t mid    = (ll >> 32) + (lh & kLoMask) + (hl & kLoMask);
-		const uint64_t result = hh + (lh >> 32) + (hl >> 32) + (mid >> 32);
-
-		return result;
+		return mulHi64Ref(_a, _b);
 	}
 
 	inline BX_CONSTEXPR_FUNC uint64_t twoOverPiWord(int32_t _index)
@@ -2751,16 +2765,15 @@ BX_FP_PRECISE_END()
 
 	inline BX_CONSTEXPR_FUNC float rsqrt(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return rsqrtRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return rsqrtSimd(_a);
+			}
 		}
 
-		return rsqrtSimd(_a);
-#else
 		return rsqrtRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double rsqrt(double _a)
@@ -2770,30 +2783,28 @@ BX_FP_PRECISE_END()
 
 	inline BX_CONSTEXPR_FUNC float sqrt(float _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return sqrtRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return sqrtSimd(_a);
+			}
 		}
 
-		return sqrtSimd(_a);
-#else
 		return sqrtRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC double sqrt(double _a)
 	{
-#if BX_SIMD_SUPPORTED
-		if (isConstantEvaluated() )
+		if constexpr (kSimdSupported)
 		{
-			return sqrtRef(_a);
+			if (!isConstantEvaluated() )
+			{
+				return sqrtSimd(_a);
+			}
 		}
 
-		return sqrtSimd(_a);
-#else
 		return sqrtRef(_a);
-#endif // BX_SIMD_SUPPORTED
 	}
 
 	inline BX_CONSTEXPR_FUNC bool isEqual(float _a, float _b, float _epsilon)
