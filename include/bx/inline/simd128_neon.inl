@@ -987,13 +987,32 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE int simd128_x32_signbitsmask(simd128_neon_t _a)
 	{
-		return simd_x32_signbitsmask_ni(_a);
+		const uint32x4_t a       = vreinterpretq_u32_f32(_a);
+		const uint32x4_t msb     = vshrq_n_u32(a, 31);
+		const int32x2_t  shiftLo = vcreate_s32(UINT64_C(0x0000000100000000) );
+		const int32x2_t  shiftHi = vcreate_s32(UINT64_C(0x0000000300000002) );
+		const int32x4_t  shift   = vcombine_s32(shiftLo, shiftHi);
+		const uint32x4_t bits    = vshlq_u32(msb, shift);
+		const uint64x2_t sum     = vpaddlq_u32(bits);
+		const uint64_t   lo      = vgetq_lane_u64(sum, 0);
+		const uint64_t   hi      = vgetq_lane_u64(sum, 1);
+		return int(lo | hi);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE int simd128_x8_signbitsmask(simd128_neon_t _a)
 	{
-		return simd_x8_signbitsmask_ni(_a);
+		const uint8x16_t a       = vreinterpretq_u8_f32(_a);
+		const uint8x16_t msb     = vshrq_n_u8(a, 7);
+		const int8x8_t   shiftLo = vcreate_s8(UINT64_C(0x0706050403020100) );
+		const int8x16_t  shift   = vcombine_s8(shiftLo, shiftLo);
+		const uint8x16_t bits    = vshlq_u8(msb, shift);
+		const uint16x8_t sum16   = vpaddlq_u8(bits);
+		const uint32x4_t sum32   = vpaddlq_u16(sum16);
+		const uint64x2_t sum64   = vpaddlq_u32(sum32);
+		const uint64_t   lo      = vgetq_lane_u64(sum64, 0);
+		const uint64_t   hi      = vgetq_lane_u64(sum64, 1);
+		return int(lo | (hi << 8) );
 	}
 
 	template<>
