@@ -518,6 +518,30 @@ namespace bx
 		}
 	}
 
+	using MemSetFn = void (*)(void*, uint8_t, size_t);
+	static MemSetFn volatile s_memSet = memSet;
+
+	void memSetSecure(void* _dst, uint8_t _ch, size_t _numBytes)
+	{
+		s_memSet(_dst, _ch, _numBytes);
+	}
+
+	void memSetSecure(void* _dst, uint32_t _dstStride, uint8_t _ch, uint32_t _stride, uint32_t _num)
+	{
+		if (_stride == _dstStride)
+		{
+			s_memSet(_dst, _ch, size_t(_stride)*_num);
+			return;
+		}
+
+		uint8_t* dst = (uint8_t*)_dst;
+
+		for (uint32_t ii = 0; ii < _num; ++ii, dst += _dstStride)
+		{
+			s_memSet(dst, _ch, _stride);
+		}
+	}
+
 	int32_t memCmpRef(const void* _lhs, const void* _rhs, size_t _numBytes)
 	{
 		const uint8_t* lhs = (const uint8_t*)_lhs;

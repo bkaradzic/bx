@@ -39,6 +39,38 @@ TEST_CASE("memSet", "")
 	REQUIRE(temp[5] == 6);
 }
 
+TEST_CASE("memSetSecure", "")
+{
+	uint8_t temp[64];
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(temp); ++ii)
+	{
+		bx::memSet(temp, 0xff, sizeof(temp) );
+		bx::memSetSecure(temp, 0x00, ii);
+
+		for (uint32_t jj = 0; jj < BX_COUNTOF(temp); ++jj)
+		{
+			REQUIRE( (jj < ii ? 0x00 : 0xff) == temp[jj]);
+		}
+	}
+
+	bx::memSet(temp, 0xff, sizeof(temp) );
+	bx::memSetSecure(temp, 16, 0x00, 4, 4);
+
+	for (uint32_t jj = 0; jj < BX_COUNTOF(temp); ++jj)
+	{
+		REQUIRE( (4 > (jj & 15) ? 0x00 : 0xff) == temp[jj]);
+	}
+
+	bx::memSet(temp, 0xff, sizeof(temp) );
+	bx::memSetSecure(temp, 16, 0x00, 16, 4);
+
+	for (uint32_t jj = 0; jj < BX_COUNTOF(temp); ++jj)
+	{
+		REQUIRE(0x00 == temp[jj]);
+	}
+}
+
 TEST_CASE("memMove", "")
 {
 	const char* original = "xxxxabvgd";

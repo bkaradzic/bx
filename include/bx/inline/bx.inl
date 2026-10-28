@@ -68,23 +68,10 @@ namespace bx
 	}
 
 	template<typename Ty>
-	inline Ty loadUnaligned(const void* _ptr)
-	{
-		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
-
-#if BX_COMPILER_GCC || BX_COMPILER_CLANG
-		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
-		return *(UnalignedTy*)_ptr;
-#else
-		Ty value;
-		memCopy(&value, _ptr, sizeof(Ty) );
-
-		return value;
-#endif // BX_COMPILER_*
-	}
+	Ty loadUnalignedRef(const void* _ptr);
 
 	template<>
-	inline uint32_t loadUnaligned(const void* _ptr)
+	inline uint32_t loadUnalignedRef(const void* _ptr)
 	{
 		const uint8_t* data = (const uint8_t*)_ptr;
 
@@ -97,7 +84,7 @@ namespace bx
 	}
 
 	template<>
-	inline uint64_t loadUnaligned(const void* _ptr)
+	inline uint64_t loadUnalignedRef(const void* _ptr)
 	{
 		const uint8_t* data = (const uint8_t*)_ptr;
 
@@ -114,6 +101,23 @@ namespace bx
 	}
 
 	template<typename Ty>
+	inline Ty loadUnaligned(const void* _ptr)
+	{
+		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
+
+#if BX_COMPILER_MSVC
+#	if BX_CPU_X86 && BX_ARCH_32BIT
+		typedef Ty UnalignedTy;
+#	else
+		typedef __unaligned Ty UnalignedTy;
+#	endif // BX_CPU_X86 && BX_ARCH_32BIT
+#else
+		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
+#endif // BX_COMPILER_MSVC
+		return *(const UnalignedTy*)_ptr;
+	}
+
+	template<typename Ty>
 	inline void storeAligned(void* _ptr, const Ty& _value)
 	{
 		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
@@ -126,12 +130,16 @@ namespace bx
 	{
 		static_assert(isTriviallyCopyable<Ty>(), "Ty must be trivially copyable type.");
 
-#if BX_COMPILER_GCC || BX_COMPILER_CLANG
-		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
-		*(UnalignedTy*)_ptr = _value;
+#if BX_COMPILER_MSVC
+#	if BX_CPU_X86 && BX_ARCH_32BIT
+		typedef Ty UnalignedTy;
+#	else
+		typedef __unaligned Ty UnalignedTy;
+#	endif // BX_CPU_X86 && BX_ARCH_32BIT
 #else
-		memCopy(_ptr, &_value, sizeof(Ty) );
-#endif // BX_COMPILER_*
+		typedef Ty BX_ATTRIBUTE(aligned(1) ) UnalignedTy;
+#endif // BX_COMPILER_MSVC
+		*(UnalignedTy*)_ptr = _value;
 	}
 
 	template<typename Ty>

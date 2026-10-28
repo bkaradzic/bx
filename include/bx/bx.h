@@ -373,6 +373,30 @@ namespace bx
 		, uint32_t _numStrides
 		);
 
+	/// Fill memory block to specified value `_ch`, the compiler can't remove it as a dead store.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _ch Fill value.
+	/// @param _numBytes Number of bytes to fill.
+	///
+	void memSetSecure(void* _dst, uint8_t _ch, size_t _numBytes);
+
+	/// Fill strided memory block to specified value `_ch`, the compiler can't remove it as a dead store.
+	///
+	/// @param _dst Destination pointer.
+	/// @param _dstStride Destination stride.
+	/// @param _ch Fill value.
+	/// @param _stride Number of bytes per stride to fill.
+	/// @param _numStrides Number of strides.
+	///
+	void memSetSecure(
+		  void* _dst
+		, uint32_t _dstStride
+		, uint8_t _ch
+		, uint32_t _stride
+		, uint32_t _numStrides
+		);
+
 	/// Compare two memory blocks.
 	///
 	/// @param _lhs Pointer to memory block.
