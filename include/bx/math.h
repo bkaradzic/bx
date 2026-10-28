@@ -168,6 +168,15 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC double bitsToDouble(uint64_t _a);
 
+	/// Returns the high 64 bits of the 128-bit product of _a and _b.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	///
+	/// @returns High 64 bits of `_a * _b`.
+	///
+	BX_CONSTEXPR_FUNC uint64_t mulHi64(uint64_t _a, uint64_t _b);
+
 	/// Format constants and bit access for a floating-point type.
 	template<typename Ty>
 	struct FloatT;

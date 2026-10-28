@@ -1841,3 +1841,26 @@ TEST_CASE("limits", "[math]")
 	STATIC_REQUIRE(bx::kFloatSmallest  == std::numeric_limits<float>::min() );
 	STATIC_REQUIRE(bx::kDoubleSmallest == std::numeric_limits<double>::min() );
 }
+
+TEST_CASE("mulHi64", "[math]")
+{
+	STATIC_REQUIRE(0 == bx::mulHi64(0, 0) );
+	STATIC_REQUIRE(0 == bx::mulHi64(UINT64_MAX, 0) );
+	STATIC_REQUIRE(0 == bx::mulHi64(UINT64_MAX, 1) );
+	STATIC_REQUIRE(1 == bx::mulHi64(UINT64_C(1)<<32, UINT64_C(1)<<32) );
+	STATIC_REQUIRE(UINT64_MAX-1 == bx::mulHi64(UINT64_MAX, UINT64_MAX) );
+	STATIC_REQUIRE(UINT64_C(0x7641f3080ff92329) == bx::mulHi64(UINT64_C(0x9e3779b97f4a7c15), UINT64_C(0xbf58476d1ce4e5b9) ) );
+
+	REQUIRE(UINT64_MAX-1 == bx::mulHi64(UINT64_MAX, UINT64_MAX) );
+	REQUIRE(UINT64_C(0x7641f3080ff92329) == bx::mulHi64(UINT64_C(0x9e3779b97f4a7c15), UINT64_C(0xbf58476d1ce4e5b9) ) );
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 100000; ++ii)
+	{
+		const uint64_t aa = (uint64_t(rng.gen() )<<32) | rng.gen();
+		const uint64_t bb = (uint64_t(rng.gen() )<<32) | rng.gen();
+
+		REQUIRE(bx::mulHi64Ref(aa, bb) == bx::mulHi64(aa, bb) );
+	}
+}
