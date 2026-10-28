@@ -6,6 +6,7 @@
 #include "test.h"
 #include <bx/string.h>
 #include <bx/readerwriter.h>
+#include <bx/rng.h>
 
 #include <limits>
 #include <inttypes.h>
@@ -111,7 +112,7 @@ static bool test(const char* _expected, const char* _format, ...)
 {
 	va_list argList;
 	va_start(argList, _format);
-	const bool result = test<false>(_expected, _format, argList);
+	const bool result = test<true>(_expected, _format, argList);
 	va_end(argList);
 
 	return result;
@@ -143,7 +144,7 @@ TEST_CASE("Format %f", "[string][printf]")
 
 	REQUIRE(test("nan     ", "%-8f",  kDoubleNan) );
 	REQUIRE(test("     nan", "%8f",   kDoubleNan) );
-	REQUIRE(test("-NAN    ", "%-8F", -kDoubleNan) );
+	REQUIRE(testNotStdCompliant("-NAN    ", "%-8F", -kDoubleNan) );
 
 	REQUIRE(test("     inf", "%8f",   bx::kDoubleInfinity) );
 	REQUIRE(test("inf     ", "%-8f",  bx::kDoubleInfinity) );
@@ -157,63 +158,63 @@ TEST_CASE("Format %f", "[string][printf]")
 	REQUIRE(test("0.0039",   "%.4f",     0.00390625) );
 
 	REQUIRE(test("0.003906",     "%f",   0.00390625) );
-	REQUIRE(test("-1.234567e-9", "%f",  -1.234567e-9) );
+	REQUIRE(test("-0.000000",    "%f",  -1.234567e-9) );
 
-	REQUIRE(test("-1e-9",            "%.0f",  -1.234567e-9) );
-	REQUIRE(test("-1.2e-9",          "%.1f",  -1.234567e-9) );
-	REQUIRE(test("-1.23e-9",         "%.2f",  -1.234567e-9) );
-	REQUIRE(test("-1.234e-9",        "%.3f",  -1.234567e-9) );
-	REQUIRE(test("-1.2345e-9",       "%.4f",  -1.234567e-9) );
-	REQUIRE(test("-1.23456e-9",      "%.5f",  -1.234567e-9) );
-	REQUIRE(test("-1.234567e-9",     "%.6f",  -1.234567e-9) );
-	REQUIRE(test("-1.2345670e-9",    "%.7f",  -1.234567e-9) );
-	REQUIRE(test("-1.23456700e-9",   "%.8f",  -1.234567e-9) );
-	REQUIRE(test("-1.234567000e-9",  "%.9f",  -1.234567e-9) );
-	REQUIRE(test("-1.2345670000e-9", "%.10f", -1.234567e-9) );
+	REQUIRE(test("-0",               "%.0f",  -1.234567e-9) );
+	REQUIRE(test("-0.0",             "%.1f",  -1.234567e-9) );
+	REQUIRE(test("-0.00",            "%.2f",  -1.234567e-9) );
+	REQUIRE(test("-0.000",           "%.3f",  -1.234567e-9) );
+	REQUIRE(test("-0.0000",          "%.4f",  -1.234567e-9) );
+	REQUIRE(test("-0.00000",         "%.5f",  -1.234567e-9) );
+	REQUIRE(test("-0.000000",        "%.6f",  -1.234567e-9) );
+	REQUIRE(test("-0.0000000",       "%.7f",  -1.234567e-9) );
+	REQUIRE(test("-0.00000000",      "%.8f",  -1.234567e-9) );
+	REQUIRE(test("-0.000000001",     "%.9f",  -1.234567e-9) );
+	REQUIRE(test("-0.0000000012",    "%.10f", -1.234567e-9) );
 
-	REQUIRE(test("3.141592",           "%f",    3.1415926535897932) );
-	REQUIRE(test("3.141592",           "%F",    3.1415926535897932) );
+	REQUIRE(test("3.141593",           "%f",    3.1415926535897932) );
+	REQUIRE(test("3.141593",           "%F",    3.1415926535897932) );
 	REQUIRE(test("3",                  "%.0f",  3.1415926535897932) );
 	REQUIRE(test("3.1",                "%.1f",  3.1415926535897932) );
 	REQUIRE(test("3.14",               "%.2f",  3.1415926535897932) );
-	REQUIRE(test("3.141",              "%.3f",  3.1415926535897932) );
-	REQUIRE(test("3.1415",             "%.4f",  3.1415926535897932) );
+	REQUIRE(test("3.142",              "%.3f",  3.1415926535897932) );
+	REQUIRE(test("3.1416",             "%.4f",  3.1415926535897932) );
 	REQUIRE(test("3.14159",            "%.5f",  3.1415926535897932) );
-	REQUIRE(test("3.141592",           "%.6f",  3.1415926535897932) );
-	REQUIRE(test("3.1415926",          "%.7f",  3.1415926535897932) );
+	REQUIRE(test("3.141593",           "%.6f",  3.1415926535897932) );
+	REQUIRE(test("3.1415927",          "%.7f",  3.1415926535897932) );
 	REQUIRE(test("3.14159265",         "%.8f",  3.1415926535897932) );
-	REQUIRE(test("3.141592653",        "%.9f",  3.1415926535897932) );
-	REQUIRE(test("3.1415926535",       "%.10f", 3.1415926535897932) );
-	REQUIRE(test("3.14159265358",      "%.11f", 3.1415926535897932) );
-	REQUIRE(test("3.141592653589",     "%.12f", 3.1415926535897932) );
-	REQUIRE(test("3.1415926535897",    "%.13f", 3.1415926535897932) );
+	REQUIRE(test("3.141592654",        "%.9f",  3.1415926535897932) );
+	REQUIRE(test("3.1415926536",       "%.10f", 3.1415926535897932) );
+	REQUIRE(test("3.14159265359",      "%.11f", 3.1415926535897932) );
+	REQUIRE(test("3.141592653590",     "%.12f", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535898",    "%.13f", 3.1415926535897932) );
 	REQUIRE(test("3.14159265358979",   "%.14f", 3.1415926535897932) );
 	REQUIRE(test("3.141592653589793",  "%.15f", 3.1415926535897932) );
-	REQUIRE(test("3.1415926535897930", "%.16f", 3.1415926535897932) );
-	REQUIRE(test("3.1415926535897930", "%.16F", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535897931", "%.16f", 3.1415926535897932) );
+	REQUIRE(test("3.1415926535897931", "%.16F", 3.1415926535897932) );
 
-	REQUIRE(test("-3.141592e-9",           "%f",    -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141592E-9",           "%F",    -3.1415926535897932e-9) );
-	REQUIRE(test("-3e-9",                  "%.0f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1e-9",                "%.1f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.14e-9",               "%.2f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141e-9",              "%.3f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415e-9",             "%.4f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.14159e-9",            "%.5f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141592e-9",           "%.6f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415926e-9",          "%.7f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.14159265e-9",         "%.8f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141592653e-9",        "%.9f",  -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415926535e-9",       "%.10f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.14159265358e-9",      "%.11f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141592653589e-9",     "%.12f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415926535897e-9",    "%.13f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.14159265358979e-9",   "%.14f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.141592653589793e-9",  "%.15f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415926535897930e-9", "%.16f", -3.1415926535897932e-9) );
-	REQUIRE(test("-3.1415926535897930E-9", "%.16F", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000",              "%f",    -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000",              "%F",    -3.1415926535897932e-9) );
+	REQUIRE(test("-0",                     "%.0f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0",                   "%.1f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.00",                  "%.2f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000",                 "%.3f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000",                "%.4f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.00000",               "%.5f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000",              "%.6f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000000",             "%.7f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.00000000",            "%.8f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000003",           "%.9f",  -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000000031",          "%.10f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.00000000314",         "%.11f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000003142",        "%.12f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000000031416",       "%.13f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.00000000314159",      "%.14f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.000000003141593",     "%.15f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000000031415927",    "%.16f", -3.1415926535897932e-9) );
+	REQUIRE(test("-0.0000000031415927",    "%.16F", -3.1415926535897932e-9) );
 
-	REQUIRE(test("1e-12", "%f", 1e-12));
+	REQUIRE(test("0.000000", "%f", 1e-12));
 
 	REQUIRE(test("0.00390625",          "%.8f",  0.00390625) );
 	REQUIRE(test("-0.00390625",         "%.8f", -0.00390625) );
@@ -278,7 +279,7 @@ TEST_CASE("Format %d, %i, %o, %u, %x", "[string][printf]")
 	REQUIRE(test("   1", "% 4i",  1) );
 	REQUIRE(test("   1", "% 4o",  1) );
 	REQUIRE(test("  +1", "%+4i",  1) );
-	REQUIRE(test("  +1", "%+4o",  1) );
+	REQUIRE(testNotStdCompliant("  +1", "%+4o",  1) );
 	REQUIRE(test("  +0", "%+4i",  0) );
 	REQUIRE(test("  -1", "%+4i", -1) );
 	REQUIRE(test("0001", "%04i",  1) );
@@ -329,8 +330,8 @@ TEST_CASE("Format modifiers", "[string][printf]")
 
 TEST_CASE("Format %p", "[string][printf]")
 {
-	REQUIRE(test("0xbadc0de", "%p", (void*)0xbadc0de) );
-	REQUIRE(test("0xbadc0de           ", "%-20p", (void*)0xbadc0de) );
+	REQUIRE(testNotStdCompliant("0xbadc0de", "%p", (void*)0xbadc0de) );
+	REQUIRE(testNotStdCompliant("0xbadc0de           ", "%-20p", (void*)0xbadc0de) );
 }
 
 TEST_CASE("Format %s", "[string][printf]")
@@ -369,9 +370,85 @@ TEST_CASE("Format %g", "[string][printf]")
 {
 	REQUIRE(test("   0.01",  "%7.2g", .01) );
 	REQUIRE(test(" 0.0123",  "%7.4G", .0123) );
-//	REQUIRE(test("1.23e+05", "%.3g",  123000.25) );
-//	REQUIRE(test("1e+05",    "%.0g",  123000.25) );
+	REQUIRE(test("1.23e+05", "%.3g",  123000.25) );
+	REQUIRE(test("1e+05",    "%.0g",  123000.25) );
 	REQUIRE(test("1",       "%.0g", 1.2) );
+
+	REQUIRE(test("100000",              "%g",    100000.0) );
+	REQUIRE(test("1e+06",               "%g",    1000000.0) );
+	REQUIRE(test("0.0001",              "%g",    0.0001) );
+	REQUIRE(test("1e-05",               "%g",    0.00001) );
+	REQUIRE(test("1.00000",             "%#g",   1.0) );
+	REQUIRE(test("0",                   "%g",    0.0) );
+	REQUIRE(test("3.14159",             "%g",    3.1415926535897932) );
+	REQUIRE(test("0.10000000000000001", "%.17g", 0.1) );
+	REQUIRE(test("1E-10",               "%G",    1e-10) );
+}
+
+TEST_CASE("Format %e", "[string][printf]")
+{
+	REQUIRE(test("1.337000e+00",  "%e",    1.337) );
+	REQUIRE(test("-1.234567e-09", "%e",   -1.234567e-9) );
+	REQUIRE(test("1.500000E+00",  "%E",    1.5) );
+	REQUIRE(test("0.000000e+00",  "%e",    0.0) );
+	REQUIRE(test("1.798e+308",    "%.3e",  1.7976931348623157e308) );
+	REQUIRE(test("4.941e-324",    "%.3e",  4.9406564584124654e-324) );
+	REQUIRE(test("1e+01",         "%.0e",  9.5) );
+	REQUIRE(test("3.e+00",        "%#.0e", 3.0) );
+	REQUIRE(test("   1.234e+03",  "%12.3e", 1234.5) );
+}
+
+TEST_CASE("Format %e, %f, %g of random doubles match the CRT", "[string][printf]")
+{
+	static const char* s_formats[] =
+	{
+		"%e", "%f", "%g", "%.0e", "%.3e", "%.17e", "%.40e", "%.0f", "%.3f", "%.20f",
+		"%.1g", "%.17g", "%#g", "%+.5e", "% 12.4g", "%-14.6e", "%010.3f", "%#.0f",
+	};
+
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 20000; ++ii)
+	{
+		const uint64_t hi   = rng.gen();
+		const uint64_t lo   = rng.gen();
+		const double value  = bx::bitsToDouble( (hi << 32) | lo);
+
+		if (!bx::isFinite(value) )
+		{
+			continue;
+		}
+
+		const char* format = s_formats[ii % BX_COUNTOF(s_formats)];
+
+		char bxTemp[1024];
+		const int32_t bxLen = bx::snprintf(bxTemp, BX_COUNTOF(bxTemp), format, value);
+
+		char crtTemp[1024];
+		const int32_t crtLen = ::snprintf(crtTemp, BX_COUNTOF(crtTemp), format, value);
+
+		INFO(format << " " << crtTemp);
+		REQUIRE(bxLen == crtLen);
+		REQUIRE(0 == bx::strCmp(bxTemp, crtTemp) );
+	}
+
+	for (uint32_t ii = 0; ii < 20000; ++ii)
+	{
+		const uint32_t odd    = rng.gen() | 1;
+		const int32_t  shift  = 1 + int32_t(rng.gen() % 40);
+		const double   value  = bx::ldexp(double(odd), -shift);
+		const int32_t  digits = shift - 1;
+
+		char bxTemp[1024];
+		const int32_t bxLen = bx::snprintf(bxTemp, BX_COUNTOF(bxTemp), "%.*f", digits, value);
+
+		char crtTemp[1024];
+		const int32_t crtLen = ::snprintf(crtTemp, BX_COUNTOF(crtTemp), "%.*f", digits, value);
+
+		INFO(digits << " " << crtTemp);
+		REQUIRE(bxLen == crtLen);
+		REQUIRE(0 == bx::strCmp(bxTemp, crtTemp) );
+	}
 }
 
 TEST_CASE("Format %c, %s, %S", "[string][printf]")
@@ -557,6 +634,61 @@ TEST_CASE("Format %c edge cases", "[string][printf]")
 	REQUIRE(test("A         ",           "%-10c", 'A') );
 }
 
+TEST_CASE("Format flags, lengths and precision", "[string][printf]")
+{
+	constexpr double kDoubleNan = bx::bitsToDouble(bx::kDoubleExponentMask | bx::kDoubleMantissaMask);
+
+	REQUIRE(test("x yz    42",         "%c %s    %d",    'x', "yz", 42) );
+	REQUIRE(test("wxy      ",          "%-9.3s",         "wxyz12345") );
+	REQUIRE(test("+9",                 "%+2d",           9) );
+	REQUIRE(test("  4",                "% 3i",           4) );
+	REQUIRE(test("-3   ",              "%-5d",           -3) );
+	REQUIRE(test("+0",                 "%+i",            0) );
+	REQUIRE(test("   00042:   -00317", "%8.5d:%9.5d",    42, -317) );
+	REQUIRE(test("-204060801",         "%d",             -204060801) );
+	REQUIRE(test("35 0035",            "%u %04u",        35u, 35u) );
+	REQUIRE(test("17 2a 7F",           "%o %x %X",       15u, 42u, 127u) );
+	REQUIRE(test(" 17 2a 7F ",         "%3o %2x %-3X",   15u, 42u, 127u) );
+	REQUIRE(test("017 0x2a 0X7F",      "%#o %#x %#X",    15u, 42u, 127u) );
+	REQUIRE(test("71 812",             "%hi %ld",        short(71), 812l) );
+	REQUIRE(test("7123456789",         "%llu",           7123456789llu) );
+	REQUIRE(test("-4 5 -6",            "%ji %zi %ti",    intmax_t(-4), ptrdiff_t(5), ptrdiff_t(-6) ) );
+
+	REQUIRE(testNotStdCompliant("5 6 7", "%I64d %I32d %Id", int64_t(5), int32_t(6), ptrdiff_t(7) ) );
+
+	REQUIRE(test("-7.000000",                      "%f",          -7.0) );
+	REQUIRE(test("-6.1234567800",                  "%.10f",       -6.12345678) );
+	REQUIRE(test("512.0625000000",                 "%.10f",       512.0625) );
+	REQUIRE(test("2.5",                            "%.1f",        2.5) );
+	REQUIRE(test(" 0",                             "% .0f",       0.3) );
+	REQUIRE(test("0.00",                           "%.2f",        3e-4) );
+	REQUIRE(test("-7.30",                          "%+5.2f",      -7.3) );
+	REQUIRE(test("0.0        ",                    "%-11.1f",     0.0) );
+	REQUIRE(test("-0.000",                         "%.3f",        -0.0) );
+	REQUIRE(test("0.000001",                       "%f",          7.5e-7) );
+	REQUIRE(test("1237940039285380274899124224.0", "%.1f",        1237940039285380274899124224.0) );
+	REQUIRE(test("0.0000002999999999999999864",    "%.25f",       3e-7) );
+	REQUIRE(test("0.000000000000000040000000",     "%.24f",       4e-17) );
+	REQUIRE(test("0.0000000300 300000000",         "%.10f %.0f",  3e-8, 3e+8) );
+	REQUIRE(test("200046813.0",                    "%.1f",        200046813.0) );
+	REQUIRE(test("  2.72 %",                       "%*.*f %%",    6, 2, 2.718) );
+	REQUIRE(test("-7.000000e+00",                  "%e",          -7.0) );
+	REQUIRE(test("2.5E+00",                        "%.1E",        2.5) );
+	REQUIRE(test("-7.30e+00",                      "%+5.2e",      -7.3) );
+	REQUIRE(test("+0.7 -5",                        "%+g %+g",     0.7, -5.0) );
+	REQUIRE(test("3",                              "%.1G",        3.2) );
+	REQUIRE(test("-7.3",                           "%+4.2g",      -7.3) );
+	REQUIRE(test("7e-250",                         "%g",          7e-250) );
+	REQUIRE(test(" 4.2 4.21",                      "% .3g %.3g",  4.203, 4.206) );
+	REQUIRE(test("3e-316:2e+307",                  "%g:%g",       3e-316, 2e+307) );
+	REQUIRE(test("inf -INF nan",                   "%f %F %g",    bx::kDoubleInfinity, -bx::kDoubleInfinity, kDoubleNan) );
+	REQUIRE(test("nan",                            "%.3g",        kDoubleNan) );
+
+	int32_t len = 0;
+	REQUIRE(testNotStdCompliant("bbbb ", "%.4s %n", "bbbbbbbbb", &len) );
+	REQUIRE(5 == len);
+}
+
 TEST_CASE("misc", "[string][printf]")
 {
 	REQUIRE(test("53000atest-20 bit", "%u%u%ctest%d %s", 5, 3000, 'a', -20, "bit") );
@@ -566,7 +698,7 @@ TEST_CASE("misc", "[string][printf]")
 	REQUIRE(test("     00004", "%10.5d", 4) );
 	REQUIRE(test("hi x",       "%*sx", -3, "hi") );
 	REQUIRE(test("0.33",       "%.*g", 2, 0.33333333) );
-//	REQUIRE(test("3.33e-01",   "%.*e", 2, 0.33333333) );
+	REQUIRE(test("3.33e-01",   "%.*e", 2, 0.33333333) );
 	REQUIRE(test("",           "") );
 }
 

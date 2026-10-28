@@ -166,6 +166,8 @@ namespace bx
 	typedef simd32_ref_t   simd32_t;
 	typedef simd64_ref_t   simd64_t;
 
+	constexpr bool kSimdSupported = 0 != BX_SIMD_SUPPORTED;
+
 	// These deduce register width from the type parameter. Call with
 	// simd128_t for 128-bit, simd256_t for 256-bit, etc.
 

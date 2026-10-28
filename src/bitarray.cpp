@@ -20,7 +20,6 @@ namespace bx
 		constexpr uint32_t kNumSimdWords  = sizeof(SimdWideT)/sizeof(uint64_t);
 		constexpr uint32_t kNumSimdDwords = sizeof(SimdWideT)/sizeof(uint32_t);
 		constexpr uint32_t kSimdDwordMask = (1u << kNumSimdDwords) - 1;
-		constexpr bool     kSimdSupported = 0 != BX_SIMD_SUPPORTED;
 
 		struct Match
 		{

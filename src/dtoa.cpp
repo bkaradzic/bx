@@ -585,6 +585,26 @@ namespace bx
 
 	constexpr uint32_t kFromStringNumLimbs = 96;
 
+	constexpr uint32_t kFromStringPow5[] =
+	{
+		1,
+		5,
+		25,
+		125,
+		625,
+		3125,
+		15625,
+		78125,
+		390625,
+		1953125,
+		9765625,
+		48828125,
+		244140625,
+		1220703125,
+	};
+
+	constexpr int32_t kFromStringPow5Max = BX_COUNTOF(kFromStringPow5) - 1;
+
 	struct FloatBig
 	{
 		uint32_t num;
@@ -819,6 +839,377 @@ namespace bx
 		const double scaled = ldexp(double(mantissa), _binExp + shift);
 
 		return _negative ? -scaled : scaled;
+	}
+
+	static void floatBigShiftRight(FloatBig& _big, uint32_t _bits, bool& _sticky)
+	{
+		const uint32_t words = _bits / 64;
+		const uint32_t bits  = _bits % 64;
+
+		for (uint32_t ii = 0; ii < words && ii < _big.num; ++ii)
+		{
+			_sticky = _sticky || 0 != _big.limb[ii];
+		}
+
+		if (_big.num <= words)
+		{
+			_big.num = 0;
+			return;
+		}
+
+		const uint32_t num = _big.num - words;
+
+		for (uint32_t ii = 0; ii < num; ++ii)
+		{
+			_big.limb[ii] = _big.limb[ii + words];
+		}
+
+		if (0 != bits)
+		{
+			_sticky = _sticky || 0 != (_big.limb[0] & ( (UINT64_C(1) << bits) - 1) );
+
+			for (uint32_t ii = 0; ii < num; ++ii)
+			{
+				const uint64_t next = ii + 1 < num ? _big.limb[ii + 1] : 0;
+				_big.limb[ii] = (_big.limb[ii] >> bits) | (next << (64 - bits) );
+			}
+		}
+
+		_big.num = num;
+
+		while (0 != _big.num
+		&&     0 == _big.limb[_big.num - 1])
+		{
+			--_big.num;
+		}
+	}
+
+	static bool floatBigIsOdd(const FloatBig& _big)
+	{
+		return 0 != _big.num
+			&& 0 != (_big.limb[0] & 1)
+			;
+	}
+
+	static int32_t floatBigScaledDigits(char* _out, int32_t _max, double _value, int32_t _scale)
+	{
+		const uint64_t bits   = doubleToBits(_value);
+		const uint64_t frac   = bits & kDoubleMantissaMask;
+		const int32_t  biased = int32_t( (bits & kDoubleExponentMask) >> kDoubleExponentShift);
+
+		const uint64_t mantissa = 0 == biased ? frac : frac | (UINT64_C(1) << kDoubleMantissaNumBits);
+		const int32_t  binExp   = (0 == biased ? 1 : biased) - int32_t(kDoubleExponentBias) - kDoubleMantissaNumBits;
+
+		FloatBig big;
+		big.num     = 1;
+		big.limb[0] = mantissa;
+
+		if (0 == mantissa)
+		{
+			big.num = 0;
+		}
+
+		bool sticky = false;
+
+		for (int32_t left = _scale; 0 < left; left -= kFromStringPow5Max)
+		{
+			if (!floatBigMulAdd(big, kFromStringPow5[min(left, kFromStringPow5Max)], 0) )
+			{
+				return -1;
+			}
+		}
+
+		const int32_t shift = binExp + _scale + 1;
+
+		if (0 < shift
+		&&  !floatBigShiftLeft(big, uint32_t(shift) ) )
+		{
+			return -1;
+		}
+
+		for (int32_t left = -_scale; 0 < left; left -= kFromStringPow5Max)
+		{
+			const uint32_t rem = floatBigDivSmall(big, kFromStringPow5[min(left, kFromStringPow5Max)]);
+
+			sticky = sticky || 0 != rem;
+		}
+
+		if (0 > shift)
+		{
+			floatBigShiftRight(big, uint32_t(-shift), sticky);
+		}
+
+		const bool half = floatBigIsOdd(big);
+
+		bool halfOut = false;
+		floatBigShiftRight(big, 1, halfOut);
+
+		if (half
+		&& (sticky || floatBigIsOdd(big) ) )
+		{
+			if (0 == big.num)
+			{
+				big.num     = 1;
+				big.limb[0] = 0;
+			}
+
+			floatBigMulAdd(big, 1, 1);
+		}
+
+		constexpr uint32_t kChunk       = 1000000000;
+		constexpr int32_t  kChunkDigits = 9;
+
+		uint32_t chunks[kFromStringNumLimbs*64/29 + 1];
+		int32_t  numChunks = 0;
+
+		while (0 != big.num)
+		{
+			chunks[numChunks++] = floatBigDivSmall(big, kChunk);
+		}
+
+		if (0 == numChunks)
+		{
+			chunks[numChunks++] = 0;
+		}
+
+		char top[kChunkDigits];
+		int32_t topLen = 0;
+
+		for (uint32_t value = chunks[numChunks - 1]; 0 == topLen || 0 != value; value /= 10)
+		{
+			top[topLen++] = char('0' + value % 10);
+		}
+
+		const int32_t len = topLen + (numChunks - 1)*kChunkDigits;
+
+		if (len > _max)
+		{
+			return -1;
+		}
+
+		int32_t pos = 0;
+
+		for (int32_t ii = topLen; ii > 0; --ii)
+		{
+			_out[pos++] = top[ii - 1];
+		}
+
+		for (int32_t ii = numChunks - 1; ii > 0; --ii)
+		{
+			uint32_t value = chunks[ii - 1];
+
+			for (int32_t jj = kChunkDigits; jj > 0; --jj)
+			{
+				_out[pos + jj - 1] = char('0' + value % 10);
+				value /= 10;
+			}
+
+			pos += kChunkDigits;
+		}
+
+		return len;
+	}
+
+	static int32_t decimalExponentEstimate(double _value)
+	{
+		const uint64_t bits   = doubleToBits(_value);
+		const uint64_t frac   = bits & kDoubleMantissaMask;
+		const int32_t  biased = int32_t( (bits & kDoubleExponentMask) >> kDoubleExponentShift);
+
+		const int32_t topBit = 0 == biased
+			? 63 - int32_t(countLeadingZeros(frac) ) + 1 - int32_t(kDoubleExponentBias) - kDoubleMantissaNumBits
+			: biased - int32_t(kDoubleExponentBias)
+			;
+
+		return int32_t(floor(double(topBit) * 0.30102999566398119521) );
+	}
+
+	static int32_t floatSignificantDigits(char* _out, int32_t _max, double _value, int32_t _count, int32_t& _exp)
+	{
+		int32_t exp = decimalExponentEstimate(_value);
+
+		int32_t len = floatBigScaledDigits(_out, _max, _value, _count - 1 - exp);
+
+		if (len > _count)
+		{
+			++exp;
+			len = floatBigScaledDigits(_out, _max, _value, _count - 1 - exp);
+		}
+
+		if (len > _count)
+		{
+			++exp;
+			len = _count;
+		}
+
+		_exp = exp;
+
+		return len;
+	}
+
+	static int32_t writeExponent(char* _out, int32_t _exp)
+	{
+		int32_t pos = 0;
+		_out[pos++] = 'e';
+		_out[pos++] = 0 > _exp ? '-' : '+';
+
+		const int32_t value = 0 > _exp ? -_exp : _exp;
+
+		if (100 <= value)
+		{
+			_out[pos++] = char('0' + value / 100);
+		}
+
+		_out[pos++] = char('0' + value / 10 % 10);
+		_out[pos++] = char('0' + value % 10);
+
+		return pos;
+	}
+
+	int32_t toStringFormatted(char* _out, int32_t _max, double _value, char _fmt, int32_t _prec, bool _alt)
+	{
+		constexpr int32_t kMaxDigits = 1100;
+
+		if (!isFinite(_value) )
+		{
+			return toString(_out, _max, _value);
+		}
+
+		char digits[kMaxDigits];
+		char tmp[kMaxDigits + 32];
+		int32_t pos = 0;
+
+		if (0 != (doubleToBits(_value) & kDoubleSignMask) )
+		{
+			tmp[pos++] = '-';
+		}
+
+		const bool zero  = 0.0 == _value;
+		int32_t    prec  = min(_prec, kMaxDigits - 2);
+		char       fmt   = _fmt;
+		bool       strip = false;
+
+		if ('g' == fmt)
+		{
+			const int32_t count = max(prec, 1);
+
+			int32_t exp = 0;
+
+			if (!zero
+			&&  0 > floatSignificantDigits(digits, kMaxDigits, _value, count, exp) )
+			{
+				return toString(_out, _max, _value);
+			}
+
+			if (count > exp
+			&&  -4 <= exp)
+			{
+				fmt  = 'f';
+				prec = count - 1 - exp;
+			}
+			else
+			{
+				fmt  = 'e';
+				prec = count - 1;
+			}
+
+			strip = !_alt;
+		}
+
+		if ('e' == fmt)
+		{
+			int32_t exp = 0;
+			int32_t len = 1;
+			digits[0] = '0';
+
+			if (!zero)
+			{
+				len = floatSignificantDigits(digits, kMaxDigits, _value, prec + 1, exp);
+
+				if (0 > len)
+				{
+					return toString(_out, _max, _value);
+				}
+			}
+
+			tmp[pos++] = digits[0];
+
+			if (0 < prec
+			||  _alt)
+			{
+				tmp[pos++] = '.';
+			}
+
+			for (int32_t ii = 1; ii <= prec; ++ii)
+			{
+				tmp[pos++] = ii < len ? digits[ii] : '0';
+			}
+
+			if (strip
+			&&  0 < prec)
+			{
+				while ('0' == tmp[pos - 1])
+				{
+					--pos;
+				}
+
+				if ('.' == tmp[pos - 1])
+				{
+					--pos;
+				}
+			}
+
+			pos += writeExponent(&tmp[pos], exp);
+		}
+		else
+		{
+			const int32_t len = floatBigScaledDigits(digits, kMaxDigits, _value, prec);
+
+			if (0 > len)
+			{
+				return toString(_out, _max, _value);
+			}
+
+			const int32_t intLen = len - prec;
+
+			if (0 >= intLen)
+			{
+				tmp[pos++] = '0';
+			}
+
+			for (int32_t ii = 0; ii < intLen; ++ii)
+			{
+				tmp[pos++] = digits[ii];
+			}
+
+			if (0 < prec
+			||  _alt)
+			{
+				tmp[pos++] = '.';
+			}
+
+			for (int32_t ii = 0; ii < prec; ++ii)
+			{
+				const int32_t at = intLen + ii;
+				tmp[pos++] = 0 > at ? '0' : digits[at];
+			}
+
+			if (strip
+			&&  0 < prec)
+			{
+				while ('0' == tmp[pos - 1])
+				{
+					--pos;
+				}
+
+				if ('.' == tmp[pos - 1])
+				{
+					--pos;
+				}
+			}
+		}
+
+		return int32_t(strCopy(_out, _max, StringView(tmp, pos) ) );
 	}
 
 	int32_t toString(char* _out, int32_t _max, bool _value)
@@ -1059,9 +1450,11 @@ namespace bx
 
 		if (0 <= decExp)
 		{
-			for (int32_t ii = 0; ii < decExp; ++ii)
+			for (int32_t left = decExp; 0 < left; left -= kFromStringPow5Max)
 			{
-				if (!floatBigMulAdd(big, 5, 0) )
+				const int32_t step = min(left, kFromStringPow5Max);
+
+				if (!floatBigMulAdd(big, kFromStringPow5[step], 0) )
 				{
 					*_out = negative ? -kDoubleInfinity : kDoubleInfinity;
 					return true;
@@ -1081,9 +1474,10 @@ namespace bx
 
 			binExp -= int32_t(prescale);
 
-			for (int32_t ii = 0; ii < count; ++ii)
+			for (int32_t left = count; 0 < left; left -= kFromStringPow5Max)
 			{
-				const uint32_t rem = floatBigDivSmall(big, 5);
+				const int32_t  step = min(left, kFromStringPow5Max);
+				const uint32_t rem  = floatBigDivSmall(big, kFromStringPow5[step]);
 
 				sticky = sticky || (0 != rem);
 			}
