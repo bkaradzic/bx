@@ -41,7 +41,7 @@
 #		include <stdio.h>  // fopen
 #		include <sys/mman.h>
 #		include <sys/syscall.h>
-#	elif BX_PLATFORM_OSX
+#	elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 #		include <mach/mach.h> // mach_task_basic_info
 #		include <sys/mman.h>
 #	endif // BX_PLATFORM_ANDROID
@@ -172,7 +172,7 @@ namespace bx
 			? pages * sysconf(_SC_PAGESIZE)
 			: 0
 			;
-#elif BX_PLATFORM_OSX
+#elif BX_PLATFORM_IOS || BX_PLATFORM_OSX
 #	if defined(MACH_TASK_BASIC_INFO)
 		mach_task_basic_info info;
 		mach_msg_type_number_t infoCount = MACH_TASK_BASIC_INFO_COUNT;
@@ -502,7 +502,7 @@ namespace bx
 
 	namespace
 	{
-#if BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+#if BX_PLATFORM_ANDROID || BX_PLATFORM_IOS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		static int32_t toPosixProt(uint32_t _protect)
 		{
 			switch (_protect)
@@ -555,7 +555,7 @@ namespace bx
 		BX_ASSERT(_alignment <= granularity, "Alignments greater than the allocation granularity are not implemented (requested %zu, granularity %zu).", _alignment, granularity);
 		BX_UNUSED(_alignment, granularity);
 
-#if BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+#if BX_PLATFORM_ANDROID || BX_PLATFORM_IOS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		if (NULL == _address)
 		{
 			if (0 == (state & Memory::Reserve) )
@@ -735,7 +735,7 @@ namespace bx
 	{
 		BX_ERROR_SCOPE(_err);
 
-#if BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+#if BX_PLATFORM_ANDROID || BX_PLATFORM_IOS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		int32_t result = munmap(_address, _size);
 
 		if (-1 == result)
@@ -766,7 +766,7 @@ namespace bx
 	{
 		const uint32_t page = _flags & Memory::PageMask;
 
-#if BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
+#if BX_PLATFORM_ANDROID || BX_PLATFORM_IOS || BX_PLATFORM_LINUX || BX_PLATFORM_OSX
 		if (0 != (page & Memory::PageHuge) )
 		{
 			return 1ull << 30; // 1 GiB nominal
