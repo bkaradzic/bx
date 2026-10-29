@@ -1453,6 +1453,24 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE bool simd128_x8_signbits_any(simd128_ref_t _a)
+	{
+		return simd_x8_signbits_any_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_first(simd128_ref_t _a)
+	{
+		return simd_x8_signbits_first_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_last(simd128_ref_t _a)
+	{
+		return simd_x8_signbits_last_ni(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_neg(simd128_ref_t _a)
 	{
 		return simd_f32_neg_ni(_a);

@@ -132,7 +132,7 @@ namespace bx
 		return strCat(_dst, _dstSize, _str.getPtr(), min(_str.getLength(), _num) );
 	}
 
-	inline uint32_t matchBytes(const char* _str, simd64_t _pattern)
+	inline simd64_t matchBytes(const char* _str, simd64_t _pattern)
 	{
 		const uint64_t word    = loadUnaligned<uint64_t>(_str);
 		const simd64_t chunk   = simd64_splat(word);
@@ -142,16 +142,14 @@ namespace bx
 		const simd64_t carry   = simd64_u64_add(lowBits, low7);
 		const simd64_t nonZero = simd64_or(carry, diff);
 		const simd64_t equal   = simd64_not(nonZero);
-		const int      mask    = simd64_x8_signbitsmask(equal);
-		return uint32_t(mask);
+		return equal;
 	}
 
-	inline uint32_t matchBytes(const char* _str, simd128_t _pattern)
+	inline simd128_t matchBytes(const char* _str, simd128_t _pattern)
 	{
 		const simd128_t chunk = simd_ldu<simd128_t>(_str);
 		const simd128_t equal = simd_i8_cmpeq(chunk, _pattern);
-		const int       mask  = simd_x8_signbitsmask(equal);
-		return uint32_t(mask);
+		return equal;
 	}
 
 	inline bool matchAny(const char* _str, simd128_t _pattern)
@@ -167,47 +165,11 @@ namespace bx
 		const simd128_t any01  = simd_or(equal0, equal1);
 		const simd128_t any23  = simd_or(equal2, equal3);
 		const simd128_t any    = simd_or(any01, any23);
-		const int       mask   = simd_x8_signbitsmask(any);
-		return 0 != mask;
+		return simd_x8_signbits_any(any);
 	}
 
-	inline const char* strFindUnsafe(const char* _str, int32_t _len, char _ch)
+	inline const char* strFindShort(const char* _str, int32_t _len, char _ch)
 	{
-		if constexpr (kSimdSupported)
-		{
-			if (16 <= _len)
-			{
-				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
-				const simd128_t pattern = simd_splat<simd128_t>(splat);
-
-				int32_t ii = 0;
-
-				for (; ii + 64 <= _len && !matchAny(&_str[ii], pattern); ii += 64)
-				{
-				}
-
-				for (; ii + 16 <= _len; ii += 16)
-				{
-					const uint32_t mask = matchBytes(&_str[ii], pattern);
-
-					if (0 != mask)
-					{
-						return &_str[ii + countTrailingZeros(mask)];
-					}
-				}
-
-				if (ii == _len)
-				{
-					return NULL;
-				}
-
-				const int32_t  at   = _len - 16;
-				const uint32_t mask = matchBytes(&_str[at], pattern);
-
-				return 0 != mask ? &_str[at + countTrailingZeros(mask)] : NULL;
-			}
-		}
-
 		if (8 <= _len)
 		{
 			const simd64_t pattern = simd64_splat(uint8_t(_ch) );
@@ -216,11 +178,11 @@ namespace bx
 
 			for (; ii + 8 <= _len; ii += 8)
 			{
-				const uint32_t mask = matchBytes(&_str[ii], pattern);
+				const simd64_t equal = matchBytes(&_str[ii], pattern);
 
-				if (0 != mask)
+				if (simd_x8_signbits_any(equal) )
 				{
-					return &_str[ii + countTrailingZeros(mask)];
+					return &_str[ii + simd_x8_signbits_first(equal)];
 				}
 			}
 
@@ -229,10 +191,10 @@ namespace bx
 				return NULL;
 			}
 
-			const int32_t  at   = _len - 8;
-			const uint32_t mask = matchBytes(&_str[at], pattern);
+			const int32_t  at    = _len - 8;
+			const simd64_t equal = matchBytes(&_str[at], pattern);
 
-			return 0 != mask ? &_str[at + countTrailingZeros(mask)] : NULL;
+			return simd_x8_signbits_any(equal) ? &_str[at + simd_x8_signbits_first(equal)] : NULL;
 		}
 
 		for (int32_t ii = 0; ii < _len; ++ii)
@@ -244,6 +206,56 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	BX_FORCE_INLINE const char* strFindUnsafe(const char* _str, int32_t _len, char _ch)
+	{
+		if constexpr (kSimdSupported)
+		{
+			if (16 <= _len)
+			{
+				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
+				const simd128_t pattern = simd_splat<simd128_t>(splat);
+
+				int32_t ii = 0;
+
+				for (; ii + 16 <= _len && ii < 64; ii += 16)
+				{
+					const simd128_t equal = matchBytes(&_str[ii], pattern);
+
+					if (simd_x8_signbits_any(equal) )
+					{
+						return &_str[ii + simd_x8_signbits_first(equal)];
+					}
+				}
+
+				for (; ii + 64 <= _len && !matchAny(&_str[ii], pattern); ii += 64)
+				{
+				}
+
+				for (; ii + 16 <= _len; ii += 16)
+				{
+					const simd128_t equal = matchBytes(&_str[ii], pattern);
+
+					if (simd_x8_signbits_any(equal) )
+					{
+						return &_str[ii + simd_x8_signbits_first(equal)];
+					}
+				}
+
+				if (ii == _len)
+				{
+					return NULL;
+				}
+
+				const int32_t   at    = _len - 16;
+				const simd128_t equal = matchBytes(&_str[at], pattern);
+
+				return simd_x8_signbits_any(equal) ? &_str[at + simd_x8_signbits_first(equal)] : NULL;
+			}
+		}
+
+		return strFindShort(_str, _len, _ch);
 	}
 
 	inline const char* strFind(const char* _str, int32_t _max, char _ch)
@@ -262,42 +274,8 @@ namespace bx
 		return StringView(ptr, ptr+1);
 	}
 
-	inline const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
+	inline const char* strRFindShort(const char* _str, int32_t _len, char _ch)
 	{
-		if constexpr (kSimdSupported)
-		{
-			if (16 <= _len)
-			{
-				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
-				const simd128_t pattern = simd_splat<simd128_t>(splat);
-
-				int32_t end = _len;
-
-				for (; 64 <= end && !matchAny(&_str[end - 64], pattern); end -= 64)
-				{
-				}
-
-				for (; 16 <= end; end -= 16)
-				{
-					const uint32_t mask = matchBytes(&_str[end - 16], pattern);
-
-					if (0 != mask)
-					{
-						return &_str[end - 16 + 31 - countLeadingZeros(mask)];
-					}
-				}
-
-				if (0 == end)
-				{
-					return NULL;
-				}
-
-				const uint32_t mask = matchBytes(_str, pattern);
-
-				return 0 != mask ? &_str[31 - countLeadingZeros(mask)] : NULL;
-			}
-		}
-
 		if (8 <= _len)
 		{
 			const simd64_t pattern = simd64_splat(uint8_t(_ch) );
@@ -306,11 +284,11 @@ namespace bx
 
 			for (; 8 <= end; end -= 8)
 			{
-				const uint32_t mask = matchBytes(&_str[end - 8], pattern);
+				const simd64_t equal = matchBytes(&_str[end - 8], pattern);
 
-				if (0 != mask)
+				if (simd_x8_signbits_any(equal) )
 				{
-					return &_str[end - 8 + 31 - countLeadingZeros(mask)];
+					return &_str[end - 8 + simd_x8_signbits_last(equal)];
 				}
 			}
 
@@ -319,9 +297,9 @@ namespace bx
 				return NULL;
 			}
 
-			const uint32_t mask = matchBytes(_str, pattern);
+			const simd64_t equal = matchBytes(_str, pattern);
 
-			return 0 != mask ? &_str[31 - countLeadingZeros(mask)] : NULL;
+			return simd_x8_signbits_any(equal) ? &_str[simd_x8_signbits_last(equal)] : NULL;
 		}
 
 		for (int32_t ii = _len-1; 0 <= ii; --ii)
@@ -333,6 +311,55 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	BX_FORCE_INLINE const char* strRFindUnsafe(const char* _str, int32_t _len, char _ch)
+	{
+		if constexpr (kSimdSupported)
+		{
+			if (16 <= _len)
+			{
+				const uint32_t  splat   = uint32_t(uint8_t(_ch) ) * 0x01010101u;
+				const simd128_t pattern = simd_splat<simd128_t>(splat);
+
+				int32_t end = _len;
+
+				for (; 16 <= end && _len - 64 < end; end -= 16)
+				{
+					const simd128_t equal = matchBytes(&_str[end - 16], pattern);
+
+					if (simd_x8_signbits_any(equal) )
+					{
+						return &_str[end - 16 + simd_x8_signbits_last(equal)];
+					}
+				}
+
+				for (; 64 <= end && !matchAny(&_str[end - 64], pattern); end -= 64)
+				{
+				}
+
+				for (; 16 <= end; end -= 16)
+				{
+					const simd128_t equal = matchBytes(&_str[end - 16], pattern);
+
+					if (simd_x8_signbits_any(equal) )
+					{
+						return &_str[end - 16 + simd_x8_signbits_last(equal)];
+					}
+				}
+
+				if (0 == end)
+				{
+					return NULL;
+				}
+
+				const simd128_t equal = matchBytes(_str, pattern);
+
+				return simd_x8_signbits_any(equal) ? &_str[simd_x8_signbits_last(equal)] : NULL;
+			}
+		}
+
+		return strRFindShort(_str, _len, _ch);
 	}
 
 	StringView strRFind(const StringView& _str, char _ch)
@@ -378,7 +405,20 @@ namespace bx
 		return NULL;
 	}
 
-	inline const char* strFindExact(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
+	inline bool strEqualTail(const char* _lhs, const char* _rhs, int32_t _len)
+	{
+		for (int32_t ii = 1; ii < _len; ++ii)
+		{
+			if (_lhs[ii] != _rhs[ii])
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	BX_FORCE_INLINE const char* strFindExact(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
 	{
 		if (0 >= _findLen
 		||  _findLen > _strLen)
@@ -399,7 +439,7 @@ namespace bx
 				return NULL;
 			}
 
-			if (0 == memCmp(ptr, _find, _findLen) )
+			if (strEqualTail(ptr, _find, _findLen) )
 			{
 				return ptr;
 			}

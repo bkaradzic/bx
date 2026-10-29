@@ -81,6 +81,32 @@ namespace bx
 	}
 
 	template<typename Ty>
+	BX_SIMD_INLINE bool simd_x8_signbits_any_ni(Ty _a)
+	{
+		const int mask = simd_x8_signbitsmask(_a);
+		return 0 != mask;
+	}
+
+	template<typename Ty>
+	BX_SIMD_INLINE int32_t simd_x8_signbits_first_ni(Ty _a)
+	{
+		const int      mask = simd_x8_signbitsmask(_a);
+		const uint32_t none = 32 == sizeof(Ty) ? 0u : 1u << (sizeof(Ty) & 31);
+		const simd32_t bits = simd32_splat(uint32_t(mask) | none);
+		const simd32_t cnt  = simd32_x32_cnttz(bits);
+		return int32_t(cnt.u32);
+	}
+
+	template<typename Ty>
+	BX_SIMD_INLINE int32_t simd_x8_signbits_last_ni(Ty _a)
+	{
+		const int      mask = simd_x8_signbitsmask(_a);
+		const simd32_t bits = simd32_splat(uint32_t(mask) );
+		const simd32_t cnt  = simd32_x32_cntlz(bits);
+		return 31 - int32_t(cnt.u32);
+	}
+
+	template<typename Ty>
 	BX_SIMD_INLINE Ty simd_f32_div_nr_ni(Ty _a, Ty _b)
 	{
 		const Ty oneish  = simd_splat<Ty>(uint32_t(0x3f800001));

@@ -1016,6 +1016,46 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE bool simd128_x8_signbits_any(simd128_neon_t _a)
+	{
+		const int8x16_t  a       = vreinterpretq_s8_f32(_a);
+		const int8x16_t  signs   = vshrq_n_s8(a, 7);
+		const uint16x8_t pairs   = vreinterpretq_u16_s8(signs);
+		const uint8x8_t  nibbles = vshrn_n_u16(pairs, 4);
+		const uint64x1_t bits    = vreinterpret_u64_u8(nibbles);
+		const uint64_t   mask    = vget_lane_u64(bits, 0);
+		return 0 != mask;
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_first(simd128_neon_t _a)
+	{
+		const int8x16_t  a       = vreinterpretq_s8_f32(_a);
+		const int8x16_t  signs   = vshrq_n_s8(a, 7);
+		const uint16x8_t pairs   = vreinterpretq_u16_s8(signs);
+		const uint8x8_t  nibbles = vshrn_n_u16(pairs, 4);
+		const uint64x1_t bits    = vreinterpret_u64_u8(nibbles);
+		const uint64_t   mask    = vget_lane_u64(bits, 0);
+		const simd64_t   word    = simd64_splat(mask);
+		const simd64_t   cnt     = simd64_x64_cnttz(word);
+		return int32_t(cnt.u64 >> 2);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_last(simd128_neon_t _a)
+	{
+		const int8x16_t  a       = vreinterpretq_s8_f32(_a);
+		const int8x16_t  signs   = vshrq_n_s8(a, 7);
+		const uint16x8_t pairs   = vreinterpretq_u16_s8(signs);
+		const uint8x8_t  nibbles = vshrn_n_u16(pairs, 4);
+		const uint64x1_t bits    = vreinterpret_u64_u8(nibbles);
+		const uint64_t   mask    = vget_lane_u64(bits, 0);
+		const simd64_t   word    = simd64_splat(mask);
+		const simd64_t   cnt     = simd64_x64_cntlz(word);
+		return (63 - int32_t(cnt.u64) ) >> 2;
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_neg(simd128_neon_t _a)
 	{
 		return vnegq_f32(_a);

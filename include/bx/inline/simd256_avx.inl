@@ -1815,6 +1815,24 @@ namespace bx
 #endif
 	}
 
+	template<>
+	BX_SIMD_FORCE_INLINE bool simd256_x8_signbits_any(simd256_avx_t _a)
+	{
+		return simd_x8_signbits_any_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd256_x8_signbits_first(simd256_avx_t _a)
+	{
+		return simd_x8_signbits_first_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd256_x8_signbits_last(simd256_avx_t _a)
+	{
+		return simd_x8_signbits_last_ni(_a);
+	}
+
 	typedef simd256_avx_t  simd256_t;
 
 } // namespace bx

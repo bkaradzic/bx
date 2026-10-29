@@ -2260,6 +2260,91 @@ TEST_CASE("simd128_signbits", "[simd]")
 	REQUIRE(simd128_x8_signbitsmask(simd128_ld<simd128_t>(0x80808080u, 0x80808080u, 0x80808080u, 0x80808080u)) == 0xffff);
 }
 
+TEST_CASE("simd32_x8_signbits_find", "[simd]")
+{
+	REQUIRE(false == simd_x8_signbits_any(make_u32(0x7f7f7f7f) ) );
+	REQUIRE(4     == simd_x8_signbits_first(make_u32(0x7f7f7f7f) ) );
+	REQUIRE(-1    == simd_x8_signbits_last(make_u32(0x7f7f7f7f) ) );
+
+	for (uint32_t first = 0; first < 4; ++first)
+	{
+		for (uint32_t last = first; last < 4; ++last)
+		{
+			const simd32_t a = make_u32( (0x80u << (first*8) ) | (0xffu << (last*8) ) );
+			REQUIRE(true           == simd_x8_signbits_any(a) );
+			REQUIRE(int32_t(first) == simd_x8_signbits_first(a) );
+			REQUIRE(int32_t(last)  == simd_x8_signbits_last(a) );
+		}
+	}
+}
+
+TEST_CASE("simd64_x8_signbits_find", "[simd]")
+{
+	REQUIRE(false == simd_x8_signbits_any(simd64_splat(UINT64_C(0x7f7f7f7f7f7f7f7f) ) ) );
+	REQUIRE(8     == simd_x8_signbits_first(simd64_splat(UINT64_C(0x7f7f7f7f7f7f7f7f) ) ) );
+	REQUIRE(-1    == simd_x8_signbits_last(simd64_splat(UINT64_C(0x7f7f7f7f7f7f7f7f) ) ) );
+
+	for (uint32_t first = 0; first < 8; ++first)
+	{
+		for (uint32_t last = first; last < 8; ++last)
+		{
+			const simd64_t a = simd64_splat( (UINT64_C(0x80) << (first*8) ) | (UINT64_C(0xff) << (last*8) ) );
+			REQUIRE(true           == simd_x8_signbits_any(a) );
+			REQUIRE(int32_t(first) == simd_x8_signbits_first(a) );
+			REQUIRE(int32_t(last)  == simd_x8_signbits_last(a) );
+		}
+	}
+}
+
+TEST_CASE("simd128_x8_signbits_find", "[simd]")
+{
+	const simd128_t low7 = simd128_ld<simd128_t>(0x7f7f7f7fu, 0x7f7f7f7fu, 0x7f7f7f7fu, 0x7f7f7f7fu);
+	REQUIRE(false == simd_x8_signbits_any(low7) );
+	REQUIRE(16    == simd_x8_signbits_first(low7) );
+	REQUIRE(-1    == simd_x8_signbits_last(low7) );
+
+	for (uint32_t first = 0; first < 16; ++first)
+	{
+		for (uint32_t last = first; last < 16; ++last)
+		{
+			uint8_t bytes[16] = {};
+			bytes[first] = 0x80;
+			bytes[last]  = 0xff;
+
+			const simd128_t a = simd_ldu<simd128_t>(bytes);
+			REQUIRE(true           == simd_x8_signbits_any(a) );
+			REQUIRE(int32_t(first) == simd_x8_signbits_first(a) );
+			REQUIRE(int32_t(last)  == simd_x8_signbits_last(a) );
+		}
+	}
+}
+
+TEST_CASE("simd256_x8_signbits_find", "[simd]")
+{
+	BX_ALIGN_DECL(32, uint8_t bytes[32]);
+
+	bx::memSet(bytes, 0x7f, sizeof(bytes) );
+	const simd256_t low7 = simd256_ld<simd256_t>(bytes);
+	REQUIRE(false == simd_x8_signbits_any(low7) );
+	REQUIRE(32    == simd_x8_signbits_first(low7) );
+	REQUIRE(-1    == simd_x8_signbits_last(low7) );
+
+	for (uint32_t first = 0; first < 32; ++first)
+	{
+		for (uint32_t last = first; last < 32; ++last)
+		{
+			bx::memSet(bytes, 0, sizeof(bytes) );
+			bytes[first] = 0x80;
+			bytes[last]  = 0xff;
+
+			const simd256_t a = simd256_ld<simd256_t>(bytes);
+			REQUIRE(true           == simd_x8_signbits_any(a) );
+			REQUIRE(int32_t(first) == simd_x8_signbits_first(a) );
+			REQUIRE(int32_t(last)  == simd_x8_signbits_last(a) );
+		}
+	}
+}
+
 // --- simd256 missing coverage ---
 
 TEST_CASE("simd256_zero_splat", "[simd]")

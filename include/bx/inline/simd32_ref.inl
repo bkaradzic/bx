@@ -218,6 +218,27 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 		     ;
 	}
 
+	inline BX_CONSTEXPR_FUNC bool simd32_x8_signbits_any(simd32_t _a)
+	{
+		return 0 != (_a.u32 & 0x80808080u);
+	}
+
+	inline BX_CONSTEXPR_FUNC int32_t simd32_x8_signbits_first(simd32_t _a)
+	{
+		const simd32_t mask  = simd32_splat(0x80808080u);
+		const simd32_t signs = simd32_and(_a, mask);
+		const simd32_t cnt   = simd32_x32_cnttz(signs);
+		return int32_t(cnt.u32 >> 3);
+	}
+
+	inline BX_CONSTEXPR_FUNC int32_t simd32_x8_signbits_last(simd32_t _a)
+	{
+		const simd32_t mask  = simd32_splat(0x80808080u);
+		const simd32_t signs = simd32_and(_a, mask);
+		const simd32_t cnt   = simd32_x32_cntlz(signs);
+		return (31 - int32_t(cnt.u32) ) >> 3;
+	}
+
 	inline BX_CONSTEXPR_FUNC simd32_t simd32_x8_shuffle(simd32_t _a, simd32_t _indices)
 	{
 		uint32_t out = 0;
@@ -789,6 +810,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		result.u32 = 0 == _a.u32 ? 32 : __builtin_clz(_a.u32);
 #else
+#	if BX_COMPILER_MSVC
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index = 0;
+			_BitScanReverse(&index, (unsigned long)_a.u32);
+			result.u32 = 0 != _a.u32 ? 31 - index : 32;
+			return result;
+		}
+#	endif // BX_COMPILER_MSVC
 		uint32_t val = _a.u32;
 		val |= val >> 1;
 		val |= val >> 2;
@@ -807,6 +837,15 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 #if BX_COMPILER_GCC || BX_COMPILER_CLANG
 		result.u32 = 0 == _a.u32 ? 32 : __builtin_ctz(_a.u32);
 #else
+#	if BX_COMPILER_MSVC
+		if (!isConstantEvaluated() )
+		{
+			unsigned long index = 0;
+			_BitScanForward(&index, (unsigned long)_a.u32);
+			result.u32 = 0 != _a.u32 ? index : 32;
+			return result;
+		}
+#	endif // BX_COMPILER_MSVC
 		simd32_t tmp{ .u32 = ~_a.u32 & (_a.u32 - 1) };
 		result = simd32_x32_cntbits(tmp);
 #endif // BX_COMPILER_*
