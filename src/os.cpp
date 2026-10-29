@@ -33,11 +33,9 @@
 #		include <dlfcn.h> // dlopen, dlclose, dlsym
 #	endif // !BX_PLATFORM_PS4 && !BX_PLATFORM_PS5
 
-#	if BX_PLATFORM_ANDROID
-#		include <stdio.h>  // fopen
-#		include <sys/mman.h>
-#	elif   BX_PLATFORM_LINUX \
-		|| BX_PLATFORM_RPI
+#	if BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX   \
+	|| BX_PLATFORM_RPI
 #		include <stdio.h>  // fopen
 #		include <sys/mman.h>
 #		include <sys/syscall.h>
@@ -144,7 +142,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return ::GetCurrentThreadId();
-#elif  BX_PLATFORM_LINUX \
+#elif  BX_PLATFORM_ANDROID \
+	|| BX_PLATFORM_LINUX   \
 	|| BX_PLATFORM_RPI
 		return (pid_t)::syscall(SYS_gettid);
 #elif  BX_PLATFORM_IOS \
