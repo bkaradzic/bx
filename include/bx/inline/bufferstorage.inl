@@ -184,14 +184,14 @@ namespace bx
 	template<typename Ty>
 	inline StorageViewT<Ty>::StorageViewT(const Ty* _ptr, uint32_t _count)
 		: m_ptr(_ptr)
-		, m_count(_count)
+		, m_term(_ptr + _count)
 	{
 	}
 
 	template<typename Ty>
 	inline StorageViewT<Ty>::StorageViewT(const StorageViewT<Ty>& _other)
 		: m_ptr(_other.m_ptr)
-		, m_count(_other.m_count)
+		, m_term(_other.m_term)
 	{
 	}
 
@@ -203,8 +203,8 @@ namespace bx
 	template<typename Ty>
 	inline StorageViewT<Ty>& StorageViewT<Ty>::operator=(const StorageViewT<Ty>& _other)
 	{
-		m_ptr   = _other.m_ptr;
-		m_count = _other.m_count;
+		m_ptr  = _other.m_ptr;
+		m_term = _other.m_term;
 
 		return *this;
 	}
@@ -212,11 +212,11 @@ namespace bx
 	template<typename Ty>
 	inline StorageViewT<Ty>& StorageViewT<Ty>::operator=(StorageViewT<Ty>&& _other)
 	{
-		m_ptr   = _other.m_ptr;
-		m_count = _other.m_count;
+		m_ptr  = _other.m_ptr;
+		m_term = _other.m_term;
 
-		_other.m_ptr   = NULL;
-		_other.m_count = 0;
+		_other.m_ptr  = NULL;
+		_other.m_term = NULL;
 
 		return *this;
 	}
@@ -225,15 +225,16 @@ namespace bx
 	template<typename StorageT>
 	inline void StorageViewT<Ty>::setCapacity(StorageT& _storage, uint32_t _capacity)
 	{
-		const uint32_t count = m_count;
+		const uint32_t count = getCount();
 		_storage.setCapacity(max(count, _capacity), count);
-		m_ptr = _storage.getPtr();
+		m_ptr  = _storage.getPtr();
+		m_term = m_ptr + count;
 	}
 
 	template<typename Ty>
 	inline uint32_t StorageViewT<Ty>::getCount() const
 	{
-		return m_count;
+		return uint32_t(m_term - m_ptr);
 	}
 
 	template<typename Ty>
@@ -250,7 +251,7 @@ namespace bx
 			sanitize(_storage.getCapacity(), idx, _count);
 		}
 
-		const uint32_t oldCount = m_count;
+		const uint32_t oldCount = getCount();
 
 		if (oldCount > _count)
 		{
@@ -265,7 +266,7 @@ namespace bx
 			StorageTraits::constructDefault(_storage.getPtr(oldCount), diff);
 		}
 
-		m_count = _count;
+		m_term = m_ptr + _count;
 	}
 
 	template<typename Ty>
@@ -281,16 +282,16 @@ namespace bx
 
 		BX_ASSERT(!overlap(_storage.getPtr(dstPos), _ptr, _count), "");
 
-		dbgGraph(m_count+_count, dstPos, _count, 'c');
+		dbgGraph(getCount()+_count, dstPos, _count, 'c');
 
-		m_count += StorageTraits::copy(_storage.getPtr(dstPos), _ptr, _count);
+		m_term += StorageTraits::copy(_storage.getPtr(dstPos), _ptr, _count);
 	}
 
 	template<typename Ty>
 	template<typename StorageT, typename... ArgsT>
 	inline void StorageViewT<Ty>::add(StorageT& _storage, uint32_t _pos, EmplaceTag, ArgsT&&... _args)
 	{
-		const uint32_t oldCount = m_count;
+		const uint32_t oldCount = getCount();
 		const uint32_t dstPos   = carve(_storage, _pos, 1, false);
 		Ty* dst = _storage.getPtr(dstPos);
 
@@ -303,7 +304,7 @@ namespace bx
 
 		dbgGraph(oldCount+1, dstPos, 1, 'E');
 
-		m_count += StorageTraits::constructEmplace(dst, 1, forward<ArgsT>(_args)...);
+		m_term += StorageTraits::constructEmplace(dst, 1, forward<ArgsT>(_args)...);
 	}
 
 	template<typename Ty>
@@ -315,7 +316,7 @@ namespace bx
 			return;
 		}
 
-		const uint32_t oldCount = m_count;
+		const uint32_t oldCount = getCount();
 		sanitize(oldCount, _pos, _count);
 
 		const uint32_t end      = _pos + _count;
@@ -350,20 +351,21 @@ namespace bx
 		dbgGraph(oldCount, newCount, _count, 'D');
 		StorageTraits::destruct(_storage.getPtr(newCount), _count);
 
-		m_count = newCount;
+		m_term = m_ptr + newCount;
 	}
 
 	template<typename Ty>
 	template<typename StorageT>
 	inline uint32_t StorageViewT<Ty>::carve(StorageT& _storage, uint32_t _pos, uint32_t _count, bool _init)
 	{
-		const uint32_t dstCount = m_count;
+		const uint32_t dstCount = getCount();
 		const uint32_t newCount = _count + dstCount;
 
 		if (newCount > _storage.getCapacity() )
 		{
 			_storage.setCapacity(max(dstCount, newCount), dstCount);
-			m_ptr = _storage.getPtr();
+			m_ptr  = _storage.getPtr();
+			m_term = m_ptr + dstCount;
 		}
 
 		BX_ASSERT(newCount <= _storage.getCapacity()

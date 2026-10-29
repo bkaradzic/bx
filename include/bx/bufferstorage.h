@@ -28,7 +28,7 @@ namespace bx
 	struct StorageViewT final
 	{
 		const Ty* m_ptr;
-		uint32_t  m_count;
+		const Ty* m_term;
 
 		///
 		StorageViewT() = delete;
