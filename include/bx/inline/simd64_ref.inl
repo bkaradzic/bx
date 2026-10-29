@@ -468,6 +468,27 @@ namespace bx
 		return result;
 	}
 
+	inline BX_CONSTEXPR_FUNC bool simd64_x8_signbits_any(simd64_t _a)
+	{
+		return 0 != (_a.u64 & UINT64_C(0x8080808080808080) );
+	}
+
+	inline BX_CONSTEXPR_FUNC int32_t simd64_x8_signbits_first(simd64_t _a)
+	{
+		const simd64_t mask  = simd64_splat(UINT64_C(0x8080808080808080) );
+		const simd64_t signs = simd64_and(_a, mask);
+		const simd64_t cnt   = simd64_x64_cnttz(signs);
+		return int32_t(cnt.u64 >> 3);
+	}
+
+	inline BX_CONSTEXPR_FUNC int32_t simd64_x8_signbits_last(simd64_t _a)
+	{
+		const simd64_t mask  = simd64_splat(UINT64_C(0x8080808080808080) );
+		const simd64_t signs = simd64_and(_a, mask);
+		const simd64_t cnt   = simd64_x64_cntlz(signs);
+		return (63 - int32_t(cnt.u64) ) >> 3;
+	}
+
 	inline BX_CONSTEXPR_FUNC simd64_t simd64_x8_shuffle(simd64_t _a, simd64_t _indices)
 	{
 		uint64_t out = 0;

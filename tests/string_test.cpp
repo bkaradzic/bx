@@ -383,12 +383,12 @@ TEST_CASE("strFind matches a byte loop", "[string]")
 {
 	bx::RngMwc rng;
 
-	char buffer[176];
+	char buffer[336];
 
 	for (uint32_t ii = 0; ii < 100000; ++ii)
 	{
 		const int32_t offset  = int32_t(rng.gen() % 16);
-		const int32_t len     = int32_t(rng.gen() % 151);
+		const int32_t len     = int32_t(rng.gen() % 301);
 		const int32_t findLen = int32_t(rng.gen() % 5);
 
 		for (int32_t jj = 0; jj < len; ++jj)

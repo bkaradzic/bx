@@ -1003,6 +1003,24 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE bool simd128_x8_signbits_any(simd128_sse_t _a)
+	{
+		return simd_x8_signbits_any_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_first(simd128_sse_t _a)
+	{
+		return simd_x8_signbits_first_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE int32_t simd128_x8_signbits_last(simd128_sse_t _a)
+	{
+		return simd_x8_signbits_last_ni(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_neg(simd128_sse_t _a)
 	{
 		const __m128i signi = _mm_set1_epi32(int32_t(kFloatSignMask) );

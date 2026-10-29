@@ -267,6 +267,39 @@ namespace bx
 	template<typename Ty>
 	int simd_x8_signbitsmask(Ty _a);
 
+	/// Test if any 8-bit lane sign bit is set.
+	///
+	/// @param[in] _a Input register.
+	///
+	/// @returns True if any 8-bit lane has sign bit set.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	bool simd_x8_signbits_any(Ty _a);
+
+	/// Find the first 8-bit lane with sign bit set.
+	///
+	/// @param[in] _a Input register.
+	///
+	/// @returns Lane index, or the number of lanes when no sign bit is set.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	int32_t simd_x8_signbits_first(Ty _a);
+
+	/// Find the last 8-bit lane with sign bit set.
+	///
+	/// @param[in] _a Input register.
+	///
+	/// @returns Lane index, or -1 when no sign bit is set.
+	///
+	/// @remark Widths: simd32, simd64, simd128, simd256.
+	///
+	template<typename Ty>
+	int32_t simd_x8_signbits_last(Ty _a);
+
 	/// Per-byte shuffle within each 16-byte lane (single-source).
 	///
 	/// For each output byte, an index byte selects which input byte is copied:
