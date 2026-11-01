@@ -73,7 +73,7 @@ namespace bx
 
 		///
 		template<typename StorageT>
-		[[nodiscard]] uint32_t carve(StorageT& _storage, uint32_t _pos, uint32_t _count, bool _init);
+		[[nodiscard]] uint32_t carve(StorageT& _storage, uint32_t _pos, uint32_t _count);
 	};
 
 	///
@@ -114,6 +114,10 @@ namespace bx
 		///
 		template<typename Ty, typename... ArgsT>
 		[[nodiscard]] static uint32_t constructEmplace(Ty* _ptr, uint32_t _count, ArgsT&&... _args);
+
+		///
+		template<typename Ty>
+		[[nodiscard]] static uint32_t constructCopy(Ty* _dst, const Ty* _src, uint32_t _count);
 
 		///
 		template<typename Ty>
