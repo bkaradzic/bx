@@ -389,17 +389,28 @@ TEST_CASE("strFind matches a byte loop", "[string]")
 	{
 		const int32_t offset  = int32_t(rng.gen() % 16);
 		const int32_t len     = int32_t(rng.gen() % 301);
-		const int32_t findLen = int32_t(rng.gen() % 5);
+		const int32_t findLen = 0 == ii%4
+			? int32_t(rng.gen() % 41)
+			: int32_t(rng.gen() % 5)
+			;
 
 		for (int32_t jj = 0; jj < len; ++jj)
 		{
 			buffer[offset + jj] = char('a' + rng.gen() % 3);
 		}
 
-		char find[4];
+		char find[40];
 		for (int32_t jj = 0; jj < findLen; ++jj)
 		{
 			find[jj] = char('a' + rng.gen() % 3);
+		}
+
+		if (0 < findLen
+		&&  findLen <= len
+		&&  0 == rng.gen() % 2)
+		{
+			const int32_t at = int32_t(rng.gen() % uint32_t(len - findLen + 1) );
+			bx::memCopy(&buffer[offset + at], find, findLen);
 		}
 
 		const char* str = &buffer[offset];
@@ -1381,4 +1392,66 @@ TEST_CASE("strFind-bench", "[.][!benchmark]")
 		haystack[len - 2] = 'a';
 		haystack[len - 1] = 'a';
 	}
+
+	std::string lines;
+
+	for (uint32_t ii = 0; ii < 1024; ++ii)
+	{
+		char tmp[64];
+		const int32_t len = bx::snprintf(tmp, sizeof(tmp), "\tfloat4 value%u = input%u;\n", ii, ii);
+		lines.append(tmp, size_t(len) );
+	}
+
+	const std::string dense(lines, 0, lines.find("value16 ") - 8);
+	const bx::StringView denseView(dense.c_str(), int32_t(dense.size() ) );
+
+	BENCHMARK("bx::strFind dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (bx::StringView found = bx::strFind(denseView, "float4"); !found.isEmpty(); found = bx::strFind(bx::StringView(found.getTerm(), denseView.getTerm() ), "float4") )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	BENCHMARK("std::string::find dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (size_t pos = dense.find("float4"); std::string::npos != pos; pos = dense.find("float4", pos + 6) )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	const bx::StringView linesView(lines.c_str(), int32_t(lines.size() ) );
+
+	BENCHMARK("bx::strFind 1024 lines")
+	{
+		return bx::strFind(linesView, "value1023 =").getPtr();
+	};
+
+	BENCHMARK("std::string::find 1024 lines")
+	{
+		return lines.find("value1023 =");
+	};
+
+	std::string fff(4096, 'f');
+	fff.replace(4096 - 8, 6, "float4");
+	const bx::StringView fffView(fff.c_str(), int32_t(fff.size() ) );
+
+	BENCHMARK("bx::strFind 4096 f")
+	{
+		return bx::strFind(fffView, "float4").getPtr();
+	};
+
+	BENCHMARK("std::string::find 4096 f")
+	{
+		return fff.find("float4");
+	};
 }
