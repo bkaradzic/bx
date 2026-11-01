@@ -124,6 +124,7 @@ namespace bx
 
 		const int32_t max = _dstSize;
 		const int32_t len = strLen(_dst, max);
+
 		return strCopy(&_dst[len], max-len, _src, _num);
 	}
 
@@ -142,6 +143,7 @@ namespace bx
 		const simd64_t carry   = simd64_u64_add(lowBits, low7);
 		const simd64_t nonZero = simd64_or(carry, diff);
 		const simd64_t equal   = simd64_not(nonZero);
+
 		return equal;
 	}
 
@@ -149,6 +151,7 @@ namespace bx
 	{
 		const simd128_t chunk = simd_ldu<simd128_t>(_str);
 		const simd128_t equal = simd_i8_cmpeq(chunk, _pattern);
+
 		return equal;
 	}
 
@@ -165,6 +168,7 @@ namespace bx
 		const simd128_t any01  = simd_or(equal0, equal1);
 		const simd128_t any23  = simd_or(equal2, equal3);
 		const simd128_t any    = simd_or(any01, any23);
+
 		return simd_x8_signbits_any(any);
 	}
 
@@ -383,13 +387,11 @@ namespace bx
 
 		for (; stringLen >= findLen; ++ptr, --stringLen)
 		{
-			// Find start of the string.
 			while (fn(*ptr) != fn(*_find) )
 			{
 				++ptr;
 				--stringLen;
 
-				// Search pattern length can't be longer than the string.
 				if (findLen > stringLen)
 				{
 					return NULL;
@@ -405,17 +407,73 @@ namespace bx
 		return NULL;
 	}
 
-	inline bool strEqualTail(const char* _lhs, const char* _rhs, int32_t _len)
+	template<typename Ty>
+	inline bool isEqualAt(const char* _lhs, const char* _rhs, int32_t _offset)
 	{
-		for (int32_t ii = 1; ii < _len; ++ii)
+		return loadUnaligned<Ty>(&_lhs[_offset]) == loadUnaligned<Ty>(&_rhs[_offset]);
+	}
+
+	inline bool strEqualExact(const char* _lhs, const char* _rhs, int32_t _len)
+	{
+		if (4 >= _len)
 		{
-			if (_lhs[ii] != _rhs[ii])
+			return 2 >= _len
+				|| (isEqualAt<uint16_t>(_lhs, _rhs, 0) && isEqualAt<uint16_t>(_lhs, _rhs, _len - 2) )
+				;
+		}
+
+		if (8 >= _len)
+		{
+			return isEqualAt<uint32_t>(_lhs, _rhs, 0) && isEqualAt<uint32_t>(_lhs, _rhs, _len - 4);
+		}
+
+		for (int32_t ii = 0; ii < _len - 8; ii += 8)
+		{
+			if (!isEqualAt<uint64_t>(_lhs, _rhs, ii) )
 			{
 				return false;
 			}
 		}
 
-		return true;
+		return isEqualAt<uint64_t>(_lhs, _rhs, _len - 8);
+	}
+
+	inline simd128_t matchFirstLast(const char* _str, int32_t _lastOffset, simd128_t _first, simd128_t _last)
+	{
+		const simd128_t chunkFirst = simd_ldu<simd128_t>(_str);
+		const simd128_t chunkLast  = simd_ldu<simd128_t>(&_str[_lastOffset]);
+		const simd128_t equalFirst = simd_i8_cmpeq(chunkFirst, _first);
+		const simd128_t equalLast  = simd_i8_cmpeq(chunkLast, _last);
+		const simd128_t equal      = simd_and(equalFirst, equalLast);
+		return equal;
+	}
+
+	inline const char* strFindCandidates(const char* _str, uint32_t _mask, const char* _find, int32_t _findLen)
+	{
+		for (uint32_t mask = _mask; 0 != mask; mask &= mask - 1)
+		{
+			const char* ptr = &_str[countTrailingZeros(mask)];
+
+			if (strEqualExact(ptr, _find, _findLen) )
+			{
+				return ptr;
+			}
+		}
+
+		return NULL;
+	}
+
+	inline const char* strFindBlock(const char* _str, simd128_t _first, simd128_t _last, const char* _find, int32_t _findLen)
+	{
+		const simd128_t equal = matchFirstLast(_str, _findLen - 1, _first, _last);
+
+		if (simd_x8_signbits_any(equal) )
+		{
+			const uint32_t mask = uint32_t(simd_x8_signbitsmask(equal) );
+			return strFindCandidates(_str, mask, _find, _findLen);
+		}
+
+		return NULL;
 	}
 
 	BX_FORCE_INLINE const char* strFindExact(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
@@ -426,20 +484,87 @@ namespace bx
 			return NULL;
 		}
 
-		const char* term = _str + _strLen;
-		const char* last = term - _findLen;
+		if (1 == _findLen)
+		{
+			return strFindUnsafe(_str, _strLen, _find[0]);
+		}
 
-		for (const char* ptr = _str; ptr <= last; ++ptr)
+		const int32_t num        = _strLen - _findLen + 1;
+		const int32_t lastOffset = _findLen - 1;
+
+		if constexpr (kSimdSupported)
+		{
+			if (16 <= num)
+			{
+				const simd128_t first = simd_splat<simd128_t>(uint32_t(uint8_t(_find[         0]) ) * 0x01010101u);
+				const simd128_t last  = simd_splat<simd128_t>(uint32_t(uint8_t(_find[lastOffset]) ) * 0x01010101u);
+
+				int32_t ii = 0;
+
+				for (; ii + 16 <= num && ii < 64; ii += 16)
+				{
+					const char* ptr = strFindBlock(&_str[ii], first, last, _find, _findLen);
+
+					if (NULL != ptr)
+					{
+						return ptr;
+					}
+				}
+
+				for (; ii + 64 <= num; ii += 64)
+				{
+					if (matchAny(&_str[ii], first) )
+					{
+						for (int32_t jj = ii; jj < ii + 64; jj += 16)
+						{
+							const char* ptr = strFindBlock(&_str[jj], first, last, _find, _findLen);
+
+							if (NULL != ptr)
+							{
+								return ptr;
+							}
+						}
+					}
+				}
+
+				for (; ii + 16 <= num; ii += 16)
+				{
+					const char* ptr = strFindBlock(&_str[ii], first, last, _find, _findLen);
+
+					if (NULL != ptr)
+					{
+						return ptr;
+					}
+				}
+
+				if (ii == num)
+				{
+					return NULL;
+				}
+
+				const int32_t   at    = num - 16;
+				const simd128_t equal = matchFirstLast(&_str[at], lastOffset, first, last);
+				const uint32_t  mask  = uint32_t(simd_x8_signbitsmask(equal) ) & (UINT32_MAX << (ii - at) );
+
+				return strFindCandidates(&_str[at], mask, _find, _findLen);
+			}
+		}
+
+		const char* term = _str + _strLen;
+		const char* end  = term - _findLen;
+
+		for (const char* ptr = _str; ptr <= end; ++ptr)
 		{
 			ptr = strFindUnsafe(ptr, int32_t(term - ptr), _find[0]);
 
 			if (NULL == ptr
-			||  ptr > last)
+			||  ptr > end)
 			{
 				return NULL;
 			}
 
-			if (strEqualTail(ptr, _find, _findLen) )
+			if (_find[lastOffset] == ptr[lastOffset]
+			&&  strEqualExact(ptr, _find, _findLen) )
 			{
 				return ptr;
 			}
@@ -614,13 +739,13 @@ namespace bx
 	{
 		StringView str(_str);
 
-		// This method returns the character past the \n, so
-		// there is no need to look for he \r which preceedes it.
 		StringView eol = strFind(str, "\n");
+
 		if (!eol.isEmpty() )
 		{
 			return StringView(eol.getTerm(), str.getTerm() );
 		}
+
 		return StringView(_str.getTerm(), _str.getTerm() );
 	}
 
@@ -733,16 +858,21 @@ namespace bx
 	{
 		const int32_t len = _word.getLength();
 		StringView ptr = strFind(_str, _word);
+
 		for (; !ptr.isEmpty(); ptr = strFind(StringView(ptr.getPtr() + len, _str.getTerm() ), _word) )
 		{
 			char ch = ptr.getPtr() != _str.getPtr() ? *(ptr.getPtr() - 1) : ' ';
-			if (isAlphaNum(ch) || '_' == ch)
+
+			if (isAlphaNum(ch)
+			||  '_' == ch)
 			{
 				continue;
 			}
 
 			ch = *(ptr.getPtr() + len);
-			if (isAlphaNum(ch) || '_' == ch)
+
+			if (isAlphaNum(ch)
+			||  '_' == ch)
 			{
 				continue;
 			}
