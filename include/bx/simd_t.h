@@ -145,7 +145,6 @@ namespace bx
 	BX_ALIGN_DECL(4,  struct) simd32_ref_t  { uint32_t u32; };
 	BX_ALIGN_DECL(8,  struct) simd64_ref_t  { uint64_t u64; };
 	BX_ALIGN_DECL(16, struct) simd128_ref_t { uint32_t u32[4]; };
-	BX_ALIGN_DECL(32, struct) simd256_ref_t { simd128_ref_t lo; simd128_ref_t hi; };
 
 #if BX_SIMD_SSE
 	typedef simd128_sse_t  simd128_t;
@@ -156,6 +155,8 @@ namespace bx
 #else
 	typedef simd128_ref_t  simd128_t;
 #endif // BX_SIMD_*
+
+	BX_ALIGN_DECL(32, struct) simd256_ref_t { simd128_t lo; simd128_t hi; };
 
 #if BX_SIMD_AVX
 	typedef simd256_avx_t  simd256_t;
