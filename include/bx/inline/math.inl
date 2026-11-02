@@ -1505,7 +1505,8 @@ BX_FP_PRECISE_BEGIN()
 #if BX_COMPILER_MSVC && BX_ARCH_64BIT
 			return __umulh(_a, _b);
 #elif (BX_COMPILER_GCC || BX_COMPILER_CLANG) && BX_ARCH_64BIT
-			return uint64_t( ( (unsigned __int128)_a * _b)>>64);
+			__extension__ typedef unsigned __int128 uint128_t;
+			return uint64_t( (uint128_t(_a) * _b)>>64);
 #endif // BX_COMPILER_*
 		}
 

@@ -58,6 +58,11 @@ project "bx"
 
 	defines (userdefines())
 
+	configuration { "not vs*" }
+		buildoptions {
+			"-Wpedantic",
+		}
+
 	configuration { "linux-*" }
 		buildoptions {
 			"-fPIC",

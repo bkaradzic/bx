@@ -267,15 +267,9 @@ namespace bx
 		return strFindUnsafe(_str, strLen(_str, _max), _ch);
 	}
 
-	StringView strFind(const StringView& _str, char _ch)
+	const char* internal::strFind(const char* _str, int32_t _len, char _ch)
 	{
-		const char* ptr = strFindUnsafe(_str.getPtr(), _str.getLength(), _ch);
-		if (NULL == ptr)
-		{
-			return StringView(_str.getTerm(), _str.getTerm() );
-		}
-
-		return StringView(ptr, ptr+1);
+		return strFindUnsafe(_str, _len, _ch);
 	}
 
 	inline const char* strRFindShort(const char* _str, int32_t _len, char _ch)
@@ -366,15 +360,9 @@ namespace bx
 		return strRFindShort(_str, _len, _ch);
 	}
 
-	StringView strRFind(const StringView& _str, char _ch)
+	const char* internal::strRFind(const char* _str, int32_t _len, char _ch)
 	{
-		const char* ptr = strRFindUnsafe(_str.getPtr(), _str.getLength(), _ch);
-		if (NULL == ptr)
-		{
-			return StringView(_str.getTerm(), _str.getTerm() );
-		}
-
-		return StringView(ptr, ptr+1);
+		return strRFindUnsafe(_str, _len, _ch);
 	}
 
 	template<CharFn fn>
@@ -573,42 +561,14 @@ namespace bx
 		return NULL;
 	}
 
-	StringView strFind(const StringView& _str, const StringView& _find, int32_t _num)
+	const char* internal::strFind(const char* _str, int32_t _len, const char* _find, int32_t _findLen)
 	{
-		int32_t len = min(_find.getLength(), _num);
-
-		const char* ptr = strFindExact(
-			  _str.getPtr()
-			, _str.getLength()
-			, _find.getPtr()
-			, len
-			);
-
-		if (NULL == ptr)
-		{
-			return StringView(_str.getTerm(), _str.getTerm() );
-		}
-
-		return StringView(ptr, len);
+		return strFindExact(_str, _len, _find, _findLen);
 	}
 
-	StringView strFindI(const StringView& _str, const StringView& _find, int32_t _num)
+	const char* internal::strFindI(const char* _str, int32_t _len, const char* _find, int32_t _findLen)
 	{
-		int32_t len = min(_find.getLength(), _num);
-
-		const char* ptr = strFind<toLower>(
-			  _str.getPtr()
-			, _str.getLength()
-			, _find.getPtr()
-			, len
-			);
-
-		if (NULL == ptr)
-		{
-			return StringView(_str.getTerm(), _str.getTerm() );
-		}
-
-		return StringView(ptr, len);
+		return bx::strFind<toLower>(_str, _len, _find, _findLen);
 	}
 
 	StringView strLTrim(const StringView& _str, const StringView& _chars)
