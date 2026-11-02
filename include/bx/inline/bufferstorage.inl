@@ -140,7 +140,25 @@ namespace bx
 	{
 		for (Ty *ptr = _ptr, *term = _ptr + _count; ptr < term; ++ptr)
 		{
-			BX_PLACEMENT_NEW(ptr, Ty)(forward<ArgsT>(_args)...);
+			BX_PLACEMENT_NEW(ptr, Ty)(bx::forward<ArgsT>(_args)...);
+		}
+
+		return _count;
+	}
+
+	template<typename Ty>
+	inline uint32_t StorageTraits::constructCopy(Ty* _dst, const Ty* _src, uint32_t _count)
+	{
+		if constexpr (isTriviallyCopyConstructible<Ty>() )
+		{
+			memCopy(_dst, _src, _count * sizeof(Ty) );
+		}
+		else
+		{
+			for (uint32_t ii = 0; ii < _count; ++ii)
+			{
+				BX_PLACEMENT_NEW(&_dst[ii], Ty)(_src[ii]);
+			}
 		}
 
 		return _count;
@@ -149,11 +167,11 @@ namespace bx
 	template<typename Ty>
 	inline void StorageTraits::constructMove(Ty* _dst, Ty* _src, uint32_t _count)
 	{
-		if (BX_ENABLED(isTriviallyMoveConstructible<Ty>() ) )
+		if constexpr (isTriviallyMoveConstructible<Ty>() )
 		{
 			memMove(_dst, _src, _count * sizeof(Ty) );
 		}
-		else if (BX_ENABLED(isMoveConstructible<Ty>() ) )
+		else if constexpr (isMoveConstructible<Ty>() )
 		{
 			for (uint32_t ii = 0; ii < _count; ++ii)
 			{
@@ -278,13 +296,13 @@ namespace bx
 			return;
 		}
 
-		const uint32_t dstPos = carve(_storage, _pos, _count, true);
+		const uint32_t dstPos = carve(_storage, _pos, _count);
 
 		BX_ASSERT(!overlap(_storage.getPtr(dstPos), _ptr, _count), "");
 
 		dbgGraph(getCount()+_count, dstPos, _count, 'c');
 
-		m_term += StorageTraits::copy(_storage.getPtr(dstPos), _ptr, _count);
+		m_term += StorageTraits::constructCopy(_storage.getPtr(dstPos), _ptr, _count);
 	}
 
 	template<typename Ty>
@@ -292,19 +310,11 @@ namespace bx
 	inline void StorageViewT<Ty>::add(StorageT& _storage, uint32_t _pos, EmplaceTag, ArgsT&&... _args)
 	{
 		const uint32_t oldCount = getCount();
-		const uint32_t dstPos   = carve(_storage, _pos, 1, false);
-		Ty* dst = _storage.getPtr(dstPos);
-
-		if (dstPos < oldCount)
-		{
-			dbgGraph(oldCount+1, dstPos, 1, 'D');
-
-			StorageTraits::destruct(dst, 1);
-		}
+		const uint32_t dstPos   = carve(_storage, _pos, 1);
 
 		dbgGraph(oldCount+1, dstPos, 1, 'E');
 
-		m_term += StorageTraits::constructEmplace(dst, 1, forward<ArgsT>(_args)...);
+		m_term += StorageTraits::constructEmplace(_storage.getPtr(dstPos), 1, bx::forward<ArgsT>(_args)...);
 	}
 
 	template<typename Ty>
@@ -356,7 +366,7 @@ namespace bx
 
 	template<typename Ty>
 	template<typename StorageT>
-	inline uint32_t StorageViewT<Ty>::carve(StorageT& _storage, uint32_t _pos, uint32_t _count, bool _init)
+	inline uint32_t StorageViewT<Ty>::carve(StorageT& _storage, uint32_t _pos, uint32_t _count)
 	{
 		const uint32_t dstCount = getCount();
 		const uint32_t newCount = _count + dstCount;
@@ -377,21 +387,24 @@ namespace bx
 		const uint32_t moveCount = dstCount - dstPos;
 		const uint32_t newPos    = dstPos + _count;
 
-		const bool needCtor = _init || dstPos != dstCount;
-
-		dbgGraph(newCount, dstCount, _count, needCtor ? 'C' : '?');
-
-		if (needCtor)
-		{
-			StorageTraits::constructDefault(_storage.getPtr(dstCount), _count);
-		}
-
 		if (0 != moveCount)
 		{
 			dbgGraph(newCount, dstPos, moveCount, 'F');
 			dbgGraph(newCount, newPos, moveCount, 'M');
 
-			StorageTraits::move(_storage.getPtr(newPos), _storage.getPtr(dstPos), moveCount);
+			if constexpr (isTriviallyCopyable<Ty>() )
+			{
+				memMove(_storage.getPtr(newPos), _storage.getPtr(dstPos), moveCount * sizeof(Ty) );
+			}
+			else
+			{
+				const uint32_t numConstruct = min(moveCount, _count);
+				const uint32_t numAssign    = moveCount - numConstruct;
+
+				StorageTraits::constructMove(_storage.getPtr(newCount - numConstruct), _storage.getPtr(dstCount - numConstruct), numConstruct);
+				StorageTraits::move(_storage.getPtr(newPos), _storage.getPtr(dstPos), numAssign);
+				StorageTraits::destruct(_storage.getPtr(dstPos), numConstruct);
+			}
 		}
 
 		return dstPos;
