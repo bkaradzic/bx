@@ -598,6 +598,18 @@ namespace bx
 	/// Converts string to 64-bit unsigned long long value.
 	bool fromString(unsigned long long* _out, const StringView& _str);
 
+	namespace internal
+	{
+		const char* strFind(const char* _str, int32_t _len, char _ch);
+
+		const char* strRFind(const char* _str, int32_t _len, char _ch);
+
+		const char* strFind(const char* _str, int32_t _len, const char* _find, int32_t _findLen);
+
+		const char* strFindI(const char* _str, int32_t _len, const char* _find, int32_t _findLen);
+
+	} // namespace internal
+
 } // namespace bx
 
 #include "inline/string.inl"

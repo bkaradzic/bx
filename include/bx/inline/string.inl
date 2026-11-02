@@ -118,14 +118,13 @@ namespace bx
 
 	inline constexpr void StringView::set(const char* _ptr, int32_t _len)
 	{
-		clear();
+		const bool    isNull       = NULL == _ptr;
+		const bool    isTerminated = INT32_MAX == _len;
+		const int32_t len          = isTerminated && !isNull ? strLen(_ptr) : _len;
 
-		if (NULL != _ptr)
-		{
-			m_len = INT32_MAX == _len ? strLen(_ptr) : _len;
-			m_ptr = _ptr;
-			m_0terminated = INT32_MAX == _len;
-		}
+		m_ptr         = isNull ? "" : _ptr;
+		m_len         = isNull ? 0  : len;
+		m_0terminated = isNull || isTerminated;
 	}
 
 	inline constexpr void StringView::set(const char* _ptr, const char* _term)
@@ -847,6 +846,56 @@ namespace bx
 
 		return result;
 	};
+
+	inline StringView strFind(const StringView& _str, char _ch)
+	{
+		const char* ptr = internal::strFind(_str.getPtr(), _str.getLength(), _ch);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, 1);
+	}
+
+	inline StringView strRFind(const StringView& _str, char _ch)
+	{
+		const char* ptr = internal::strRFind(_str.getPtr(), _str.getLength(), _ch);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, 1);
+	}
+
+	inline StringView strFind(const StringView& _str, const StringView& _find, int32_t _num)
+	{
+		const int32_t len = min(_find.getLength(), _num);
+		const char*   ptr = internal::strFind(_str.getPtr(), _str.getLength(), _find.getPtr(), len);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, len);
+	}
+
+	inline StringView strFindI(const StringView& _str, const StringView& _find, int32_t _num)
+	{
+		const int32_t len = min(_find.getLength(), _num);
+		const char*   ptr = internal::strFindI(_str.getPtr(), _str.getLength(), _find.getPtr(), len);
+
+		if (NULL == ptr)
+		{
+			return StringView(_str.getTerm(), _str.getTerm() );
+		}
+
+		return StringView(ptr, len);
+	}
 
 	template<uint16_t MaxCapacityT>
 	inline FixedStringT<MaxCapacityT> toHuman(Ticks _value, uint8_t _numFrac)
