@@ -8,22 +8,43 @@
 
 #include "string.h"
 
-#define BX_ERROR_SET(_ptr, _result, _msg)    \
+///
+#define BX_ERROR_SET(_err, _result, _msg)    \
 	BX_MACRO_BLOCK_BEGIN                     \
-		(_ptr)->setError(_result,  "" _msg); \
+		(_err)->setError(_result,  "" _msg); \
 	BX_MACRO_BLOCK_END
 
-#define BX_ERROR_USE_TEMP_WHEN_NULL(_ptr)                           \
+///
+#define BX_ERROR_USE_TEMP_WHEN_NULL(_err)                           \
 	const bx::Error tmpError; /* It should not be used directly! */ \
-	_ptr = NULL == _ptr ? const_cast<bx::Error*>(&tmpError) : _ptr
+	_err = NULL == _err ? const_cast<bx::Error*>(&tmpError) : _err
 
-#define BX_ERROR_SCOPE(_ptr, ...)                                  \
-	BX_ERROR_USE_TEMP_WHEN_NULL(_ptr);                             \
+///
+#define BX_ERROR_SCOPE(_err, ...)                                  \
+	BX_ERROR_USE_TEMP_WHEN_NULL(_err);                             \
 	bx::ErrorScope bxErrorScope(const_cast<bx::Error*>(&tmpError), "" __VA_ARGS__)
 
+///
 #define BX_ERROR_RESULT(_err, _code)                       \
 	static_assert(_code != 0, "ErrorCode 0 is reserved!"); \
 	static constexpr bx::ErrorResult _err = { _code }
+
+/// Set error and begin its context: BX_ERROR_CONTEXT_BEGIN(_err, _result, _msg, _size[, _skip]).
+#define BX_ERROR_CONTEXT_BEGIN(_err, _result, _msg, ...) \
+	BX_MACRO_BLOCK_BEGIN                                 \
+		bx::ErrorContext bxErrorContext(_err, _result, _msg, __VA_ARGS__)
+
+/// Error context writer.
+#define BX_ERROR_CONTEXT_WRITER() \
+		(&bxErrorContext)
+
+/// Write to error context.
+#define BX_ERROR_CONTEXT_WRITE(...) \
+		bx::write(BX_ERROR_CONTEXT_WRITER(), bx::ErrorIgnore(), __VA_ARGS__)
+
+/// End error context.
+#define BX_ERROR_CONTEXT_END() \
+	BX_MACRO_BLOCK_END
 
 namespace bx
 {
@@ -57,10 +78,13 @@ namespace bx
 		ErrorResult get() const;
 
 		///
-		const StringLiteral& getMessage() const;
+		StringLiteral getMessage() const;
 
 		///
-		const Location& getLocation() const;
+		Location getLocation() const;
+
+		/// The error context attached to this error, or 0 when there is none.
+		uint32_t getContext() const;
 
 		///
 		bool operator==(const ErrorResult& _rhs) const;
@@ -69,9 +93,14 @@ namespace bx
 		bool operator!=(const ErrorResult& _rhs) const;
 
 	private:
-		Location      m_location;
-		StringLiteral m_msg;
-		uint32_t      m_code;
+		friend class ErrorContext;
+
+		const char* m_filePath;
+		const char* m_msg;
+		uint32_t    m_line;
+		int32_t     m_msgLen;
+		uint32_t    m_code;
+		uint32_t    m_context;
 	};
 
 	/// Do nothing even if error is set.

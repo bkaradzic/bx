@@ -43,6 +43,12 @@ namespace bx
 	{
 	}
 
+	inline constexpr StringLiteral::StringLiteral(const char* _ptr, int32_t _len)
+		: m_ptr(_ptr)
+		, m_len(_len)
+	{
+	}
+
 	template<int32_t SizeT>
 	inline constexpr StringLiteral::StringLiteral(const char (&_str)[SizeT])
 		: m_ptr(_str)
@@ -273,11 +279,6 @@ namespace bx
 		: FixedStringT<MaxCapacityT>()
 	{
 		set(_str);
-	}
-
-	template<uint16_t MaxCapacityT>
-	inline constexpr FixedStringT<MaxCapacityT>::~FixedStringT()
-	{
 	}
 
 	template<uint16_t MaxCapacityT>

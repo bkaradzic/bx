@@ -11,15 +11,24 @@
 
 namespace bx
 {
+	static_assert(sizeof(Error) == 2*sizeof(void*) + 4*sizeof(uint32_t), "Error has padding.");
+
 	inline Error::Error()
-		: m_code(0)
+		: m_filePath("")
+		, m_msg("")
+		, m_line(0)
+		, m_msgLen(0)
+		, m_code(0)
+		, m_context(0)
 	{
 	}
 
 	inline void Error::reset()
 	{
-		m_code = 0;
-		m_msg.clear();
+		m_code    = 0;
+		m_context = 0;
+		m_msg     = "";
+		m_msgLen  = 0;
 	}
 
 	inline void Error::setError(ErrorResult _errorResult, const StringLiteral& _msg, const Location& _location)
@@ -31,9 +40,11 @@ namespace bx
 			return;
 		}
 
-		m_location = _location;
+		m_filePath = _location.filePath;
+		m_line     = _location.line;
 		m_code     = _errorResult.code;
-		m_msg      = _msg;
+		m_msg      = _msg.getCPtr();
+		m_msgLen   = _msg.getLength();
 	}
 
 	inline bool Error::isOk() const
@@ -47,14 +58,19 @@ namespace bx
 		return result;
 	}
 
-	inline const StringLiteral& Error::getMessage() const
+	inline StringLiteral Error::getMessage() const
 	{
-		return m_msg;
+		return StringLiteral(m_msg, m_msgLen);
 	}
 
-	inline const Location& Error::getLocation() const
+	inline Location Error::getLocation() const
 	{
-		return m_location;
+		return Location(m_filePath, m_line);
+	}
+
+	inline uint32_t Error::getContext() const
+	{
+		return m_context;
 	}
 
 	inline bool Error::operator==(const ErrorResult& _rhs) const
@@ -74,9 +90,12 @@ namespace bx
 
 	inline ErrorAssert::~ErrorAssert()
 	{
+		const StringLiteral msg = getMessage();
+		BX_UNUSED(msg);
+
 		BX_ASSERT_LOC(getLocation(), isOk(), "ErrorAssert: 0x%08x `%S`"
 			, get().code
-			, &getMessage()
+			, &msg
 			);
 	}
 
@@ -87,9 +106,10 @@ namespace bx
 
 	inline ErrorFatal::~ErrorFatal()
 	{
+		const StringLiteral msg = getMessage();
 		_BX_ASSERT_LOC(getLocation(), isOk(), "ErrorFatal: 0x%08x `%S`"
 			, get().code
-			, &getMessage()
+			, &msg
 			);
 	}
 
@@ -108,6 +128,9 @@ namespace bx
 
 	inline ErrorScope::~ErrorScope()
 	{
+		const StringLiteral msg = m_err->getMessage();
+		BX_UNUSED(msg);
+
 		if (m_name.isEmpty() )
 		{
 			BX_ASSERT_LOC(
@@ -115,7 +138,7 @@ namespace bx
 				, m_err->isOk()
 				, "ErrorScope: 0x%08x `%S`"
 				, m_err->get().code
-				, &m_err->getMessage()
+				, &msg
 				);
 		}
 		else
@@ -126,7 +149,7 @@ namespace bx
 				, "ErrorScope: %S - 0x%08x `%S`"
 				, &m_name
 				, m_err->get().code
-				, &m_err->getMessage()
+				, &msg
 				);
 		}
 	}

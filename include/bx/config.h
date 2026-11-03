@@ -36,4 +36,14 @@
 #	endif
 #endif // BX_CONFIG_FMA
 
+/// Error context ring buffer size in bytes.
+#ifndef BX_CONFIG_ERROR_CONTEXT_RING_SIZE
+#	define BX_CONFIG_ERROR_CONTEXT_RING_SIZE (64<<10)
+#endif // BX_CONFIG_ERROR_CONTEXT_RING_SIZE
+
+/// Maximum size of one error context in bytes.
+#ifndef BX_CONFIG_ERROR_CONTEXT_MAX_SIZE
+#	define BX_CONFIG_ERROR_CONTEXT_MAX_SIZE (4<<10)
+#endif // BX_CONFIG_ERROR_CONTEXT_MAX_SIZE
+
 #endif // BX_CONFIG_H_HEADER_GUARD

@@ -52,6 +52,10 @@ namespace bx
 		constexpr bool isEmpty() const;
 
 	private:
+		friend class Error;
+
+		constexpr StringLiteral(const char* _ptr, int32_t _len);
+
 		const char* m_ptr;
 		int32_t     m_len;
 	};
@@ -181,8 +185,6 @@ namespace bx
 		constexpr FixedStringT(const StringView& _str);
 
 		///
-		constexpr ~FixedStringT();
-
 		///
 		constexpr void set(const char* _str);
 
