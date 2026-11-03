@@ -263,6 +263,40 @@ namespace bx
 		StaticMemoryBlock m_smb;
 	};
 
+	/// Error context: text and call stack attached to an error.
+	class ErrorContext : public WriterI
+	{
+		BX_CLASS(ErrorContext
+			, NO_DEFAULT_CTOR
+			, NO_COPY
+			);
+
+	public:
+		/// Sets the error, reserves `_size` bytes of text, and captures the call stack skipping
+		/// `_skip` frames. Does nothing when `_err` is NULL or already set.
+		ErrorContext(
+			  Error* _err
+			, ErrorResult _result
+			, const StringLiteral& _msg
+			, int32_t _size
+			, uint32_t _skip = 1
+			, const Location& _location = Location::current()
+			);
+
+		/// Attaches the context to the error.
+		virtual ~ErrorContext();
+
+		///
+		virtual int32_t write(const void* _data, int32_t _size, Error* _err) override;
+
+	private:
+		Error*   m_err;
+		char*    m_text;
+		int32_t  m_max;
+		int32_t  m_len;
+		uint32_t m_start;
+	};
+
 	/// Read data.
 	int32_t read(ReaderI* _reader, void* _data, int32_t _size, Error* _err);
 
@@ -312,6 +346,9 @@ namespace bx
 	/// Write value as big endian.
 	template<typename Ty>
 	int32_t writeBE(WriterI* _writer, const Ty& _value, Error* _err);
+
+	/// Write error context, and optionally its call stack.
+	int32_t write(WriterI* _writer, const Error& _error, bool _callstack, Error* _err);
 
 	/// Skip _offset bytes forward.
 	int64_t skip(SeekerI* _seeker, int64_t _offset);

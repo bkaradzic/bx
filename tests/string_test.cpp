@@ -1111,6 +1111,8 @@ TEST_CASE("0terminated", "[string]")
 	REQUIRE(2 == st.getLength() );
 }
 
+static_assert(bx::isTriviallyCopyable<bx::FixedString64>(), "FixedStringT must be trivially copyable.");
+
 TEST_CASE("FixedStringT", "[string]")
 {
 	bx::FixedString64 fs64("1389");

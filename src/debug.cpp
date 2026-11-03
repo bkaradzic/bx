@@ -4,8 +4,11 @@
  */
 
 #include <bx/debug.h>
+#include <bx/cpu.h>          // atomicCompareAndSwap
+#include <bx/error.h>        // Error
+#include <bx/math.h>         // min, clamp
 #include <bx/string.h>       // isPrint
-#include <bx/readerwriter.h> // WriterI
+#include <bx/readerwriter.h> // WriterI, ErrorContext
 #include <bx/os.h>           // exit
 #include <bx/process.h>      // ProcessReader
 #include <bx/scanner.h>      // Scanner
@@ -1554,6 +1557,160 @@ namespace bx
 
 			static ExceptionHandler s_exceptionHandler;
 		}
+	}
+
+	namespace
+	{
+		constexpr uint32_t kErrorContextBlockShift = 8;
+		constexpr uint32_t kErrorContextBlockSize  = 1u << kErrorContextBlockShift;
+		constexpr uint32_t kErrorContextNumBlocks  = BX_CONFIG_ERROR_CONTEXT_RING_SIZE >> kErrorContextBlockShift;
+		constexpr uint32_t kErrorContextMaxBlocks  = BX_CONFIG_ERROR_CONTEXT_MAX_SIZE  >> kErrorContextBlockShift;
+		constexpr uint32_t kErrorContextMaxFrames  = 32;
+
+		static_assert(0 == BX_CONFIG_ERROR_CONTEXT_RING_SIZE % kErrorContextBlockSize, "BX_CONFIG_ERROR_CONTEXT_RING_SIZE must be a multiple of 256.");
+		static_assert(0 == BX_CONFIG_ERROR_CONTEXT_MAX_SIZE  % kErrorContextBlockSize, "BX_CONFIG_ERROR_CONTEXT_MAX_SIZE must be a multiple of 256.");
+		static_assert(kErrorContextMaxBlocks <= kErrorContextNumBlocks, "BX_CONFIG_ERROR_CONTEXT_MAX_SIZE must not exceed BX_CONFIG_ERROR_CONTEXT_RING_SIZE.");
+
+		struct ErrorContextHeader
+		{
+			uintptr_t frames[kErrorContextMaxFrames];
+			uint32_t  numFrames;
+			uint32_t  numBlocks;
+		};
+
+		static_assert(sizeof(ErrorContextHeader) < kErrorContextBlockSize * kErrorContextMaxBlocks, "ErrorContextHeader leaves no room for text.");
+
+		BX_ALIGN_DECL_16(uint8_t s_errorContextRing[kErrorContextNumBlocks * kErrorContextBlockSize]);
+
+		uint32_t s_errorContextHead = 1;
+
+		uint8_t* errorContextBlock(uint32_t _block)
+		{
+			return &s_errorContextRing[(_block % kErrorContextNumBlocks) * kErrorContextBlockSize];
+		}
+
+		bool isErrorContextIntact(uint32_t _start)
+		{
+			const uint32_t head = atomicLoad(&s_errorContextHead);
+
+			return head - _start <= kErrorContextNumBlocks;
+		}
+
+		uint32_t reserveErrorContext(uint32_t _numBlocks)
+		{
+			for (;;)
+			{
+				const uint32_t head  = atomicLoad(&s_errorContextHead);
+				const uint32_t index = head % kErrorContextNumBlocks;
+
+				const uint32_t wrapped = index + _numBlocks > kErrorContextNumBlocks
+					? head + (kErrorContextNumBlocks - index)
+					: head
+					;
+				const uint32_t start = 0 == wrapped ? kErrorContextNumBlocks : wrapped;
+
+				if (head == atomicCompareAndSwap<uint32_t>(&s_errorContextHead, head, start + _numBlocks) )
+				{
+					return start;
+				}
+			}
+		}
+
+	} // namespace
+
+	ErrorContext::ErrorContext(Error* _err, ErrorResult _result, const StringLiteral& _msg, int32_t _size, uint32_t _skip, const Location& _location)
+		: m_err(NULL)
+		, m_text(NULL)
+		, m_max(0)
+		, m_len(0)
+		, m_start(0)
+	{
+		if (NULL == _err
+		||  !_err->isOk() )
+		{
+			return;
+		}
+
+		_err->setError(_result, _msg, _location);
+
+		const uint32_t size      = uint32_t(sizeof(ErrorContextHeader) ) + uint32_t(max(_size, 0) ) + 1;
+		const uint32_t numBlocks = min( (size + kErrorContextBlockSize - 1) >> kErrorContextBlockShift, kErrorContextMaxBlocks);
+
+		m_start = reserveErrorContext(numBlocks);
+
+		ErrorContextHeader* header = (ErrorContextHeader*)errorContextBlock(m_start);
+		header->numFrames = getCallStackFast(_skip + 1 /* skip self */, kErrorContextMaxFrames, header->frames);
+		header->numBlocks = numBlocks;
+
+		m_err   = _err;
+		m_text  = (char*)(header + 1);
+		m_max   = int32_t(numBlocks * kErrorContextBlockSize - sizeof(ErrorContextHeader) );
+		m_text[0] = '\0';
+	}
+
+	ErrorContext::~ErrorContext()
+	{
+		if (NULL != m_err)
+		{
+			m_err->m_context = m_start;
+		}
+	}
+
+	int32_t ErrorContext::write(const void* _data, int32_t _size, Error* _err)
+	{
+		BX_UNUSED(_err);
+
+		if (NULL == m_text)
+		{
+			return 0;
+		}
+
+		const int32_t size = clamp(_size, 0, m_max - 1 - m_len);
+		memCopy(&m_text[m_len], _data, size);
+		m_len += size;
+		m_text[m_len] = '\0';
+
+		return size;
+	}
+
+	int32_t write(WriterI* _writer, const Error& _error, bool _callstack, Error* _err)
+	{
+		const uint32_t start = _error.getContext();
+
+		if (0 == start)
+		{
+			return 0;
+		}
+
+		const StringView overwritten("Error context was overwritten.\n");
+
+		if (!isErrorContextIntact(start) )
+		{
+			return write(_writer, overwritten, _err);
+		}
+
+		BX_ALIGN_DECL_16(uint8_t copy[kErrorContextMaxBlocks * kErrorContextBlockSize]);
+		const ErrorContextHeader* ring = (const ErrorContextHeader*)errorContextBlock(start);
+		const uint32_t numBlocks = clamp<uint32_t>(ring->numBlocks, 1, kErrorContextMaxBlocks);
+		memCopy(copy, ring, numBlocks * kErrorContextBlockSize);
+
+		if (!isErrorContextIntact(start) )
+		{
+			return write(_writer, overwritten, _err);
+		}
+
+		const ErrorContextHeader* header = (const ErrorContextHeader*)copy;
+		const char*   text    = (const char*)(header + 1);
+		const int32_t maxText = int32_t(numBlocks * kErrorContextBlockSize - sizeof(ErrorContextHeader) );
+
+		int32_t total = write(_writer, StringView(text, strLen(text, maxText) ), _err);
+
+		if (_callstack)
+		{
+			total += writeCallstack(_writer, header->frames, min(header->numFrames, kErrorContextMaxFrames), _err);
+		}
+
+		return total;
 	}
 
 } // namespace bx
