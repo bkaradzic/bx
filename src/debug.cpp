@@ -412,7 +412,7 @@ namespace bx
 #endif // BX_CONFIG_CALLSTACK_USE_EXECINFO
 	}
 
-	static const uintptr_t* nextStackFrame(const uintptr_t* _stackFrame)
+	inline const uintptr_t* nextStackFrame(const uintptr_t* _stackFrame)
 	{
 		const uintptr_t* newStackFrame = (const uintptr_t*)*_stackFrame;
 
@@ -431,7 +431,7 @@ namespace bx
 
 	BX_NO_INLINE uint32_t getCallStackSystemVAbi(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
 	{
-		if (BX_ENABLED( (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT) )
+		if constexpr (BX_ENABLED( (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT) )
 		{
 			const uintptr_t* stackFrame = (const uintptr_t*)BX_STACK_FRAME_ADDRESS();
 
@@ -459,8 +459,10 @@ namespace bx
 
 			return num;
 		}
-
-		return 0;
+		else
+		{
+			return 0;
+		}
 	}
 
 	BX_NO_INLINE uint32_t getCallStackGccBuiltin(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
@@ -591,7 +593,7 @@ namespace bx
 
 	BX_NO_INLINE uint32_t getCallStackWinAbi(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
 	{
-		if (BX_ENABLED(BX_PLATFORM_WINDOWS && BX_CPU_X86 && BX_ARCH_32BIT) )
+		if constexpr (BX_ENABLED(BX_PLATFORM_WINDOWS && BX_CPU_X86 && BX_ARCH_32BIT) )
 		{
 			const uintptr_t* stackFrame = (uintptr_t*)&_skip - 2;
 
@@ -619,12 +621,14 @@ namespace bx
 
 			return num;
 		}
-		else if (BX_ENABLED(BX_PLATFORM_WINDOWS && BX_ARCH_64BIT) )
+		else if constexpr (BX_ENABLED(BX_PLATFORM_WINDOWS && BX_ARCH_64BIT) )
 		{
 			return getCallStackWinRtl(_skip + 1 /* skip self */, _max, _outStack);
 		}
-
-		return 0;
+		else
+		{
+			return 0;
+		}
 	}
 
 	BX_NO_INLINE uint32_t getCallStackFast(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)

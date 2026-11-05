@@ -47,7 +47,7 @@ namespace bx
 	template<typename Ty>
 	inline uint32_t StorageTraits::copy(Ty* _dst, const Ty* _src, uint32_t _count)
 	{
-		if (BX_ENABLED(isTriviallyCopyAssignable<Ty>() ) )
+		if constexpr (isTriviallyCopyAssignable<Ty>() )
 		{
 			memMove(_dst, _src, _count * sizeof(Ty) );
 		}
@@ -76,7 +76,7 @@ namespace bx
 	template<typename Ty>
 	inline void StorageTraits::move(Ty* _dst, Ty* _src, uint32_t _count)
 	{
-		if (BX_ENABLED(isTriviallyMoveAssignable<Ty>() ) )
+		if constexpr (isTriviallyMoveAssignable<Ty>() )
 		{
 			memMove(_dst, _src, _count * sizeof(Ty) );
 		}
@@ -188,7 +188,7 @@ namespace bx
 	template<typename Ty>
 	inline void StorageTraits::destruct(Ty* _ptr, uint32_t _count)
 	{
-		if (!BX_ENABLED(isTriviallyDestructible<Ty>() ) )
+		if constexpr (!isTriviallyDestructible<Ty>() )
 		{
 			for (Ty *ptr = _ptr, *term = _ptr + _count; ptr < term; ++ptr)
 			{
@@ -530,7 +530,7 @@ namespace bx
 			bx::free(m_allocator, m_ptr, BX_ALIGNOF(Ty) );
 			m_ptr = NULL;
 		}
-		else if (BX_ENABLED(isTriviallyMoveConstructible<Ty>() ) )
+		else if constexpr (isTriviallyMoveConstructible<Ty>() )
 		{
 			m_ptr = (Ty*)bx::realloc(m_allocator, m_ptr, sizeof(Ty)*capacity, BX_ALIGNOF(Ty) );
 		}

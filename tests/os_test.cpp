@@ -10,7 +10,7 @@
 
 TEST_CASE("getProcessMemoryUsed", "[os]")
 {
-	if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
+	if constexpr (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
 	{
 		SKIP("Not supported by wasm.");
 	}
@@ -163,7 +163,7 @@ TEST_CASE("memoryAllocationGranularity", "[os]")
 	REQUIRE(granularity >= pageSize);
 	REQUIRE(0 == (granularity & (granularity - 1) ) );
 
-	if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	if constexpr (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{
 		REQUIRE(4<<10 == pageSize);
 		REQUIRE(64<<10 == granularity);

@@ -448,7 +448,7 @@ TEST_CASE("commandLine args", "")
 	REQUIRE(0 < args.getArgc() );
 	REQUIRE(args.getArgv() != (const char**)NULL);
 
-	if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
+	if constexpr (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{
 		// Taken from the process command line, so the program is this test executable.
 		REQUIRE(!bx::strFind(args.getArgv()[0], "bx.test").isEmpty() );
