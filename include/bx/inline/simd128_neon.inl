@@ -13,6 +13,26 @@ namespace bx
 #if BX_COMPILER_CLANG
 #	define BX_SIMD_SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shufflevector(_a, _a, _i0, _i1, _i2, _i3 )
 #	define BX_SIMD_SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shufflevector(_a, _b, _i0, _i1, _i2, _i3 )
+#elif BX_COMPILER_MSVC
+	template<uint8_t I0, uint8_t I1, uint8_t I2, uint8_t I3>
+	BX_SIMD_FORCE_INLINE float32x4_t simd128_neon_shuffle(float32x4_t _a, float32x4_t _b)
+	{
+		alignas(16) static constexpr uint8_t kIndex[16] =
+		{
+			uint8_t(I0*4+0), uint8_t(I0*4+1), uint8_t(I0*4+2), uint8_t(I0*4+3),
+			uint8_t(I1*4+0), uint8_t(I1*4+1), uint8_t(I1*4+2), uint8_t(I1*4+3),
+			uint8_t(I2*4+0), uint8_t(I2*4+1), uint8_t(I2*4+2), uint8_t(I2*4+3),
+			uint8_t(I3*4+0), uint8_t(I3*4+1), uint8_t(I3*4+2), uint8_t(I3*4+3),
+		};
+
+		const uint8x16_t   index  = vld1q_u8(kIndex);
+		const uint8x16x2_t table  = { { vreinterpretq_u8_f32(_a), vreinterpretq_u8_f32(_b) } };
+		const uint8x16_t   result = vqtbl2q_u8(table, index);
+		return vreinterpretq_f32_u8(result);
+	}
+
+#	define BX_SIMD_SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     simd128_neon_shuffle<_i0, _i1, _i2, _i3>(_a, _a)
+#	define BX_SIMD_SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) simd128_neon_shuffle<_i0, _i1, _i2, _i3>(_a, _b)
 #else
 #	define BX_SIMD_SHUFFLE_A(_a,  _i0, _i1, _i2, _i3)     __builtin_shuffle(_a, (uint32x4_t){ _i0, _i1, _i2, _i3 })
 #	define BX_SIMD_SHUFFLE_AB(_a, _b, _i0, _i1, _i2, _i3) __builtin_shuffle(_a, _b, (uint32x4_t){ _i0, _i1, _i2, _i3 })
@@ -419,8 +439,28 @@ namespace bx
 #if BX_ARCH_64BIT
 		return vsqrtq_f32(_a);
 #else
-		const simd128_neon_t rsqrt = simd128_f32_rsqrt_est<simd128_neon_t>(_a);
-		return simd128_f32_mul<simd128_neon_t>(_a, rsqrt);
+		float a[4], r[4];
+		vst1q_f32(a, _a);
+		__asm__("vsqrt.f32 %0, %1" : "=t"(r[0]) : "t"(a[0]) );
+		__asm__("vsqrt.f32 %0, %1" : "=t"(r[1]) : "t"(a[1]) );
+		__asm__("vsqrt.f32 %0, %1" : "=t"(r[2]) : "t"(a[2]) );
+		__asm__("vsqrt.f32 %0, %1" : "=t"(r[3]) : "t"(a[3]) );
+		return vld1q_f32(r);
+#endif // BX_ARCH_64BIT
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f32_sqrt1(simd128_neon_t _a)
+	{
+#if BX_ARCH_64BIT
+		const float32x2_t lo     = vget_low_f32(_a);
+		const float32x2_t result = vsqrt_f32(lo);
+		return vcombine_f32(result, result);
+#else
+		const float a = vgetq_lane_f32(_a, 0);
+		float r;
+		__asm__("vsqrt.f32 %0, %1" : "=t"(r) : "t"(a) );
+		return vdupq_n_f32(r);
 #endif // BX_ARCH_64BIT
 	}
 
@@ -1252,6 +1292,16 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_sqrt1(simd128_neon_t _a)
+	{
+		const float64x2_t a      = vreinterpretq_f64_f32(_a);
+		const float64x1_t lo     = vget_low_f64(a);
+		const float64x1_t sqrt   = vsqrt_f64(lo);
+		const float64x2_t result = vcombine_f64(sqrt, sqrt);
+		return vreinterpretq_f32_f64(result);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_rsqrt(simd128_neon_t _a)
 	{
 		return simd_f64_rsqrt_ni(_a);
@@ -1338,8 +1388,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_add(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] + b[0]; r[1] = a[1] + b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] + b[0];
+		r[1] = a[1] + b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1347,8 +1399,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_sub(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] - b[0]; r[1] = a[1] - b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] - b[0];
+		r[1] = a[1] - b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1356,8 +1410,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_mul(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] * b[0]; r[1] = a[1] * b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] * b[0];
+		r[1] = a[1] * b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1365,8 +1421,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_div(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] / b[0]; r[1] = a[1] / b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] / b[0];
+		r[1] = a[1] / b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1374,8 +1432,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_min(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] < b[0] ? a[0] : b[0]; r[1] = a[1] < b[1] ? a[1] : b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] < b[0] ? a[0] : b[0];
+		r[1] = a[1] < b[1] ? a[1] : b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1383,8 +1443,10 @@ namespace bx
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_max(simd128_neon_t _a, simd128_neon_t _b)
 	{
 		double a[2], b[2], r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] > b[0] ? a[0] : b[0]; r[1] = a[1] > b[1] ? a[1] : b[1];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] > b[0] ? a[0] : b[0];
+		r[1] = a[1] > b[1] ? a[1] : b[1];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1435,7 +1497,18 @@ namespace bx
 	{
 		double a[2], r[2];
 		vst1q_f32((float*)a, _a);
-		r[0] = __builtin_sqrt(a[0]); r[1] = __builtin_sqrt(a[1]);
+		__asm__("vsqrt.f64 %P0, %P1" : "=w"(r[0]) : "w"(a[0]) );
+		__asm__("vsqrt.f64 %P0, %P1" : "=w"(r[1]) : "w"(a[1]) );
+		return vld1q_f32((const float*)r);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_sqrt1(simd128_neon_t _a)
+	{
+		double a[2], r[2];
+		vst1q_f32((float*)a, _a);
+		__asm__("vsqrt.f64 %P0, %P1" : "=w"(r[0]) : "w"(a[0]) );
+		r[1] = r[0];
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1448,36 +1521,30 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_round(simd128_neon_t _a)
 	{
-		double a[2], r[2];
-		vst1q_f32((float*)a, _a);
-		r[0] = __builtin_round(a[0]); r[1] = __builtin_round(a[1]);
-		return vld1q_f32((const float*)r);
+		return simd_f64_round_ni(_a);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_ceil(simd128_neon_t _a)
 	{
-		double a[2], r[2];
-		vst1q_f32((float*)a, _a);
-		r[0] = __builtin_ceil(a[0]); r[1] = __builtin_ceil(a[1]);
-		return vld1q_f32((const float*)r);
+		return simd_f64_ceil_ni(_a);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_floor(simd128_neon_t _a)
 	{
-		double a[2], r[2];
-		vst1q_f32((float*)a, _a);
-		r[0] = __builtin_floor(a[0]); r[1] = __builtin_floor(a[1]);
-		return vld1q_f32((const float*)r);
+		return simd_f64_floor_ni(_a);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_cmpeq(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		double a[2], b[2]; uint64_t r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] == b[0] ? UINT64_MAX : 0; r[1] = a[1] == b[1] ? UINT64_MAX : 0;
+		double a[2], b[2];
+		uint64_t r[2];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] == b[0] ? UINT64_MAX : 0;
+		r[1] = a[1] == b[1] ? UINT64_MAX : 0;
 		return vld1q_f32((const float*)r);
 	}
 
@@ -1490,36 +1557,48 @@ namespace bx
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_cmplt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		double a[2], b[2]; uint64_t r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] < b[0] ? UINT64_MAX : 0; r[1] = a[1] < b[1] ? UINT64_MAX : 0;
+		double a[2], b[2];
+		uint64_t r[2];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] < b[0] ? UINT64_MAX : 0;
+		r[1] = a[1] < b[1] ? UINT64_MAX : 0;
 		return vld1q_f32((const float*)r);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_cmple(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		double a[2], b[2]; uint64_t r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] <= b[0] ? UINT64_MAX : 0; r[1] = a[1] <= b[1] ? UINT64_MAX : 0;
+		double a[2], b[2];
+		uint64_t r[2];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] <= b[0] ? UINT64_MAX : 0;
+		r[1] = a[1] <= b[1] ? UINT64_MAX : 0;
 		return vld1q_f32((const float*)r);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_cmpgt(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		double a[2], b[2]; uint64_t r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] > b[0] ? UINT64_MAX : 0; r[1] = a[1] > b[1] ? UINT64_MAX : 0;
+		double a[2], b[2];
+		uint64_t r[2];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] > b[0] ? UINT64_MAX : 0;
+		r[1] = a[1] > b[1] ? UINT64_MAX : 0;
 		return vld1q_f32((const float*)r);
 	}
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_neon_t simd128_f64_cmpge(simd128_neon_t _a, simd128_neon_t _b)
 	{
-		double a[2], b[2]; uint64_t r[2];
-		vst1q_f32((float*)a, _a); vst1q_f32((float*)b, _b);
-		r[0] = a[0] >= b[0] ? UINT64_MAX : 0; r[1] = a[1] >= b[1] ? UINT64_MAX : 0;
+		double a[2], b[2];
+		uint64_t r[2];
+		vst1q_f32((float*)a, _a);
+		vst1q_f32((float*)b, _b);
+		r[0] = a[0] >= b[0] ? UINT64_MAX : 0;
+		r[1] = a[1] >= b[1] ? UINT64_MAX : 0;
 		return vld1q_f32((const float*)r);
 	}
 

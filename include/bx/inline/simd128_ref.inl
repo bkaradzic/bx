@@ -510,6 +510,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_sqrt1(simd128_ref_t _a)
+	{
+		return simd128_f32_sqrt<simd128_ref_t>(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f32_rsqrt_est(simd128_ref_t _a)
 	{
 		const simd128_f32_ref_t a = bitCast<simd128_f32_ref_t>(_a);
@@ -1765,43 +1771,39 @@ namespace bx
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f64_sqrt(simd128_ref_t _a)
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_sqrt(simd128_ref_t _a)
 	{
-		const simd128_f64_ref_t a = bitCast<simd128_f64_ref_t>(_a);
-		const simd128_f64_ref_t result = { { simd_sqrt(a.f64[0]), simd_sqrt(a.f64[1]) } };
-		return bitCast<simd128_ref_t>(result);
+		return simd_f64_sqrt_ni(_a);
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f64_rsqrt(simd128_ref_t _a)
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_sqrt1(simd128_ref_t _a)
 	{
-		const simd128_f64_ref_t a = bitCast<simd128_f64_ref_t>(_a);
-		const simd128_f64_ref_t result = { { 1.0 / simd_sqrt(a.f64[0]), 1.0 / simd_sqrt(a.f64[1]) } };
-		return bitCast<simd128_ref_t>(result);
+		return simd128_f64_sqrt<simd128_ref_t>(_a);
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f64_round(simd128_ref_t _a)
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_rsqrt(simd128_ref_t _a)
 	{
-		const simd128_f64_ref_t a = bitCast<simd128_f64_ref_t>(_a);
-		const simd128_f64_ref_t result = { { simd_round(a.f64[0]), simd_round(a.f64[1]) } };
-		return bitCast<simd128_ref_t>(result);
+		return simd_f64_rsqrt_ni(_a);
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f64_ceil(simd128_ref_t _a)
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_round(simd128_ref_t _a)
 	{
-		const simd128_f64_ref_t a = bitCast<simd128_f64_ref_t>(_a);
-		const simd128_f64_ref_t result = { { simd_ceil(a.f64[0]), simd_ceil(a.f64[1]) } };
-		return bitCast<simd128_ref_t>(result);
+		return simd_f64_round_ni(_a);
 	}
 
 	template<>
-	inline BX_CONSTEXPR_FUNC simd128_ref_t simd128_f64_floor(simd128_ref_t _a)
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_ceil(simd128_ref_t _a)
 	{
-		const simd128_f64_ref_t a = bitCast<simd128_f64_ref_t>(_a);
-		const simd128_f64_ref_t result = { { simd_floor(a.f64[0]), simd_floor(a.f64[1]) } };
-		return bitCast<simd128_ref_t>(result);
+		return simd_f64_ceil_ni(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_ref_t simd128_f64_floor(simd128_ref_t _a)
+	{
+		return simd_f64_floor_ni(_a);
 	}
 
 	template<>

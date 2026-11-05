@@ -466,6 +466,11 @@ namespace bx
 	template<typename Ty>
 	Ty simd128_f32_sqrt(Ty _a);
 
+	/// Lowest lane f32 square root.
+	///
+	template<typename Ty>
+	Ty simd128_f32_sqrt1(Ty _a);
+
 	/// 4xf32 sqrt Newton-Raphson.
 	///
 	template<typename Ty>
@@ -986,6 +991,7 @@ namespace bx
 	template<typename Ty> Ty simd128_f64_lerp(Ty _a, Ty _b, Ty _s);
 	template<typename Ty> Ty simd128_f64_rcp(Ty _a);
 	template<typename Ty> Ty simd128_f64_sqrt(Ty _a);
+	template<typename Ty> Ty simd128_f64_sqrt1(Ty _a);
 	template<typename Ty> Ty simd128_f64_rsqrt(Ty _a);
 	template<typename Ty> Ty simd128_f64_round(Ty _a);
 	template<typename Ty> Ty simd128_f64_ceil(Ty _a);
@@ -1213,6 +1219,18 @@ namespace bx
 
 	template<typename Ty>
 	Ty simd_f64_rsqrt_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f64_round_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f64_floor_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f64_ceil_ni(Ty _a);
+
+	template<typename Ty>
+	Ty simd_f64_sqrt_ni(Ty _a);
 
 	template<typename Ty>
 	Ty simd_f64_cmpneq_ni(Ty _a, Ty _b);
@@ -1491,6 +1509,10 @@ namespace bx
 	BX_CONSTEXPR_FUNC float round(float _f);
 	BX_CONSTEXPR_FUNC float trunc(float _f);
 	BX_CONSTEXPR_FUNC float sqrt(float _a);
+	BX_CONSTEXPR_FUNC double floor(double _a);
+	BX_CONSTEXPR_FUNC double ceil(double _a);
+	BX_CONSTEXPR_FUNC double round(double _a);
+	BX_CONSTEXPR_FUNC double sqrt(double _a);
 } // namespace bx
 
 #include "simd32_ref.inl"
@@ -1651,6 +1673,9 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_sqrt(simd128_t _a) { return simd128_f32_sqrt(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f32_sqrt1(simd128_t _a) { return simd128_f32_sqrt1(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f32_rsqrt(simd128_t _a) { return simd128_f32_rsqrt(_a); }
@@ -1822,6 +1847,9 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f64_sqrt(simd128_t _a) { return simd128_f64_sqrt(_a); }
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_t simd_f64_sqrt1(simd128_t _a) { return simd128_f64_sqrt1(_a); }
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_t simd_f64_rsqrt(simd128_t _a) { return simd128_f64_rsqrt(_a); }

@@ -58,6 +58,15 @@ project "bx"
 
 	defines (userdefines())
 
+	-- bx.test's assert handler throws through bx, and on Apple's arm64 -fno-exceptions leaves
+	-- no unwind info to get past these frames, which aborts instead of reaching the test.
+	configuration { "osx* or ios*" }
+		buildoptions {
+			"-funwind-tables",
+		}
+
+	configuration {}
+
 	configuration { "not vs*" }
 		buildoptions {
 			"-Wpedantic",

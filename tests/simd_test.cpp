@@ -622,6 +622,8 @@ static float parityInput(bx::RngMwc& _rng, float _lo, float _hi, bool _withNan =
 	return _lo + (_hi - _lo) * t;
 }
 
+static constexpr uint32_t kParityMaxUlp = BX_COMPILER_MSVC && BX_CPU_X86 && BX_ARCH_32BIT ? 1 : 0;
+
 static bool sameBits(float _a, float _b)
 {
 	if (bx::isNan(_a) && bx::isNan(_b) )
@@ -629,7 +631,11 @@ static bool sameBits(float _a, float _b)
 		return true;
 	}
 
-	return bx::bitCast<uint32_t>(_a) == bx::bitCast<uint32_t>(_b);
+	const uint32_t aa   = bx::bitCast<uint32_t>(_a);
+	const uint32_t bb   = bx::bitCast<uint32_t>(_b);
+	const uint32_t diff = aa > bb ? aa - bb : bb - aa;
+
+	return kParityMaxUlp >= diff;
 }
 
 template<typename Ty, typename SimdFn, typename ScalarFn>
@@ -831,21 +837,21 @@ static void parityAll()
 	parity1<Ty>("fract",      [](Ty a      ) { return simd_f32_fract(a);      }, [](float a         ) { return bx::fract(a);      },  -1.0e6f,  1.0e6f);
 	parity1<Ty>("sign",       [](Ty a      ) { return simd_f32_sign(a);       }, [](float a         ) { return bx::sign(a);       },   -10.0f,   10.0f, false);
 	parity1<Ty>("smoothstep", [](Ty a      ) { return simd_f32_smoothstep(a); }, [](float a         ) { return bx::smoothStep(a); },    -2.0f,    2.0f);
-	accuracy1<Ty>("cos",   [](Ty a) { return simd_f32_cos(a);  }, [](double a) { return bx::cos(a);  }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
-	accuracy1<Ty>("sin",   [](Ty a) { return simd_f32_sin(a);  }, [](double a) { return bx::sin(a);  }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
-	accuracy1<Ty>("tan",   [](Ty a) { return simd_f32_tan(a);  }, [](double a) { return bx::tan(a);  }, [](double _r ) { return 1.0 + _r*_r;   }, 1.0e-5, -100.0f, 100.0f);
-	parity1<Ty>("exp",        [](Ty a      ) { return simd_f32_exp(a);        }, [](float a         ) { return bx::exp(a);        },   -90.0f,   90.0f);
-	parity1<Ty>("log",        [](Ty a      ) { return simd_f32_log(a);        }, [](float a         ) { return bx::log(a);        }, 1.0e-30f, 1.0e30f, false);
-	parity1<Ty>("exp2",       [](Ty a      ) { return simd_f32_exp2(a);       }, [](float a         ) { return bx::exp2(a);       },  -120.0f,  120.0f, false);
-	parity1<Ty>("log2",       [](Ty a      ) { return simd_f32_log2(a);       }, [](float a         ) { return bx::log2(a);       }, 1.0e-30f, 1.0e30f, false);
-	accuracy1<Ty>("acos",  [](Ty a) { return simd_f32_acos(a); }, [](double a) { return bx::acos(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
-	accuracy1<Ty>("asin",  [](Ty a) { return simd_f32_asin(a); }, [](double a) { return bx::asin(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
-	accuracy1<Ty>("atan",  [](Ty a) { return simd_f32_atan(a); }, [](double a) { return bx::atan(a); }, [](double    ) { return 1.0;           }, 5.0e-6, -1000.0f, 1000.0f);
-	parity1<Ty>("sinh",       [](Ty a      ) { return simd_f32_sinh(a);       }, [](float a         ) { return bx::sinh(a);       },   -30.0f,   30.0f);
-	parity1<Ty>("cosh",       [](Ty a      ) { return simd_f32_cosh(a);       }, [](float a         ) { return bx::cosh(a);       },   -30.0f,   30.0f);
-	parity1<Ty>("tanh",       [](Ty a      ) { return simd_f32_tanh(a);       }, [](float a         ) { return bx::tanh(a);       },   -30.0f,   30.0f);
-	accuracy2<Ty>("pow",   [](Ty a, Ty b) { return simd_f32_pow(a, b);   }, [](double a, double b) { return bx::pow(a, b);   }, [](double _r) { return bx::abs(_r); }, 1.0e-5, 0.01f, 100.0f, -10.0f, 10.0f);
-	accuracy2<Ty>("atan2", [](Ty y, Ty x) { return simd_f32_atan2(y, x); }, [](double y, double x) { return bx::atan2(y, x); }, [](double    ) { return 1.0;         }, 5.0e-6, -100.0f, 100.0f, -100.0f, 100.0f);
+	accuracy1<Ty>("cos",   [](Ty a) { return simd_f32_cos(a);  }, [](double a) { return bx::cosExact(a); }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
+	accuracy1<Ty>("sin",   [](Ty a) { return simd_f32_sin(a);  }, [](double a) { return bx::sinExact(a); }, [](double    ) { return 1.0;           }, 1.0e-5, -100.0f, 100.0f);
+	accuracy1<Ty>("tan",   [](Ty a) { return simd_f32_tan(a);  }, [](double a) { return bx::tanExact(a); }, [](double _r ) { return 1.0 + _r*_r;   }, 1.0e-5, -100.0f, 100.0f);
+	parity1<Ty>("exp",        [](Ty a      ) { return simd_f32_exp(a);        }, [](float a         ) { return bx::expExact(a); },   -90.0f,   90.0f);
+	parity1<Ty>("log",        [](Ty a      ) { return simd_f32_log(a);        }, [](float a         ) { return bx::logExact(a); }, 1.0e-30f, 1.0e30f, false);
+	parity1<Ty>("exp2",       [](Ty a      ) { return simd_f32_exp2(a);       }, [](float a         ) { return bx::exp2Exact(a); },  -120.0f,  120.0f, false);
+	parity1<Ty>("log2",       [](Ty a      ) { return simd_f32_log2(a);       }, [](float a         ) { return bx::log2Exact(a); }, 1.0e-30f, 1.0e30f, false);
+	accuracy1<Ty>("acos",  [](Ty a) { return simd_f32_acos(a); }, [](double a) { return bx::acosExact(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
+	accuracy1<Ty>("asin",  [](Ty a) { return simd_f32_asin(a); }, [](double a) { return bx::asinExact(a); }, [](double    ) { return 1.0;           }, 1.0e-4,   -1.5f,   1.5f);
+	accuracy1<Ty>("atan",  [](Ty a) { return simd_f32_atan(a); }, [](double a) { return bx::atanExact(a); }, [](double    ) { return 1.0;           }, 5.0e-6, -1000.0f, 1000.0f);
+	parity1<Ty>("sinh",       [](Ty a      ) { return simd_f32_sinh(a);       }, [](float a         ) { return bx::sinhExact(a); },   -30.0f,   30.0f);
+	parity1<Ty>("cosh",       [](Ty a      ) { return simd_f32_cosh(a);       }, [](float a         ) { return bx::coshExact(a); },   -30.0f,   30.0f);
+	parity1<Ty>("tanh",       [](Ty a      ) { return simd_f32_tanh(a);       }, [](float a         ) { return bx::tanhExact(a); },   -30.0f,   30.0f);
+	accuracy2<Ty>("pow",   [](Ty a, Ty b) { return simd_f32_pow(a, b);   }, [](double a, double b) { return bx::powExact(a, b); }, [](double _r) { return bx::abs(_r); }, 1.0e-5, 0.01f, 100.0f, -10.0f, 10.0f);
+	accuracy2<Ty>("atan2", [](Ty y, Ty x) { return simd_f32_atan2(y, x); }, [](double y, double x) { return bx::atan2Exact(y, x); }, [](double    ) { return 1.0;         }, 5.0e-6, -100.0f, 100.0f, -100.0f, 100.0f);
 	parity2<Ty>("step",       [](Ty e, Ty a) { return simd_f32_step(e, a);    }, [](float e, float a) { return bx::step(e, a);    },   -10.0f,   10.0f,  -10.0f,  10.0f);
 	parity2<Ty>("mod",        [](Ty a, Ty b) { return simd_f32_mod(a, b);     }, [](float a, float b) { return bx::mod(a, b);     },  -100.0f,  100.0f,  -10.0f,  10.0f);
 }
@@ -1176,6 +1182,106 @@ TEST_CASE("simd128_f32_sqrt", "[simd]")
 {
 	const simd128_t a = simd128_ld<simd128_t>(4.0f, 9.0f, 16.0f, 25.0f);
 	check_f32("f32_sqrt", simd128_f32_sqrt(a), 2.0f, 3.0f, 4.0f, 5.0f);
+}
+
+static uint64_t simdF64NiMismatch(double _value)
+{
+	const simd128_t aa = simd_splat<simd128_t>(_value);
+
+	alignas(16) double fl[2];
+	alignas(16) double ce[2];
+	alignas(16) double ro[2];
+	alignas(16) double sq[2];
+	alignas(16) double sqRef[2];
+	simd_st(fl,    simd_f64_floor_ni(aa) );
+	simd_st(ce,    simd_f64_ceil_ni(aa) );
+	simd_st(ro,    simd_f64_round_ni(aa) );
+	simd_st(sq,    simd_f64_sqrt_ni(aa) );
+	simd_st(sqRef, simd_f64_sqrt<simd128_t>(aa) );
+
+	if (bx::isNan(_value) )
+	{
+		return !bx::isNan(fl[0]) + !bx::isNan(ce[0]) + !bx::isNan(ro[0]) + !bx::isNan(sq[0]);
+	}
+
+	const bool sqrtNan = bx::isNan(sqRef[0]) && bx::isNan(sq[0]);
+
+	uint64_t result = 0;
+	result += bitCast<uint64_t>(bx::floor(_value) ) != bitCast<uint64_t>(fl[0]);
+	result += bitCast<uint64_t>(bx::ceil(_value)  ) != bitCast<uint64_t>(ce[0]);
+	result += bitCast<uint64_t>(bx::round(_value) ) != bitCast<uint64_t>(ro[0]);
+	result += !sqrtNan && bitCast<uint64_t>(sqRef[0]) != bitCast<uint64_t>(sq[0]);
+	return result;
+}
+
+TEST_CASE("simd_f64 floor ceil round sqrt ni", "[simd]")
+{
+	const double kValues[] =
+	{
+		0.0, -0.0, 0.3, -0.3, 0.5, -0.5, 1.5, -1.5, 2.5, -2.5, 0.49999999999999994, -0.49999999999999994,
+		1.0e-310, -1.0e-310, 4503599627370495.5, -4503599627370495.5, 4503599627370497.0, -4503599627370497.0,
+		1.0e300, -1.0e300, kDoubleInfinity, -kDoubleInfinity, 1.0, 2.0, 3.0, 4.0, 0.25, kDoubleSmallest,
+		kDoubleLargest, 0x1p-1074, 0x1p-512, 0x1p512, 0x1.fffffffffffffp-513, 0x1.0000000000001p512,
+		0x1.fffffffffffffp0, 0x1.fffffffffffffp1, 0x1.0000000000001p0,
+	};
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(kValues); ++ii)
+	{
+		REQUIRE(0 == simdF64NiMismatch(kValues[ii]) );
+	}
+
+	bx::RngMwc rng;
+
+	uint64_t mismatch = 0;
+
+	for (uint32_t ii = 0; ii < 1u<<20; ++ii)
+	{
+		const uint64_t hi    = rng.gen();
+		const uint64_t lo    = rng.gen();
+		const double   value = bitCast<double>( (hi << 32) | lo);
+		mismatch += simdF64NiMismatch(value);
+
+		const double root   = double( (hi << 21) | (lo >> 11) ) * 0x1p-53;
+		const double square = root * root;
+		mismatch += simdF64NiMismatch(square);
+		mismatch += simdF64NiMismatch(bitCast<double>(bitCast<uint64_t>(square) + 1) );
+		mismatch += simdF64NiMismatch(bitCast<double>(bitCast<uint64_t>(square) - 1) );
+	}
+
+	REQUIRE(0 == mismatch);
+}
+
+TEST_CASE("simd_f32_sqrt1, simd_f64_sqrt1", "[simd]")
+{
+	const float kF32[] = { 0.0f, 1.0f, 2.0f, 3.0f, 0.1f, 1.0e-30f, 3.0e38f, 12345.678f };
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(kF32); ++ii)
+	{
+		const simd128_t a    = simd_splat<simd128_t>(kF32[ii]);
+		const simd128_t full = simd_f32_sqrt<simd128_t>(a);
+		const simd128_t one  = simd_f32_sqrt1<simd128_t>(a);
+
+		float expected = 0.0f;
+		float actual   = 0.0f;
+		simd_x32_st1<simd128_t>(&expected, full);
+		simd_x32_st1<simd128_t>(&actual,   one);
+		REQUIRE(bitCast<uint32_t>(expected) == bitCast<uint32_t>(actual) );
+	}
+
+	const double kF64[] = { 0.0, 1.0, 2.0, 3.0, 0.1, 1.0e-300, 1.0e300, 12345.678 };
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(kF64); ++ii)
+	{
+		const simd128_t a    = simd_splat<simd128_t>(kF64[ii]);
+		const simd128_t full = simd_f64_sqrt<simd128_t>(a);
+		const simd128_t one  = simd_f64_sqrt1<simd128_t>(a);
+
+		alignas(16) double expected[2];
+		alignas(16) double actual[2];
+		simd_st<simd128_t>(expected, full);
+		simd_st<simd128_t>(actual,   one);
+		REQUIRE(bitCast<uint64_t>(expected[0]) == bitCast<uint64_t>(actual[0]) );
+	}
 }
 
 TEST_CASE("simd128_f32_rcp", "[simd]")

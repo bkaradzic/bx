@@ -1646,7 +1646,7 @@ namespace bx
 		const Vec3  axis    = sub(_cylinder.end, _cylinder.pos);
 		const float lenSq   = dot(axis, axis);
 		const float cosA    = (lenSq > 0.0f) ? dot(axis, _plane.normal) / sqrt(lenSq) : 0.0f;
-		const float sinA    = sqrt(max(0.0f, 1.0f - cosA * cosA) );
+		const float sinA    = sqrtSafe(1.0f - cosA * cosA);
 		const float diskExt = _cylinder.radius * sinA;
 
 		return min(abs(distPos), abs(distEnd) ) <= diskExt;
