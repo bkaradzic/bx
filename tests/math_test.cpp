@@ -565,6 +565,89 @@ TEST_CASE("sqrt", "[math][libm]")
 
 BX_PRAGMA_DIAGNOSTIC_POP();
 
+TEST_CASE("Safe domain", "[math]")
+{
+	STATIC_REQUIRE(0.0f == bx::sqrtSafe(-1.0e-7f) );
+	STATIC_REQUIRE(2.0f == bx::sqrtSafe(4.0f) );
+	STATIC_REQUIRE(0.0  == bx::sqrtSafe(-1.0e-300) );
+	STATIC_REQUIRE(3.0  == bx::sqrtSafe(9.0) );
+
+	STATIC_REQUIRE(bx::acos(1.0f)  == bx::acos(1.0000001f) );
+	STATIC_REQUIRE(bx::acos(-1.0f) == bx::acos(-2.0f) );
+	STATIC_REQUIRE(bx::asin(1.0f)  == bx::asin(1.0000001f) );
+	STATIC_REQUIRE(bx::asin(-1.0f) == bx::asin(-2.0f) );
+	STATIC_REQUIRE(bx::acos(1.0)   == bx::acos(1.0000000000000002) );
+	STATIC_REQUIRE(bx::asin(-1.0)  == bx::asin(-1.0000000000000002) );
+	STATIC_REQUIRE(bx::isNan(bx::acosExact(1.0000001f) ) );
+	STATIC_REQUIRE(bx::isNan(bx::asinExact(-2.0f) ) );
+	STATIC_REQUIRE(bx::isNan(bx::acosExact(1.5) ) );
+	STATIC_REQUIRE(bx::isNan(bx::asinExact(1.5) ) );
+
+	STATIC_REQUIRE(0.25f == bx::invLerp(0.0f, 4.0f, 1.0f) );
+	STATIC_REQUIRE(0.0f  == bx::invLerp(2.0f, 2.0f, 2.0f) );
+	STATIC_REQUIRE(0.0f  == bx::invLerp(2.0f, 2.0f, 3.0f) );
+
+	REQUIRE(bx::isNan(bx::sqrt(-1.0e-7f) ) );
+
+	bx::Vec3 axis(bx::InitNone);
+	float angle = 0.0f;
+	bx::toAxisAngle(axis, angle, { 0.0f, 5.0e-5f, 0.0f, 1.0000001f });
+	REQUIRE(bx::isFinite(angle) );
+	REQUIRE(bx::isFinite(axis.x) );
+	REQUIRE(bx::isFinite(axis.y) );
+	REQUIRE(bx::isFinite(axis.z) );
+
+	const bx::Vec3 euler = bx::toEuler({ 0.7071069f, 0.7071069f, 0.0f, 0.0f });
+	REQUIRE(bx::isFinite(euler.x) );
+	REQUIRE(bx::isFinite(euler.y) );
+	REQUIRE(bx::isFinite(euler.z) );
+
+	float uu = 0.0f;
+	float vv = 0.0f;
+	bx::toLatLong(&uu, &vv, { 0.0f, 1.0000001f, 0.0f });
+	REQUIRE(bx::isFinite(uu) );
+	REQUIRE(0.0f == vv);
+
+	REQUIRE(bx::isFinite(bx::invSmoothStep(1.0000001f) ) );
+}
+
+TEST_CASE("sqrt correctly rounded", "[math]")
+{
+	STATIC_REQUIRE(1.4142135623730951 == bx::sqrtRef(2.0) );
+	STATIC_REQUIRE(1.41421356f        == bx::sqrtRef(2.0f) );
+	STATIC_REQUIRE(0x1p-537           == bx::sqrtRef(0x1p-1074) );
+	STATIC_REQUIRE(0x1p-74f           == bx::sqrtRef(0x1p-148f) );
+
+	REQUIRE(0x1p-74f == bx::sqrt(0x1p-148f) );
+	REQUIRE(0x1p-537 == bx::sqrt(0x1p-1074) );
+
+	bx::RngMwc rng;
+
+	uint32_t mismatch = 0;
+
+	for (uint32_t ii = 0; ii < 1u<<20; ++ii)
+	{
+		const uint32_t hi = rng.gen();
+		const uint32_t lo = rng.gen();
+
+		const float  xf = bx::abs(bx::bitCast<float>(hi) );
+		const double xd = bx::abs(bx::bitCast<double>( (uint64_t(hi) << 32) | lo) );
+
+		mismatch += bx::bitCast<uint32_t>(bx::sqrtRef(xf) ) != bx::bitCast<uint32_t>(bx::sqrtSimd(xf) ) && !bx::isNan(xf);
+		mismatch += bx::bitCast<uint64_t>(bx::sqrtRef(xd) ) != bx::bitCast<uint64_t>(bx::sqrtSimd(xd) ) && !bx::isNan(xd);
+
+		const double root   = double( (uint64_t(hi) << 21) | (lo >> 11) ) * 0x1p-53;
+		const double square = root * root;
+		const double below  = bx::bitCast<double>(bx::bitCast<uint64_t>(square) - 1);
+		const double above  = bx::bitCast<double>(bx::bitCast<uint64_t>(square) + 1);
+
+		mismatch += bx::bitCast<uint64_t>(bx::sqrtRef(below) ) != bx::bitCast<uint64_t>(bx::sqrtSimd(below) ) && 0.0 < square;
+		mismatch += bx::bitCast<uint64_t>(bx::sqrtRef(above) ) != bx::bitCast<uint64_t>(bx::sqrtSimd(above) );
+	}
+
+	REQUIRE(0 == mismatch);
+}
+
 TEST_CASE("abs", "[math][libm]")
 {
 	STATIC_REQUIRE(1389.0f == bx::abs(-1389.0f) );
@@ -608,12 +691,18 @@ TEST_CASE("mad", "[math]")
 	volatile float vc = -1.0f;
 	REQUIRE(kFused == maddRef(va, vb, vc) );
 
-	STATIC_REQUIRE( kFused == bx::mad(kA, kB, -1.0f) );
-	STATIC_REQUIRE(-kFused == bx::nms(kA, kB,  1.0f) );
+	STATIC_REQUIRE( kFused == bx::madExact(kA, kB, -1.0f) );
+	STATIC_REQUIRE(-kFused == bx::nmsExact(kA, kB,  1.0f) );
+	REQUIRE( kFused == bx::madExact(va, vb, vc) );
+	REQUIRE(-kFused == bx::nmsExact(va, vb, -vc) );
 
 #if BX_CONFIG_FMA
+	STATIC_REQUIRE( kFused == bx::mad(kA, kB, -1.0f) );
+	STATIC_REQUIRE(-kFused == bx::nms(kA, kB,  1.0f) );
 	REQUIRE(kFused == bx::mad(va, vb, vc) );
 #else
+	STATIC_REQUIRE(0.0f == bx::mad(kA, kB, -1.0f) );
+	STATIC_REQUIRE(0.0f == bx::nms(kA, kB,  1.0f) );
 	REQUIRE(0.0f   == bx::mad(va, vb, vc) );
 #endif // BX_CONFIG_FMA
 
@@ -667,6 +756,9 @@ TEST_CASE("mad", "[math]")
 #endif // LDBL_MANT_DIG >= 64
 		const float sw  = maddRef(aa, bb, cc);
 		REQUIRE(bx::bitCast<uint32_t>(ref) == bx::bitCast<uint32_t>(sw) );
+
+		const float exact = bx::madExact(aa, bb, cc);
+		REQUIRE(bx::bitCast<uint32_t>(ref) == bx::bitCast<uint32_t>(exact) );
 
 #if BX_CONFIG_FMA
 		const float mad = bx::mad(aa, bb, cc);
@@ -1269,8 +1361,8 @@ TEST_CASE("asin, acos, atan double", "[math][libm]")
 	STATIC_REQUIRE(0.0 == bx::asin(0.0) );
 	STATIC_REQUIRE(0.0 == bx::atan(0.0) );
 	STATIC_REQUIRE(0.0 == bx::acos(1.0) );
-	STATIC_REQUIRE(bx::isNan(bx::asin(1.5) ) );
-	STATIC_REQUIRE(bx::isNan(bx::acos(1.5) ) );
+	STATIC_REQUIRE(bx::asin(1.0) == bx::asin(1.5) );
+	STATIC_REQUIRE(bx::acos(1.0) == bx::acos(1.5) );
 
 	STATIC_REQUIRE(bx::isEqual(1.57079632679489662,  bx::asin(1.0),      1.0e-15) );
 	STATIC_REQUIRE(bx::isEqual(3.14159265358979324,  bx::acos(-1.0),     1.0e-15) );

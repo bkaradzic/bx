@@ -351,6 +351,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_sqrt1(simd128_sse_t _a)
+	{
+		return _mm_sqrt_ss(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f32_rsqrt_est(simd128_sse_t _a)
 	{
 		return _mm_rsqrt_ps(_a);
@@ -1233,6 +1239,14 @@ namespace bx
 	{
 		const __m128d a      = _mm_castps_pd(_a);
 		const __m128d result = _mm_sqrt_pd(a);
+		return _mm_castpd_ps(result);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_sse_t simd128_f64_sqrt1(simd128_sse_t _a)
+	{
+		const __m128d a      = _mm_castps_pd(_a);
+		const __m128d result = _mm_sqrt_sd(a, a);
 		return _mm_castpd_ps(result);
 	}
 

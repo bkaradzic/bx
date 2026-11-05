@@ -377,7 +377,7 @@ namespace bx
 	/// @param[in] _b End value.
 	/// @param[in] _value Value to map.
 	///
-	/// @returns Factor t such that lerp(_a, _b, t) == _value.
+	/// @returns Factor t such that lerp(_a, _b, t) == _value, or 0 when _a == _b.
 	///
 	BX_CONSTEXPR_FUNC float invLerp(float _a, float _b, float _value);
 
@@ -500,17 +500,17 @@ namespace bx
 
 	/// Returns radian angle between -pi/2 and +pi/2 whose sine is _a.
 	///
-	/// @param[in] _a Sine value [-1, 1].
+	/// @param[in] _a Sine value, values outside [-1, 1] are clamped.
 	///
-	/// @returns Arcsine of _a in radians.
+	/// @returns Arcsine of _a in radians, never NaN for a non-NaN _a.
 	///
 	BX_CONSTEXPR_FUNC float asin(float _a);
 
 	/// Returns the arc sine of _a.
 	///
-	/// @param[in] _a Input value in [-1, 1].
+	/// @param[in] _a Input value, values outside [-1, 1] are clamped.
 	///
-	/// @returns asin(_a) in radians, or NaN if _a is outside [-1, 1].
+	/// @returns asin(_a) in radians, never NaN for a non-NaN _a.
 	///
 	BX_CONSTEXPR_FUNC double asin(double _a);
 
@@ -548,17 +548,17 @@ namespace bx
 
 	/// Returns radian angle between 0 and pi whose cosine is _a.
 	///
-	/// @param[in] _a Cosine value [-1, 1].
+	/// @param[in] _a Cosine value, values outside [-1, 1] are clamped.
 	///
-	/// @returns Arccosine of _a in radians.
+	/// @returns Arccosine of _a in radians, never NaN for a non-NaN _a.
 	///
 	BX_CONSTEXPR_FUNC float acos(float _a);
 
 	/// Returns the arc cosine of _a.
 	///
-	/// @param[in] _a Input value in [-1, 1].
+	/// @param[in] _a Input value, values outside [-1, 1] are clamped.
 	///
-	/// @returns acos(_a) in radians, or NaN if _a is outside [-1, 1].
+	/// @returns acos(_a) in radians, never NaN for a non-NaN _a.
 	///
 	BX_CONSTEXPR_FUNC double acos(double _a);
 
@@ -956,6 +956,14 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float sqrt(float _a);
 
+	/// Returns the square root of _a clamped to zero or more.
+	///
+	/// @param[in] _a Input value, negative values are clamped to zero.
+	///
+	/// @returns sqrt(max(_a, 0) ), never NaN for a non-NaN _a.
+	///
+	BX_CONSTEXPR_FUNC float sqrtSafe(float _a);
+
 	/// Returns the square root of _a.
 	///
 	/// @param[in] _a Input value (must be >= 0).
@@ -963,6 +971,14 @@ namespace bx
 	/// @returns sqrt(_a).
 	///
 	BX_CONSTEXPR_FUNC double sqrt(double _a);
+
+	/// Returns the square root of _a clamped to zero or more.
+	///
+	/// @param[in] _a Input value, negative values are clamped to zero.
+	///
+	/// @returns sqrt(max(_a, 0) ), never NaN for a non-NaN _a.
+	///
+	BX_CONSTEXPR_FUNC double sqrtSafe(double _a);
 
 	/// Returns reciprocal square root of _a.
 	///
@@ -1020,6 +1036,425 @@ namespace bx
 	/// @returns _c - _a * _b.
 	///
 	BX_CONSTEXPR_FUNC double nms(double _a, double _b, double _c);
+
+	/// Returns result of multiply and add (_a * _b + _c) rounded once, same bits on every
+	/// platform and at compile time. Fused instruction when `BX_CONFIG_FMA` is set, exact
+	/// software emulation otherwise. Not bit exact with MSVC on 32-bit x86, which evaluates
+	/// through x87.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Addend.
+	///
+	/// @returns _a * _b + _c.
+	///
+	BX_CONSTEXPR_FUNC float madExact(float _a, float _b, float _c);
+
+	/// Returns _c - _a * _b rounded once, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Value to subtract from.
+	///
+	/// @returns _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC float nmsExact(float _a, float _b, float _c);
+
+	/// Returns linear interpolation between _a and _b like lerp, same bits on every platform,
+	/// see madExact.
+	///
+	/// @param[in] _a Start value.
+	/// @param[in] _b End value.
+	/// @param[in] _t Interpolation factor [0, 1].
+	///
+	/// @returns Interpolated value _a + (_b - _a) * _t.
+	///
+	BX_CONSTEXPR_FUNC float lerpExact(float _a, float _b, float _t);
+
+	/// Returns the remainder of _a / _b truncated towards zero like fmod, same bits on every
+	/// platform, see madExact.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * trunc(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC float fmodExact(float _a, float _b);
+
+	/// Returns the remainder of _a / _b with the sign of _b like mod, same bits on every
+	/// platform, see madExact.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * floor(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC float modExact(float _a, float _b);
+
+	/// Returns result of multiply and add (_a * _b + _c), multiply and add rounded separately, never
+	/// fused, same bits on every platform and at compile time.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Addend.
+	///
+	/// @returns _a * _b + _c.
+	///
+	BX_CONSTEXPR_FUNC double madExact(double _a, double _b, double _c);
+
+	/// Returns _c - _a * _b, like nms, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a First factor.
+	/// @param[in] _b Second factor.
+	/// @param[in] _c Value to subtract from.
+	///
+	/// @returns _c - _a * _b.
+	///
+	BX_CONSTEXPR_FUNC double nmsExact(double _a, double _b, double _c);
+
+	/// Returns the remainder of _a / _b truncated towards zero, like fmod, same bits on every
+	/// platform, see madExact.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * trunc(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC double fmodExact(double _a, double _b);
+
+	/// Returns the remainder of _a / _b with the sign of _b, like mod, same bits on every
+	/// platform, see madExact.
+	///
+	/// @param[in] _a Numerator.
+	/// @param[in] _b Denominator.
+	///
+	/// @returns _a - _b * floor(_a / _b).
+	///
+	BX_CONSTEXPR_FUNC double modExact(double _a, double _b);
+
+	/// Returns the sine of _a like sin, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns sin(_a).
+	///
+	BX_CONSTEXPR_FUNC float sinExact(float _a);
+
+	/// Returns the cosine of _a like cos, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns cos(_a).
+	///
+	BX_CONSTEXPR_FUNC float cosExact(float _a);
+
+	/// Returns the tangent of _a like tan, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns tan(_a).
+	///
+	BX_CONSTEXPR_FUNC float tanExact(float _a);
+
+	/// Returns the arc sine of _a like asin, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns asin(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC float asinExact(float _a);
+
+	/// Returns the arc cosine of _a like acos, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns acos(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC float acosExact(float _a);
+
+	/// Returns the arc tangent of _a like atan, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns atan(_a) in radians.
+	///
+	BX_CONSTEXPR_FUNC float atanExact(float _a);
+
+	/// Returns the hyperbolic sine of _a like sinh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns sinh(_a).
+	///
+	BX_CONSTEXPR_FUNC float sinhExact(float _a);
+
+	/// Returns the hyperbolic cosine of _a like cosh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns cosh(_a).
+	///
+	BX_CONSTEXPR_FUNC float coshExact(float _a);
+
+	/// Returns the hyperbolic tangent of _a like tanh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns tanh(_a).
+	///
+	BX_CONSTEXPR_FUNC float tanhExact(float _a);
+
+	/// Returns the inverse hyperbolic sine of _a like asinh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns asinh(_a).
+	///
+	BX_CONSTEXPR_FUNC float asinhExact(float _a);
+
+	/// Returns the inverse hyperbolic cosine of _a like acosh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be >= 1).
+	///
+	/// @returns acosh(_a), or NaN if _a < 1.
+	///
+	BX_CONSTEXPR_FUNC float acoshExact(float _a);
+
+	/// Returns the inverse hyperbolic tangent of _a like atanh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns atanh(_a), or NaN if |_a| > 1.
+	///
+	BX_CONSTEXPR_FUNC float atanhExact(float _a);
+
+	/// Returns e (2.71828...) raised to the _a power like exp, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns e^_a.
+	///
+	BX_CONSTEXPR_FUNC float expExact(float _a);
+
+	/// Returns 2 raised to the _a power like exp2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns 2^_a.
+	///
+	BX_CONSTEXPR_FUNC float exp2Exact(float _a);
+
+	/// Returns the base e (2.71828...) logarithm of _a like log, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns ln(_a).
+	///
+	BX_CONSTEXPR_FUNC float logExact(float _a);
+
+	/// Returns the base 2 logarithm of _a like log2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log2(_a).
+	///
+	BX_CONSTEXPR_FUNC float log2Exact(float _a);
+
+	/// Returns the base 10 logarithm of _a like log10, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log10(_a).
+	///
+	BX_CONSTEXPR_FUNC float log10Exact(float _a);
+
+	/// Returns the natural logarithm of 1 + _a like log1p, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be >= -1).
+	///
+	/// @returns ln(1 + _a).
+	///
+	BX_CONSTEXPR_FUNC float log1pExact(float _a);
+
+	/// Returns the arc tangent of _y / _x like atan2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _y Numerator.
+	/// @param[in] _x Denominator.
+	///
+	/// @returns atan2(_y, _x) in radians.
+	///
+	BX_CONSTEXPR_FUNC float atan2Exact(float _y, float _x);
+
+	/// Returns _a raised to the _b power like pow, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Base.
+	/// @param[in] _b Exponent.
+	///
+	/// @returns _a^_b.
+	///
+	BX_CONSTEXPR_FUNC float powExact(float _a, float _b);
+
+	/// Returns the sine of _a like sin, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns sin(_a).
+	///
+	BX_CONSTEXPR_FUNC double sinExact(double _a);
+
+	/// Returns the cosine of _a like cos, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns cos(_a).
+	///
+	BX_CONSTEXPR_FUNC double cosExact(double _a);
+
+	/// Returns the tangent of _a like tan, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Angle in radians.
+	///
+	/// @returns tan(_a).
+	///
+	BX_CONSTEXPR_FUNC double tanExact(double _a);
+
+	/// Returns the arc sine of _a like asin, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns asin(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC double asinExact(double _a);
+
+	/// Returns the arc cosine of _a like acos, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns acos(_a) in radians, or NaN if _a is outside [-1, 1].
+	///
+	BX_CONSTEXPR_FUNC double acosExact(double _a);
+
+	/// Returns the arc tangent of _a like atan, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns atan(_a) in radians.
+	///
+	BX_CONSTEXPR_FUNC double atanExact(double _a);
+
+	/// Returns the hyperbolic sine of _a like sinh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns sinh(_a).
+	///
+	BX_CONSTEXPR_FUNC double sinhExact(double _a);
+
+	/// Returns the hyperbolic cosine of _a like cosh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns cosh(_a).
+	///
+	BX_CONSTEXPR_FUNC double coshExact(double _a);
+
+	/// Returns the hyperbolic tangent of _a like tanh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns tanh(_a).
+	///
+	BX_CONSTEXPR_FUNC double tanhExact(double _a);
+
+	/// Returns the inverse hyperbolic sine of _a like asinh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value.
+	///
+	/// @returns asinh(_a).
+	///
+	BX_CONSTEXPR_FUNC double asinhExact(double _a);
+
+	/// Returns the inverse hyperbolic cosine of _a like acosh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be >= 1).
+	///
+	/// @returns acosh(_a), or NaN if _a < 1.
+	///
+	BX_CONSTEXPR_FUNC double acoshExact(double _a);
+
+	/// Returns the inverse hyperbolic tangent of _a like atanh, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value in [-1, 1].
+	///
+	/// @returns atanh(_a), or NaN if |_a| > 1.
+	///
+	BX_CONSTEXPR_FUNC double atanhExact(double _a);
+
+	/// Returns e (2.71828...) raised to the _a power like exp, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns e^_a.
+	///
+	BX_CONSTEXPR_FUNC double expExact(double _a);
+
+	/// Returns 2 raised to the _a power like exp2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Exponent.
+	///
+	/// @returns 2^_a.
+	///
+	BX_CONSTEXPR_FUNC double exp2Exact(double _a);
+
+	/// Returns the base e (2.71828...) logarithm of _a like log, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns ln(_a).
+	///
+	BX_CONSTEXPR_FUNC double logExact(double _a);
+
+	/// Returns the base 2 logarithm of _a like log2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log2(_a).
+	///
+	BX_CONSTEXPR_FUNC double log2Exact(double _a);
+
+	/// Returns the base 10 logarithm of _a like log10, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be > 0).
+	///
+	/// @returns log10(_a).
+	///
+	BX_CONSTEXPR_FUNC double log10Exact(double _a);
+
+	/// Returns the natural logarithm of 1 + _a like log1p, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Input value (must be >= -1).
+	///
+	/// @returns ln(1 + _a).
+	///
+	BX_CONSTEXPR_FUNC double log1pExact(double _a);
+
+	/// Returns the arc tangent of _y / _x like atan2, same bits on every platform, see madExact.
+	///
+	/// @param[in] _y Numerator.
+	/// @param[in] _x Denominator.
+	///
+	/// @returns atan2(_y, _x) in radians.
+	///
+	BX_CONSTEXPR_FUNC double atan2Exact(double _y, double _x);
+
+	/// Returns _a raised to the _b power like pow, same bits on every platform, see madExact.
+	///
+	/// @param[in] _a Base.
+	/// @param[in] _b Exponent.
+	///
+	/// @returns _a^_b.
+	///
+	BX_CONSTEXPR_FUNC double powExact(double _a, double _b);
 
 	/// Count number of bits set.
 	///

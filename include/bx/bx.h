@@ -272,6 +272,17 @@ namespace bx
 	template <typename Ty, typename FromT>
 	constexpr Ty bitCast(const FromT& _from);
 
+	/// Returns `_a` unchanged, hidden from the optimizer, so the operation producing it is not
+	/// combined with the one consuming it, e.g. a multiply and an add fused into a multiply-add.
+	/// No instruction for values in registers; classes and unions go through memory.
+	///
+	/// @param[in] _a Value.
+	///
+	/// @returns `_a`.
+	///
+	template<typename Ty>
+	Ty compilerHideValue(Ty _a);
+
 	/// Performs `static_cast` of value `_from`, and if value doesn't fit result type `Ty` it clamps
 	/// the value to `Ty` min/max.
 	template<typename Ty, typename FromT>

@@ -263,6 +263,42 @@ namespace bx
 		return __builtin_bit_cast(Ty, _from);
 	}
 
+	template<typename Ty>
+	inline Ty compilerHideValue(Ty _a)
+	{
+#if BX_COMPILER_GCC || BX_COMPILER_CLANG
+		if constexpr (isInteger<Ty>() || isPointer<Ty>() )
+		{
+			__asm__("" : "+r"(_a) );
+		}
+		else if constexpr (isClass<Ty>() || isUnion<Ty>() )
+		{
+			__asm__("" : "+m"(_a) );
+		}
+		else
+		{
+#	if BX_CPU_X86 && defined(__SSE2__)
+			__asm__("" : "+x"(_a) );
+#	elif BX_CPU_ARM && BX_ARCH_32BIT
+			if constexpr (4 == sizeof(Ty) )
+			{
+				__asm__("" : "+t"(_a) );
+			}
+			else
+			{
+				__asm__("" : "+w"(_a) );
+			}
+#	elif BX_CPU_ARM
+			__asm__("" : "+w"(_a) );
+#	elif !BX_CPU_JIT
+			__asm__("" : "+m"(_a) );
+#	endif // BX_CPU_*
+		}
+#endif // BX_COMPILER_GCC || BX_COMPILER_CLANG
+
+		return _a;
+	}
+
 	BX_PRAGMA_DIAGNOSTIC_POP();
 
 	template<typename Ty, typename FromT>

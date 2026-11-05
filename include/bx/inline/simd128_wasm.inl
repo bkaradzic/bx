@@ -344,6 +344,12 @@ namespace bx
 	}
 
 	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f32_sqrt1(simd128_wasm_t _a)
+	{
+		return wasm_f32x4_sqrt(_a);
+	}
+
+	template<>
 	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f32_rsqrt_est(simd128_wasm_t _a)
 	{
 		const simd128_wasm_t one    = wasm_f32x4_splat(1.0f);
@@ -964,6 +970,12 @@ namespace bx
 
 	template<>
 	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f64_sqrt(simd128_wasm_t _a)
+	{
+		return wasm_f64x2_sqrt(_a);
+	}
+
+	template<>
+	BX_SIMD_FORCE_INLINE simd128_wasm_t simd128_f64_sqrt1(simd128_wasm_t _a)
 	{
 		return wasm_f64x2_sqrt(_a);
 	}
