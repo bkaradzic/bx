@@ -880,10 +880,12 @@
 
 				return aa > 0.0 ? Ty(kPiHalfSum) : Ty(-kPiHalfSum);
 			}
+			else
+			{
+				constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
 
-			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
-
-			return Traits::fromBits(kNanBits);
+				return Traits::fromBits(kNanBits);
+			}
 		}
 
 		if (1.0 == absA)
@@ -959,10 +961,12 @@
 			{
 				return aa > 0.0 ? Ty(0.0) : Ty(kPiFull);
 			}
+			else
+			{
+				constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
 
-			constexpr Bits kNanBits = Traits::kExponentMask | Traits::kMantissaMask;
-
-			return Traits::fromBits(kNanBits);
+				return Traits::fromBits(kNanBits);
+			}
 		}
 
 		if (1.0 == absA)

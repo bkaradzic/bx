@@ -310,46 +310,46 @@ namespace bx
 		{
 			return _from;
 		}
-
-		constexpr Ty mx = max<Ty>();
-
-		if constexpr (isSigned<Ty>() && isSigned<FromT>() )
+		else
 		{
-			if constexpr (sizeof(Ty) < sizeof(FromT) )
-			{
-				constexpr FromT mn = min<Ty>();
+			constexpr Ty mx = max<Ty>();
 
-				if (_from < mn)
+			if constexpr (isSigned<Ty>() && isSigned<FromT>() )
+			{
+				if constexpr (sizeof(Ty) < sizeof(FromT) )
 				{
-					return Ty(mn);
+					constexpr FromT mn = min<Ty>();
+
+					if (_from < mn)
+					{
+						return Ty(mn);
+					}
+					else if (_from > mx)
+					{
+						return mx;
+					}
 				}
-				else if (_from > mx)
+			}
+			else if constexpr (isSigned<FromT>() )
+			{
+				if (_from < FromT(0) )
+				{
+					return Ty(0);
+				}
+				else if (asUnsigned<FromT>(_from) > mx)
 				{
 					return mx;
 				}
 			}
-		}
-		else if constexpr (isSigned<FromT>() )
-		{
-			if (_from < FromT(0) )
-			{
-				return Ty(0);
-			}
-			else if (asUnsigned<FromT>(_from) > mx)
+			else if (_from > asUnsigned<Ty>(max<Ty>() ) )
 			{
 				return mx;
 			}
-		}
-		else if (_from > asUnsigned<Ty>(max<Ty>() ) )
-		{
-			return mx;
-		}
 
-		return static_cast<Ty>(_from);
+			return static_cast<Ty>(_from);
+		}
 	}
 
-BX_PRAGMA_DIAGNOSTIC_PUSH()
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702) // warning C4702: unreachable code
 	template<typename Ty, typename FromT>
 	inline constexpr bool narrowCastTest(Ty* _out, const FromT& _from)
 	{
@@ -358,11 +358,12 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702) // warning C4702: unreachable code
 			*_out = _from;
 			return true;
 		}
-
-		*_out = static_cast<Ty>(_from);
-		return static_cast<FromT>(*_out) == _from;
+		else
+		{
+			*_out = static_cast<Ty>(_from);
+			return static_cast<FromT>(*_out) == _from;
+		}
 	}
-BX_PRAGMA_DIAGNOSTIC_POP()
 
 	template<typename Ty, typename FromT>
 	inline Ty narrowCast(const FromT& _from, Location _location)

@@ -33,7 +33,7 @@ TEST_CASE("getCallStackFast", "[debug]")
 	uintptr_t stack[32];
 	const uint32_t num = bx::getCallStackFast(0, BX_COUNTOF(stack), stack);
 
-	if (!BX_ENABLED(BX_PLATFORM_LINUX) )
+	if constexpr (!BX_ENABLED(BX_PLATFORM_LINUX) )
 	{
 		REQUIRE(0 < num);
 	}

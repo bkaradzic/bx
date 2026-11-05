@@ -403,8 +403,10 @@ namespace bx
 			const Ty  satVal   = (ua & signBit) ? LimitsT<Ty>::min : LimitsT<Ty>::max;
 			return 0 != overflow ? satVal : Ty(sum);
 		}
-
-		return sum < ua ? LimitsT<Ty>::max : Ty(sum);
+		else
+		{
+			return sum < ua ? LimitsT<Ty>::max : Ty(sum);
+		}
 	}
 
 	template<typename Ty>
@@ -426,8 +428,10 @@ namespace bx
 
 			return 0 != overflow ? satVal : Ty(diff);
 		}
-
-		return ua > ub ? Ty(diff) : Ty(0);
+		else
+		{
+			return ua > ub ? Ty(diff) : Ty(0);
+		}
 	}
 
 	inline BX_CONSTEXPR_FUNC float mul(float _a, float _b)
@@ -524,7 +528,6 @@ namespace bx
 
 BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4756); // warning C4756: overflow in constant arithmetic
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702); // warning C4702: unreachable code
 
 	inline BX_CONSTEXPR_FUNC float mad(float _a, float _b, float _c)
 	{
@@ -537,11 +540,13 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702); // warning C4702: unreachable code
 
 			return bitCast<float>(result);
 		}
+		else
+		{
+			const float prod   = _a*_b;
+			const float result = prod + _c;
 
-		const float prod   = _a*_b;
-		const float result = prod + _c;
-
-		return result;
+			return result;
+		}
 	}
 
 	inline BX_CONSTEXPR_FUNC double mad(double _a, double _b, double _c)
@@ -550,11 +555,13 @@ BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702); // warning C4702: unreachable code
 		{
 			return _a*_b + _c;
 		}
+		else
+		{
+			const double prod   = _a*_b;
+			const double result = prod + _c;
 
-		const double prod   = _a*_b;
-		const double result = prod + _c;
-
-		return result;
+			return result;
+		}
 	}
 
 BX_PRAGMA_DIAGNOSTIC_POP();
@@ -1055,23 +1062,22 @@ BX_PRAGMA_DIAGNOSTIC_POP();
 
 BX_FP_PRECISE_BEGIN()
 
-BX_PRAGMA_DIAGNOSTIC_PUSH();
-BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702); // warning C4702: unreachable code
 	inline BX_CONSTEXPR_FUNC float madExact(float _a, float _b, float _c)
 	{
 		if constexpr (kFmaSupported)
 		{
 			return mad(_a, _b, _c);
 		}
+		else
+		{
+			const simd32_t aa     = simd32_ld(_a);
+			const simd32_t bb     = simd32_ld(_b);
+			const simd32_t cc     = simd32_ld(_c);
+			const simd32_t result = simd32_f32_madd_ref(aa, bb, cc);
 
-		const simd32_t aa     = simd32_ld(_a);
-		const simd32_t bb     = simd32_ld(_b);
-		const simd32_t cc     = simd32_ld(_c);
-		const simd32_t result = simd32_f32_madd_ref(aa, bb, cc);
-
-		return bitCast<float>(result);
+			return bitCast<float>(result);
+		}
 	}
-BX_PRAGMA_DIAGNOSTIC_POP();
 
 	inline BX_CONSTEXPR_FUNC float nmsExact(float _a, float _b, float _c)
 	{

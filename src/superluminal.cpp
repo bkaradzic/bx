@@ -87,7 +87,7 @@ namespace bx
 
 	bool Superluminal::load()
 	{
-		if (!BX_ENABLED(BX_PLATFORM_WINDOWS) )
+		if constexpr (!BX_ENABLED(BX_PLATFORM_WINDOWS) )
 		{
 			return false;
 		}

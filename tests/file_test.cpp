@@ -36,7 +36,7 @@ struct ScopedCwd
 
 TEST_CASE("File paths are UTF-8", "[file][filepath][utf8]")
 {
-	if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
+	if constexpr (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN) )
 	{
 		SKIP("Not supported by wasm.");
 	}
