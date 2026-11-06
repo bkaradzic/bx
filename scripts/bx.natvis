@@ -1,12 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-    <Type Name="bx::StringView">
-        <DisplayString>{m_ptr,[m_len]s8}</DisplayString>
-        <StringView>m_ptr,[m_len]s8</StringView>
-        <Expand>
-            <ExpandedItem>m_ptr,[m_len]</ExpandedItem>
-        </Expand>
-    </Type>
+	<Type Name="bx::StringLiteral">
+		<DisplayString>{m_ptr,[m_len]s8}</DisplayString>
+		<StringView>m_ptr,[m_len]s8</StringView>
+		<Expand>
+			<Item Name="[length]">m_len</Item>
+			<Item Name="[ptr]">(const void*)m_ptr</Item>
+		</Expand>
+	</Type>
+	<Type Name="bx::StringView">
+		<DisplayString>{m_ptr,[m_len]s8}</DisplayString>
+		<StringView>m_ptr,[m_len]s8</StringView>
+		<Expand>
+			<Item Name="[length]">m_len</Item>
+			<Item Name="[0terminated]">m_0terminated</Item>
+			<Item Name="[ptr]">(const void*)m_ptr</Item>
+		</Expand>
+	</Type>
+	<Type Name="bx::StringT&lt;*&gt;">
+		<DisplayString>{m_ptr,[m_len]s8}</DisplayString>
+		<StringView>m_ptr,[m_len]s8</StringView>
+		<Expand>
+			<Item Name="[length]">m_len</Item>
+			<Item Name="[capacity]">m_capacity</Item>
+			<Item Name="[ptr]">(const void*)m_ptr</Item>
+		</Expand>
+	</Type>
 	<Type Name="bx::HandleAlloc">
 		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
 		<Expand>
@@ -68,12 +87,12 @@
 	</Type>
 
 	<Type Name="bx::StorageViewT&lt;*&gt;">
-		<DisplayString>{{ count={m_count} }}</DisplayString>
+		<DisplayString>{{ count={m_term - m_ptr} }}</DisplayString>
 		<Expand>
-			<Item Name="[count]" ExcludeView="simple">m_count</Item>
+			<Item Name="[count]" ExcludeView="simple">m_term - m_ptr</Item>
 			<Item Name="[ptr]" ExcludeView="simple">m_ptr</Item>
 			<ArrayItems>
-				<Size>m_count</Size>
+				<Size>m_term - m_ptr</Size>
 				<ValuePointer>m_ptr</ValuePointer>
 			</ArrayItems>
 		</Expand>
