@@ -173,15 +173,9 @@
 #	if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
 #		undef  BX_PLATFORM_WINDOWS
 #		if !defined(WINVER) && !defined(_WIN32_WINNT)
-#			if BX_ARCH_64BIT
-//				When building 64-bit target Win7 and above.
-#				define WINVER 0x0601
-#				define _WIN32_WINNT 0x0601
-#			else
-//				When building 32-bit target Win7 and above.
-#				define WINVER 0x0601
-#				define _WIN32_WINNT 0x0601
-#			endif // BX_ARCH_64BIT
+//			Target Win10 and above.
+#			define WINVER 0x0A00
+#			define _WIN32_WINNT 0x0A00
 #		endif // !defined(WINVER) && !defined(_WIN32_WINNT)
 #		define BX_PLATFORM_WINDOWS _WIN32_WINNT
 #	else
