@@ -176,7 +176,7 @@ namespace bx
 	inline int64_t atomicFetchAndAdd<int64_t>(volatile int64_t* _ptr, int64_t _add)
 	{
 #if BX_COMPILER_MSVC
-#	if _WIN32_WINNT >= 0x600
+#	if !(BX_CPU_X86 && BX_ARCH_32BIT)
 		return _InterlockedExchangeAdd64( (volatile int64_t*)_ptr, _add);
 #	else
 		int64_t oldVal;
