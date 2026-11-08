@@ -1249,25 +1249,34 @@ namespace bx
 		return false;
 	}
 
-	static bool fromStringFloating(double* _out, const StringView& _str, int32_t _mantBits, int32_t _minExp)
+	static const char* numberSkipPrefix(bool* _outNegative, const char* _ptr, const char* _term)
 	{
-		const char* ptr  = _str.getPtr();
+		while (_ptr != _term
+		&&     isSpace(*_ptr) )
+		{
+			++_ptr;
+		}
+
+		*_outNegative = false;
+
+		if (_ptr != _term
+		&& ('+' == *_ptr || '-' == *_ptr) )
+		{
+			*_outNegative = '-' == *_ptr;
+			++_ptr;
+		}
+
+		return _ptr;
+	}
+
+	static bool fromStringFloating(double* _out, const StringView& _str, StringView* _outRest, int32_t _mantBits, int32_t _minExp)
+	{
 		const char* term = _str.getTerm();
 
-		while (ptr != term
-		&&     isSpace(*ptr) )
-		{
-			++ptr;
-		}
+		*_outRest = _str;
 
-		bool negative = false;
-
-		if (ptr != term
-		&& ('+' == *ptr || '-' == *ptr) )
-		{
-			negative = '-' == *ptr;
-			++ptr;
-		}
+		bool negative;
+		const char* ptr = numberSkipPrefix(&negative, _str.getPtr(), term);
 
 		const bool hex = (term - ptr) >= 2
 			&& '0' == ptr[0]
@@ -1416,6 +1425,8 @@ namespace bx
 			}
 		}
 
+		*_outRest = StringView(ptr, term);
+
 		if (0 == big.num)
 		{
 			*_out = negative ? -0.0 : 0.0;
@@ -1488,52 +1499,118 @@ namespace bx
 		return true;
 	}
 
+	static bool isNumberEnd(const StringView& _rest)
+	{
+		return _rest.isEmpty()
+			|| strLTrimSpace(_rest).isEmpty()
+			;
+	}
+
 	bool fromString(float* _out, const StringView& _str)
 	{
 		double value;
+		StringView rest;
 
-		const bool result = fromStringFloating(&value, _str, 24, -126);
+		const bool result = fromStringFloating(&value, _str, &rest, 24, -126);
 
 		*_out = float(value);
 
-		return result;
+		return result
+			&& isNumberEnd(rest)
+			;
 	}
 
 	bool fromString(double* _out, const StringView& _str)
 	{
-		return fromStringFloating(_out, _str, 53, -1022);
+		StringView rest;
+
+		return fromStringFloating(_out, _str, &rest, 53, -1022)
+			&& isNumberEnd(rest)
+			;
+	}
+
+	static bool fromStringInteger(uint64_t* _outMagnitude, bool* _outNegative, bool* _outOverflow, const StringView& _str, StringView* _outRest)
+	{
+		const char* term = _str.getTerm();
+
+		bool negative;
+		const char* ptr = numberSkipPrefix(&negative, _str.getPtr(), term);
+
+		const char* digits = ptr;
+		uint64_t magnitude = 0;
+		bool overflow = false;
+
+		for (; ptr != term && isNumeric(*ptr); ++ptr)
+		{
+			const uint64_t digit = uint64_t(*ptr - '0');
+
+			overflow  = overflow || magnitude > (UINT64_MAX - digit) / 10;
+			magnitude = magnitude*10 + digit;
+		}
+
+		*_outMagnitude = magnitude;
+		*_outNegative  = negative;
+		*_outOverflow  = overflow;
+
+		const bool any = digits != ptr;
+
+		*_outRest = any ? StringView(ptr, term) : _str;
+
+		return any;
 	}
 
 	bool fromString(long long* _out, const StringView& _str)
 	{
-		StringView str = strLTrimSpace(_str);
+		uint64_t magnitude;
+		bool negative;
+		bool overflow;
+		StringView rest;
 
-		const char* ptr  = str.getPtr();
-		const char* term = str.getTerm();
-
-		char ch = *ptr++;
-		bool neg = false;
-		switch (ch)
+		if (!fromStringInteger(&magnitude, &negative, &overflow, _str, &rest) )
 		{
-		case '-':
-		case '+': neg = '-' == ch;
-			break;
-
-		default:
-			--ptr;
-			break;
+			*_out = 0;
+			return false;
 		}
 
-		long long result = 0;
+		const uint64_t max = uint64_t(INT64_MAX) + (negative ? 1 : 0);
 
-		for (ch = *ptr++; isNumeric(ch) && ptr <= term; ch = *ptr++)
+		if (overflow
+		||  magnitude > max)
 		{
-			result = 10*result - (ch - '0');
+			*_out = negative ? INT64_MIN : INT64_MAX;
+			return false;
 		}
 
-		*_out = neg ? result : -result;
+		*_out = negative ? int64_t(0 - magnitude) : int64_t(magnitude);
+		return isNumberEnd(rest);
+	}
 
-		return true;
+	bool fromString(unsigned long long* _out, const StringView& _str)
+	{
+		uint64_t magnitude;
+		bool negative;
+		bool overflow;
+		StringView rest;
+
+		if (!fromStringInteger(&magnitude, &negative, &overflow, _str, &rest) )
+		{
+			*_out = 0;
+			return false;
+		}
+
+		if (negative)
+		{
+			*_out = 0;
+			return 0 == magnitude
+				&& !overflow
+				&& isNumberEnd(rest)
+				;
+		}
+
+		*_out = overflow ? UINT64_MAX : magnitude;
+		return !overflow
+			&& isNumberEnd(rest)
+			;
 	}
 
 } // namespace bx
