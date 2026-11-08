@@ -720,8 +720,150 @@ TEST_CASE("fromString rejects malformed", "[string]")
 	}
 
 	double d = 0.0;
-	REQUIRE(bx::fromString(&d, "12abc") );
+	REQUIRE(!bx::fromString(&d, "12abc") );
 	REQUIRE(d == 12.0);
+}
+
+TEST_CASE("fromString whole string", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE( bx::fromString(&d, "1.5e3") );   REQUIRE(d == 1500.0);
+	REQUIRE( bx::fromString(&d, " 1.5 \t") ); REQUIRE(d == 1.5);
+	REQUIRE(!bx::fromString(&d, "1.5e3x") );  REQUIRE(d == 1500.0);
+	REQUIRE(!bx::fromString(&d, "2e") );      REQUIRE(d == 2.0);
+	REQUIRE(!bx::fromString(&d, "1 2") );     REQUIRE(d == 1.0);
+
+	float f = 0.0f;
+	REQUIRE( bx::fromString(&f, "0.25") );    REQUIRE(f == 0.25f);
+	REQUIRE(!bx::fromString(&f, "0.25f") );   REQUIRE(f == 0.25f);
+}
+
+TEST_CASE("fromString integer", "[string]")
+{
+	long long ll = 1234;
+
+	REQUIRE(bx::fromString(&ll, "0") );        REQUIRE(0 == ll);
+	REQUIRE(bx::fromString(&ll, "123") );      REQUIRE(123 == ll);
+	REQUIRE(bx::fromString(&ll, "-123") );     REQUIRE(-123 == ll);
+	REQUIRE(bx::fromString(&ll, "+7") );       REQUIRE(7 == ll);
+	REQUIRE(bx::fromString(&ll, " \t42") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "42 \n") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "007") );      REQUIRE(7 == ll);
+
+	REQUIRE(!bx::fromString(&ll, "12abc") );   REQUIRE(12 == ll);
+	REQUIRE(!bx::fromString(&ll, "4u") );      REQUIRE(4 == ll);
+	REQUIRE(!bx::fromString(&ll, "1 2") );     REQUIRE(1 == ll);
+	REQUIRE(!bx::fromString(&ll, "0x10") );    REQUIRE(0 == ll);
+	REQUIRE(!bx::fromString(&ll, "1.5") );     REQUIRE(1 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(!bx::fromString(&u32, "7b") );     REQUIRE(7 == u32);
+
+	int8_t i8 = 0;
+	REQUIRE(!bx::fromString(&i8, "300x") );    REQUIRE(127 == i8);
+}
+
+TEST_CASE("fromString integer rejects malformed", "[string]")
+{
+	const char* bad[] = { "", "abc", "+", "-", "x1", "   ", "- 1", "+-1", ".5" };
+
+	for (const char* str : bad)
+	{
+		long long ll = 1234;
+		REQUIRE(!bx::fromString(&ll, str) );
+		REQUIRE(0 == ll);
+
+		unsigned long long ull = 1234;
+		REQUIRE(!bx::fromString(&ull, str) );
+		REQUIRE(0 == ull);
+
+		int32_t i32 = 1234;
+		REQUIRE(!bx::fromString(&i32, str) );
+		REQUIRE(0 == i32);
+
+		uint8_t u8 = 123;
+		REQUIRE(!bx::fromString(&u8, str) );
+		REQUIRE(0 == u8);
+	}
+
+	const char* digits = "123";
+	long long ll = 1234;
+	REQUIRE(!bx::fromString(&ll, bx::StringView(digits, 0) ) );
+}
+
+TEST_CASE("fromString integer stays in view", "[string]")
+{
+	const char digits[] = { '1', '2', '3', '4' };
+
+	long long ll = 0;
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 2) ) );
+	REQUIRE(12 == ll);
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 4) ) );
+	REQUIRE(1234 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(bx::fromString(&u32, bx::StringView(digits, 3) ) );
+	REQUIRE(123 == u32);
+}
+
+TEST_CASE("fromString integer range", "[string]")
+{
+	long long ll = 0;
+
+	REQUIRE( bx::fromString(&ll,  "9223372036854775807") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE( bx::fromString(&ll, "-9223372036854775808") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "9223372036854775808") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-9223372036854775809") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "99999999999999999999999999") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-99999999999999999999999999") ); REQUIRE(INT64_MIN == ll);
+
+	unsigned long long ull = 0;
+
+	REQUIRE( bx::fromString(&ull, "18446744073709551615") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "18446744073709551616") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "99999999999999999999999999") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE( bx::fromString(&ull, "9223372036854775808") );  REQUIRE(UINT64_C(9223372036854775808) == ull);
+	REQUIRE(!bx::fromString(&ull, "-1") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "-0") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "+5") );                   REQUIRE(5 == ull);
+
+	int8_t i8 = 0;
+	REQUIRE( bx::fromString(&i8, "127") );  REQUIRE( 127 == i8);
+	REQUIRE( bx::fromString(&i8, "-128") ); REQUIRE(-128 == i8);
+	REQUIRE(!bx::fromString(&i8, "128") );  REQUIRE( 127 == i8);
+	REQUIRE(!bx::fromString(&i8, "-129") ); REQUIRE(-128 == i8);
+
+	uint8_t u8 = 0;
+	REQUIRE( bx::fromString(&u8, "255") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "256") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "-1") );   REQUIRE(0 == u8);
+
+	int16_t i16 = 0;
+	REQUIRE( bx::fromString(&i16, "-32768") ); REQUIRE(INT16_MIN == i16);
+	REQUIRE(!bx::fromString(&i16, "32768") );  REQUIRE(INT16_MAX == i16);
+
+	uint16_t u16 = 0;
+	REQUIRE( bx::fromString(&u16, "65535") ); REQUIRE(UINT16_MAX == u16);
+	REQUIRE(!bx::fromString(&u16, "65536") ); REQUIRE(UINT16_MAX == u16);
+
+	int32_t i32 = 0;
+	REQUIRE( bx::fromString(&i32, "-2147483648") ); REQUIRE(INT32_MIN == i32);
+	REQUIRE(!bx::fromString(&i32, "2147483648") );  REQUIRE(INT32_MAX == i32);
+	REQUIRE(!bx::fromString(&i32, "99999999999999999999999999") ); REQUIRE(INT32_MAX == i32);
+
+	uint32_t u32 = 0;
+	REQUIRE( bx::fromString(&u32, "4294967295") ); REQUIRE(UINT32_MAX == u32);
+	REQUIRE(!bx::fromString(&u32, "4294967296") ); REQUIRE(UINT32_MAX == u32);
+
+	long l = 0;
+	REQUIRE( bx::fromString(&l, "-2147483648") ); REQUIRE(-2147483647L - 1 == l);
+
+	unsigned long ul = 0;
+	REQUIRE( bx::fromString(&ul, "4294967295") ); REQUIRE(4294967295UL == ul);
+	REQUIRE(!bx::fromString(&ul, "-1") );         REQUIRE(0 == ul);
 }
 
 TEST_CASE("fromString float rounds once", "[string]")

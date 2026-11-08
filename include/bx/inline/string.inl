@@ -743,73 +743,89 @@ namespace bx
 	inline bool fromString(int8_t* _out, const StringView& _str)
 	{
 		long long tmp;
-		fromString(&tmp, _str);
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<int8_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(uint8_t* _out, const StringView& _str)
 	{
-		long long tmp;
-		fromString(&tmp, _str);
+		unsigned long long tmp;
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<uint8_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(int16_t* _out, const StringView& _str)
 	{
 		long long tmp;
-		fromString(&tmp, _str);
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<int16_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(uint16_t* _out, const StringView& _str)
 	{
-		long long tmp;
-		fromString(&tmp, _str);
+		unsigned long long tmp;
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<uint16_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(int32_t* _out, const StringView& _str)
 	{
 		long long tmp;
-		fromString(&tmp, _str);
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<int32_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(uint32_t* _out, const StringView& _str)
 	{
-		long long tmp;
-		fromString(&tmp, _str);
+		unsigned long long tmp;
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<uint32_t>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(long* _out, const StringView& _str)
 	{
 		long long tmp;
-		fromString(&tmp, _str);
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<long>(tmp);
 
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	inline bool fromString(unsigned long* _out, const StringView& _str)
 	{
-		long long tmp;
-		fromString(&tmp, _str);
+		unsigned long long tmp;
+		const bool result = fromString(&tmp, _str);
+		*_out = saturateCast<unsigned long>(tmp);
 
-		return narrowCastTest(_out, tmp);
-	}
-
-	inline bool fromString(unsigned long long* _out, const StringView& _str)
-	{
-		long long tmp;
-		fromString(&tmp, _str);
-
-		return narrowCastTest(_out, tmp);
+		return result
+			&& *_out == tmp
+			;
 	}
 
 	template<uint16_t MaxCapacityT>
