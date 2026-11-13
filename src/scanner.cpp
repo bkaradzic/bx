@@ -150,12 +150,9 @@ namespace bx
 	{
 		uint32_t line = 0;
 
-		StringView str = strFindEol(_str);
-
-		while (!str.isEmpty() )
+		for (const char* ptr = _str.getPtr(), *term = _str.getTerm(); ptr != term; ++ptr)
 		{
-			++line;
-			str = strFindEol(strFindNl(str) );
+			line += '\n' == *ptr ? 1 : 0;
 		}
 
 		return line;
@@ -173,9 +170,6 @@ namespace bx
 			const StringView line = m_scanner.between(cursor);
 			m_scanner.accept(Scanner::Class::NewLine);
 
-			// A line terminator is `\n` or `\r\n`, and `Class::EndOfLine` already
-			// excludes it. Only malformed input (`\r` at the end of input, or
-			// `\r\r\n`) can leave a trailing `\r` behind.
 			return strRTrim(line, "\r");
 		}
 

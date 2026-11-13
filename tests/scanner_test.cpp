@@ -307,6 +307,43 @@ TEST_CASE("Scanner.EndOfLine mixed", "[scanner]")
 	REQUIRE(4 == bx::countLines(bx::StringView("a\nb\r\nc\rd\ne\r\n") ) );
 }
 
+TEST_CASE("Scanner.getLine CRLF", "[scanner]")
+{
+	const bx::StringView input("a\r\nb\rc\r\n\r\nd");
+
+	REQUIRE(3 == bx::countLines(input) );
+
+	bx::Scanner sc(input);
+	REQUIRE(1 == sc.getLine() );
+
+	sc.accept();     // a
+	sc.accept('\r');
+	REQUIRE(1 == sc.getLine() );
+
+	sc.accept('\n');
+	REQUIRE(2 == sc.getLine() );
+
+	sc.accept();     // b
+	sc.accept('\r'); // lone
+	sc.accept();     // c
+	REQUIRE(2 == sc.getLine() );
+
+	REQUIRE("\r\n" == sc.accept(bx::Scanner::Class::NewLine) );
+	REQUIRE(3 == sc.getLine() );
+
+	sc.acceptAll();
+	REQUIRE(4 == sc.getLine() );
+
+	sc.seek(-3);     // before the last `\r\n`
+	REQUIRE(3 == sc.getLine() );
+
+	sc.seek(1);      // between its `\r` and `\n`
+	REQUIRE(3 == sc.getLine() );
+
+	sc.seek(1);
+	REQUIRE(4 == sc.getLine() );
+}
+
 TEST_CASE("LineReader", "[scanner][string]")
 {
 	{
