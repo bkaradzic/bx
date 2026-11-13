@@ -122,7 +122,7 @@ function toolchain(_buildDir, _libDir)
 	newoption {
 		trigger     = "with-android",
 		value       = "#",
-		description = "Set Android platform version (default: android-24).",
+		description = "Set Android platform version (default: android-34).",
 	}
 
 	newoption {
@@ -186,7 +186,7 @@ function toolchain(_buildDir, _libDir)
 		os.exit(1)
 	end
 
-	local androidApiLevel = 24
+	local androidApiLevel = 34
 	if _OPTIONS["with-android"] then
 		androidApiLevel = _OPTIONS["with-android"]
 	end
