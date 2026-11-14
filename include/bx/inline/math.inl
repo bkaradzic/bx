@@ -1622,7 +1622,14 @@ BX_FP_PRECISE_END()
 	template<>
 	inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(unsigned long _val)
 	{
-		return countLeadingZeros<unsigned long long>(_val);
+		if constexpr (sizeof(unsigned long) == sizeof(uint32_t) )
+		{
+			return countLeadingZeros<uint32_t>(uint32_t(_val) );
+		}
+		else
+		{
+			return countLeadingZeros<unsigned long long>(_val);
+		}
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint8_t countLeadingZeros(uint8_t  _val) { return countLeadingZeros<uint32_t>(_val)-24; }
@@ -1685,7 +1692,14 @@ BX_FP_PRECISE_END()
 	template<>
 	inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(unsigned long _val)
 	{
-		return countTrailingZeros<unsigned long long>(_val);
+		if constexpr (sizeof(unsigned long) == sizeof(uint32_t) )
+		{
+			return countTrailingZeros<uint32_t>(uint32_t(_val) );
+		}
+		else
+		{
+			return countTrailingZeros<unsigned long long>(_val);
+		}
 	}
 
 	template<> inline BX_CONSTEXPR_FUNC uint8_t countTrailingZeros(uint8_t  _val) { return min<uint8_t>(8,  countTrailingZeros<uint32_t>(_val) ); }

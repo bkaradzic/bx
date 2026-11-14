@@ -243,6 +243,19 @@ TEST_CASE("countLeadingZeros/countTrailingZeros runtime", "[math]")
 {
 	testCountZeros<uint32_t>(0);
 	testCountZeros<uint64_t>(0);
+	testCountZeros<unsigned long>(0);
+
+	for (uint32_t ii = 0; ii < sizeof(unsigned long)*8; ++ii)
+	{
+		testCountZeros<unsigned long>( (unsigned long)(1) << ii);
+		testCountZeros<unsigned long>(ULONG_MAX << ii);
+		testCountZeros<unsigned long>(ULONG_MAX >> ii);
+
+		volatile unsigned long val = (unsigned long)(1) << ii;
+		REQUIRE(ii == bx::floorLog2<unsigned long>(val) );
+		REQUIRE(ii == bx::ceilLog2<unsigned long>(val) );
+		REQUIRE(val == bx::nextPow2<unsigned long>(val) );
+	}
 
 	for (uint32_t ii = 0; ii < 64; ++ii)
 	{
