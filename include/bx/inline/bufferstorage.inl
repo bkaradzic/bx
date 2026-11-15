@@ -103,7 +103,7 @@ namespace bx
 	template<typename Ty>
 	inline EnableIfType<true
 		&& !IsTriviallyConstructibleT<Ty>::value
-		&& !IsConstructibleT<Ty, InitNoneTag>::value
+		&& (IsAggregateT<Ty>::value || !IsConstructibleT<Ty, InitNoneTag>::value)
 		, void>
 	StorageTraits::constructDefault(Ty* _ptr, uint32_t _count)
 	{
@@ -116,6 +116,7 @@ namespace bx
 	template<typename Ty>
 	inline EnableIfType<true
 		&& !IsTriviallyConstructibleT<Ty>::value
+		&& !IsAggregateT<Ty>::value
 		&&  IsConstructibleT<Ty, InitNoneTag>::value
 		, void>
 	StorageTraits::constructDefault(Ty* _ptr, uint32_t _count)
@@ -392,18 +393,20 @@ namespace bx
 			dbgGraph(newCount, dstPos, moveCount, 'F');
 			dbgGraph(newCount, newPos, moveCount, 'M');
 
+			Ty* ptr = const_cast<Ty*>(m_ptr);
+
 			if constexpr (isTriviallyCopyable<Ty>() )
 			{
-				memMove(_storage.getPtr(newPos), _storage.getPtr(dstPos), moveCount * sizeof(Ty) );
+				memMove(ptr + newPos, ptr + dstPos, moveCount * sizeof(Ty) );
 			}
 			else
 			{
 				const uint32_t numConstruct = min(moveCount, _count);
 				const uint32_t numAssign    = moveCount - numConstruct;
 
-				StorageTraits::constructMove(_storage.getPtr(newCount - numConstruct), _storage.getPtr(dstCount - numConstruct), numConstruct);
-				StorageTraits::move(_storage.getPtr(newPos), _storage.getPtr(dstPos), numAssign);
-				StorageTraits::destruct(_storage.getPtr(dstPos), numConstruct);
+				StorageTraits::constructMove(ptr + newCount - numConstruct, ptr + dstCount - numConstruct, numConstruct);
+				StorageTraits::move(ptr + newPos, ptr + dstPos, numAssign);
+				StorageTraits::destruct(ptr + dstPos, numConstruct);
 			}
 		}
 
