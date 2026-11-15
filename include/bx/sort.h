@@ -10,6 +10,7 @@
 #include "bx.h"
 #include "math.h"
 #include "string.h"
+#include "uniqueptr.h"
 
 namespace bx
 {
@@ -98,8 +99,8 @@ namespace bx
 	/// holding a small-string buffer, or anything else self-referential, is safe here and is not
 	/// safe there.
 	///
-	/// @param _allocator Allocator for scratch buffer. Nothing is allocated when there are few
-	///   enough elements for insertion sort alone.
+	/// @param _allocator Allocator for scratch buffer, must be CPU accessible. Nothing is allocated
+	///   when there are few enough elements for insertion sort alone.
 	/// @param _data Pointer to array data.
 	/// @param _num Number of elements.
 	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. It must be a
@@ -108,18 +109,17 @@ namespace bx
 	/// @attention Element type must be default constructible and copy assignable.
 	///
 	template<typename Ty, typename LessFn>
-	void stableSort(AllocatorI* _allocator, Ty* _data, uint32_t _num, LessFn _less);
+	void stableSort(AllocatorHandle _allocator, Ty* _data, uint32_t _num, LessFn _less);
 
 	/// Performs stable sort over contiguous container.
 	///
-	/// @param _allocator Allocator for scratch buffer.
-	/// @param _container Container with `empty`, `size` and `operator[]`, such as
-	///   `tinystl::vector`.
+	/// @param _allocator Allocator for scratch buffer, must be CPU accessible.
+	/// @param _container Container with `empty`, `size` and `operator[]`.
 	/// @param _less Comparison function returning true if `_lhs` sorts before `_rhs`. It must be a
 	///   strict weak ordering.
 	///
 	template<typename ContainerT, typename LessFn>
-	void stableSort(AllocatorI* _allocator, ContainerT& _container, LessFn _less);
+	void stableSort(AllocatorHandle _allocator, ContainerT& _container, LessFn _less);
 
 	/// Performs reordering of duplicate elements in the array in the way that unique elements
 	/// are sorted to the front of array, and duplicates are after the return value index.

@@ -6,11 +6,11 @@
 #ifndef BX_COMMANDLINE_H_HEADER_GUARD
 #define BX_COMMANDLINE_H_HEADER_GUARD
 
+#include "blk.h"
 #include "string.h"
 
 namespace bx
 {
-	struct AllocatorI;
 	class  Error;
 	struct WriterI;
 
@@ -147,6 +147,14 @@ namespace bx
 	class CommandLineArgs
 	{
 	public:
+		/// Constructs process arguments.
+		///
+		/// @param[in] _allocator Allocator, must be CPU accessible.
+		/// @param[in] _argc Number of arguments `main` received.
+		/// @param[in] _argv Arguments `main` received.
+		///
+		CommandLineArgs(AllocatorHandle _allocator, int32_t _argc, const char* const* _argv);
+
 		///
 		CommandLineArgs(AllocatorI* _allocator, int32_t _argc, const char* const* _argv);
 
@@ -160,8 +168,7 @@ namespace bx
 		const char** getArgv() const;
 
 	private:
-		AllocatorI*  m_allocator;
-		void*        m_data;
+		Blk          m_blk;
 		int32_t      m_argc;
 		const char** m_argv;
 	};

@@ -3,17 +3,17 @@
  * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
  */
 
-#include <bx/allocator.h>
 #include <bx/commandline.h>
 #include <bx/file.h>
 #include <bx/string.h>
+#include <bx/uniqueptr.h>
 
 #include <bx/debug.h>
 
 class Bin2cWriter : public bx::WriterI
 {
 public:
-	Bin2cWriter(bx::AllocatorI* _allocator, const bx::StringView& _name)
+	Bin2cWriter(bx::AllocatorHandle _allocator, const bx::StringView& _name)
 		: m_mb(_allocator)
 		, m_mw(&m_mb)
 		, m_name(_name)
@@ -225,8 +225,8 @@ void help(const char* _error = NULL)
 
 int main(int _argc, const char* _argv[])
 {
-	bx::DefaultAllocator allocator;
-	bx::CommandLineArgs args(&allocator, _argc, _argv);
+	const bx::AllocatorHandle allocator = bx::getDefaultAllocatorBlk()->getHandle();
+	bx::CommandLineArgs args(allocator, _argc, _argv);
 
 	bx::CommandLine cmdLine(args.getArgc(), args.getArgv(), s_options, BX_COUNTOF(s_options) );
 
@@ -273,7 +273,6 @@ int main(int _argc, const char* _argv[])
 		name.set("data");
 	}
 
-	void* data = NULL;
 	uint32_t size = 0;
 
 	bx::FileReader fr;
@@ -281,15 +280,15 @@ int main(int _argc, const char* _argv[])
 	{
 		size = uint32_t(bx::getSize(&fr) );
 
-		data = bx::alloc(&allocator, size);
-		bx::read(&fr, data, size, bx::ErrorAssert{});
+		bx::UniquePtrT<uint8_t[]> data = BX_MAKE_UNIQUE(allocator, uint8_t[], size);
+		bx::read(&fr, data.getPtr(), size, bx::ErrorAssert{});
 		bx::close(&fr);
 
 		bx::FileWriter fw;
 		if (bx::open(&fw, outFilePath) )
 		{
-			Bin2cWriter writer(&allocator, name);
-			bx::write(&writer, data, size, bx::ErrorAssert{});
+			Bin2cWriter writer(allocator, name);
+			bx::write(&writer, data.getPtr(), size, bx::ErrorAssert{});
 
 			writer.output(&fw);
 			bx::close(&fw);
@@ -299,8 +298,6 @@ int main(int _argc, const char* _argv[])
 			bx::StringView path = outFilePath;
 			error("Failed to open output file '%.*s'.\n", path.getLength(), path.getPtr() );
 		}
-
-		bx::free(&allocator, data);
 	}
 	else
 	{

@@ -9,6 +9,7 @@
 #include <bx/bx.h>
 #include <bx/bufferstorage.h>
 #include <bx/math.h>
+#include <bx/storageblk.h>
 
 namespace bx
 {
@@ -392,54 +393,74 @@ namespace bx
 	class BitArray final : public BitArrayBaseT<DynamicStorageT<uint64_t>>
 	{
 	public:
-		/// Default constructor is deleted; an allocator must be provided.
-		BitArray() = delete;
+		/// Constructs an empty bit array on the process default allocator.
+		BitArray();
 
-		/// Copy constructor.
+		/// Constructs copy of `_src`.
 		///
-		/// @param[in] _other Source bit array to copy from.
+		/// @param[in] _src Source bit array.
 		///
-		BitArray(const BitArray& _other);
+		BitArray(const BitArray& _src);
+
+		/// Constructs bit array taking over storage of `_src`.
+		///
+		/// @param[in] _src Source bit array, left empty.
+		///
+		BitArray(BitArray&& _src);
 
 		/// Constructs an empty bit array with the specified allocator.
 		///
-		/// @param[in] _allocator Memory allocator.
+		/// @param[in] _allocator Allocator for bit storage.
 		///
-		BitArray(AllocatorI* _allocator);
+		explicit BitArray(AllocatorHandle _allocator);
+
+		/// Constructs an empty bit array with the specified allocator and initial capacity.
+		///
+		/// @param[in] _allocator Allocator for bit storage.
+		/// @param[in] _capacity  Number of bits.
+		///
+		BitArray(AllocatorHandle _allocator, uint32_t _capacity);
 
 		/// Constructs a bit array by copying from a bit array view.
 		///
-		/// @param[in] _allocator Memory allocator.
-		/// @param[in] _src       Source bit array view to copy from.
+		/// @param[in] _allocator Allocator for bit storage.
+		/// @param[in] _src       Source bit array view.
 		///
-		BitArray(AllocatorI* _allocator, const BitArrayViewBase& _src);
+		BitArray(AllocatorHandle _allocator, const BitArrayViewBase& _src);
 
-		/// Returns the allocator used by this bit array.
-		AllocatorI* getAllocator() const;
+		/// Returns the handle of the allocator used by this bit array.
+		///
+		/// @returns Allocator handle.
+		///
+		AllocatorHandle getAllocatorHandle() const;
 
-		/// Copy assignment operator.
+		/// Copies contents of `_src`. A bit array without allocator adopts the source's allocator.
 		///
-		/// @param[in] _other Source bit array to copy from.
+		/// @param[in] _src Source bit array.
 		///
-		BitArray& operator=(const BitArray& _other);
+		/// @returns Reference to this.
+		///
+		BitArray& operator=(const BitArray& _src);
 
-		/// Move assignment operator. Takes ownership of the source bit array's storage.
+		/// Takes over storage of `_src`.
 		///
-		/// @param[in] _other Source bit array to move from.
+		/// @param[in] _src Source bit array, left empty.
 		///
-		BitArray& operator=(BitArray&& _other);
+		/// @returns Reference to this.
+		///
+		BitArray& operator=(BitArray&& _src);
 
 		/// Sets the bit array contents from a bit array view.
 		///
-		/// @param[in] _src Source bit array view to copy from.
+		/// @param[in] _src Source bit array view.
 		///
 		void set(const BitArrayViewBase& _src);
 
 		/// Sets the bit array contents by moving from another bit array.
 		///
-		/// @param[in] _other Source bit array to move from.
+		/// @param[in] _src Source bit array, left empty.
 		///
-		void set(BitArray&& _other);
+		void set(BitArray&& _src);
 
 		/// Sets a single bit to the specified value.
 		///
@@ -448,26 +469,23 @@ namespace bx
 		///
 		void set(uint32_t _idx, bool _value);
 
-		/// Sets all bits in the range [_beginBit, _endBit) to the specified value.
+		/// Sets all bits in the range [`_beginBit`, `_endBit`) to the specified value.
 		///
-		/// @param[in] _beginBit First bit index (inclusive).
-		/// @param[in] _endBit   Last bit index (exclusive).
+		/// @param[in] _beginBit First bit index.
+		/// @param[in] _endBit   Bit index past the last bit.
 		/// @param[in] _value    Bit value.
 		///
 		void set(uint32_t _beginBit, uint32_t _endBit, bool _value);
 
-		/// Sets bits in the range [_beginBit, _endBit) from a packed uint64_t value.
+		/// Sets bits in the range [`_beginBit`, `_endBit`) from packed bit values in `_value`.
 		///
-		/// @param[in] _beginBit First bit index (inclusive).
-		/// @param[in] _endBit   Last bit index (exclusive).
+		/// @param[in] _beginBit First bit index.
+		/// @param[in] _endBit   Bit index past the last bit.
 		/// @param[in] _value    Packed bit values.
 		///
 		void set(uint32_t _beginBit, uint32_t _endBit, uint64_t _value);
 
 	private:
-		/// Releases storage and resets the view to empty, so that no member
-		/// refers to the freed block.
-		///
 		void release();
 	};
 
@@ -613,26 +631,19 @@ namespace bx
 	/// Dynamic mipped bit array with heap-allocated memory managed by an allocator.
 	class MippedBitArray final : public MippedBitArrayT<DynamicStorageT<uint64_t>>
 	{
+		BX_CLASS_NO_COPY(MippedBitArray);
+
 	public:
 		/// Default constructor is deleted; an allocator must be provided.
 		MippedBitArray() = delete;
-
-		/// Copying is not supported.
-		MippedBitArray(const MippedBitArray&) = delete;
-
-		/// Copying is not supported.
-		MippedBitArray& operator=(const MippedBitArray&) = delete;
 
 		/// Constructs an empty bit array with the specified allocator.
 		///
 		/// @param[in] _allocator Memory allocator.
 		///
-		MippedBitArray(AllocatorI* _allocator);
+		explicit MippedBitArray(AllocatorHandle _allocator);
 
-		/// Returns the allocator used by this bit array.
-		AllocatorI* getAllocator() const;
 	};
-
 
 } // namespace bx
 

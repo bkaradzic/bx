@@ -60,6 +60,12 @@ namespace bx
 	/// Reinterpret data.
 	BX_DECLARE_TAG(Reinterpret);
 
+	/// Copy tag.
+	BX_DECLARE_TAG(Copy);
+
+	/// Unchecked tag, caller guarantees preconditions and treats failure as fatal.
+	BX_DECLARE_TAG(Unchecked);
+
 	/// Source location with file path, and file line.
 	///
 	struct Location
@@ -220,6 +226,7 @@ namespace bx
 
 	/// Swap two values.
 	template<typename Ty>
+	requires (isMoveConstructible<Ty>() && isMoveAssignable<Ty>() )
 	void swap(Ty& _a, Ty& _b);
 
 	/// Swap memory.
@@ -498,6 +505,30 @@ namespace bx
 	BX_CONSTEXPR_FUNC const Ty* alignUp(const Ty* _ptr, size_t _align);
 
 } // namespace bx
+
+/// Converts KiB to bytes.
+///
+/// @param[in] _size Size in KiB.
+///
+/// @returns Size in bytes. Compile error when it doesn't fit `size_t`.
+///
+consteval size_t operator""_KiB(unsigned long long _size);
+
+/// Converts MiB to bytes.
+///
+/// @param[in] _size Size in MiB.
+///
+/// @returns Size in bytes. Compile error when it doesn't fit `size_t`.
+///
+consteval size_t operator""_MiB(unsigned long long _size);
+
+/// Converts GiB to bytes.
+///
+/// @param[in] _size Size in GiB.
+///
+/// @returns Size in bytes. Compile error when it doesn't fit `size_t`.
+///
+consteval size_t operator""_GiB(unsigned long long _size);
 
 #include "inline/bx.inl"
 

@@ -197,7 +197,7 @@ void addData32(ThisT* _this, const void* _data, int32_t _len)
 	self.m_size += _len;
 	mixTail32(self, data, _len);
 
-	if (BX_UNLIKELY(!isAligned(data, 4) ) )
+	if (!isAligned(data, 4) ) [[unlikely]]
 	{
 		addData32<SelfT, loadUnaligned<uint32_t>>(self, data, _len);
 		return;
@@ -254,7 +254,7 @@ void addData128(ThisT* _this, const void* _data, int32_t _len)
 	self.m_size += _len;
 	mixTail128(self, data, _len);
 
-	if (BX_UNLIKELY(!isAligned(data, 8) ) )
+	if (!isAligned(data, 8) ) [[unlikely]]
 	{
 		addData128<SelfT, loadUnaligned<uint64_t>>(self, data, _len);
 		return;

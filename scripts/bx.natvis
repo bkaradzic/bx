@@ -73,19 +73,6 @@
 		</Expand>
 	</Type>
 
-	<Type Name="bx::DynamicStorageT&lt;*&gt;">
-		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
-		<DisplayString>{{ Capacity={m_capacity} ptr={(void*)m_ptr} }}</DisplayString>
-		<Expand>
-			<Item Name="[capacity]">m_capacity</Item>
-			<Item Name="[allocator]">m_allocator</Item>
-			<ArrayItems Condition="m_ptr != 0">
-				<Size>m_capacity</Size>
-				<ValuePointer>m_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
 	<Type Name="bx::StorageViewT&lt;*&gt;">
 		<DisplayString>{{ count={m_term - m_ptr} }}</DisplayString>
 		<Expand>
@@ -112,22 +99,6 @@
 		</Expand>
 	</Type>
 
-	<Type Name="bx::BitArray">
-		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
-		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
-		<Expand>
-			<Item Name="[count]">m_count</Item>
-			<Item Name="[sizeInBytes]">m_sizeInBytes</Item>
-			<Item Name="[allocator]">m_storage.m_allocator</Item>
-			<Item Name="[capacity]">m_storage.m_capacity</Item>
-			<ArrayItems Condition="m_ptr != 0">
-				<Size>m_sizeInBytes / 8</Size>
-				<ValuePointer>m_ptr</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-
 	<Type Name="bx::MippedBitArrayBase">
 		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
 		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
@@ -148,6 +119,500 @@
 		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
 		<Expand>
 			<ExpandedItem>*(bx::MippedBitArrayBase*)this</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::memoryTracking0::Blk">
+		<AlternativeType Name="bx::memoryTracking1::Blk" />
+		<!-- Invalid: show reason -->
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 0">{{ Invalid (Default) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 2">{{ Invalid (Noop) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 3">{{ Invalid (Freed) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 4">{{ Invalid (AllocateFailed) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 5">{{ Invalid (NoBlockLargeEnough) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 6">{{ Invalid (ResizeFailed) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 7">{{ Invalid (RealignFailed) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 8">{{ Invalid (NotSupported) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff &amp;&amp; log2Alignment == 9">{{ Invalid (NotImplemented) }}</DisplayString>
+		<DisplayString Condition="ptr == 0xffffffffffffffff">{{ Invalid (reason={log2Alignment}) }}</DisplayString>
+		<!-- Valid: show pointer, size, alignment -->
+		<DisplayString>{{ ptr={(void*)ptr} size={size} align={1 &lt;&lt; log2Alignment} }}</DisplayString>
+		<Expand>
+			<Item Name="[ptr]" Condition="ptr != 0xffffffffffffffff &amp;&amp; cpuAccessible != 0">(unsigned char*)ptr,[size &lt; 64 ? size : 64]</Item>
+			<Item Name="[ptr]" Condition="!(ptr != 0xffffffffffffffff &amp;&amp; cpuAccessible != 0)">(void*)ptr</Item>
+			<Item Name="[size]">size</Item>
+			<Item Name="[alignment]">(unsigned __int64)(1) &lt;&lt; log2Alignment</Item>
+			<Item Name="[cpuAccessible]">(bool)cpuAccessible</Item>
+			<Item Name="[allocatorOp]">(bx::AllocatorOp::Enum)allocatorOp</Item>
+			<Item Name="[allocatorHandle]">allocatorHandle</Item>
+			<Item Name="[bookKeeping]">bookKeeping</Item>
+			<Item Name="[text]" Condition="ptr != 0xffffffffffffffff &amp;&amp; cpuAccessible != 0">(const char*)ptr,[size]s8</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::DynamicStorageT&lt;*&gt;">
+		<DisplayString Condition="m_blk.ptr == 0xffffffffffffffff">{{ empty }}</DisplayString>
+		<DisplayString>{{ Capacity={m_blk.size/sizeof($T1)} ptr={(void*)m_blk.ptr} }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]">m_blk.size/sizeof($T1)</Item>
+			<Item Name="[allocator]">m_allocator</Item>
+			<Item Name="[blk]">m_blk</Item>
+			<ArrayItems Condition="m_blk.ptr != 0xffffffffffffffff &amp;&amp; m_blk.cpuAccessible != 0">
+				<Size>m_blk.size/sizeof($T1)</Size>
+				<ValuePointer>($T1*)m_blk.ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::ArrayViewBaseT&lt;*&gt;">
+		<DisplayString>{{ count={m_storageView.m_term - m_storageView.m_ptr} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]" ExcludeView="simple">m_storageView.m_term - m_storageView.m_ptr</Item>
+			<ArrayItems>
+				<Size>m_storageView.m_term - m_storageView.m_ptr</Size>
+				<ValuePointer>m_storageView.m_ptr</ValuePointer>
+			</ArrayItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::MutableArrayViewT&lt;*&gt;">
+		<DisplayString>{*(bx::ArrayViewBaseT&lt;$T1&gt;*)this}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::ArrayBaseT&lt;*,*&gt;">
+		<DisplayString>{*(bx::ArrayViewBaseT&lt;$T1&gt;*)this}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+			<Item Name="[storage]" ExcludeView="simple">m_storage</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::ArrayT&lt;*&gt;">
+		<DisplayString Condition="m_storage.m_blk.ptr == 0xcccccccccccccccc">Uninitialized!</DisplayString>
+		<DisplayString>{{ count={m_storageView.m_term - m_storageView.m_ptr} capacity={m_storage.m_blk.ptr == 0xffffffffffffffff ? 0 : m_storage.m_blk.size/sizeof($T1)} }}</DisplayString>
+		<Expand>
+			<Item Name="[capacity]" ExcludeView="simple">m_storage.m_blk.ptr == 0xffffffffffffffff ? 0 : m_storage.m_blk.size/sizeof($T1)</Item>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+			<Item Name="[storage]" ExcludeView="simple">m_storage</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::StaticArrayT&lt;*,*&gt;">
+		<DisplayString>{{ count={m_storageView.m_term - m_storageView.m_ptr} capacity={$T2} }}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::SortedArrayBaseT&lt;*,*,*&gt;">
+		<DisplayString>{{ count={m_storageView.m_term - m_storageView.m_ptr} sorted }}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+			<Item Name="[storage]" ExcludeView="simple">m_storage</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::SortedArrayT&lt;*,*&gt;">
+		<DisplayString>{{ count={m_storageView.m_term - m_storageView.m_ptr} sorted }}</DisplayString>
+		<Expand>
+			<ExpandedItem>*(bx::ArrayViewBaseT&lt;$T1&gt;*)this</ExpandedItem>
+			<Item Name="[storage]" ExcludeView="simple">m_storage</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::UniquePtrT&lt;*&gt;" Priority="High">
+		<DisplayString Condition="m_debugPtr == 0">empty</DisplayString>
+		<DisplayString>{{ count={m_count} }}</DisplayString>
+		<Expand>
+			<ArrayItems>
+				<Size>m_count</Size>
+				<ValuePointer>m_debugPtr</ValuePointer>
+			</ArrayItems>
+			<Item Name="[blk]" ExcludeView="simple">m_blk</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::UniquePtrT&lt;*&gt;" Priority="MediumHigh">
+		<DisplayString Condition="m_debugPtr == 0">empty</DisplayString>
+		<DisplayString>{*m_debugPtr}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="m_debugPtr != 0">*m_debugPtr</ExpandedItem>
+			<Item Name="[blk]" ExcludeView="simple">m_blk</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::UniquePtrT&lt;*&gt;" Priority="Medium">
+		<DisplayString Condition="m_blk.ptr == 0xffffffffffffffff">empty</DisplayString>
+		<DisplayString>{{ count={m_count} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[blk]" ExcludeView="simple">m_blk</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::UniquePtrT&lt;*&gt;" Priority="MediumLow">
+		<DisplayString Condition="m_blk.ptr == 0xffffffffffffffff">empty</DisplayString>
+		<DisplayString>{*($T1*)m_blk.ptr}</DisplayString>
+		<Expand>
+			<ExpandedItem Condition="m_blk.ptr != 0xffffffffffffffff">*($T1*)m_blk.ptr</ExpandedItem>
+			<Item Name="[blk]" ExcludeView="simple">m_blk</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::StringPoolEntry">
+		<DisplayString>{(const char*)(this + 1),[m_length]s8}</DisplayString>
+		<StringView>(const char*)(this + 1),[m_length]s8</StringView>
+		<Expand>
+			<Item Name="[string]">(const char*)(this + 1),[m_length]s8</Item>
+			<Item Name="[length]">m_length</Item>
+			<Item Name="[refCount]" Condition="(m_flags &amp; 1) == 0">m_refCount</Item>
+			<Item Name="[immortal]">(m_flags &amp; 1) != 0</Item>
+			<Item Name="[hash]">m_hash,x</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::String">
+		<Intrinsic Name="slot"    Expression="m_handle &amp; 0xffffff" />
+		<Intrinsic Name="poolId"  Expression="m_handle &gt;&gt; 24" />
+		<Intrinsic Name="biased"  Expression="slot() + 1" />
+		<Intrinsic Name="segment" Expression="biased() &gt;= 0x800000 ? 23 : biased() &gt;= 0x400000 ? 22 : biased() &gt;= 0x200000 ? 21 : biased() &gt;= 0x100000 ? 20 : biased() &gt;= 0x80000 ? 19 : biased() &gt;= 0x40000 ? 18 : biased() &gt;= 0x20000 ? 17 : biased() &gt;= 0x10000 ? 16 : biased() &gt;= 0x8000 ? 15 : biased() &gt;= 0x4000 ? 14 : biased() &gt;= 0x2000 ? 13 : biased() &gt;= 0x1000 ? 12 : biased() &gt;= 0x800 ? 11 : biased() &gt;= 0x400 ? 10 : biased() &gt;= 0x200 ? 9 : biased() &gt;= 0x100 ? 8 : biased() &gt;= 0x80 ? 7 : biased() &gt;= 0x40 ? 6 : biased() &gt;= 0x20 ? 5 : biased() &gt;= 0x10 ? 4 : biased() &gt;= 0x8 ? 3 : biased() &gt;= 0x4 ? 2 : biased() &gt;= 0x2 ? 1 : 0" />
+		<Intrinsic Name="pool"    Expression="bx::StringPool::s_pools[poolId()]" />
+		<Intrinsic Name="entry"   Expression="pool()-&gt;m_segments[segment()][biased() ^ (1u &lt;&lt; segment())]" />
+		<DisplayString Condition="slot() == 0">""</DisplayString>
+		<DisplayString Condition="pool() == 0">{{ invalid pool {poolId()} }}</DisplayString>
+		<DisplayString>{(const char*)(entry() + 1),[entry()-&gt;m_length]s8}</DisplayString>
+		<StringView Condition="slot() != 0 &amp;&amp; pool() != 0">(const char*)(entry() + 1),[entry()-&gt;m_length]s8</StringView>
+		<Expand>
+			<Item Name="[string]" Condition="slot() != 0 &amp;&amp; pool() != 0">(const char*)(entry() + 1),[entry()-&gt;m_length]s8</Item>
+			<Item Name="[length]" Condition="slot() != 0 &amp;&amp; pool() != 0">entry()-&gt;m_length</Item>
+			<Item Name="[pool]">poolId()</Item>
+			<Item Name="[slot]">slot()</Item>
+			<Item Name="[entry]" Condition="slot() != 0 &amp;&amp; pool() != 0">*entry()</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HandleTableT&lt;*,*&gt;">
+		<DisplayString>{{ count={m_count} capacity={m_numBlocks &lt;&lt; m_blockShift} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[capacity]">m_numBlocks &lt;&lt; m_blockShift</Item>
+			<Item Name="[blocks]" ExcludeView="simple">m_numBlocks</Item>
+			<CustomListItems MaxItemsPerView="5000">
+				<Variable Name="idx" InitialValue="1" />
+				<Loop Condition="idx &lt; m_usedSlots.m_count">
+					<If Condition="(idx &amp; 63) == 0 &amp;&amp; m_usedSlots.m_ptr[idx &gt;&gt; 6] == 0">
+						<Exec>idx += 64</Exec>
+					</If>
+					<Else>
+						<If Condition="((m_usedSlots.m_ptr[idx &gt;&gt; 6] &gt;&gt; (idx &amp; 63)) &amp; 1) != 0">
+							<Item Name="[{idx}]">*(m_debugBase[idx &gt;&gt; m_blockShift] + idx)</Item>
+						</If>
+						<Exec>idx++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HandleTableT&lt;*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_count} capacity={m_numBlocks &lt;&lt; m_blockShift} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[capacity]">m_numBlocks &lt;&lt; m_blockShift</Item>
+			<Item Name="[blocks]" ExcludeView="simple">m_numBlocks</Item>
+			<CustomListItems MaxItemsPerView="5000">
+				<Variable Name="idx" InitialValue="1" />
+				<Loop Condition="idx &lt; m_usedSlots.m_count">
+					<If Condition="(idx &amp; 63) == 0 &amp;&amp; m_usedSlots.m_ptr[idx &gt;&gt; 6] == 0">
+						<Exec>idx += 64</Exec>
+					</If>
+					<Else>
+						<If Condition="((m_usedSlots.m_ptr[idx &gt;&gt; 6] &gt;&gt; (idx &amp; 63)) &amp; 1) != 0">
+							<Item Name="[{idx}]">*(($T1*)m_base[idx &gt;&gt; m_blockShift] + idx)</Item>
+						</If>
+						<Exec>idx++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::StringBuilder">
+		<Intrinsic Name="charsLen" Expression="(unsigned int)(m_chars.m_storageView.m_term - m_chars.m_storageView.m_ptr)" />
+		<Intrinsic Name="textBase" Expression="m_text.m_storageView.m_ptr + m_editCapacity*sizeof(bx::StringBuilder::Edit)" />
+		<DisplayString Condition="m_numEdits == 0">{m_chars.m_storageView.m_ptr,[charsLen()]s8}</DisplayString>
+		<DisplayString>{{ {m_chars.m_storageView.m_ptr,[charsLen()]s8} with {m_numEdits} edits, length {charsLen() + m_delta}, Watch getDebugPreview() for the text }}</DisplayString>
+		<StringView Condition="m_numEdits == 0">m_chars.m_storageView.m_ptr,[charsLen()]s8</StringView>
+		<Expand>
+			<Item Name="[length]">charsLen() + m_delta</Item>
+			<Item Name="[base]">m_chars.m_storageView.m_ptr,[charsLen()]s8</Item>
+			<Item Name="[cursor]" Condition="m_cursor == 0xffffffff">charsLen() + m_delta</Item>
+			<Item Name="[cursor]" Condition="m_cursor != 0xffffffff">m_cursor</Item>
+			<Item Name="[pool]" ExcludeView="simple">m_pool</Item>
+			<CustomListItems Condition="m_numEdits != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="edit" InitialValue="(const bx::StringBuilder::Edit*)m_text.m_storageView.m_ptr" />
+				<Loop Condition="ii &lt; m_numEdits">
+					<Item Name="[edit {ii}] at {edit[ii].m_pos} replace {edit[ii].m_len}">textBase() + edit[ii].m_textOffset,[edit[ii].m_textLen]s8</Item>
+					<Exec>ii++</Exec>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HashMapT&lt;*,*,*,*,*&gt;">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{m_control.m_debugKeys[ii]}]">m_values.m_term[(int)m_control.m_slots[ii] - (int)(m_values.m_blk.size / sizeof(*m_values.m_term))]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HashMapT&lt;*,*,*,*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{(($T1*)m_control.m_keys)[ii]}]">m_values.m_term[(int)m_control.m_slots[ii] - (int)(m_values.m_blk.size / sizeof(*m_values.m_term))]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::FixedHashMapT&lt;*,*,*,*,*&gt;">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{m_control.m_debugKeys[ii]}]">m_debugValues[m_control.m_slots[ii]]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::FixedHashMapT&lt;*,*,*,*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{(($T1*)m_control.m_keys)[ii]}]">(($T2*)m_values.m_data)[m_control.m_slots[ii]]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::BlockHashMapT&lt;*,*,*,*,*,*&gt;">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{m_control.m_debugKeys[ii]}]">m_values.m_debugBlocks[(m_control.m_slots[ii] &gt;&gt; m_values.m_blockShift) * (sizeof(*m_values.m_blocks.m_term) / sizeof(*m_values.m_debugBlocks))][m_control.m_slots[ii] &amp; (m_values.m_blockCapacity - 1)]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::BlockHashMapT&lt;*,*,*,*,*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{(($T1*)m_control.m_keys)[ii]}]">(($T2*)(m_values.m_blocks.m_term - m_values.m_blocks.m_blk.size / sizeof(*m_values.m_blocks.m_term))[m_control.m_slots[ii] &gt;&gt; m_values.m_blockShift].ptr)[m_control.m_slots[ii] &amp; (m_values.m_blockCapacity - 1)]</Item>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HashSetT&lt;*,*,*&gt;">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Variable Name="nn" InitialValue="0" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{nn}]">m_control.m_debugKeys[ii]</Item>
+							<Exec>nn++</Exec>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::HashSetT&lt;*,*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Variable Name="nn" InitialValue="0" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{nn}]">(($T1*)m_control.m_keys)[ii]</Item>
+							<Exec>nn++</Exec>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::FixedHashSetT&lt;*,*,*&gt;">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Variable Name="nn" InitialValue="0" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{nn}]">m_control.m_debugKeys[ii]</Item>
+							<Exec>nn++</Exec>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::FixedHashSetT&lt;*,*,*&gt;" Priority="MediumLow">
+		<DisplayString>{{ count={m_control.m_count} capacity={m_control.m_count == 0 ? 0 : m_control.m_capacityMask + 1} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_control.m_count</Item>
+			<Item Name="[capacity]" ExcludeView="simple">m_control.m_capacityMask + 1</Item>
+			<CustomListItems MaxItemsPerView="5000" Condition="m_control.m_count != 0">
+				<Variable Name="ii" InitialValue="0" />
+				<Variable Name="cap" InitialValue="m_control.m_capacityMask + 1" />
+				<Variable Name="nn" InitialValue="0" />
+				<Loop Condition="ii &lt; cap">
+					<If Condition="(ii &amp; 7) == 0 &amp;&amp; ii + 8 &lt;= cap &amp;&amp; (*(unsigned __int64*)(m_control.m_control + ii) &amp; 0x8080808080808080) == 0x8080808080808080">
+						<Exec>ii += 8</Exec>
+					</If>
+					<Else>
+						<If Condition="(m_control.m_control[ii] &amp; 0x80) == 0">
+							<Item Name="[{nn}]">(($T1*)m_control.m_keys)[ii]</Item>
+							<Exec>nn++</Exec>
+						</If>
+						<Exec>ii++</Exec>
+					</Else>
+				</Loop>
+			</CustomListItems>
+		</Expand>
+	</Type>
+
+	<Type Name="bx::BitArray">
+		<DisplayString Condition="m_ptr == 0">{{ empty }}</DisplayString>
+		<DisplayString>{{ count={m_count} bytes={m_sizeInBytes} }}</DisplayString>
+		<Expand>
+			<Item Name="[count]">m_count</Item>
+			<Item Name="[sizeInBytes]">m_sizeInBytes</Item>
+			<Item Name="[allocator]">m_storage.m_allocator</Item>
+			<Item Name="[blk]">m_storage.m_blk</Item>
+			<ArrayItems Condition="m_ptr != 0">
+				<Size>m_sizeInBytes / 8</Size>
+				<ValuePointer>m_ptr</ValuePointer>
+			</ArrayItems>
 		</Expand>
 	</Type>
 

@@ -812,5 +812,11 @@ namespace bx
 		m_storage.setCount(MaxHandlesT);
 	}
 
+	inline DynamicHandleAlloc::DynamicHandleAlloc(AllocatorHandle _allocator, uint16_t _maxHandles)
+		: HandleAlloc2(InitNone, m_storage, _maxHandles)
+		, m_storage(_allocator)
+	{
+		m_storage.setCount(_maxHandles);
+	}
 
 } // namespace bx

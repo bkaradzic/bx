@@ -430,44 +430,65 @@ namespace bx
 		}
 	}
 
-	inline BitArray::BitArray(const BitArray& _other)
-		: BitArray(_other.m_storage.getAllocator(), _other)
-	{
-	}
-
-	inline BitArray::BitArray(AllocatorI* _allocator)
+	inline BitArray::BitArray()
 		: BitArrayBaseT<DynamicStorageT<uint64_t>>()
 	{
-		this->m_storage.setAllocator(_allocator);
 	}
 
-	inline BitArray::BitArray(AllocatorI* _allocator, const BitArrayViewBase& _src)
+	inline BitArray::BitArray(const BitArray& _src)
+		: BitArray(_src.m_storage.getAllocatorHandle(), _src)
+	{
+	}
+
+	inline BitArray::BitArray(BitArray&& _src)
+		: BitArrayBaseT<DynamicStorageT<uint64_t>>()
+	{
+		set(bx::move(_src) );
+	}
+
+	inline BitArray::BitArray(AllocatorHandle _allocator)
+		: BitArrayBaseT<DynamicStorageT<uint64_t>>()
+	{
+		BX_ASSERT(getAllocator(_allocator)->isCpuAccessible(), "Allocator must be CPU accessible!");
+		this->m_storage.setAllocatorHandle(_allocator);
+	}
+
+	inline BitArray::BitArray(AllocatorHandle _allocator, uint32_t _capacity)
+		: BitArray(_allocator)
+	{
+		this->setCapacity(_capacity);
+	}
+
+	inline BitArray::BitArray(AllocatorHandle _allocator, const BitArrayViewBase& _src)
 		: BitArray(_allocator)
 	{
 		set(_src);
 	}
 
-	inline AllocatorI* BitArray::getAllocator() const
+	inline AllocatorHandle BitArray::getAllocatorHandle() const
 	{
-		return this->m_storage.getAllocator();
+		return this->m_storage.getAllocatorHandle();
 	}
 
-	inline BitArray& BitArray::operator=(const BitArray& _other)
+	inline BitArray& BitArray::operator=(const BitArray& _src)
 	{
-		if (this != &_other)
+		if (this != &_src)
 		{
-			release();
+			if (0 == this->getCapacity()
+			&&  kAllocatorHandleDefault == this->m_storage.getAllocatorHandle().idx)
+			{
+				this->m_storage.setAllocatorHandle(_src.m_storage.getAllocatorHandle() );
+			}
 
-			this->m_storage.setAllocator(_other.m_storage.getAllocator() );
-			this->set(_other);
+			this->set(_src);
 		}
 
 		return *this;
 	}
 
-	inline BitArray& BitArray::operator=(BitArray&& _other)
+	inline BitArray& BitArray::operator=(BitArray&& _src)
 	{
-		set(move(_other) );
+		set(bx::move(_src) );
 
 		return *this;
 	}
@@ -477,30 +498,28 @@ namespace bx
 		BitArrayBaseT<DynamicStorageT<uint64_t>>::set(_src);
 	}
 
-	inline void BitArray::set(BitArray&& _other)
+	inline void BitArray::set(BitArray&& _src)
 	{
-		if (this != &_other)
+		if (this != &_src)
 		{
 			release();
 
-			this->m_storage = move(_other.m_storage);
+			this->m_storage = bx::move(_src.m_storage);
 
-			this->m_ptr         = _other.m_ptr;
-			this->m_sizeInBytes = _other.m_sizeInBytes;
-			this->m_count       = _other.m_count;
+			this->m_ptr         = _src.m_ptr;
+			this->m_sizeInBytes = _src.m_sizeInBytes;
+			this->m_count       = _src.m_count;
 
-			_other.m_ptr         = NULL;
-			_other.m_sizeInBytes = 0;
-			_other.m_count       = 0;
+			_src.m_ptr         = NULL;
+			_src.m_sizeInBytes = 0;
+			_src.m_count       = 0;
 		}
 	}
 
 	inline void BitArray::release()
 	{
-		if (NULL != this->m_storage.getAllocator() )
-		{
-			this->m_storage.setCapacity(0, 0);
-		}
+		this->clear();
+		this->m_storage.setCapacity(0, 0);
 
 		this->m_ptr         = this->m_storage.getPtr();
 		this->m_sizeInBytes = 0;
@@ -814,16 +833,10 @@ namespace bx
 		}
 	}
 
-	inline MippedBitArray::MippedBitArray(AllocatorI* _allocator)
+	inline MippedBitArray::MippedBitArray(AllocatorHandle _allocator)
 		: MippedBitArrayT<DynamicStorageT<uint64_t>>()
 	{
-		this->m_storage.setAllocator(_allocator);
+		this->m_storage.setAllocatorHandle(_allocator);
 	}
-
-	inline AllocatorI* MippedBitArray::getAllocator() const
-	{
-		return this->m_storage.getAllocator();
-	}
-
 
 } // namespace bx

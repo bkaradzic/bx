@@ -22,6 +22,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		MpScUnboundedQueueT(AllocatorHandle _allocator);
+
 		///
 		MpScUnboundedQueueT(AllocatorI* _allocator);
 
@@ -52,6 +58,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		MpScUnboundedBlockingQueue(AllocatorHandle _allocator);
+
 		///
 		MpScUnboundedBlockingQueue(AllocatorI* _allocator);
 

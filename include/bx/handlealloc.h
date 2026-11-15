@@ -382,6 +382,21 @@ namespace bx
 		FixedMippedBitArrayT<MaxHandlesT> m_storage;
 	};
 
+	/// Bit set handle allocator with storage from a block allocator.
+	///
+	class DynamicHandleAlloc final : public HandleAlloc2
+	{
+	public:
+		/// Constructs allocator for `_maxHandles` handles.
+		///
+		/// @param[in] _allocator Allocator for bit set storage.
+		/// @param[in] _maxHandles Maximum number of handles.
+		///
+		DynamicHandleAlloc(AllocatorHandle _allocator, uint16_t _maxHandles);
+
+	private:
+		MippedBitArray m_storage;
+	};
 
 } // namespace bx
 

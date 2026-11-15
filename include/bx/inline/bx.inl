@@ -143,6 +143,7 @@ namespace bx
 	}
 
 	template<typename Ty>
+	requires (isMoveConstructible<Ty>() && isMoveAssignable<Ty>() )
 	inline void swap(Ty& _a, Ty& _b)
 	{
 		Ty tmp = move(_a); _a = move(_b); _b = move(tmp);
@@ -482,3 +483,32 @@ namespace bx
 	}
 
 } // namespace bx
+
+namespace bx { namespace internal
+{
+	size_t sizeLiteralOverflow();
+
+	consteval size_t sizeLiteral(unsigned long long _size, uint32_t _shift)
+	{
+		return _size <= (size_t(-1) >> _shift)
+			? size_t(_size) << _shift
+			: sizeLiteralOverflow()
+			;
+	}
+
+} } // namespace bx::internal
+
+consteval size_t operator""_KiB(unsigned long long _size)
+{
+	return bx::internal::sizeLiteral(_size, 10);
+}
+
+consteval size_t operator""_MiB(unsigned long long _size)
+{
+	return bx::internal::sizeLiteral(_size, 20);
+}
+
+consteval size_t operator""_GiB(unsigned long long _size)
+{
+	return bx::internal::sizeLiteral(_size, 30);
+}

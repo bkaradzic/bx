@@ -75,7 +75,7 @@ namespace bx
 	}
 
 	template<typename Ty, typename LessFn>
-	inline void stableSort(AllocatorI* _allocator, Ty* _data, uint32_t _num, LessFn _less)
+	inline void stableSort(AllocatorHandle _allocator, Ty* _data, uint32_t _num, LessFn _less)
 	{
 		if (2 > _num)
 		{
@@ -92,14 +92,10 @@ namespace bx
 			return;
 		}
 
-		Ty* scratch = (Ty*)alloc(_allocator, _num*sizeof(Ty) );
-		for (uint32_t ii = 0; ii < _num; ++ii)
-		{
-			BX_PLACEMENT_NEW(&scratch[ii], Ty);
-		}
+		UniquePtrT<Ty[]> scratch = BX_MAKE_UNIQUE(_allocator, Ty[], _num);
 
 		Ty* src = _data;
-		Ty* dst = scratch;
+		Ty* dst = scratch.getPtr();
 
 		for (uint32_t width = kStableSortInsertionRun; width < _num; width <<= 1)
 		{
@@ -150,17 +146,10 @@ namespace bx
 				_data[ii] = src[ii];
 			}
 		}
-
-		for (uint32_t ii = 0; ii < _num; ++ii)
-		{
-			scratch[ii].~Ty();
-		}
-
-		free(_allocator, scratch);
 	}
 
 	template<typename ContainerT, typename LessFn>
-	inline void stableSort(AllocatorI* _allocator, ContainerT& _container, LessFn _less)
+	inline void stableSort(AllocatorHandle _allocator, ContainerT& _container, LessFn _less)
 	{
 		if (!_container.empty() )
 		{

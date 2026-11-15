@@ -10,6 +10,12 @@
 namespace bx
 {
 	template <typename Ty>
+	inline MpScUnboundedQueueT<Ty>::MpScUnboundedQueueT(AllocatorHandle _allocator)
+		: m_queue(_allocator)
+	{
+	}
+
+	template <typename Ty>
 	inline MpScUnboundedQueueT<Ty>::MpScUnboundedQueueT(AllocatorI* _allocator)
 		: m_queue(_allocator)
 	{
@@ -37,6 +43,12 @@ namespace bx
 	inline Ty* MpScUnboundedQueueT<Ty>::pop()
 	{
 		return m_queue.pop();
+	}
+
+	template <typename Ty>
+	inline MpScUnboundedBlockingQueue<Ty>::MpScUnboundedBlockingQueue(AllocatorHandle _allocator)
+		: m_queue(_allocator)
+	{
 	}
 
 	template <typename Ty>

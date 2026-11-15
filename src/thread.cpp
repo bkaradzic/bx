@@ -30,12 +30,6 @@
 
 namespace bx
 {
-	static AllocatorI* getAllocator()
-	{
-		static DefaultAllocator s_allocator;
-		return &s_allocator;
-	}
-
 	struct ThreadInternal
 	{
 #if BX_CRT_NONE
@@ -81,7 +75,7 @@ namespace bx
 	Thread::Thread()
 		: m_fn(NULL)
 		, m_userData(NULL)
-		, m_queue(getAllocator() )
+		, m_queue(getDefaultAllocatorBlk()->getHandle() )
 		, m_stackSize(0)
 		, m_exitCode(kExitSuccess)
 		, m_running(false)
@@ -403,6 +397,31 @@ namespace bx
 		BX_ASSERT(0 == result, "pthread_setspecific failed %d.", result); BX_UNUSED(result);
 	}
 #endif // BX_PLATFORM_*
+
+} // namespace bx
+
+#else
+
+namespace bx
+{
+	TlsData::TlsData()
+	{
+		*(void**)m_internal = NULL;
+	}
+
+	TlsData::~TlsData()
+	{
+	}
+
+	void* TlsData::get() const
+	{
+		return *(void* const*)m_internal;
+	}
+
+	void TlsData::set(void* _ptr)
+	{
+		*(void**)m_internal = _ptr;
+	}
 
 } // namespace bx
 

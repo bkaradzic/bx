@@ -7,6 +7,7 @@
 #define BX_SETTINGS_H_HEADER_GUARD
 
 #include "allocator.h"
+#include "blk.h"
 #include "readerwriter.h"
 #include "string.h"
 
@@ -16,6 +17,14 @@ namespace bx
 	class Settings
 	{
 	public:
+		/// Constructs settings, optionally loaded from INI text.
+		///
+		/// @param[in] _allocator Allocator, must be CPU accessible.
+		/// @param[in] _data INI text, NULL for none.
+		/// @param[in] _len Length of INI text in bytes.
+		///
+		Settings(AllocatorHandle _allocator, const void* _data = NULL, uint32_t _len = 0);
+
 		///
 		Settings(AllocatorI* _allocator, const void* _data = NULL, uint32_t _len = 0);
 
@@ -48,8 +57,7 @@ namespace bx
 
 		struct Ini;
 
-		AllocatorI* m_allocator;
-		Ini*        m_ini;
+		Ini* m_ini;
 	};
 
 	///

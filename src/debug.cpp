@@ -445,7 +445,7 @@ namespace bx
 					break;
 				}
 
-				if (BX_UNLIKELY(0 < _skip) )
+				if (0 < _skip) [[unlikely]]
 				{
 					--_skip;
 				}
@@ -607,7 +607,7 @@ namespace bx
 					break;
 				}
 
-				if (BX_UNLIKELY(0 < _skip) )
+				if (0 < _skip) [[unlikely]]
 				{
 					--_skip;
 				}
@@ -1570,10 +1570,6 @@ namespace bx
 		constexpr uint32_t kErrorContextNumBlocks  = BX_CONFIG_ERROR_CONTEXT_RING_SIZE >> kErrorContextBlockShift;
 		constexpr uint32_t kErrorContextMaxBlocks  = BX_CONFIG_ERROR_CONTEXT_MAX_SIZE  >> kErrorContextBlockShift;
 		constexpr uint32_t kErrorContextMaxFrames  = 32;
-
-		static_assert(0 == BX_CONFIG_ERROR_CONTEXT_RING_SIZE % kErrorContextBlockSize, "BX_CONFIG_ERROR_CONTEXT_RING_SIZE must be a multiple of 256.");
-		static_assert(0 == BX_CONFIG_ERROR_CONTEXT_MAX_SIZE  % kErrorContextBlockSize, "BX_CONFIG_ERROR_CONTEXT_MAX_SIZE must be a multiple of 256.");
-		static_assert(kErrorContextMaxBlocks <= kErrorContextNumBlocks, "BX_CONFIG_ERROR_CONTEXT_MAX_SIZE must not exceed BX_CONFIG_ERROR_CONTEXT_RING_SIZE.");
 
 		struct ErrorContextHeader
 		{

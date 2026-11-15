@@ -13,11 +13,16 @@ namespace bx
 	// - Writing Lock-Free Code: A Corrected Queue
 	//   https://web.archive.org/web/20190207230604/http://www.drdobbs.com/parallel/writing-lock-free-code-a-corrected-queue/210604448
 	//
-	inline SpScUnboundedQueue::SpScUnboundedQueue(AllocatorI* _allocator)
-		: m_allocator(_allocator)
-		, m_first(BX_NEW(m_allocator, Node)(NULL) )
+	inline SpScUnboundedQueue::SpScUnboundedQueue(AllocatorHandle _allocator)
+		: m_allocatorHandle(_allocator)
+		, m_first(BX_NEW_PTR(getAllocator(_allocator), Node)(NULL) )
 		, m_divider(m_first)
 		, m_last(m_first)
+	{
+	}
+
+	inline SpScUnboundedQueue::SpScUnboundedQueue(AllocatorI* _allocator)
+		: SpScUnboundedQueue(internal::pointerAllocatorAcquire(_allocator) )
 	{
 	}
 
@@ -27,19 +32,21 @@ namespace bx
 		{
 			Node* node = m_first;
 			m_first = node->m_next;
-			deleteObject(m_allocator, node);
+			deletePtr(node);
 		}
+
+		internal::pointerAllocatorRelease(m_allocatorHandle);
 	}
 
 	inline void SpScUnboundedQueue::push(void* _ptr)
 	{
-		m_last->m_next = BX_NEW(m_allocator, Node)(_ptr);
+		m_last->m_next = BX_NEW_PTR(getAllocator(m_allocatorHandle), Node)(_ptr);
 		atomicExchangePtr( (void**)&m_last, m_last->m_next);
 		while (m_first != atomicLoad(&m_divider) )
 		{
 			Node* node = m_first;
 			m_first = m_first->m_next;
-			deleteObject(m_allocator, node);
+			deletePtr(node);
 		}
 	}
 
@@ -68,6 +75,12 @@ namespace bx
 	inline SpScUnboundedQueue::Node::Node(void* _ptr)
 		: m_ptr(_ptr)
 		, m_next(NULL)
+	{
+	}
+
+	template<typename Ty>
+	inline SpScUnboundedQueueT<Ty>::SpScUnboundedQueueT(AllocatorHandle _allocator)
+		: m_queue(_allocator)
 	{
 	}
 
@@ -101,6 +114,11 @@ namespace bx
 	}
 
 #if BX_CONFIG_SUPPORTS_THREADING
+	inline SpScBlockingUnboundedQueue::SpScBlockingUnboundedQueue(AllocatorHandle _allocator)
+		: m_queue(_allocator)
+	{
+	}
+
 	inline SpScBlockingUnboundedQueue::SpScBlockingUnboundedQueue(AllocatorI* _allocator)
 		: m_queue(_allocator)
 	{
@@ -129,6 +147,12 @@ namespace bx
 		}
 
 		return NULL;
+	}
+
+	template<typename Ty>
+	inline SpScBlockingUnboundedQueueT<Ty>::SpScBlockingUnboundedQueueT(AllocatorHandle _allocator)
+		: m_queue(_allocator)
+	{
 	}
 
 	template<typename Ty>
