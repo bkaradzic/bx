@@ -92,7 +92,7 @@ namespace bx
 		template<typename Ty>
 		static EnableIfType<true
 			&& !IsTriviallyConstructibleT<Ty>::value
-			&& !IsConstructibleT<Ty, InitNoneTag>::value
+			&& (IsAggregateT<Ty>::value || !IsConstructibleT<Ty, InitNoneTag>::value)
 			, void>
 		constructDefault(Ty* _ptr, uint32_t _count);
 
@@ -100,6 +100,7 @@ namespace bx
 		template<typename Ty>
 		static EnableIfType<true
 			&& !IsTriviallyConstructibleT<Ty>::value
+			&& !IsAggregateT<Ty>::value
 			&&  IsConstructibleT<Ty, InitNoneTag>::value
 			, void>
 		constructDefault(Ty* _ptr, uint32_t _count);
