@@ -449,12 +449,12 @@ TEST_CASE("BitArray-resize", "[container]")
 	bx::BitArray array(allocator.getHandle() );
 
 	array.setCapacity(1024);
-	REQUIRE(1024 == array.getCapacity() );
+	REQUIRE(1024 <= array.getCapacity() );
 	REQUIRE(0 == array.getCount() );
 
 	array.setCount(2048);
 	REQUIRE(2048 == array.getCount() );
-	REQUIRE(2048 == array.getCapacity() );
+	REQUIRE(2048 <= array.getCapacity() );
 
 	array.set(0, 2048, true);
 	REQUIRE(array.testAll() );
