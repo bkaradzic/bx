@@ -11,25 +11,20 @@
 
 namespace bx
 {
-	inline HandleAlloc::HandleAlloc(uint16_t _maxHandles)
-		: m_numHandles(0)
+	inline HandleAlloc::HandleAlloc(MippedBitArrayBase& _bits, uint16_t _maxHandles)
+		: m_bits(_bits)
 		, m_maxHandles(_maxHandles)
+		, m_numHandles(0)
 	{
+		BX_ASSERT(_bits.getCount() >= _maxHandles, "Bit array holds %d bits, %d handles requested.", _bits.getCount(), _maxHandles);
 		reset();
 	}
 
-	inline HandleAlloc::~HandleAlloc()
+	inline HandleAlloc::HandleAlloc(InitNoneTag, MippedBitArrayBase& _bits, uint16_t _maxHandles)
+		: m_bits(_bits)
+		, m_maxHandles(_maxHandles)
+		, m_numHandles(0)
 	{
-	}
-
-	inline const uint16_t* HandleAlloc::getHandles() const
-	{
-		return getDensePtr();
-	}
-
-	inline uint16_t HandleAlloc::getHandleAt(uint16_t _at) const
-	{
-		return getDensePtr()[_at];
 	}
 
 	inline uint16_t HandleAlloc::getNumHandles() const
@@ -44,86 +39,82 @@ namespace bx
 
 	inline uint16_t HandleAlloc::alloc()
 	{
-		if (m_numHandles < m_maxHandles)
-		{
-			uint16_t index = m_numHandles;
-			++m_numHandles;
+		const uint32_t idx = m_bits.findClear(0, m_maxHandles);
 
-			uint16_t* dense  = getDensePtr();
-			uint16_t  handle = dense[index];
-			uint16_t* sparse = getSparsePtr();
-			sparse[handle] = index;
-			return handle;
+		if (kInvalid == idx)
+		{
+			return kInvalidHandle;
 		}
 
-		return kInvalidHandle;
+		m_bits.set(idx, true);
+		++m_numHandles;
+
+		return uint16_t(idx);
 	}
 
 	inline bool HandleAlloc::isValid(uint16_t _handle) const
 	{
-		uint16_t* dense  = getDensePtr();
-		uint16_t* sparse = getSparsePtr();
-		uint16_t  index  = sparse[_handle];
-
-		return index < m_numHandles
-			&& dense[index] == _handle
+		return true
+			&& _handle < m_maxHandles
+			&& m_bits.get(_handle)
 			;
 	}
 
 	inline void HandleAlloc::free(uint16_t _handle)
 	{
-		uint16_t* dense  = getDensePtr();
-		uint16_t* sparse = getSparsePtr();
-		uint16_t index = sparse[_handle];
-		--m_numHandles;
-		uint16_t temp = dense[m_numHandles];
-		dense[m_numHandles] = _handle;
-		sparse[temp] = index;
-		dense[index] = temp;
+		if (isValid(_handle) )
+		{
+			m_bits.set(_handle, false);
+			--m_numHandles;
+		}
 	}
 
 	inline void HandleAlloc::reset()
 	{
+		m_bits.set(0, m_maxHandles, false);
 		m_numHandles = 0;
-		uint16_t* dense = getDensePtr();
-		for (uint16_t ii = 0, num = m_maxHandles; ii < num; ++ii)
-		{
-			dense[ii] = ii;
-		}
 	}
 
-	inline uint16_t* HandleAlloc::getDensePtr() const
+	inline uint16_t HandleAlloc::findFirst() const
 	{
-		uint8_t* ptr = (uint8_t*)reinterpret_cast<const uint8_t*>(this);
-		return (uint16_t*)&ptr[sizeof(HandleAlloc)];
+		return findFrom(0);
 	}
 
-	inline uint16_t* HandleAlloc::getSparsePtr() const
+	inline uint16_t HandleAlloc::findNext(uint16_t _handle) const
 	{
-		return &getDensePtr()[m_maxHandles];
+		return findFrom(uint32_t(_handle) + 1);
 	}
 
-	inline HandleAlloc* createHandleAlloc(AllocatorI* _allocator, uint16_t _maxHandles)
+	inline const BitArrayViewBase& HandleAlloc::getBits() const
 	{
-		uint8_t* ptr = (uint8_t*)alloc(_allocator, sizeof(HandleAlloc) + 2*_maxHandles*sizeof(uint16_t) );
-		return BX_PLACEMENT_NEW(ptr, HandleAlloc)(_maxHandles);
+		return m_bits;
 	}
 
-	inline void destroyHandleAlloc(AllocatorI* _allocator, HandleAlloc* _handleAlloc)
+	inline uint16_t HandleAlloc::findFrom(uint32_t _start) const
 	{
-		_handleAlloc->~HandleAlloc();
-		free(_allocator, _handleAlloc);
+		const uint32_t idx = _start < m_maxHandles
+			? m_bits.findSet(_start, m_maxHandles)
+			: kInvalid
+			;
+
+		return kInvalid == idx
+			? kInvalidHandle
+			: uint16_t(idx)
+			;
 	}
 
-	template <uint16_t MaxHandlesT>
+	template<uint16_t MaxHandlesT>
 	inline HandleAllocT<MaxHandlesT>::HandleAllocT()
-		: HandleAlloc(MaxHandlesT)
+		: HandleAlloc(InitNone, m_storage, MaxHandlesT)
 	{
+		m_storage.setCount(MaxHandlesT);
 	}
 
-	template <uint16_t MaxHandlesT>
-	inline HandleAllocT<MaxHandlesT>::~HandleAllocT()
+	inline DynamicHandleAlloc::DynamicHandleAlloc(AllocatorHandle _allocator, uint16_t _maxHandles)
+		: HandleAlloc(InitNone, m_storage, _maxHandles)
+		, m_storage(_allocator)
 	{
+		m_storage.setCount(_maxHandles);
 	}
 
 	template <uint16_t MaxHandlesT>
@@ -314,18 +305,6 @@ namespace bx
 	template <uint16_t MaxHandlesT>
 	inline HandleAllocLruT<MaxHandlesT>::~HandleAllocLruT()
 	{
-	}
-
-	template <uint16_t MaxHandlesT>
-	inline const uint16_t* HandleAllocLruT<MaxHandlesT>::getHandles() const
-	{
-		return m_alloc.getHandles();
-	}
-
-	template <uint16_t MaxHandlesT>
-	inline uint16_t HandleAllocLruT<MaxHandlesT>::getHandleAt(uint16_t _at) const
-	{
-		return m_alloc.getHandleAt(_at);
 	}
 
 	template <uint16_t MaxHandlesT>
@@ -618,205 +597,6 @@ namespace bx
 		const simd64_t c1     = simd64_splat(uint64_t(11400714785074694791ull) );
 		const simd64_t result = simd64_u64_mul(tmp1, c1);
 		return result.u64;
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline HandleHashMapAllocT<MaxHandlesT, KeyT>::HandleHashMapAllocT()
-	{
-		reset();
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline HandleHashMapAllocT<MaxHandlesT, KeyT>::~HandleHashMapAllocT()
-	{
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::alloc(KeyT _key)
-	{
-		uint16_t handle = m_alloc.alloc();
-		if (kInvalidHandle == handle)
-		{
-			return kInvalidHandle;
-		}
-
-		bool ok = m_table.insert(_key, handle);
-		if (!ok)
-		{
-			m_alloc.free(handle);
-			return kInvalidHandle;
-		}
-
-		return handle;
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline void HandleHashMapAllocT<MaxHandlesT, KeyT>::free(KeyT _key)
-	{
-		uint16_t handle = m_table.find(_key);
-		if (kInvalidHandle == handle)
-		{
-			return;
-		}
-
-		m_table.removeByKey(_key);
-		m_alloc.free(handle);
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline void HandleHashMapAllocT<MaxHandlesT, KeyT>::free(uint16_t _handle)
-	{
-		m_table.removeByHandle(_handle);
-		m_alloc.free(_handle);
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::find(KeyT _key) const
-	{
-		return m_table.find(_key);
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline const uint16_t* HandleHashMapAllocT<MaxHandlesT, KeyT>::getHandles() const
-	{
-		return m_alloc.getHandles();
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::getHandleAt(uint16_t _at) const
-	{
-		return m_alloc.getHandleAt(_at);
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::getNumHandles() const
-	{
-		return m_alloc.getNumHandles();
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline uint16_t HandleHashMapAllocT<MaxHandlesT, KeyT>::getMaxHandles() const
-	{
-		return m_alloc.getMaxHandles();
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline bool HandleHashMapAllocT<MaxHandlesT, KeyT>::isValid(uint16_t _handle) const
-	{
-		return m_alloc.isValid(_handle);
-	}
-
-	template <uint16_t MaxHandlesT, typename KeyT>
-	inline void HandleHashMapAllocT<MaxHandlesT, KeyT>::reset()
-	{
-		m_table.reset();
-		m_alloc.reset();
-	}
-
-	inline HandleAlloc2::HandleAlloc2(MippedBitArrayBase& _bits, uint16_t _maxHandles)
-		: m_bits(_bits)
-		, m_maxHandles(_maxHandles)
-		, m_numHandles(0)
-	{
-		BX_ASSERT(_bits.getCount() >= _maxHandles, "Bit array holds %d bits, %d handles requested.", _bits.getCount(), _maxHandles);
-		reset();
-	}
-
-	inline HandleAlloc2::HandleAlloc2(InitNoneTag, MippedBitArrayBase& _bits, uint16_t _maxHandles)
-		: m_bits(_bits)
-		, m_maxHandles(_maxHandles)
-		, m_numHandles(0)
-	{
-	}
-
-	inline uint16_t HandleAlloc2::getNumHandles() const
-	{
-		return m_numHandles;
-	}
-
-	inline uint16_t HandleAlloc2::getMaxHandles() const
-	{
-		return m_maxHandles;
-	}
-
-	inline uint16_t HandleAlloc2::alloc()
-	{
-		const uint32_t idx = m_bits.findClear(0, m_maxHandles);
-
-		if (kInvalid == idx)
-		{
-			return kInvalidHandle;
-		}
-
-		m_bits.set(idx, true);
-		++m_numHandles;
-
-		return uint16_t(idx);
-	}
-
-	inline bool HandleAlloc2::isValid(uint16_t _handle) const
-	{
-		return true
-			&& _handle < m_maxHandles
-			&& m_bits.get(_handle)
-			;
-	}
-
-	inline void HandleAlloc2::free(uint16_t _handle)
-	{
-		if (isValid(_handle) )
-		{
-			m_bits.set(_handle, false);
-			--m_numHandles;
-		}
-	}
-
-	inline void HandleAlloc2::reset()
-	{
-		m_bits.set(0, m_maxHandles, false);
-		m_numHandles = 0;
-	}
-
-	inline uint16_t HandleAlloc2::findFirst() const
-	{
-		return findFrom(0);
-	}
-
-	inline uint16_t HandleAlloc2::findNext(uint16_t _handle) const
-	{
-		return findFrom(uint32_t(_handle) + 1);
-	}
-
-	inline const BitArrayViewBase& HandleAlloc2::getBits() const
-	{
-		return m_bits;
-	}
-
-	inline uint16_t HandleAlloc2::findFrom(uint32_t _start) const
-	{
-		const uint32_t idx = _start < m_maxHandles
-			? m_bits.findSet(_start, m_maxHandles)
-			: kInvalid
-			;
-
-		return kInvalid == idx
-			? kInvalidHandle
-			: uint16_t(idx)
-			;
-	}
-
-	template<uint16_t MaxHandlesT>
-	inline HandleAlloc2T<MaxHandlesT>::HandleAlloc2T()
-		: HandleAlloc2(InitNone, m_storage, MaxHandlesT)
-	{
-		m_storage.setCount(MaxHandlesT);
-	}
-
-	inline DynamicHandleAlloc::DynamicHandleAlloc(AllocatorHandle _allocator, uint16_t _maxHandles)
-		: HandleAlloc2(InitNone, m_storage, _maxHandles)
-		, m_storage(_allocator)
-	{
-		m_storage.setCount(_maxHandles);
 	}
 
 } // namespace bx

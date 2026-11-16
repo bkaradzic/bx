@@ -16,8 +16,6 @@ TEST_CASE("HandleAllocT", "")
 	constexpr int32_t kMax = 64;
 	bx::HandleAllocT<kMax> alloc;
 
-	REQUIRE(sizeof(alloc) == sizeof(uint16_t) * kMax * 2 + sizeof(bx::HandleAlloc) );
-
 	for (uint16_t ii = 0; ii < kMax; ++ii)
 	{
 		REQUIRE(!alloc.isValid(ii) );
@@ -154,6 +152,46 @@ TEST_CASE("HandleAllocLruT", "")
 	}
 }
 
+TEST_CASE("HandleAllocLruT free and full", "")
+{
+	constexpr uint16_t kMax = 4;
+	bx::HandleAllocLruT<kMax> lru;
+
+	for (uint16_t ii = 0; ii < kMax; ++ii)
+	{
+		REQUIRE(ii == lru.alloc() );
+	}
+
+	REQUIRE(kMax == lru.getNumHandles() );
+	REQUIRE(kMax == lru.getMaxHandles() );
+	REQUIRE(bx::kInvalidHandle == lru.alloc() );
+	REQUIRE(0 == lru.getBack() );
+
+	lru.free(2);
+	REQUIRE(!lru.isValid(2) );
+	REQUIRE(kMax - 1 == lru.getNumHandles() );
+
+	uint16_t expected[] = { 3, 1, 0 };
+	uint16_t count = 0;
+	for (uint16_t it = lru.getFront(); bx::kInvalidHandle != it; it = lru.getNext(it), ++count)
+	{
+		REQUIRE(it == expected[count]);
+	}
+	REQUIRE(BX_COUNTOF(expected) == count);
+
+	REQUIRE(2 == lru.alloc() );
+	REQUIRE(2 == lru.getFront() );
+
+	lru.reset();
+	REQUIRE(0 == lru.getNumHandles() );
+	REQUIRE(bx::kInvalidHandle == lru.getFront() );
+	REQUIRE(0 == lru.alloc() );
+}
+
+static_assert(bx::isSame<bx::HandleAlloc2, bx::HandleAlloc>(), "HandleAlloc2 is the former name of HandleAlloc.");
+static_assert(bx::isSame<bx::HandleAlloc2T<16>, bx::HandleAllocT<16> >(), "HandleAlloc2T is the former name of HandleAllocT.");
+static_assert(!bx::isCopyConstructible<bx::HandleAllocT<16> >(), "HandleAllocT refers to its own storage, copies would share it.");
+
 TEST_CASE("HandleHashTable", "")
 {
 	typedef bx::HandleHashMapT<512> HashMap;
@@ -193,11 +231,11 @@ TEST_CASE("HandleHashTable", "")
 	}
 }
 
-TEST_CASE("HandleAlloc2", "[container]")
+TEST_CASE("HandleAllocT bit set", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 1024;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	REQUIRE(0 == handleAlloc.getNumHandles() );
 	REQUIRE(kMaxHandles == handleAlloc.getMaxHandles() );
@@ -220,9 +258,9 @@ TEST_CASE("HandleAlloc2", "[container]")
 	REQUIRE(!handleAlloc.isValid(handle) );
 }
 
-TEST_CASE("HandleAlloc2 - lowest free first", "[container]")
+TEST_CASE("HandleAllocT - lowest free first", "[container]")
 {
-	bx::HandleAlloc2T<200> handleAlloc;
+	bx::HandleAllocT<200> handleAlloc;
 
 	for (uint32_t ii = 0; ii < 200; ++ii)
 	{
@@ -240,11 +278,11 @@ TEST_CASE("HandleAlloc2 - lowest free first", "[container]")
 	REQUIRE(bx::kInvalidHandle == handleAlloc.alloc() );
 }
 
-TEST_CASE("HandleAlloc2 - reset", "[container]")
+TEST_CASE("HandleAllocT - reset", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 64;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	for (uint32_t ii = 0; ii < kMaxHandles; ++ii)
 	{
@@ -264,11 +302,11 @@ TEST_CASE("HandleAlloc2 - reset", "[container]")
 	REQUIRE(1 == handleAlloc.getNumHandles() );
 }
 
-TEST_CASE("HandleAlloc2 - free and realloc", "[container]")
+TEST_CASE("HandleAllocT - free and realloc", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 4;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	uint16_t handles[kMaxHandles];
 	for (uint32_t ii = 0; ii < kMaxHandles; ++ii)
@@ -288,11 +326,11 @@ TEST_CASE("HandleAlloc2 - free and realloc", "[container]")
 	REQUIRE(kMaxHandles == handleAlloc.getNumHandles() );
 }
 
-TEST_CASE("HandleAlloc2 - isValid out of range", "[container]")
+TEST_CASE("HandleAllocT - isValid out of range", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 8;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	REQUIRE(!handleAlloc.isValid(0) );
 	REQUIRE(!handleAlloc.isValid(kMaxHandles) );
@@ -300,11 +338,11 @@ TEST_CASE("HandleAlloc2 - isValid out of range", "[container]")
 	REQUIRE(!handleAlloc.isValid(UINT16_MAX) );
 }
 
-TEST_CASE("HandleAlloc2 - double free", "[container]")
+TEST_CASE("HandleAllocT - double free", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 8;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	uint16_t handle = handleAlloc.alloc();
 	REQUIRE(1 == handleAlloc.getNumHandles() );
@@ -316,11 +354,11 @@ TEST_CASE("HandleAlloc2 - double free", "[container]")
 	REQUIRE(0 == handleAlloc.getNumHandles() );
 }
 
-TEST_CASE("HandleAlloc2 - interleaved alloc free", "[container]")
+TEST_CASE("HandleAllocT - interleaved alloc free", "[container]")
 {
 	constexpr uint16_t kMaxHandles = 16;
 
-	bx::HandleAlloc2T<kMaxHandles> handleAlloc;
+	bx::HandleAllocT<kMaxHandles> handleAlloc;
 
 	uint16_t handles[kMaxHandles / 2];
 	for (uint32_t ii = 0; ii < kMaxHandles / 2; ++ii)
@@ -351,9 +389,9 @@ TEST_CASE("HandleAlloc2 - interleaved alloc free", "[container]")
 	REQUIRE(!handleAlloc.isValid(overflow) );
 }
 
-TEST_CASE("HandleAlloc2 - iteration", "[container]")
+TEST_CASE("HandleAllocT - iteration", "[container]")
 {
-	bx::HandleAlloc2T<300> handleAlloc;
+	bx::HandleAllocT<300> handleAlloc;
 
 	REQUIRE(bx::kInvalidHandle == handleAlloc.findFirst() );
 
@@ -392,12 +430,12 @@ TEST_CASE("HandleAlloc2 - iteration", "[container]")
 	REQUIRE(bx::kInvalidHandle == handleAlloc.findNext(299) );
 }
 
-TEST_CASE("HandleAlloc2 - external storage", "[container]")
+TEST_CASE("HandleAllocT - external storage", "[container]")
 {
 	bx::FixedMippedBitArrayT<100> bits;
 	bits.setCount(100);
 
-	bx::HandleAlloc2 handleAlloc(bits, 100);
+	bx::HandleAlloc handleAlloc(bits, 100);
 
 	for (uint32_t ii = 0; ii < 100; ++ii)
 	{
@@ -410,9 +448,9 @@ TEST_CASE("HandleAlloc2 - external storage", "[container]")
 	REQUIRE(bx::kInvalidHandle == handleAlloc.findNext(99) );
 }
 
-TEST_CASE("HandleAlloc2 - full word summary", "[container]")
+TEST_CASE("HandleAllocT - full word summary", "[container]")
 {
-	bx::HandleAlloc2T<4096> handleAlloc;
+	bx::HandleAllocT<4096> handleAlloc;
 
 	for (uint32_t ii = 0; ii < 4096; ++ii)
 	{
@@ -448,9 +486,9 @@ TEST_CASE("HandleAlloc2 - full word summary", "[container]")
 	REQUIRE(0 == handleAlloc.alloc() );
 }
 
-TEST_CASE("HandleAlloc2 - odd sizes", "[container]")
+TEST_CASE("HandleAllocT - odd sizes", "[container]")
 {
-	bx::HandleAlloc2T<65> small;
+	bx::HandleAllocT<65> small;
 
 	for (uint32_t ii = 0; ii < 65; ++ii)
 	{
@@ -463,7 +501,7 @@ TEST_CASE("HandleAlloc2 - odd sizes", "[container]")
 	REQUIRE(64 == small.findNext(63) );
 	REQUIRE(bx::kInvalidHandle == small.findNext(64) );
 
-	bx::HandleAlloc2T<4097> big;
+	bx::HandleAllocT<4097> big;
 
 	for (uint32_t ii = 0; ii < 4097; ++ii)
 	{

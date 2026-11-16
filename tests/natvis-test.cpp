@@ -183,18 +183,13 @@ TEST_CASE("natvis", "[.][natvis]")
 	const uint16_t handleAlloc1 = handleAlloc.alloc();
 	handleAlloc.free(handleAlloc0);
 
-	bx::HandleAlloc2T<16> handleAlloc2;
-	const uint16_t handleAlloc20 = handleAlloc2.alloc();
-	const uint16_t handleAlloc21 = handleAlloc2.alloc();
-	handleAlloc2.free(handleAlloc20);
-
-	bx::FixedMippedBitArrayT<32> handleAlloc2Bits;
-	handleAlloc2Bits.setCount(32);
-	bx::HandleAlloc2 handleAlloc2External(handleAlloc2Bits, 32);
-	const uint16_t handleAlloc2External0 = handleAlloc2External.alloc();
+	bx::FixedMippedBitArrayT<32> handleAllocBits;
+	handleAllocBits.setCount(32);
+	bx::HandleAlloc handleAllocExternal(handleAllocBits, 32);
+	const uint16_t handleAllocExternal0 = handleAllocExternal.alloc();
 
 	BX_UNUSED(allocatorOp, arrayView, mutableArrayView, storageView, stringView, stringLiteral, stringEmpty);
-	BX_UNUSED(handle0, handle2, handleAlloc1, handleAlloc21, handleAlloc2External0, bitArrayView);
+	BX_UNUSED(handle0, handle2, handleAlloc1, handleAllocExternal0, bitArrayView);
 
 	BX_TRACE("natvis: break here and inspect locals.");
 
