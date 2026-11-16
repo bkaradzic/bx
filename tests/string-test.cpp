@@ -12,13 +12,6 @@
 #include <bx/sort.h>
 #include <string>
 
-TEST_CASE("stringPrintfTy", "[string]")
-{
-	std::string test;
-	bx::stringPrintf(test, "printf into std::string.");
-	REQUIRE(0 == bx::strCmp(bx::StringView(test.data(), int32_t(test.length() ) ), "printf into std::string.") );
-}
-
 TEST_CASE("prettify", "[string]")
 {
 	char tmp[1024];

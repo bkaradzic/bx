@@ -17,28 +17,7 @@
 			<Item Name="[ptr]">(const void*)m_ptr</Item>
 		</Expand>
 	</Type>
-	<Type Name="bx::StringT&lt;*&gt;">
-		<DisplayString>{m_ptr,[m_len]s8}</DisplayString>
-		<StringView>m_ptr,[m_len]s8</StringView>
-		<Expand>
-			<Item Name="[length]">m_len</Item>
-			<Item Name="[capacity]">m_capacity</Item>
-			<Item Name="[ptr]">(const void*)m_ptr</Item>
-		</Expand>
-	</Type>
 	<Type Name="bx::HandleAlloc">
-		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
-		<Expand>
-			<Item Name="[numHandles]">m_numHandles</Item>
-			<Item Name="[maxHandles]">m_maxHandles</Item>
-			<ArrayItems>
-				<Size>m_numHandles</Size>
-				<ValuePointer>(unsigned short*)(this+1)</ValuePointer>
-			</ArrayItems>
-		</Expand>
-	</Type>
-
-	<Type Name="bx::HandleAlloc2">
 		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
 		<Expand>
 			<Item Name="[numHandles]">m_numHandles</Item>
@@ -56,10 +35,10 @@
 		</Expand>
 	</Type>
 
-	<Type Name="bx::HandleAlloc2T&lt;*&gt;">
+	<Type Name="bx::HandleAllocT&lt;*&gt;">
 		<DisplayString>{{ handles={m_numHandles}/{m_maxHandles} }}</DisplayString>
 		<Expand>
-			<ExpandedItem>*(bx::HandleAlloc2*)this</ExpandedItem>
+			<ExpandedItem>*(bx::HandleAlloc*)this</ExpandedItem>
 		</Expand>
 	</Type>
 

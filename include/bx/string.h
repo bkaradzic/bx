@@ -226,61 +226,6 @@ namespace bx
 	using FixedString256  = FixedStringT<256>;
 	using FixedString1024 = FixedStringT<1024>;
 
-	/// Dynamic string
-	///
-	template<AllocatorI** AllocatorT>
-	class StringT
-	{
-	public:
-		///
-		StringT();
-
-		///
-		StringT(const StringT<AllocatorT>& _rhs);
-
-		///
-		StringT(const StringView& _rhs);
-
-		///
-		~StringT();
-
-		///
-		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs);
-
-		///
-		void set(const StringView& _str);
-
-		///
-		void append(const StringView& _str);
-
-		///
-		void append(const char* _ptr, const char* _term);
-
-		///
-		void clear();
-
-		/// Returns `true` if string is empty.
-		///
-		bool isEmpty() const;
-
-		/// Returns string length.
-		///
-		int32_t getLength() const;
-
-		/// Returns zero-terminated C string pointer.
-		///
-		const char* getCPtr() const;
-
-		/// Implicitly converts StringT to StringView.
-		///
-		operator StringView() const;
-
-	protected:
-		const char* m_ptr;
-		int32_t     m_len;
-		int32_t     m_capacity;
-	};
-
 	typedef bool (*CharTestFn)(char _ch);
 
 	/// Returns true if character is part of white space set.
@@ -496,14 +441,6 @@ namespace bx
 
 	///
 	int32_t printf(const char* _format, ...);
-
-	/// Templatized snprintf.
-	template <typename Ty>
-	void stringPrintfVargs(Ty& _out, const char* _format, va_list _argList);
-
-	/// Templatized snprintf.
-	template <typename Ty>
-	void stringPrintf(Ty& _out, const char* _format, ...);
 
 	/// Format number to human readable representation.
 	///
