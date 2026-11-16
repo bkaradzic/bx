@@ -97,17 +97,6 @@ namespace bx
 		MippedBitArray m_storage;
 	};
 
-	/// Former name of `HandleAlloc`, kept until dependents move to it.
-	///
-	using HandleAlloc2 = HandleAlloc;
-
-	/// Former name of `HandleAllocT`, kept until dependents move to it.
-	///
-	/// @tparam MaxHandlesT Maximum number of handles.
-	///
-	template<uint16_t MaxHandlesT>
-	using HandleAlloc2T = HandleAllocT<MaxHandlesT>;
-
 	///
 	template <uint16_t MaxHandlesT>
 	class HandleListT
