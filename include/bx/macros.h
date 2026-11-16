@@ -230,6 +230,11 @@ extern "C" void* __cdecl _alloca(size_t _size);
 	public: void* operator new[](size_t _size); \
 	public: void  operator delete[](void* _ptr)
 
+/// Objects of the class can move to another address with a memory copy, see
+/// `bx::isTriviallyRelocatable`.
+#define BX_CLASS_TRIVIALLY_RELOCATABLE(_class) \
+	public: using TriviallyRelocatable [[maybe_unused]] = _class
+
 #define BX_CLASS_1(_class, _a1) BX_CONCATENATE(BX_CLASS_, _a1)(_class)
 #define BX_CLASS_2(_class, _a1, _a2) BX_CLASS_1(_class, _a1); BX_CLASS_1(_class, _a2)
 #define BX_CLASS_3(_class, _a1, _a2, _a3) BX_CLASS_2(_class, _a1, _a2); BX_CLASS_1(_class, _a3)

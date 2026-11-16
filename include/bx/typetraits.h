@@ -129,6 +129,14 @@ namespace bx
 	template<typename Ty>
 	constexpr bool isTriviallyCopyable();
 
+	/// Returns true if objects of type `Ty` can move to another address with a memory copy,
+	/// the source not destroyed after, otherwise returns false. A type that holds no pointer
+	/// into itself opts in with `BX_CLASS(Self, TRIVIALLY_RELOCATABLE)`. It names the type, so
+	/// a type deriving from it has to opt in on its own. Specialize `IsTriviallyRelocatableT`
+	/// only for types that can't be changed.
+	template<typename Ty>
+	constexpr bool isTriviallyRelocatable();
+
 	/// Returns true if any two objects of type `Ty` that hold the same value also have the
 	/// same object representation, otherwise returns false. False for a type with padding.
 	template<typename Ty>

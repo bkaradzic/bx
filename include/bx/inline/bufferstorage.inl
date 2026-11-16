@@ -139,10 +139,19 @@ namespace bx
 	template<typename Ty, typename... ArgsT>
 	inline uint32_t StorageTraits::constructEmplace(Ty* _ptr, uint32_t _count, ArgsT&&... _args)
 	{
-		for (Ty *ptr = _ptr, *term = _ptr + _count; ptr < term; ++ptr)
+		if (0 == _count)
 		{
-			BX_PLACEMENT_NEW(ptr, Ty)(bx::forward<ArgsT>(_args)...);
+			return 0;
 		}
+
+		Ty* last = _ptr + _count - 1;
+
+		for (Ty* ptr = _ptr; ptr < last; ++ptr)
+		{
+			BX_PLACEMENT_NEW(ptr, Ty)(_args...);
+		}
+
+		BX_PLACEMENT_NEW(last, Ty)(bx::forward<ArgsT>(_args)...);
 
 		return _count;
 	}
@@ -158,7 +167,7 @@ namespace bx
 		{
 			for (uint32_t ii = 0; ii < _count; ++ii)
 			{
-				BX_PLACEMENT_NEW(&_dst[ii], Ty)(_src[ii]);
+				BX_PLACEMENT_NEW(_dst + ii, Ty)(_src[ii]);
 			}
 		}
 
@@ -176,7 +185,7 @@ namespace bx
 		{
 			for (uint32_t ii = 0; ii < _count; ++ii)
 			{
-				BX_PLACEMENT_NEW(&_dst[ii], Ty)(bx::move(_src[ii]) );
+				BX_PLACEMENT_NEW(_dst + ii, Ty)(bx::move(_src[ii]) );
 			}
 		}
 		else
@@ -315,7 +324,8 @@ namespace bx
 
 		dbgGraph(oldCount+1, dstPos, 1, 'E');
 
-		m_term += StorageTraits::constructEmplace(_storage.getPtr(dstPos), 1, bx::forward<ArgsT>(_args)...);
+		BX_PLACEMENT_NEW(_storage.getPtr(dstPos), Ty)(bx::forward<ArgsT>(_args)...);
+		++m_term;
 	}
 
 	template<typename Ty>
@@ -473,135 +483,6 @@ namespace bx
 	inline FixedStorageT<Ty, CapacityT>& FixedStorageT<Ty, CapacityT>::operator=(FixedStorageT<Ty, CapacityT>&& _other)
 	{
 		memCopy(m_data, _other.m_data, sizeof(m_data) );
-		return *this;
-	}
-
-	template<typename Ty>
-	inline DynamicStorageT<Ty>::DynamicStorageT()
-		: m_ptr(NULL)
-		, m_capacity(0)
-		, m_allocator(NULL)
-	{
-	}
-
-	template<typename Ty>
-	inline void DynamicStorageT<Ty>::setAllocator(AllocatorI* _allocator)
-	{
-		BX_ASSERT(false
-			|| NULL == m_ptr
-			|| NULL == m_allocator
-			, "Allocator is already set, or storage is not empty!"
-			);
-
-		m_allocator = _allocator;
-	}
-
-	template<typename Ty>
-	inline AllocatorI* DynamicStorageT<Ty>::getAllocator() const
-	{
-		return m_allocator;
-	}
-
-	template<typename Ty>
-	inline DynamicStorageT<Ty>::~DynamicStorageT()
-	{
-		if (NULL != m_ptr)
-		{
-			bx::free(m_allocator, m_ptr, BX_ALIGNOF(Ty) );
-		}
-	}
-
-	template<typename Ty>
-	inline uint32_t DynamicStorageT<Ty>::getCapacity() const
-	{
-		return m_capacity;
-	}
-
-	template<typename Ty>
-	inline void DynamicStorageT<Ty>::setCapacity(uint32_t _capacity, uint32_t _count)
-	{
-		const uint32_t minCapacity = max(_capacity, _count);
-		const uint32_t capacity    = minCapacity == 0 ? 0 : alignUp(minCapacity, 16);
-
-		if (capacity == m_capacity)
-		{
-			return;
-		}
-
-		if (0 == capacity)
-		{
-			bx::free(m_allocator, m_ptr, BX_ALIGNOF(Ty) );
-			m_ptr = NULL;
-		}
-		else if constexpr (isTriviallyMoveConstructible<Ty>() )
-		{
-			m_ptr = (Ty*)bx::realloc(m_allocator, m_ptr, sizeof(Ty)*capacity, BX_ALIGNOF(Ty) );
-		}
-		else
-		{
-			Ty* ptr = (Ty*)bx::alloc(m_allocator, sizeof(Ty)*capacity, BX_ALIGNOF(Ty) );
-
-			if (0 < _count)
-			{
-				StorageTraits::constructMove(ptr, m_ptr, _count);
-				StorageTraits::destruct(m_ptr, _count);
-			}
-
-			if (NULL != m_ptr)
-			{
-				bx::free(m_allocator, m_ptr, BX_ALIGNOF(Ty) );
-			}
-
-			m_ptr = ptr;
-		}
-
-		m_capacity = capacity;
-	}
-
-	template<typename Ty>
-	inline Ty* DynamicStorageT<Ty>::getPtr(uint32_t _idx)
-	{
-		if (NULL == m_ptr)
-		{
-			return NULL;
-		}
-
-		return m_ptr + _idx;
-	}
-
-	template<typename Ty>
-	inline const Ty* DynamicStorageT<Ty>::getPtr(uint32_t _idx) const
-	{
-		return const_cast<DynamicStorageT<Ty>*>(this)->getPtr(_idx);
-	}
-
-	template<typename Ty>
-	inline Ty* DynamicStorageT<Ty>::getTerm()
-	{
-		return getPtr(getCapacity() );
-	}
-
-	template<typename Ty>
-	inline const Ty* DynamicStorageT<Ty>::getTerm() const
-	{
-		return getPtr(getCapacity() );
-	}
-
-	template<typename Ty>
-	inline DynamicStorageT<Ty>& DynamicStorageT<Ty>::operator=(DynamicStorageT<Ty>&& _other)
-	{
-		if (NULL != m_ptr)
-		{
-			bx::free(m_allocator, m_ptr, BX_ALIGNOF(Ty) );
-		}
-
-		m_ptr       = _other.m_ptr;
-		m_capacity  = _other.m_capacity;
-		m_allocator = _other.m_allocator;
-
-		_other.m_ptr      = NULL;
-		_other.m_capacity = 0;
-
 		return *this;
 	}
 

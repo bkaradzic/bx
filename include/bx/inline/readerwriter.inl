@@ -58,27 +58,36 @@ namespace bx
 		return m_size;
 	}
 
+	inline MemoryBlock::MemoryBlock(AllocatorHandle _allocator)
+		: m_size(0)
+	{
+		m_blk.allocatorHandle = _allocator.idx;
+	}
+
 	inline MemoryBlock::MemoryBlock(AllocatorI* _allocator)
-		: m_allocator(_allocator)
-		, m_data(NULL)
-		, m_size(0)
+		: MemoryBlock(internal::pointerAllocatorAcquire(_allocator) )
 	{
 	}
 
 	inline MemoryBlock::~MemoryBlock()
 	{
-		free(m_allocator, m_data);
+		const AllocatorHandle handle = getAllocatorHandle(m_blk);
+		m_blk = free(move(m_blk) );
+
+		internal::pointerAllocatorRelease(handle);
 	}
 
 	inline void* MemoryBlock::more(uint32_t _size)
 	{
 		if (0 < _size)
 		{
+			const uint8_t handle = uint8_t(m_blk.allocatorHandle);
 			m_size += _size;
-			m_data = realloc(m_allocator, m_data, m_size);
+			m_blk = realloc(move(m_blk), m_size);
+			m_blk.allocatorHandle = handle;
 		}
 
-		return m_data;
+		return isValid(m_blk) ? (uint8_t*)m_blk : NULL;
 	}
 
 	inline uint32_t MemoryBlock::getSize()

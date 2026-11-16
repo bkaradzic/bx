@@ -75,7 +75,13 @@ namespace bx
 		FixedString64 m_name;
 	};
 
-	///
+} // namespace bx
+
+#endif // BX_CONFIG_SUPPORTS_THREADING
+
+namespace bx
+{
+	/// Thread local pointer, a plain pointer without threading support.
 	class TlsData
 	{
 	public:
@@ -98,7 +104,5 @@ namespace bx
 } // namespace bx
 
 #include "inline/thread.inl"
-
-#endif
 
 #endif // BX_THREAD_H_HEADER_GUARD

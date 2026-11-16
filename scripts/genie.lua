@@ -59,7 +59,6 @@ project "bx.test"
 
 	files {
 		path.join(BX_DIR, "3rdparty/catch/catch_amalgamated.cpp"),
-		path.join(BX_DIR, "tests/*_test.cpp"),
 		path.join(BX_DIR, "tests/*-test.cpp"),
 		path.join(BX_DIR, "tests/*.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
@@ -105,6 +104,7 @@ project "bx.test"
 		linkoptions {
 			"-fwasm-exceptions",
 			"-s STACK_SIZE=262144",
+			"-s ALLOW_MEMORY_GROWTH=1",
 		}
 
 	configuration {}
@@ -126,8 +126,8 @@ project "bx.bench"
 	}
 
 	files {
-		path.join(BX_DIR, "tests/*_bench.cpp"),
-		path.join(BX_DIR, "tests/*_bench.h"),
+		path.join(BX_DIR, "tests/*-bench.cpp"),
+		path.join(BX_DIR, "tests/*-bench.h"),
 		path.join(BX_DIR, "tests/dbg.*"),
 	}
 

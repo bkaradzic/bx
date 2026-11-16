@@ -7,6 +7,7 @@
 #define BX_SPSCQUEUE_H_HEADER_GUARD
 
 #include "allocator.h"
+#include "blk.h"
 #include "cpu.h"
 #include "semaphore.h"
 
@@ -21,6 +22,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		SpScUnboundedQueue(AllocatorHandle _allocator);
+
 		///
 		SpScUnboundedQueue(AllocatorI* _allocator);
 
@@ -46,7 +53,7 @@ namespace bx
 			Node* m_next;
 		};
 
-		AllocatorI* m_allocator;
+		AllocatorHandle m_allocatorHandle;
 		Node* m_first;
 		Node* m_divider;
 		Node* m_last;
@@ -62,6 +69,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		SpScUnboundedQueueT(AllocatorHandle _allocator);
+
 		///
 		SpScUnboundedQueueT(AllocatorI* _allocator);
 
@@ -91,6 +104,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		SpScBlockingUnboundedQueue(AllocatorHandle _allocator);
+
 		///
 		SpScBlockingUnboundedQueue(AllocatorI* _allocator);
 
@@ -121,6 +140,12 @@ namespace bx
 			);
 
 	public:
+		/// Constructs empty queue.
+		///
+		/// @param[in] _allocator Allocator for queue nodes, must be CPU accessible and thread safe.
+		///
+		SpScBlockingUnboundedQueueT(AllocatorHandle _allocator);
+
 		///
 		SpScBlockingUnboundedQueueT(AllocatorI* _allocator);
 

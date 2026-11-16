@@ -168,50 +168,6 @@ namespace bx
 		BX_ALIGN_DECL(alignof(Ty), uint8_t) m_data[sizeof(Ty)*CapacityT];
 	};
 
-	///
-	template<typename Ty>
-	class DynamicStorageT final
-	{
-	public:
-		///
-		DynamicStorageT();
-
-		///
-		~DynamicStorageT();
-
-		///
-		void setAllocator(AllocatorI* _allocator);
-
-		///
-		AllocatorI* getAllocator() const;
-
-		///
-		uint32_t getCapacity() const;
-
-		///
-		void setCapacity(uint32_t _capacity, uint32_t _count);
-
-		///
-		Ty* getPtr(uint32_t _idx = 0);
-
-		///
-		const Ty* getPtr(uint32_t _idx = 0) const;
-
-		///
-		Ty* getTerm();
-
-		///
-		const Ty* getTerm() const;
-
-		///
-		DynamicStorageT<Ty>& operator=(DynamicStorageT<Ty>&& _other);
-
-	private:
-		Ty*         m_ptr;
-		uint32_t    m_capacity;
-		AllocatorI* m_allocator;
-	};
-
 } // namespace bx
 
 #include "inline/bufferstorage.inl"

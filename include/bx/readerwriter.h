@@ -7,6 +7,7 @@
 #define BX_READERWRITER_H_HEADER_GUARD
 
 #include "allocator.h"
+#include "blk.h"
 #include "endian.h"
 #include "error.h"
 #include "filepath.h"
@@ -155,6 +156,12 @@ namespace bx
 	class MemoryBlock : public MemoryBlockI
 	{
 	public:
+		/// Constructs empty memory block.
+		///
+		/// @param[in] _allocator Allocator, must be CPU accessible.
+		///
+		MemoryBlock(AllocatorHandle _allocator);
+
 		///
 		MemoryBlock(AllocatorI* _allocator);
 
@@ -168,9 +175,8 @@ namespace bx
 		virtual uint32_t getSize() override;
 
 	private:
-		AllocatorI* m_allocator;
-		void*       m_data;
-		uint32_t    m_size;
+		Blk      m_blk;
+		uint32_t m_size;
 	};
 
 	/// Sizer writer. Dummy writer that only counts number of bytes written into it.

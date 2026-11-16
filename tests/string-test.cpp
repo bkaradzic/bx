@@ -1,0 +1,1470 @@
+/*
+ * Copyright 2010-2026 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bx/blob/master/LICENSE
+ */
+
+#include "test.h"
+#include <bx/constants.h>
+#include <bx/filepath.h>
+#include <bx/string.h>
+#include <bx/handlealloc.h>
+#include <bx/rng.h>
+#include <bx/sort.h>
+#include <string>
+
+TEST_CASE("stringPrintfTy", "[string]")
+{
+	std::string test;
+	bx::stringPrintf(test, "printf into std::string.");
+	REQUIRE(0 == bx::strCmp(bx::StringView(test.data(), int32_t(test.length() ) ), "printf into std::string.") );
+}
+
+TEST_CASE("prettify", "[string]")
+{
+	char tmp[1024];
+	prettify(tmp, BX_COUNTOF(tmp), 4000, bx::Units::Kilo);
+	REQUIRE(0 == bx::strCmp(tmp, "4 kB") );
+
+	prettify(tmp, BX_COUNTOF(tmp), 4096, bx::Units::KibiByte);
+	REQUIRE(0 == bx::strCmp(tmp, "4 KiB") );
+}
+
+TEST_CASE("chars", "[string]")
+{
+	for (char ch = 'A'; ch <= 'Z'; ++ch)
+	{
+		REQUIRE(!bx::isLower(ch) );
+		REQUIRE(!bx::isNumeric(ch) );
+		REQUIRE(bx::isUpper(ch) );
+		REQUIRE(bx::isAlpha(ch) );
+		REQUIRE(bx::isAlphaNum(ch) );
+		REQUIRE(bx::isLower(bx::toLower(ch) ) );
+	}
+}
+
+TEST_CASE("strLen", "[string]")
+{
+	const char* test = "test";
+
+	REQUIRE(0 == bx::strLen(test, 0) );
+	REQUIRE(2 == bx::strLen(test, 2) );
+	REQUIRE(4 == bx::strLen(test, INT32_MAX) );
+}
+
+TEST_CASE("strCopy", "[string]")
+{
+	char dst[128];
+	size_t num;
+
+	num = bx::strCopy(dst, 1, "blah");
+	REQUIRE(num == 0);
+
+	num = bx::strCopy(dst, 3, "blah", 3);
+	REQUIRE(0 == bx::strCmp(dst, "bl") );
+	REQUIRE(num == 2);
+
+	num = bx::strCopy(dst, sizeof(dst), "blah", 3);
+	REQUIRE(0 == bx::strCmp(dst, "bla") );
+	REQUIRE(num == 3);
+
+	num = bx::strCopy(dst, sizeof(dst), "blah");
+	REQUIRE(0 == bx::strCmp(dst, "bl", 2) );
+	REQUIRE(0 == bx::strCmp(dst, "blah") );
+	REQUIRE(num == 4);
+}
+
+TEST_CASE("strCat", "[string]")
+{
+	char dst[128] = { '\0' };
+
+	REQUIRE(0 == bx::strCat(dst, 1, "cat") );
+
+	REQUIRE(4 == bx::strCopy(dst, 5, "copy") );
+	REQUIRE(3 == bx::strCat(dst, 8, "cat") );
+	REQUIRE(0 == bx::strCmp(dst, "copycat") );
+	REQUIRE(0 == bx::strCmp(dst, "copy", 4) );
+
+	REQUIRE(1 == bx::strCat(dst, BX_COUNTOF(dst), "------", 1) );
+	REQUIRE(3 == bx::strCat(dst, BX_COUNTOF(dst), "cat") );
+	REQUIRE(0 == bx::strCmp(dst, "copycat-cat") );
+}
+
+TEST_CASE("strCmp", "[string]")
+{
+	REQUIRE(0  < bx::strCmp("abvgd", "abv") );
+	REQUIRE(0  < bx::strCmp("abvgd", "") );
+	REQUIRE(0  > bx::strCmp("", "abvgd") );
+	REQUIRE(0 != bx::strCmp(".tar.gz", ".") );
+	REQUIRE(0 != bx::strCmp("meh", "meh/") );
+}
+
+TEST_CASE("strCmpI", "[string]")
+{
+	REQUIRE(0 == bx::strCmpI("test", "test") );
+	REQUIRE(0 == bx::strCmpI("test", "testestes", 4) );
+	REQUIRE(0 == bx::strCmpI("testestes", "test", 4) );
+	REQUIRE(0 != bx::strCmpI("preprocess", "platform") );
+
+	const char* abvgd = "abvgd";
+	const char* abvgx = "abvgx";
+	const char* empty = "";
+	REQUIRE(0 == bx::strCmpI(abvgd, abvgd) );
+	REQUIRE(0 == bx::strCmpI(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpI(empty, empty) );
+
+	REQUIRE(0 >  bx::strCmpI(abvgd, abvgx) );
+	REQUIRE(0 >  bx::strCmpI(empty, abvgd) );
+
+	REQUIRE(0 <  bx::strCmpI(abvgx, abvgd) );
+	REQUIRE(0 <  bx::strCmpI(abvgd, empty) );
+}
+
+TEST_CASE("isEqual", "[string]")
+{
+	// Case sensitive (default).
+	REQUIRE( bx::isEqual("test", "test") );
+	REQUIRE(!bx::isEqual("test", "Test") );
+	REQUIRE(!bx::isEqual("test", "testtest") );
+	REQUIRE(!bx::isEqual("testtest", "test") );
+	REQUIRE( bx::isEqual("", "") );
+	REQUIRE(!bx::isEqual("", "test") );
+	REQUIRE(!bx::isEqual("a", "A") );
+
+	// Case insensitive.
+	REQUIRE( bx::isEqual("test", "TEST", false) );
+	REQUIRE( bx::isEqual("TeSt", "tEsT", false) );
+	REQUIRE( bx::isEqual("a", "A", false) );
+	REQUIRE(!bx::isEqual("test", "testest", false) );
+	REQUIRE( bx::isEqual("", "", false) );
+
+	// Non-letters are unaffected by case folding.
+	REQUIRE( bx::isEqual("1389-[]", "1389-[]", false) );
+	REQUIRE(!bx::isEqual("1389-[]", "1389-{}", false) );
+
+	// Mixed string types (all implicitly convert to StringView).
+	const bx::StringView    sv("RGBA");
+	const bx::StringLiteral sl("RGBA");
+	REQUIRE( bx::isEqual(sv, sl) );
+	REQUIRE( bx::isEqual(sv, "RGBA") );
+	REQUIRE( bx::isEqual("rgba", sl, false) );
+}
+
+TEST_CASE("operator==/operator!=", "[string]")
+{
+	REQUIRE(  bx::StringView("test") == bx::StringView("test") );
+	REQUIRE(  bx::StringView("test") == "test" );
+	REQUIRE(  "test" == bx::StringView("test") );
+	REQUIRE(!(bx::StringView("test") == "Test") );
+
+	REQUIRE(  bx::StringView("test") != "Test" );
+	REQUIRE(!(bx::StringView("test") != "test") );
+}
+
+TEST_CASE("isEqual constexpr", "[string]")
+{
+	STATIC_REQUIRE( bx::isEqual("1389", "1389") );
+	STATIC_REQUIRE(!bx::isEqual("1389", "1388") );
+	STATIC_REQUIRE( bx::isEqual("abvgd", "ABVGD", false) );
+	STATIC_REQUIRE(!bx::isEqual("abvgd", "ABVGD") );
+
+	STATIC_REQUIRE( bx::StringView("mac") == "mac" );
+	STATIC_REQUIRE( bx::StringView("mac") != "pod" );
+	STATIC_REQUIRE( bx::isEqual(bx::StringLiteral("pod"), bx::StringView("POD"), false) );
+}
+
+TEST_CASE("strCmp constexpr", "[string]")
+{
+	STATIC_REQUIRE(0 == bx::strCmp("abvgd", "abvgd") );
+	STATIC_REQUIRE(0  < bx::strCmp("abvgd", "abv") );
+	STATIC_REQUIRE(0  > bx::strCmp("", "abvgd") );
+	STATIC_REQUIRE(0 == bx::strCmp("abvgd", "abvgx", 4) );
+
+	STATIC_REQUIRE(0 == bx::strCmpI("abvgd", "ABVGD") );
+	STATIC_REQUIRE(0  > bx::strCmpI("abvgd", "ABVGX") );
+
+	STATIC_REQUIRE(0  > bx::strCmpV("test_2.txt", "test_10.txt") );
+
+	constexpr bx::StringLiteral sorted[] = { "dds", "exr", "ktx", "ktx2", "png" };
+	STATIC_REQUIRE( bx::isSorted(sorted, BX_COUNTOF(sorted), [](const bx::StringLiteral& _lhs, const bx::StringLiteral& _rhs) { return 0 > bx::strCmp(_lhs, _rhs); }) );
+	STATIC_REQUIRE(!bx::isSorted(sorted, BX_COUNTOF(sorted), [](const bx::StringLiteral& _lhs, const bx::StringLiteral& _rhs) { return 0 < bx::strCmp(_lhs, _rhs); }) );
+}
+
+TEST_CASE("strCmpV", "[string]")
+{
+	REQUIRE(0 == bx::strCmpV("test", "test") );
+	REQUIRE(0 == bx::strCmpV("test", "testestes", 4) );
+	REQUIRE(0 == bx::strCmpV("testestes", "test", 4) );
+	REQUIRE(0 != bx::strCmpV("preprocess", "platform") );
+
+	const char* abvgd = "abvgd";
+	const char* abvgx = "abvgx";
+	const char* empty = "";
+	REQUIRE(0 == bx::strCmpV(abvgd, abvgd) );
+	REQUIRE(0 == bx::strCmpV(abvgd, abvgx, 4) );
+	REQUIRE(0 == bx::strCmpV(empty, empty) );
+
+	REQUIRE(0 >  bx::strCmpV(abvgd, abvgx) );
+	REQUIRE(0 >  bx::strCmpV(empty, abvgd) );
+
+	REQUIRE(0 <  bx::strCmpV(abvgx, abvgd) );
+	REQUIRE(0 <  bx::strCmpV(abvgd, empty) );
+}
+
+static int32_t strCmpV(const void* _lhs, const void* _rhs)
+{
+	const char* lhs = *(const char**)_lhs;
+	const char* rhs = *(const char**)_rhs;
+	int32_t result = bx::strCmpV(lhs, rhs);
+	return result;
+}
+
+TEST_CASE("strCmpV sort", "[string][sort]")
+{
+	const char* test[] =
+	{
+		"test_1.txt",
+		"test_10.txt",
+		"test_100.txt",
+		"test_15.txt",
+		"test_11.txt",
+		"test_23.txt",
+		"test_3.txt",
+	};
+
+	const char* expected[] =
+	{
+		"test_1.txt",
+		"test_3.txt",
+		"test_10.txt",
+		"test_11.txt",
+		"test_15.txt",
+		"test_23.txt",
+		"test_100.txt",
+	};
+
+	static_assert(BX_COUNTOF(test) == BX_COUNTOF(expected) );
+
+	bx::quickSort(test, BX_COUNTOF(test), sizeof(const char*), strCmpV);
+
+	for (uint32_t ii = 0; ii < BX_COUNTOF(test); ++ii)
+	{
+		REQUIRE(0 == bx::strCmp(test[ii], expected[ii]) );
+	}
+}
+
+TEST_CASE("overlap", "[string]")
+{
+	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
+
+	const bx::StringView quick = bx::strFind(test, "Quick");
+
+	REQUIRE(bx::overlap(quick, test) );
+
+	const bx::StringView empty;
+	REQUIRE(!bx::overlap(quick, empty) );
+	REQUIRE(!bx::overlap(test, empty) );
+}
+
+TEST_CASE("strRFind", "[string]")
+{
+	const char* test = "test";
+	REQUIRE(bx::strRFind(bx::StringView(test, 0), 's').isEmpty() );
+	REQUIRE(bx::strRFind(bx::StringView(test, 1), 's').isEmpty() );
+	REQUIRE(&test[2] == bx::strRFind(test, 's').getPtr() );
+	REQUIRE(&test[3] == bx::strRFind(test, 't').getPtr() );
+}
+
+TEST_CASE("strFindI", "[string]")
+{
+	const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
+
+	REQUIRE(bx::strFindI(bx::StringView(test, 8), "quick").isEmpty() );
+	REQUIRE(bx::strFindI(test, "quick1").isEmpty() );
+	REQUIRE(&test[4] == bx::strFindI(bx::StringView(test, 9), "quick").getPtr() );
+	REQUIRE(&test[4] == bx::strFindI(test, "quick").getPtr() );
+}
+
+TEST_CASE("strFind", "[string]")
+{
+	{
+		const char* test = "test";
+
+		REQUIRE(bx::strFind(bx::StringView(test, 0), 's').isEmpty() );
+		REQUIRE(bx::strFind(bx::StringView(test, 2), 's').isEmpty() );
+		REQUIRE(&test[2] == bx::strFind(test, 's').getPtr() );
+	}
+
+	{
+		const char* test = "The Quick Brown Fox Jumps Over The Lazy Dog.";
+
+		REQUIRE(bx::strFind(bx::StringView(test, 8), "quick").isEmpty() );
+		REQUIRE(bx::strFind(test, "quick1").isEmpty() );
+		REQUIRE(bx::strFind(bx::StringView(test, 9), "quick").isEmpty() );
+		REQUIRE(bx::strFind(test, "quick").isEmpty() );
+
+		REQUIRE(bx::strFind(bx::StringView(test, 8), "Quick").isEmpty() );
+		REQUIRE(bx::strFind(test, "Quick1").isEmpty() );
+		REQUIRE(&test[4] == bx::strFind(bx::StringView(test, 9), "Quick").getPtr() );
+		REQUIRE(&test[4] == bx::strFind(test, "Quick").getPtr() );
+
+		REQUIRE(bx::strFind("vgd", 'a').isEmpty() );
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", "a");
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
+
+	{
+		bx::StringView test = bx::strFind("a", bx::StringView("a ", 1) );
+		REQUIRE(test.getLength() == 1);
+		REQUIRE(*test.getPtr() == 'a');
+	}
+}
+
+TEST_CASE("strFind edges", "[string]")
+{
+	const char* test = "0123456789abcdefXYZ0123456789abcdefghij";
+	const bx::StringView view(test);
+
+	REQUIRE(&test[0]  == bx::strFind(view, "0123").getPtr() );
+	REQUIRE(&test[35] == bx::strFind(view, "ghij").getPtr() );
+	REQUIRE(&test[38] == bx::strFind(view, 'j').getPtr() );
+	REQUIRE(&test[19] == bx::strRFind(view, '0').getPtr() );
+	REQUIRE(&test[15] == bx::strFind(view, "fXY").getPtr() );
+	REQUIRE(&test[16] == bx::strFind(view, 'X').getPtr() );
+	REQUIRE(&test[16] == bx::strRFind(view, 'X').getPtr() );
+
+	REQUIRE(bx::strFind(bx::StringView(test, 4), "01234").isEmpty() );
+	REQUIRE(bx::strFind(view, "").isEmpty() );
+	REQUIRE(bx::strFind(bx::StringView(), "a").isEmpty() );
+	REQUIRE(bx::strFind(view, 'q').isEmpty() );
+	REQUIRE(bx::strRFind(view, 'q').isEmpty() );
+
+	REQUIRE(&test[16] == bx::strFind(view, "XYQ", 2).getPtr() );
+	REQUIRE(2 == bx::strFind(view, "XYQ", 2).getLength() );
+	REQUIRE(bx::strFind(view, "XYQ").isEmpty() );
+
+	REQUIRE(&test[21] == bx::strFind(bx::StringView(&test[3], 36), "2345").getPtr() );
+	REQUIRE(&test[3]  == bx::strFind(bx::StringView(&test[3], 36), "3456").getPtr() );
+}
+
+static const char* strFindRef(const char* _str, int32_t _strLen, const char* _find, int32_t _findLen)
+{
+	for (int32_t ii = 0; 0 < _findLen && ii + _findLen <= _strLen; ++ii)
+	{
+		if (0 == bx::memCmp(&_str[ii], _find, _findLen) )
+		{
+			return &_str[ii];
+		}
+	}
+
+	return NULL;
+}
+
+static const char* strRFindRef(const char* _str, int32_t _strLen, char _ch)
+{
+	for (int32_t ii = _strLen - 1; 0 <= ii; --ii)
+	{
+		if (_ch == _str[ii])
+		{
+			return &_str[ii];
+		}
+	}
+
+	return NULL;
+}
+
+TEST_CASE("strFind matches a byte loop", "[string]")
+{
+	bx::RngMwc rng;
+
+	char buffer[336];
+
+	for (uint32_t ii = 0; ii < 100000; ++ii)
+	{
+		const int32_t offset  = int32_t(rng.gen() % 16);
+		const int32_t len     = int32_t(rng.gen() % 301);
+		const int32_t findLen = 0 == ii%4
+			? int32_t(rng.gen() % 41)
+			: int32_t(rng.gen() % 5)
+			;
+
+		for (int32_t jj = 0; jj < len; ++jj)
+		{
+			buffer[offset + jj] = char('a' + rng.gen() % 3);
+		}
+
+		char find[40];
+		for (int32_t jj = 0; jj < findLen; ++jj)
+		{
+			find[jj] = char('a' + rng.gen() % 3);
+		}
+
+		if (0 < findLen
+		&&  findLen <= len
+		&&  0 == rng.gen() % 2)
+		{
+			const int32_t at = int32_t(rng.gen() % uint32_t(len - findLen + 1) );
+			bx::memCopy(&buffer[offset + at], find, findLen);
+		}
+
+		const char* str = &buffer[offset];
+		const bx::StringView view(str, len);
+
+		const char* expected = strFindRef(str, len, find, findLen);
+		const bx::StringView found = bx::strFind(view, bx::StringView(find, findLen) );
+		REQUIRE( (NULL == expected ? view.getTerm() : expected) == found.getPtr() );
+
+		const char ch = char('a' + rng.gen() % 4);
+		const char* expectedCh = strFindRef(str, len, &ch, 1);
+		REQUIRE( (NULL == expectedCh ? view.getTerm() : expectedCh) == bx::strFind(view, ch).getPtr() );
+
+		const char* expectedRCh = strRFindRef(str, len, ch);
+		REQUIRE( (NULL == expectedRCh ? view.getTerm() : expectedRCh) == bx::strRFind(view, ch).getPtr() );
+	}
+}
+
+TEST_CASE("strSkip", "[string]")
+{
+	const bx::StringView t0("   test X");
+
+	const bx::StringView t1 = bx::strLTrimSpace(t0);
+	REQUIRE(0 == bx::strCmp(t1, "test", 4) );
+
+	const bx::StringView t2 = bx::strLTrimNonSpace(t1);
+	REQUIRE(0 == bx::strCmp(t2, " X", 2) );
+
+	const bx::StringView t3("test");
+
+	const bx::StringView t4 = bx::strLTrimNonSpace(t3);
+	REQUIRE(t4.getTerm() == t4.getPtr() );
+}
+
+template<typename Ty>
+static bool testToStringS(Ty _value, const char* _expected, char _separator = '\0')
+{
+	char tmp[1024];
+	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value, 10, _separator);
+	int32_t len = (int32_t)bx::strLen(_expected);
+	if (0 == bx::strCmp(tmp, _expected)
+	&&  num == len)
+	{
+		return true;
+	}
+
+	printf("result '%s' (%d), expected '%s' (%d)\n", tmp, num, _expected, len);
+	return false;
+}
+
+TEST_CASE("toString intXX_t/uintXX_t", "[string]")
+{
+	REQUIRE(testToStringS(0,          "0") );
+	REQUIRE(testToStringS(-256,       "-256") );
+	REQUIRE(testToStringS(INT32_MIN,  "-2147483648") );
+	REQUIRE(testToStringS(INT32_MAX,  "2147483647") );
+	REQUIRE(testToStringS(UINT32_MAX, "4294967295") );
+	REQUIRE(testToStringS(INT64_MIN,  "-9223372036854775808") );
+	REQUIRE(testToStringS(INT64_MAX,  "9223372036854775807") );
+	REQUIRE(testToStringS(UINT64_MAX, "18446744073709551615") );
+
+	REQUIRE(testToStringS(0,          "0", ',') );
+	REQUIRE(testToStringS(-256,       "-256", ',') );
+	REQUIRE(testToStringS(INT32_MAX,  "2,147,483,647", ',') );
+	REQUIRE(testToStringS(UINT32_MAX, "4,294,967,295", ',') );
+	REQUIRE(testToStringS(INT64_MAX,  "9,223,372,036,854,775,807", ',') );
+	REQUIRE(testToStringS(UINT64_MAX, "18,446,744,073,709,551,615", ',') );
+}
+
+template<typename Ty>
+static bool testToString(Ty _value, const char* _expected)
+{
+	char tmp[1024];
+	int32_t num = bx::toString(tmp, BX_COUNTOF(tmp), _value);
+	int32_t len = (int32_t)bx::strLen(_expected);
+	if (0 == bx::strCmp(tmp, _expected)
+	&&  num == len)
+	{
+		return true;
+	}
+
+	printf("result '%s' (%d), expected '%s' (%d)\n", tmp, num, _expected, len);
+	return false;
+}
+
+TEST_CASE("toString double", "[string]")
+{
+	REQUIRE(testToString(0.0,                     "0.0") );
+	REQUIRE(testToString(-0.0,                    "-0.0") );
+	REQUIRE(testToString(1.0,                     "1.0") );
+	REQUIRE(testToString(-1.0,                    "-1.0") );
+	REQUIRE(testToString(1.2345,                  "1.2345") );
+	REQUIRE(testToString(1.2345678,               "1.2345678") );
+	REQUIRE(testToString(0.123456789012,          "0.123456789012") );
+	REQUIRE(testToString(1234567.8,               "1234567.8") );
+	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testToString(0.000001,                "0.000001") );
+	REQUIRE(testToString(0.0000001,               "1e-7") );
+	REQUIRE(testToString(1e30,                    "1e30") );
+	REQUIRE(testToString(1.234567890123456e30,    "1.234567890123456e30") );
+	REQUIRE(testToString(-5e-324,                 "-5e-324") );
+	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testToString(2.2250738585072014e-308, "2.2250738585072014e-308") );
+	REQUIRE(testToString(1.7976931348623157e308,  "1.7976931348623157e308") );
+	REQUIRE(testToString(0.00000123123123,        "0.00000123123123") );
+	REQUIRE(testToString(0.000000123123123,       "1.23123123e-7") );
+	REQUIRE(testToString(123123.123,              "123123.123") );
+	REQUIRE(testToString(1231231.23,              "1231231.23") );
+	REQUIRE(testToString(0.000000000123123,       "1.23123e-10") );
+	REQUIRE(testToString(0.0000000001,            "1e-10") );
+	REQUIRE(testToString(-270.000000,             "-270.0") );
+	REQUIRE(testToString(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testToString(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testToString(-1.234567e-9,            "-1.234567e-9") );
+	REQUIRE(testToString(0.1 + 0.2,               "0.30000000000000004") );
+	REQUIRE(testToString(1.0000000000000002,      "1.0000000000000002") );
+}
+
+template<typename Ty>
+static bool testFromString(Ty _value, const char* _input)
+{
+	char tmp[1024];
+	bx::toString(tmp, BX_COUNTOF(tmp), _value);
+
+	Ty lhs;
+	bx::fromString(&lhs, tmp);
+
+	Ty rhs;
+	bx::fromString(&rhs, _input);
+
+	if (lhs == rhs)
+	{
+		return true;
+	}
+
+	printf("result '%f', input '%s'\n", _value, _input);
+	return false;
+}
+
+TEST_CASE("fromString float", "[string]")
+{
+	REQUIRE(testFromString<float>(std::numeric_limits<float>::min(),    "1.175494351e-38") );
+	REQUIRE(testFromString<float>(std::numeric_limits<float>::lowest(), "-3.402823466e+38") );
+	REQUIRE(testFromString<float>(std::numeric_limits<float>::max(),    "3.402823466e+38") );
+}
+
+TEST_CASE("fromString double", "[string]")
+{
+	REQUIRE(testFromString<double>(0.0,                     "0.0") );
+	REQUIRE(testFromString<double>(-0.0,                    "-0.0") );
+	REQUIRE(testFromString<double>(1.0,                     "1.0") );
+	REQUIRE(testFromString<double>(-1.0,                    "-1.0") );
+	REQUIRE(testFromString<double>(1.2345,                  "1.2345") );
+	REQUIRE(testFromString<double>(1.2345678,               "1.2345678") );
+	REQUIRE(testFromString<double>(0.123456789012,          "0.123456789012") );
+	REQUIRE(testFromString<double>(123456.789,              "123456.789") );
+	REQUIRE(testFromString<double>(1234567.8,               "1234567.8") );
+	REQUIRE(testFromString<double>(-79.39773355813419,      "-79.39773355813419") );
+	REQUIRE(testFromString<double>(0.000001,                "0.000001") );
+	REQUIRE(testFromString<double>(0.0000001,               "1e-7") );
+	REQUIRE(testFromString<double>(1e30,                    "1e30") );
+	REQUIRE(testFromString<double>(1.234567890123456e30,    "1.234567890123456e30") );
+	REQUIRE(testFromString<double>(-5e-324,                 "-5e-324") );
+	REQUIRE(testFromString<double>(2.225073858507201e-308,  "2.225073858507201e-308") );
+	REQUIRE(testFromString<double>(2.2250738585072014e-308, "2.2250738585072014e-308") );
+	REQUIRE(testFromString<double>(1.7976931348623157e308,  "1.7976931348623157e308") );
+	REQUIRE(testFromString<double>(0.00000123123123,        "0.00000123123123") );
+	REQUIRE(testFromString<double>(0.000000123123123,       "1.23123123e-7") );
+	REQUIRE(testFromString<double>(123123.123,              "123123.123") );
+	REQUIRE(testFromString<double>(1231231.23,              "1231231.23") );
+	REQUIRE(testFromString<double>(0.000000000123123,       "1.23123e-10") );
+	REQUIRE(testFromString<double>(0.0000000001,            "1e-10") );
+	REQUIRE(testFromString<double>(-270.000000,             "-270.0") );
+	REQUIRE(testFromString<double>(2.2250738585072011e-308, "2.2250738585072011e-308") ); // https://web.archive.org/web/20181112222123/https://www.exploringbinary.com/php-hangs-on-numeric-value-2-2250738585072011e-308/
+	REQUIRE(testFromString<double>(2.2250738585072009e-308, "2.2250738585072009e-308") ); // Max subnormal double
+	REQUIRE(testFromString<double>(4.9406564584124654e-324, "4.9406564584124654e-324") ); // Min denormal
+	REQUIRE(testFromString<double>(1.7976931348623157e+308, "1.7976931348623157e+308") ); // Max double
+
+//  warning: magnitude of floating-point constant too small for type 'double'; minimum is 4.9406564584124654E-324
+//	REQUIRE(testFromString<double>(1e-10000,                "0.0") );                     // Must underflow
+//	integer literal is too large to be represented in any integer type
+//	REQUIRE(testFromString<double>(18446744073709551616,    "18446744073709551616.0") );  // 2^64 (max of uint64_t + 1, force to use double)
+//	REQUIRE(testFromString<double>(-9223372036854775809,    "-9223372036854775809.0") );  // -2^63 - 1(min of int64_t + 1, force to use double)
+
+	REQUIRE(testFromString<double>(0.9868011474609375,      "0.9868011474609375") );      // https://github.com/miloyip/rapidjson/issues/120
+	REQUIRE(testFromString<double>(123e34,                  "123e34") );
+	REQUIRE(testFromString<double>(45913141877270640000.0,  "45913141877270640000.0") );
+	REQUIRE(testFromString<double>(std::numeric_limits<double>::min(),    "2.2250738585072014e-308") );
+	REQUIRE(testFromString<double>(std::numeric_limits<double>::lowest(), "-1.7976931348623158e+308") );
+	REQUIRE(testFromString<double>(std::numeric_limits<double>::max(),    "1.7976931348623158e+308") );
+}
+
+TEST_CASE("fromString hex float", "[string]")
+{
+	double d = 1.0;
+
+	REQUIRE(bx::fromString(&d, "0x1p+0")   ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1P0")    ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1.8p+1") ); REQUIRE(d ==  3.0);
+	REQUIRE(bx::fromString(&d, "0x1p-1")   ); REQUIRE(d ==  0.5);
+	REQUIRE(bx::fromString(&d, "-0x1.4p+2")); REQUIRE(d == -5.0);
+	REQUIRE(bx::fromString(&d, "0x0.8p+1") ); REQUIRE(d ==  1.0);
+	REQUIRE(bx::fromString(&d, "0x1.8")    ); REQUIRE(d ==  1.5);
+	REQUIRE(bx::fromString(&d, "0x10")     ); REQUIRE(d == 16.0);
+
+	REQUIRE(bx::fromString(&d, "0x1.fffffep+127") );
+	REQUIRE(d == double(bx::kFloatLargest) );
+
+	REQUIRE(bx::fromString(&d, "0x1p-126") );
+	REQUIRE(d == double(bx::kFloatSmallest) );
+
+	REQUIRE(bx::fromString(&d, "0x1.fffffffffffffp+1023") );
+	REQUIRE(d == bx::kDoubleLargest);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1022") );
+	REQUIRE(d == bx::kDoubleSmallest);
+
+	float f = 0.0f;
+
+	REQUIRE(bx::fromString(&f, "0x1.fffffep+127") );
+	REQUIRE(f == bx::kFloatLargest);
+
+	REQUIRE(bx::fromString(&f, "0x1p-126") );
+	REQUIRE(f == bx::kFloatSmallest);
+}
+
+TEST_CASE("fromString round half to even", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE(bx::fromString(&d, "1e23") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x44b52d02c7e14af6) );
+
+	REQUIRE(bx::fromString(&d, "9007199254740993") );
+	REQUIRE(d == 9007199254740992.0);
+
+	REQUIRE(bx::fromString(&d, "7.2057594037927933e16") );
+	REQUIRE(d == 72057594037927936.0);
+
+	REQUIRE(bx::fromString(&d, "9007199254740992.5") );
+	REQUIRE(d == 9007199254740992.0);
+
+	REQUIRE(bx::fromString(&d, "9007199254740993.5") );
+	REQUIRE(d == 9007199254740994.0);
+
+	REQUIRE(bx::fromString(&d, "1.00000000000000011102230246251565404236316680908203125") );
+	REQUIRE(d == 1.0);
+
+	REQUIRE(bx::fromString(&d, "1.000000000000000111022302462515654042363166809082031250000001") );
+	REQUIRE(d == 1.0000000000000002);
+
+	REQUIRE(bx::fromString(&d, "1.00000000000000011102230246251565404236316680908203124999999") );
+	REQUIRE(d == 1.0);
+}
+
+TEST_CASE("fromString subnormal", "[string]")
+{
+	double d = 1.0;
+
+	REQUIRE(bx::fromString(&d, "5e-324") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "2.5e-324") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "2e-324") );
+	REQUIRE(d == 0.0);
+
+	REQUIRE(bx::fromString(&d, "1e-320") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x00000000000007e8) );
+
+	REQUIRE(bx::fromString(&d, "1e-308") );
+	REQUIRE(bx::doubleToBits(d) == UINT64_C(0x000730d67819e8d2) );
+
+	for (int32_t exp = -1022; exp >= -1074; --exp)
+	{
+		char tmp[1200];
+		const double value = bx::ldexp(1.0, exp);
+
+		bx::toString(tmp, BX_COUNTOF(tmp), value);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(read == value);
+	}
+
+	float f = 1.0f;
+
+	REQUIRE(bx::fromString(&f, "1e-45") );
+	REQUIRE(f == 0x1p-149f);
+
+	REQUIRE(bx::fromString(&f, "1e-46") );
+	REQUIRE(f == 0.0f);
+}
+
+TEST_CASE("fromString rejects malformed", "[string]")
+{
+	const char* bad[] = { "", "abc", "+", "-", ".", "e10", "   ", "0x", "-0x", "+.e5" };
+
+	for (const char* str : bad)
+	{
+		double d = 1234.5;
+		float  f = 1234.5f;
+
+		REQUIRE(!bx::fromString(&d, str) );
+		REQUIRE(!bx::fromString(&f, str) );
+	}
+
+	double d = 0.0;
+	REQUIRE(!bx::fromString(&d, "12abc") );
+	REQUIRE(d == 12.0);
+}
+
+TEST_CASE("fromString whole string", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE( bx::fromString(&d, "1.5e3") );   REQUIRE(d == 1500.0);
+	REQUIRE( bx::fromString(&d, " 1.5 \t") ); REQUIRE(d == 1.5);
+	REQUIRE(!bx::fromString(&d, "1.5e3x") );  REQUIRE(d == 1500.0);
+	REQUIRE(!bx::fromString(&d, "2e") );      REQUIRE(d == 2.0);
+	REQUIRE(!bx::fromString(&d, "1 2") );     REQUIRE(d == 1.0);
+
+	float f = 0.0f;
+	REQUIRE( bx::fromString(&f, "0.25") );    REQUIRE(f == 0.25f);
+	REQUIRE(!bx::fromString(&f, "0.25f") );   REQUIRE(f == 0.25f);
+}
+
+TEST_CASE("fromString integer", "[string]")
+{
+	long long ll = 1234;
+
+	REQUIRE(bx::fromString(&ll, "0") );        REQUIRE(0 == ll);
+	REQUIRE(bx::fromString(&ll, "123") );      REQUIRE(123 == ll);
+	REQUIRE(bx::fromString(&ll, "-123") );     REQUIRE(-123 == ll);
+	REQUIRE(bx::fromString(&ll, "+7") );       REQUIRE(7 == ll);
+	REQUIRE(bx::fromString(&ll, " \t42") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "42 \n") );    REQUIRE(42 == ll);
+	REQUIRE(bx::fromString(&ll, "007") );      REQUIRE(7 == ll);
+
+	REQUIRE(!bx::fromString(&ll, "12abc") );   REQUIRE(12 == ll);
+	REQUIRE(!bx::fromString(&ll, "4u") );      REQUIRE(4 == ll);
+	REQUIRE(!bx::fromString(&ll, "1 2") );     REQUIRE(1 == ll);
+	REQUIRE(!bx::fromString(&ll, "0x10") );    REQUIRE(0 == ll);
+	REQUIRE(!bx::fromString(&ll, "1.5") );     REQUIRE(1 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(!bx::fromString(&u32, "7b") );     REQUIRE(7 == u32);
+
+	int8_t i8 = 0;
+	REQUIRE(!bx::fromString(&i8, "300x") );    REQUIRE(127 == i8);
+}
+
+TEST_CASE("fromString integer rejects malformed", "[string]")
+{
+	const char* bad[] = { "", "abc", "+", "-", "x1", "   ", "- 1", "+-1", ".5" };
+
+	for (const char* str : bad)
+	{
+		long long ll = 1234;
+		REQUIRE(!bx::fromString(&ll, str) );
+		REQUIRE(0 == ll);
+
+		unsigned long long ull = 1234;
+		REQUIRE(!bx::fromString(&ull, str) );
+		REQUIRE(0 == ull);
+
+		int32_t i32 = 1234;
+		REQUIRE(!bx::fromString(&i32, str) );
+		REQUIRE(0 == i32);
+
+		uint8_t u8 = 123;
+		REQUIRE(!bx::fromString(&u8, str) );
+		REQUIRE(0 == u8);
+	}
+
+	const char* digits = "123";
+	long long ll = 1234;
+	REQUIRE(!bx::fromString(&ll, bx::StringView(digits, 0) ) );
+}
+
+TEST_CASE("fromString integer stays in view", "[string]")
+{
+	const char digits[] = { '1', '2', '3', '4' };
+
+	long long ll = 0;
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 2) ) );
+	REQUIRE(12 == ll);
+
+	REQUIRE(bx::fromString(&ll, bx::StringView(digits, 4) ) );
+	REQUIRE(1234 == ll);
+
+	uint32_t u32 = 0;
+	REQUIRE(bx::fromString(&u32, bx::StringView(digits, 3) ) );
+	REQUIRE(123 == u32);
+}
+
+TEST_CASE("fromString integer range", "[string]")
+{
+	long long ll = 0;
+
+	REQUIRE( bx::fromString(&ll,  "9223372036854775807") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE( bx::fromString(&ll, "-9223372036854775808") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "9223372036854775808") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-9223372036854775809") ); REQUIRE(INT64_MIN == ll);
+	REQUIRE(!bx::fromString(&ll,  "99999999999999999999999999") ); REQUIRE(INT64_MAX == ll);
+	REQUIRE(!bx::fromString(&ll, "-99999999999999999999999999") ); REQUIRE(INT64_MIN == ll);
+
+	unsigned long long ull = 0;
+
+	REQUIRE( bx::fromString(&ull, "18446744073709551615") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "18446744073709551616") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE(!bx::fromString(&ull, "99999999999999999999999999") ); REQUIRE(UINT64_MAX == ull);
+	REQUIRE( bx::fromString(&ull, "9223372036854775808") );  REQUIRE(UINT64_C(9223372036854775808) == ull);
+	REQUIRE(!bx::fromString(&ull, "-1") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "-0") );                   REQUIRE(0 == ull);
+	REQUIRE( bx::fromString(&ull, "+5") );                   REQUIRE(5 == ull);
+
+	int8_t i8 = 0;
+	REQUIRE( bx::fromString(&i8, "127") );  REQUIRE( 127 == i8);
+	REQUIRE( bx::fromString(&i8, "-128") ); REQUIRE(-128 == i8);
+	REQUIRE(!bx::fromString(&i8, "128") );  REQUIRE( 127 == i8);
+	REQUIRE(!bx::fromString(&i8, "-129") ); REQUIRE(-128 == i8);
+
+	uint8_t u8 = 0;
+	REQUIRE( bx::fromString(&u8, "255") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "256") );  REQUIRE(255 == u8);
+	REQUIRE(!bx::fromString(&u8, "-1") );   REQUIRE(0 == u8);
+
+	int16_t i16 = 0;
+	REQUIRE( bx::fromString(&i16, "-32768") ); REQUIRE(INT16_MIN == i16);
+	REQUIRE(!bx::fromString(&i16, "32768") );  REQUIRE(INT16_MAX == i16);
+
+	uint16_t u16 = 0;
+	REQUIRE( bx::fromString(&u16, "65535") ); REQUIRE(UINT16_MAX == u16);
+	REQUIRE(!bx::fromString(&u16, "65536") ); REQUIRE(UINT16_MAX == u16);
+
+	int32_t i32 = 0;
+	REQUIRE( bx::fromString(&i32, "-2147483648") ); REQUIRE(INT32_MIN == i32);
+	REQUIRE(!bx::fromString(&i32, "2147483648") );  REQUIRE(INT32_MAX == i32);
+	REQUIRE(!bx::fromString(&i32, "99999999999999999999999999") ); REQUIRE(INT32_MAX == i32);
+
+	uint32_t u32 = 0;
+	REQUIRE( bx::fromString(&u32, "4294967295") ); REQUIRE(UINT32_MAX == u32);
+	REQUIRE(!bx::fromString(&u32, "4294967296") ); REQUIRE(UINT32_MAX == u32);
+
+	long l = 0;
+	REQUIRE( bx::fromString(&l, "-2147483648") ); REQUIRE(-2147483647L - 1 == l);
+
+	unsigned long ul = 0;
+	REQUIRE( bx::fromString(&ul, "4294967295") ); REQUIRE(4294967295UL == ul);
+	REQUIRE(!bx::fromString(&ul, "-1") );         REQUIRE(0 == ul);
+}
+
+TEST_CASE("fromString float rounds once", "[string]")
+{
+	float f = 0.0f;
+
+	REQUIRE(bx::fromString(&f, "1e23") );
+	REQUIRE(bx::floatToBits(f) == UINT32_C(0x65a96816) );
+
+	REQUIRE(bx::fromString(&f, "0.1") );
+	REQUIRE(f == 0.1f);
+
+	REQUIRE(bx::fromString(&f, "16777217") );
+	REQUIRE(f == 16777216.0f);
+
+	REQUIRE(bx::fromString(&f, "3.4028234663852886e+38") );
+	REQUIRE(f == bx::kFloatLargest);
+
+	REQUIRE(bx::fromString(&f, "1e39") );
+	REQUIRE(bx::isInfinite(f) );
+}
+
+TEST_CASE("fromString long digit strings", "[string]")
+{
+	const double values[] =
+	{
+		1.0, 0.1, 1.0e-300, 1.0e300, 0x1p-1074, 2.2250738585072014e-308,
+		1.7976931348623157e308, 3.141592653589793, -79.39773355813419,
+	};
+
+	for (double value : values)
+	{
+		char tmp[1200];
+		bx::snprintf(tmp, BX_COUNTOF(tmp), "%.760e", value);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(read == value);
+	}
+
+	double d = 0.0;
+	REQUIRE(bx::fromString(&d, "1.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001") );
+	REQUIRE(d == 1.0);
+}
+
+TEST_CASE("fromString round trip across every exponent", "[string]")
+{
+	bx::RngMwc rng;
+
+	for (uint32_t ii = 0; ii < 100000; ++ii)
+	{
+		const uint64_t hi   = rng.gen();
+		const uint64_t lo   = rng.gen();
+		const uint64_t bits = (hi << 32) | lo;
+		const double value  = bx::bitsToDouble(bits);
+
+		if (!bx::isFinite(value) )
+		{
+			continue;
+		}
+
+		char tmp[64];
+		bx::toString(tmp, BX_COUNTOF(tmp), value);
+		INFO(tmp);
+
+		double read = 0.0;
+		REQUIRE(bx::fromString(&read, tmp) );
+		REQUIRE(bx::doubleToBits(read) == bits);
+	}
+}
+
+TEST_CASE("fromString hex wide mantissa", "[string]")
+{
+	double d = 0.0;
+
+	REQUIRE(bx::fromString(&d, "0x1fffffffffffffp0") );
+	REQUIRE(d == 9007199254740991.0);
+
+	REQUIRE(bx::fromString(&d, "0x1ffffffffffffff80p0") );
+	REQUIRE(d == 36893488147419103232.0);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1074") );
+	REQUIRE(d == 0x1p-1074);
+
+	REQUIRE(bx::fromString(&d, "0x1p-1075") );
+	REQUIRE(d == 0.0);
+
+	REQUIRE(bx::fromString(&d, "0x3p-1075") );
+	REQUIRE(d == 0x1p-1073);
+}
+
+static bool testFromString(int32_t _value, const char* _input)
+{
+	char tmp[1024];
+	bx::toString(tmp, BX_COUNTOF(tmp), _value);
+
+	double lhs;
+	bx::fromString(&lhs, tmp);
+
+	double rhs;
+	bx::fromString(&rhs, _input);
+
+	if (lhs == rhs)
+	{
+		return true;
+	}
+
+	printf("result '%d', input '%s'\n", _value, _input);
+	return false;
+}
+
+TEST_CASE("fromString int32_t", "[string]")
+{
+	REQUIRE(testFromString(1389,   "1389") );
+	REQUIRE(testFromString(1389,   "  1389") );
+	REQUIRE(testFromString(1389,   "+1389") );
+	REQUIRE(testFromString(-1389,  "-1389") );
+	REQUIRE(testFromString(-1389,  " -1389") );
+	REQUIRE(testFromString(555333, "555333") );
+	REQUIRE(testFromString(-21,    "-021") );
+}
+
+TEST_CASE("StringLiteral", "[string]")
+{
+	constexpr bx::StringLiteral tmp[] = { "1389", "abvgd", "mac", "pod" };
+
+	REQUIRE(bx::isSorted(tmp, BX_COUNTOF(tmp) ) );
+
+	STATIC_REQUIRE(4 == tmp[0].getLength() );
+	STATIC_REQUIRE(4 == bx::strLen(tmp[0]) );
+	REQUIRE(0 == bx::strCmp("1389", tmp[0]) );
+
+	STATIC_REQUIRE(5 == tmp[1].getLength() );
+	STATIC_REQUIRE(5 == bx::strLen(tmp[1]) );
+	REQUIRE(0 == bx::strCmp("abvgd", tmp[1]) );
+
+	STATIC_REQUIRE(3 == tmp[2].getLength() );
+	STATIC_REQUIRE(3 == bx::strLen(tmp[2]) );
+	REQUIRE(0 == bx::strCmp("mac", tmp[2]) );
+
+	STATIC_REQUIRE(3 == tmp[3].getLength() );
+	STATIC_REQUIRE(3 == bx::strLen(tmp[3]) );
+	REQUIRE(0 == bx::strCmp("pod", tmp[3]) );
+
+	constexpr bx::StringLiteral copy(tmp[0]);
+	STATIC_REQUIRE(4 == copy.getLength() );
+	REQUIRE(4 == bx::strLen(copy) );
+	REQUIRE(0 == bx::strCmp("1389", copy) );
+
+	constexpr bx::StringView sv(tmp[1]);
+	STATIC_REQUIRE(5 == sv.getLength() );
+	STATIC_REQUIRE(5 == bx::strLen(sv) );
+	STATIC_REQUIRE("abvgd" == sv);
+}
+
+TEST_CASE("StringView constexpr", "[string]")
+{
+	constexpr bx::StringView sv("1389");
+
+	STATIC_REQUIRE(sv == "1389");
+	STATIC_REQUIRE(4  == bx::strLen(sv) );
+}
+
+TEST_CASE("StringView", "[string]")
+{
+	bx::StringView sv("test");
+	REQUIRE(4 == sv.getLength() );
+
+	sv.clear();
+	REQUIRE(0 == sv.getLength() );
+}
+
+TEST_CASE("Trim", "[string]")
+{
+	REQUIRE(bx::strLTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("aba", "a"), "ba") );
+
+	REQUIRE(bx::strRTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("aba", "a"), "ab") );
+
+	REQUIRE(bx::strTrim("a", "a").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("aba", "a"), "b") );
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "ab"), "vgd") );
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd", "vagbd"), "abvgd") );
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("abvgd", "vgd"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strLTrim("/555333/podmac/", "/"), "555333/podmac/") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "vagbd"), "") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd", "vagbd"), "abvgd") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("abvgd", "abv"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strRTrim("/555333/podmac/", "/"), "/555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", "da"), "bvg") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("<1389>", "<>"), "1389") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim("/555333/podmac/", "/"), "555333/podmac") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrim("abvgd", ""), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strTrim(" \t a b\tv g d \t ", " \t"), "a b\tv g d") );
+
+	bx::FilePath uri("/555333/podmac/");
+	REQUIRE(0 == bx::strCmp(bx::strTrim(uri.getPath(), "/"), "555333/podmac") );
+}
+
+TEST_CASE("TrimSpace", "[string]")
+{
+	REQUIRE(bx::strLTrimSpace("").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "").isEmpty() );
+
+	REQUIRE(bx::strLTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strRTrimSpace("\n").isEmpty() );
+	REQUIRE(bx::strTrimSpace( "\n").isEmpty() );
+
+	const bx::StringView t0("1389");
+	const bx::StringView t1("    1389");
+	const bx::StringView t2("1389    ");
+	const bx::StringView t3("  1389  ");
+
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t2), t2) );
+	REQUIRE(0 == bx::strCmp(bx::strLTrimSpace(t3), "1389  ") );
+
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t1), t1) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strRTrimSpace(t3), "  1389") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t0), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t1), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t2), t0) );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSpace(t3), t0) );
+}
+
+TEST_CASE("strWord", "[string]")
+{
+	REQUIRE(bx::strWord(" abvgd-1389.0").isEmpty() );
+	REQUIRE(0 == bx::strCmp(bx::strWord("abvgd-1389.0"), "abvgd") );
+
+	REQUIRE(0 == bx::strCmp(bx::strWord("1389.0"), "1389") );
+}
+
+TEST_CASE("strIdentifier", "[string]")
+{
+	REQUIRE(bx::strIdentifier("").isEmpty() );
+	REQUIRE(bx::strIdentifier(" abvgd").isEmpty() );
+	REQUIRE(bx::strIdentifier("-abc").isEmpty() );
+
+	REQUIRE(bx::strIdentifier("123abc").isEmpty() );
+	REQUIRE(bx::strIdentifier("5_0").isEmpty() );
+
+	REQUIRE(0 == bx::strCmp(bx::strIdentifier("abvgd-1389.0"), "abvgd") );
+	REQUIRE(0 == bx::strCmp(bx::strIdentifier("abc123 def"),   "abc123") );
+	REQUIRE(0 == bx::strCmp(bx::strIdentifier("_abc9"),        "_abc9") );
+	REQUIRE(0 == bx::strCmp(bx::strIdentifier("ps_5_0"),       "ps_5_0") );
+
+	const bx::StringView test("123abc");
+	REQUIRE(test.getPtr() == bx::strIdentifier(test).getPtr() );
+}
+
+TEST_CASE("strFindEol strFindNl", "[string]")
+{
+	{
+		const bx::StringView test("abc");
+		REQUIRE(test.getTerm() == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getTerm() == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		const bx::StringView test("abc\ndef");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 4 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// End of line is the \r of a \r\n pair, new line is past the \n.
+		const bx::StringView test("abc\r\ndef");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 5 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// A lone \r is not a line terminator.
+		const bx::StringView test("abc\rdef\n");
+		REQUIRE(test.getPtr() + 7 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 8 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// Must return the *first* terminator, not the first \r\n.
+		const bx::StringView test("abc\ndef\r\n");
+		REQUIRE(test.getPtr() + 3 == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getPtr() + 4 == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		const bx::StringView test("\r\n");
+		REQUIRE(test.getPtr() == bx::strFindEol(test).getPtr() );
+		REQUIRE(test.getTerm() == bx::strFindNl(test).getPtr() );
+	}
+
+	{
+		// Leading \n whose preceding \r is outside the view.
+		const bx::StringView test("a\r\nb");
+		const bx::StringView tail(test, 2, INT32_MAX);
+		REQUIRE(tail.getPtr() == bx::strFindEol(tail).getPtr() );
+	}
+}
+
+TEST_CASE("strFindBlock", "[string]")
+{
+	const bx::StringView test0("{ { {} {} abvgd; {} } }");
+	const bx::StringView test1(test0, 1, INT32_MAX);
+
+	bx::StringView result = bx::strFindBlock(test1, '{', '}');
+	REQUIRE(19 == result.getLength() );
+}
+
+TEST_CASE("prefix", "[string]")
+{
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "abv") );
+	REQUIRE(!bx::hasPrefix("abvgd-1389.0", "bvg") );
+	REQUIRE( bx::hasPrefix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "abv"), "gd-1389.0") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimPrefix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
+}
+
+TEST_CASE("suffix", "[string]")
+{
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "389.0") );
+	REQUIRE(!bx::hasSuffix("abvgd-1389.0", "1389") );
+	REQUIRE( bx::hasSuffix("abvgd-1389.0", "") );
+
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "389.0"), "abvgd-1") );
+	REQUIRE(0 == bx::strCmp(bx::strTrimSuffix("abvgd-1389.0", "xyz"), "abvgd-1389.0") );
+}
+
+TEST_CASE("0terminated", "[string]")
+{
+	const bx::StringView t0("1389");
+	REQUIRE(t0.is0Terminated() );
+	const bx::StringView t1(strTrimPrefix(t0, "13") );
+	REQUIRE(!t1.is0Terminated() );
+	const bx::StringView t2(strTrimSuffix(t0, "89") );
+	REQUIRE(!t2.is0Terminated() );
+}
+
+static_assert(bx::isTriviallyCopyable<bx::FixedString64>(), "FixedStringT must be trivially copyable.");
+
+TEST_CASE("FixedStringT", "[string]")
+{
+	bx::FixedString64 fs64("1389");
+	bx::FixedString256 fs256(fs64);
+
+	REQUIRE(0 == strCmp(fs64, fs256) );
+	REQUIRE(0 == strCmp(fs64, "1389") );
+	REQUIRE(0 == strCmp(fs256, "1389") );
+
+	fs64.append("9831");
+	REQUIRE(8 == fs64.getLength() );
+
+	REQUIRE(0 != strCmp(fs64, fs256) );
+	REQUIRE(0 == strCmp(fs64, "13899831") );
+}
+
+bool testFormatHumanNumber(bx::StringView _expected, double _value, uint8_t _numFrac, int32_t _bufferSize = 32)
+{
+	char* tmp = (char*)BX_STACK_ALLOC(_bufferSize);
+	int32_t total = bx::formatHumanNumber(tmp, _bufferSize, _value, _numFrac);
+
+	bx::StringView human(tmp, total);
+
+	const bool result = 0 == bx::strCmp(human, _expected);
+
+	if (!result)
+	{
+		DBG(
+			  "expected: '%S' (len: %d), human: '%S' (len: %d)"
+			, &_expected
+			, _expected.getLength()
+			, &human
+			, human.getLength()
+			);
+	}
+
+	return result;
+}
+
+TEST_CASE("formatHumanNumber", "[string]")
+{
+	REQUIRE(testFormatHumanNumber("1,389,983,113.89", 1389983113.891389, 2) );
+	REQUIRE(testFormatHumanNumber("13,899,831.1389", 13899831.1389, 4) );
+	REQUIRE(testFormatHumanNumber("1,389.10", 1389.1, 2) );
+	REQUIRE(testFormatHumanNumber("1,389", 1389.0, 8) );
+	REQUIRE(testFormatHumanNumber("0", 0.0, 2) );
+
+	REQUIRE(testFormatHumanNumber("", 1389983113.891389, 2, 4) );
+}
+
+TEST_CASE("StringView is trivially copyable", "[string]")
+{
+	static_assert(bx::isTriviallyCopyable<bx::StringView>(), "StringView must stay trivially copyable");
+
+	union Variant
+	{
+		struct { bx::StringView name; } named;
+		struct { int32_t value; }       scalar;
+	};
+
+	struct Node
+	{
+		int32_t        kind;
+		bx::StringView span;
+		Variant        variant;
+	};
+
+	static_assert(bx::isTriviallyCopyable<Variant>(), "a union holding a StringView must stay copyable");
+
+	const Node node =
+	{
+		.kind    = 7,
+		.span    = bx::StringView("span"),
+		.variant = { .named = { .name = bx::StringView("hello") } },
+	};
+
+	const Node copy = node;
+	REQUIRE(7 == copy.kind);
+	REQUIRE(0 == bx::strCmp(copy.span, "span") );
+	REQUIRE(0 == bx::strCmp(copy.variant.named.name, "hello") );
+}
+
+TEST_CASE("UTF-16 conversion", "[string][utf8]")
+{
+	// "a", U+00FC, U+6D4B, U+1F600 (surrogate pair).
+	static const char*    kUtf8    = "a\xc3\xbc\xe6\xb5\x8b\xf0\x9f\x98\x80";
+	static const uint16_t kUtf16[] = { 0x0061, 0x00fc, 0x6d4b, 0xd83d, 0xde00, 0 };
+
+	uint16_t utf16[8];
+	REQUIRE(6 == bx::toUtf16(utf16, BX_COUNTOF(utf16), kUtf8) );
+	REQUIRE(0 == bx::memCmp(utf16, kUtf16, sizeof(kUtf16) ) );
+
+	char utf8[16];
+	REQUIRE(11 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kUtf16) );
+	REQUIRE(0 == bx::strCmp(utf8, kUtf8) );
+
+	// Required size, and a buffer one short of it.
+	REQUIRE(6  == bx::toUtf16(NULL, 0, kUtf8) );
+	REQUIRE(0  == bx::toUtf16(utf16, 5, kUtf8) );
+	REQUIRE(11 == bx::fromUtf16(NULL, 0, kUtf16) );
+	REQUIRE(0  == bx::fromUtf16(utf8, 10, kUtf16) );
+
+	// Empty.
+	REQUIRE(1 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "") );
+	REQUIRE(0 == utf16[0]);
+	static const uint16_t kEmpty[] = { 0 };
+	REQUIRE(1 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kEmpty) );
+	REQUIRE('\0' == utf8[0]);
+
+	// Invalid input is rejected rather than replaced.
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xc3") );                 // truncated sequence
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xc0\x80") );             // overlong NUL
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xed\xa0\x80") );         // encoded surrogate
+	REQUIRE(0 == bx::toUtf16(utf16, BX_COUNTOF(utf16), "\xff") );                 // not a lead byte
+	static const uint16_t kLoneHigh[] = { 0xd83d, 0x0061, 0 };
+	static const uint16_t kLoneLow[]  = { 0xde00, 0 };
+	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneHigh) );
+	REQUIRE(0 == bx::fromUtf16(utf8, BX_COUNTOF(utf8), kLoneLow) );
+}
+
+TEST_CASE("strFind-bench", "[.][!benchmark]")
+{
+	char haystack[1025];
+	bx::memSet(haystack, 'a', sizeof(haystack) - 1);
+	haystack[sizeof(haystack) - 1] = '\0';
+
+	for (int32_t len : { 12, 16, 1024 })
+	{
+		haystack[1]       = 'W';
+		haystack[len - 2] = 'X';
+		haystack[len - 1] = 'Y';
+
+		const bx::StringView view(haystack, len);
+		const std::string    str(haystack, len);
+
+		char name[64];
+
+		bx::snprintf(name, sizeof(name), "bx::strFind %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, "XY").getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find %d", len);
+		BENCHMARK(name)
+		{
+			return str.find("XY");
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strFind not found %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, "ZY").getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find not found %d", len);
+		BENCHMARK(name)
+		{
+			return str.find("ZY");
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strFind char %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strFind(view, 'Y').getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::find char %d", len);
+		BENCHMARK(name)
+		{
+			return str.find('Y');
+		};
+
+		bx::snprintf(name, sizeof(name), "bx::strRFind char %d", len);
+		BENCHMARK(name)
+		{
+			return bx::strRFind(view, 'W').getPtr();
+		};
+
+		bx::snprintf(name, sizeof(name), "std::string::rfind char %d", len);
+		BENCHMARK(name)
+		{
+			return str.rfind('W');
+		};
+
+		haystack[1]       = 'a';
+		haystack[len - 2] = 'a';
+		haystack[len - 1] = 'a';
+	}
+
+	std::string lines;
+
+	for (uint32_t ii = 0; ii < 1024; ++ii)
+	{
+		char tmp[64];
+		const int32_t len = bx::snprintf(tmp, sizeof(tmp), "\tfloat4 value%u = input%u;\n", ii, ii);
+		lines.append(tmp, size_t(len) );
+	}
+
+	const std::string dense(lines, 0, lines.find("value16 ") - 8);
+	const bx::StringView denseView(dense.c_str(), int32_t(dense.size() ) );
+
+	BENCHMARK("bx::strFind dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (bx::StringView found = bx::strFind(denseView, "float4"); !found.isEmpty(); found = bx::strFind(bx::StringView(found.getTerm(), denseView.getTerm() ), "float4") )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	BENCHMARK("std::string::find dense 16 lines")
+	{
+		int32_t num = 0;
+
+		for (size_t pos = dense.find("float4"); std::string::npos != pos; pos = dense.find("float4", pos + 6) )
+		{
+			++num;
+		}
+
+		return num;
+	};
+
+	const bx::StringView linesView(lines.c_str(), int32_t(lines.size() ) );
+
+	BENCHMARK("bx::strFind 1024 lines")
+	{
+		return bx::strFind(linesView, "value1023 =").getPtr();
+	};
+
+	BENCHMARK("std::string::find 1024 lines")
+	{
+		return lines.find("value1023 =");
+	};
+
+	std::string fff(4096, 'f');
+	fff.replace(4096 - 8, 6, "float4");
+	const bx::StringView fffView(fff.c_str(), int32_t(fff.size() ) );
+
+	BENCHMARK("bx::strFind 4096 f")
+	{
+		return bx::strFind(fffView, "float4").getPtr();
+	};
+
+	BENCHMARK("std::string::find 4096 f")
+	{
+		return fff.find("float4");
+	};
+}

@@ -51,9 +51,9 @@ namespace bx
 
 	StringView Scanner::moveTo(const StringView& _to)
 	{
-		if (BX_LIKELY(!_to.isEmpty() ) )
+		if (!_to.isEmpty() ) [[likely]]
 		{
-			if (BX_LIKELY(overlap(m_tail, _to) ) )
+			if (overlap(m_tail, _to) ) [[likely]]
 			{
 				const StringView result(m_tail.getPtr(), _to.getTerm() );
 
@@ -128,7 +128,7 @@ namespace bx
 		const int32_t len = m_tail.getLength();
 		_bytes = clamp(_bytes, len - m_input.getLength(), len);
 
-		if (BX_LIKELY(0 < _bytes) )
+		if (0 < _bytes) [[likely]]
 		{
 			const StringView result(m_tail.getPtr(), m_tail.getPtr() + _bytes);
 

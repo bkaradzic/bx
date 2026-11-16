@@ -667,12 +667,12 @@ namespace bx
 		return NULL;
 	}
 
-	CommandLineArgs::CommandLineArgs(AllocatorI* _allocator, int32_t _argc, const char* const* _argv)
-		: m_allocator(_allocator)
-		, m_data(NULL)
-		, m_argc(_argc)
+	CommandLineArgs::CommandLineArgs(AllocatorHandle _allocator, int32_t _argc, const char* const* _argv)
+		: m_argc(_argc)
 		, m_argv(const_cast<const char**>(_argv) )
 	{
+		m_blk.allocatorHandle = _allocator.idx;
+
 #if BX_PLATFORM_WINDOWS
 		const uint16_t* cmdLine = (const uint16_t*)::GetCommandLineW();
 		const int32_t   size    = fromUtf16(NULL, 0, cmdLine);
@@ -685,7 +685,8 @@ namespace bx
 		const int32_t maxArgs    = size/2 + 1;
 		const int32_t bufferSize = size*2 + 2;
 
-		uint8_t* data = (uint8_t*)alloc(m_allocator, maxArgs*sizeof(char*) + size + bufferSize);
+		Blk blk = alloc(_allocator, maxArgs*sizeof(char*) + size + bufferSize, alignof(char*) );
+		uint8_t* data = (uint8_t*)blk;
 
 		const char** argv   = (const char**)data;
 		char*        utf8   = (char*)&data[maxArgs*sizeof(char*)];
@@ -693,7 +694,7 @@ namespace bx
 
 		if (0 == fromUtf16(utf8, size, cmdLine) )
 		{
-			free(m_allocator, data);
+			(void)free(move(blk) );
 			return;
 		}
 
@@ -701,18 +702,23 @@ namespace bx
 		int32_t  argc = 0;
 		tokenizeCommandLine(StringView(utf8, size-1), buffer, len, argc, (char**)argv, maxArgs);
 
-		m_data = data;
+		m_blk  = move(blk);
 		m_argc = argc;
 		m_argv = argv;
 #endif // BX_PLATFORM_WINDOWS
 	}
 
+	CommandLineArgs::CommandLineArgs(AllocatorI* _allocator, int32_t _argc, const char* const* _argv)
+		: CommandLineArgs(internal::pointerAllocatorAcquire(_allocator), _argc, _argv)
+	{
+	}
+
 	CommandLineArgs::~CommandLineArgs()
 	{
-		if (NULL != m_data)
-		{
-			free(m_allocator, m_data);
-		}
+		const AllocatorHandle handle = getAllocatorHandle(m_blk);
+		m_blk = free(move(m_blk) );
+
+		internal::pointerAllocatorRelease(handle);
 	}
 
 	int32_t CommandLineArgs::getArgc() const

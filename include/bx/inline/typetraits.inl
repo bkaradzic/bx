@@ -585,6 +585,33 @@ namespace bx
 	}
 
 	//---
+#if defined(__has_builtin)
+#	if __has_builtin(__builtin_is_cpp_trivially_relocatable)
+	template<typename Ty> struct IsCompilerTriviallyRelocatableT : public BoolConstantT<__builtin_is_cpp_trivially_relocatable(Ty)> {};
+#	else
+	template<typename Ty> struct IsCompilerTriviallyRelocatableT : public FalseConstant {};
+#	endif // __has_builtin(__builtin_is_cpp_trivially_relocatable)
+#else
+	template<typename Ty> struct IsCompilerTriviallyRelocatableT : public FalseConstant {};
+#endif // defined(__has_builtin)
+
+	template<typename Ty>
+	struct IsTriviallyRelocatableT
+	{
+		static constexpr bool value = false
+			|| IsTriviallyCopyableT<Ty>::value
+			|| IsCompilerTriviallyRelocatableT<Ty>::value
+			|| requires { requires IsSameT<typename Ty::TriviallyRelocatable, Ty>::value; }
+			;
+	};
+
+	template<typename Ty>
+	inline constexpr bool isTriviallyRelocatable()
+	{
+		return IsTriviallyRelocatableT<Ty>::value;
+	}
+
+	//---
 	template<typename Ty>
 	[[nodiscard]] BX_ATTRIBUTE_INTRINSIC constexpr RemoveReferenceType<Ty>&& move(Ty&& _a)
 	{
