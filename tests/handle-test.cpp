@@ -188,8 +188,6 @@ TEST_CASE("HandleAllocLruT free and full", "")
 	REQUIRE(0 == lru.alloc() );
 }
 
-static_assert(bx::isSame<bx::HandleAlloc2, bx::HandleAlloc>(), "HandleAlloc2 is the former name of HandleAlloc.");
-static_assert(bx::isSame<bx::HandleAlloc2T<16>, bx::HandleAllocT<16> >(), "HandleAlloc2T is the former name of HandleAllocT.");
 static_assert(!bx::isCopyConstructible<bx::HandleAllocT<16> >(), "HandleAllocT refers to its own storage, copies would share it.");
 
 TEST_CASE("HandleHashTable", "")
