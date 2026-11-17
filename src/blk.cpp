@@ -1079,6 +1079,11 @@ namespace bx
 
 	struct MemoryTracker
 	{
+		static constexpr size_t kReserveSize = 1_MiB;
+
+		PageReserveAllocator m_pageAllocator;
+		ImplementAllocatorBlkInterfaceT<PageReserveAllocator> m_allocator;
+
 		HashMapT<uint64_t, uint32_t> m_locationMap;
 		HandleTableT<MemoryLocation> m_memLocation;
 
@@ -1087,11 +1092,11 @@ namespace bx
 		Mutex m_mutex;
 		bool m_init = false;
 
-		MemoryTracker() = delete;
-
-		MemoryTracker(AllocatorHandle _allocator)
-			: m_locationMap(_allocator, 0)
-			, m_memLocation(_allocator, 0)
+		MemoryTracker()
+			: m_pageAllocator(kReserveSize)
+			, m_allocator(m_pageAllocator)
+			, m_locationMap(m_allocator.getHandle(), 0)
+			, m_memLocation(m_allocator.getHandle(), 0)
 			, m_init(true)
 		{
 		}
@@ -1292,46 +1297,53 @@ namespace bx
 
 	BX_THREAD_LOCAL bool MemoryTracker::s_insideTracker = false;
 
-	static CrtAllocator  s_crtAllocator;
-	MemoryTracker s_memoryTracker(s_crtAllocator.getHandle() );
+	static MemoryTracker& getMemoryTracker()
+	{
+		static MemoryTracker s_memoryTracker;
+		return s_memoryTracker;
+	}
 
 	namespace internal
 	{
 		uint32_t addLocationTracking(const Location& _location, uint32_t _skip, size_t _newSize)
 		{
-			if (!s_memoryTracker.m_init)
+			MemoryTracker& tracker = getMemoryTracker();
+
+			if (!tracker.m_init)
 			{
 				return 0;
 			}
 
-			return s_memoryTracker.addLocationTracking(_location, _skip+1, _newSize);
+			return tracker.addLocationTracking(_location, _skip+1, _newSize);
 		}
 
 		void updateLocationTracking(uint32_t _locationIdx, size_t _oldSize, size_t _newSize)
 		{
-			if (!s_memoryTracker.m_init)
+			MemoryTracker& tracker = getMemoryTracker();
+
+			if (!tracker.m_init)
 			{
 				return;
 			}
 
-			s_memoryTracker.updateLocationTracking(_locationIdx, _oldSize, _newSize);
+			tracker.updateLocationTracking(_locationIdx, _oldSize, _newSize);
 		}
 
 	} // namespace internal
 
 	uint32_t getNumMemoryLocations()
 	{
-		return s_memoryTracker.m_memLocation.getCount();
+		return getMemoryTracker().m_memLocation.getCount();
 	}
 
 	const MemoryLocation& getMemoryLocation(uint32_t _locationIdx)
 	{
 		if (0 == _locationIdx)
 		{
-			return s_memoryTracker.m_global;
+			return getMemoryTracker().m_global;
 		}
 
-		return s_memoryTracker.m_memLocation[_locationIdx];
+		return getMemoryTracker().m_memLocation[_locationIdx];
 	}
 
 } // namespace bx
