@@ -7,6 +7,7 @@
 #include <bx/debug.h>
 #include <bx/error.h>
 #include <bx/readerwriter.h>
+#include <bx/thread.h>
 
 static BX_NO_INLINE uintptr_t getCalleeStackAddress()
 {
@@ -43,6 +44,71 @@ TEST_CASE("getCallStackFast", "[debug]")
 		REQUIRE(0 < num);
 	}
 }
+
+#if (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_CPU_X86 && BX_ARCH_64BIT
+struct BadFramePointer
+{
+	const uintptr_t* frame;
+	uintptr_t threadFrame;
+	uint32_t num;
+	uintptr_t stack[32];
+};
+
+static BX_NO_INLINE void getCallStackFastBadFramePointer(BadFramePointer& _bfp)
+{
+	volatile uintptr_t* frame = (volatile uintptr_t*)__builtin_frame_address(0);
+	const uintptr_t saved = frame[0];
+	frame[0] = uintptr_t(_bfp.frame);
+	_bfp.threadFrame = uintptr_t(frame);
+	_bfp.num = bx::getCallStackFast(0, BX_COUNTOF(_bfp.stack), _bfp.stack);
+	frame[0] = saved;
+}
+
+static int32_t badFramePointerThread(bx::Thread* _thread, void* _userData)
+{
+	BX_UNUSED(_thread);
+	getCallStackFastBadFramePointer(*(BadFramePointer*)_userData);
+	return 0;
+}
+
+TEST_CASE("getCallStackFast bad frame pointer", "[debug]")
+{
+	SECTION("Other thread's stack")
+	{
+		const uintptr_t marker = 0xbadc0de0;
+		const uintptr_t frame[2] = { 0, marker };
+
+		BadFramePointer bfp = {};
+		bfp.frame = frame;
+
+		bx::Thread thread;
+		REQUIRE(thread.init(badFramePointerThread, &bfp) );
+		thread.shutdown();
+
+		if (uintptr_t(frame) <= bfp.threadFrame)
+		{
+			SKIP("Thread's stack is above the main thread's.");
+		}
+
+		for (uint32_t ii = 0; ii < bfp.num; ++ii)
+		{
+			REQUIRE(marker != bfp.stack[ii]);
+		}
+	}
+
+	SECTION("End of the address space")
+	{
+		BadFramePointer bfp = {};
+		bfp.frame = (const uintptr_t*)(UINTPTR_MAX - sizeof(uintptr_t) + 1);
+
+		bx::Thread thread;
+		REQUIRE(thread.init(badFramePointerThread, &bfp) );
+		thread.shutdown();
+
+		REQUIRE(bfp.num <= BX_COUNTOF(bfp.stack) );
+	}
+}
+#endif // (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_CPU_X86 && BX_ARCH_64BIT
 
 static int32_t errorContextText(const bx::Error& _error, char* _out, int32_t _max)
 {
