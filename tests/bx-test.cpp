@@ -98,6 +98,12 @@ TEST_CASE("align", "[bx]")
 	REQUIRE(240 == bx::alignDown(255, 16) );
 	REQUIRE(-16 == bx::alignDown(-1,  16) );
 	REQUIRE(-32 == bx::alignDown(-31, 16) );
+
+	constexpr uint64_t kHi = UINT64_C(0x0000000300000000);
+	REQUIRE(kHi + 16 == bx::alignUp(kHi + 1, 16) );
+	REQUIRE(kHi      == bx::alignDown(kHi + 15, 16) );
+	REQUIRE( bx::isAligned(kHi, 16) );
+	REQUIRE(!bx::isAligned(kHi + 1, 16) );
 }
 
 TEST_CASE("loadUnaligned, storeUnaligned", "[bx]")

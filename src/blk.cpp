@@ -274,12 +274,12 @@ namespace bx
 			return ::malloc(_size);
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		return ::_aligned_malloc(_size, _alignment);
 #else
 		void* ptr = NULL;
 		return 0 == ::posix_memalign(&ptr, _alignment, _size) ? ptr : NULL;
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	static size_t crtSize(void* _ptr, size_t _size)
@@ -305,11 +305,11 @@ namespace bx
 			return;
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		::_aligned_free(_ptr);
 #else
 		::free(_ptr);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	static Blk crtAllocBlk(uint8_t _handle, size_t _size, size_t _alignment)
