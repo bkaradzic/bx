@@ -19,6 +19,11 @@
 #	endif // BX_CPU_X86
 #endif // BX_COMPILER_MSVC
 
+#if BX_PLATFORM_XBOXONE
+extern "C" unsigned __int64 __readgsqword(unsigned long _offset);
+#	pragma intrinsic(__readgsqword)
+#endif // BX_PLATFORM_XBOXONE
+
 namespace bx
 {
 	struct ThreadSpanAllocatorBase::FreeNode
@@ -110,29 +115,24 @@ namespace bx
 #endif // BX_COMPILER_MSVC && BX_CPU_X86
 		}
 
-#if BX_TLS_DATA_TEB
-		constexpr uint32_t kTebSelfOffset = BX_ARCH_64BIT ? 0x30 : 0x18;
-
 		uintptr_t threadSelf()
 		{
-			return uintptr_t(readTeb(kTebSelfOffset) );
-		}
-#elif BX_PLATFORM_WINDOWS
-		uintptr_t threadSelf()
-		{
+#if !BX_CONFIG_SUPPORTS_THREADING
+			return 1;
+#elif BX_TLS_DATA_TEB
+			return uintptr_t(readTeb(BX_ARCH_64BIT ? 0x30 : 0x18) );
+#elif BX_PLATFORM_XBOXONE
+			return uintptr_t(__readgsqword(0x30) );
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
 			return uintptr_t(NtCurrentTeb() );
-		}
 #elif (BX_PLATFORM_ANDROID || BX_PLATFORM_LINUX) && defined(__has_builtin) && __has_builtin(__builtin_thread_pointer)
-		uintptr_t threadSelf()
-		{
 			return uintptr_t(__builtin_thread_pointer() );
-		}
-#else
-		uintptr_t threadSelf()
-		{
+#elif BX_PLATFORM_POSIX
 			return uintptr_t(pthread_self() );
+#else
+#	error "Not implemented!"
+#endif // BX_PLATFORM_
 		}
-#endif // BX_TLS_DATA_TEB
 
 		uint64_t s_nextTlsId = 0;
 

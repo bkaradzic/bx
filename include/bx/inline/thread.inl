@@ -26,31 +26,22 @@ namespace bx
 	constexpr uint32_t kTebTlsExpansionSlotsOffset = BX_ARCH_64BIT ? 0x1780 : 0xf94;
 	constexpr uint32_t kTebTlsSlotsNum             = 64;
 
+	inline void* readTeb(uint32_t _offset)
+	{
 #	if BX_COMPILER_MSVC && BX_ARCH_64BIT
-	inline void* readTeb(uint32_t _offset)
-	{
 		return (void*)__readgsqword(_offset);
-	}
 #	elif BX_COMPILER_MSVC
-	inline void* readTeb(uint32_t _offset)
-	{
 		return (void*)__readfsdword(_offset);
-	}
 #	elif BX_ARCH_64BIT
-	inline void* readTeb(uint32_t _offset)
-	{
 		void* ptr;
 		__asm__ volatile ("movq %%gs:(%1), %0" : "=r" (ptr) : "r" (uintptr_t(_offset) ) );
 		return ptr;
-	}
 #	else
-	inline void* readTeb(uint32_t _offset)
-	{
 		void* ptr;
 		__asm__ volatile ("movl %%fs:(%1), %0" : "=r" (ptr) : "r" (uintptr_t(_offset) ) );
 		return ptr;
-	}
 #	endif // BX_COMPILER_*
+	}
 
 	inline void* TlsData::get() const
 	{
