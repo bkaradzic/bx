@@ -7,6 +7,8 @@
 #include <bx/file.h>
 #include <bx/os.h>
 
+BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4702); // warning C4702: unreachable code
+
 namespace bx
 {
 	namespace

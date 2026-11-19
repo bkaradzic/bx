@@ -12,7 +12,7 @@
 #endif // BX_CONFIG_CRT_FILE_READER_WRITER
 
 #ifndef BX_CONFIG_CRT_DIRECTORY_READER
-#	define BX_CONFIG_CRT_DIRECTORY_READER ( (BX_PLATFORM_OS_DESKTOP || BX_PLATFORM_ANDROID || BX_PLATFORM_IOS) && !BX_CRT_NONE)
+#	define BX_CONFIG_CRT_DIRECTORY_READER ( (BX_PLATFORM_OS_DESKTOP || BX_PLATFORM_ANDROID || BX_PLATFORM_IOS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE) && !BX_CRT_NONE)
 #endif // BX_CONFIG_CRT_DIRECTORY_READER
 
 #if BX_CRT_NONE
@@ -33,13 +33,15 @@
 #	endif // BX_CRT_MSVC
 #endif // !BX_CRT_NONE
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif // WIN32_LEAN_AND_MEAN
 #	include <windows.h>
-#	include <shellapi.h>   // SHFileOperationW
-#endif // BX_PLATFORM_WINDOWS
+#	if BX_PLATFORM_WINDOWS
+#		include <shellapi.h> // SHFileOperationW
+#	endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 
 namespace bx
 {
@@ -99,7 +101,7 @@ namespace bx
 
 	static FILE* openFile(const FilePath& _filePath, const char* _mode)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t filePath[kMaxFilePath];
 		wchar_t mode[4];
 
@@ -112,7 +114,7 @@ namespace bx
 		return _wfopen(filePath, mode);
 #else
 		return fopen(_filePath.getCPtr(), _mode);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	class FileReaderImpl : public FileReaderI
@@ -597,17 +599,17 @@ namespace bx
 
 #if BX_CONFIG_CRT_DIRECTORY_READER
 
-#	if BX_PLATFORM_WINDOWS
+#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	typedef _WDIR    DirHandle;
 	typedef _wdirent DirEntry;
 #	else
 	typedef DIR    DirHandle;
 	typedef dirent DirEntry;
-#	endif // BX_PLATFORM_WINDOWS
+#	endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 
 	static DirHandle* openDir(const FilePath& _filePath)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t filePath[kMaxFilePath];
 
 		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
@@ -618,25 +620,25 @@ namespace bx
 		return _wopendir(filePath);
 #else
 		return opendir(_filePath.getCPtr() );
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	static DirEntry* readDir(DirHandle* _dir)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		return _wreaddir(_dir);
 #else
 		return readdir(_dir);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	static void closeDir(DirHandle* _dir)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		_wclosedir(_dir);
 #else
 		closedir(_dir);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	class DirectoryReaderImpl : public ReaderOpenI, public CloserI, public ReaderI
@@ -737,7 +739,7 @@ namespace bx
 
 				_out.size = UINT64_MAX;
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 				char name[kMaxFilePath];
 
 				if (0 == fromUtf16(name, BX_COUNTOF(name), (const uint16_t*)item->d_name) )
@@ -748,7 +750,7 @@ namespace bx
 				_out.filePath.set(name);
 #else
 				_out.filePath.set(item->d_name);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 
 				return true;
 			}
@@ -835,7 +837,7 @@ namespace bx
 		_outFileInfo.size = 0;
 		_outFileInfo.type = FileType::Count;
 
-#	if BX_PLATFORM_WINDOWS
+#	if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t filePath[kMaxFilePath];
 
 		if (0 == toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath) )
@@ -892,7 +894,7 @@ namespace bx
 		{
 			_outFileInfo.type = FileType::Dir;
 		}
-#	endif // BX_PLATFORM_WINDOWS
+#	endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 
 		_outFileInfo.size = st.st_size;
 
@@ -909,7 +911,7 @@ namespace bx
 			return false;
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t filePath[kMaxFilePath];
 		int32_t result = 0 != toUtf16( (uint16_t*)filePath, BX_COUNTOF(filePath), _filePath)
 			? ::_wmkdir(filePath)
@@ -980,7 +982,7 @@ namespace bx
 			return false;
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		int32_t result = -1;
 		FileInfo fi;
 		wchar_t filePath[kMaxFilePath];
@@ -1146,7 +1148,7 @@ namespace bx
 			return false;
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t from[kMaxFilePath+1];
 		wchar_t to[kMaxFilePath+1];
 
@@ -1182,7 +1184,7 @@ namespace bx
 		}
 
 		return remove(_from, _err);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 	}
 
 	[[maybe_unused]] static bool claimFilePath(const FilePath& _filePath, bool _isDir)

@@ -8,20 +8,20 @@
 #include <bx/readerwriter.h>
 #include <bx/scanner.h>
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 #	include <direct.h>   // _wgetcwd
 #elif !BX_CRT_MSVC
 #	include <unistd.h>   // getcwd
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 #if !defined(GetModuleFileName)
 extern "C" __declspec(dllimport) unsigned long __stdcall GetModuleFileNameW(void* _module, wchar_t* _outFilePath, unsigned long _size);
 #endif
 extern "C" __declspec(dllimport) unsigned long __stdcall GetTempPathW(unsigned long _max, wchar_t* _outFilePath);
 #elif BX_PLATFORM_OSX
 extern "C" int _NSGetExecutablePath(char* _buf, uint32_t* _bufSize);
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_*
 
 namespace bx
 {
@@ -160,14 +160,12 @@ namespace bx
 
 	static char* pwd(char* _buffer, uint32_t _size)
 	{
-#if BX_PLATFORM_PS4     \
- || BX_PLATFORM_PS5     \
- || BX_PLATFORM_XBOXONE \
- || BX_PLATFORM_WINRT   \
+#if BX_PLATFORM_PS4 \
+ || BX_PLATFORM_PS5 \
  || BX_CRT_NONE
 		BX_UNUSED(_buffer, _size);
 		return NULL;
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t tmp[kMaxFilePath];
 
 		if (NULL == ::_wgetcwd(tmp, BX_COUNTOF(tmp) )
@@ -196,7 +194,7 @@ namespace bx
 
 	static bool getExecutablePath(char* _out, uint32_t* _inOutSize)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t tmp[kMaxFilePath];
 		const uint32_t len = ::GetModuleFileNameW(NULL, tmp, BX_COUNTOF(tmp) );
 
@@ -243,7 +241,7 @@ namespace bx
 
 	static bool getTempPath(char* _out, uint32_t* _inOutSize)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		wchar_t tmp[kMaxFilePath];
 		const uint32_t len = ::GetTempPathW(BX_COUNTOF(tmp), tmp);
 

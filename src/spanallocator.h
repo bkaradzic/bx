@@ -9,7 +9,7 @@
 #include <bx/mutex.h>
 
 #if BX_CRT_NONE
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 #	include <windows.h>
 #elif BX_PLATFORM_POSIX
 #	include <pthread.h>
@@ -36,7 +36,7 @@ namespace bx
 
 #if BX_CRT_NONE
 		constexpr uintptr_t kInvalidExitKey = UINTPTR_MAX;
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 		constexpr uintptr_t kInvalidExitKey = FLS_OUT_OF_INDEXES;
 
 		template<ThreadExitFn ThreadExitFnT>
@@ -53,7 +53,7 @@ namespace bx
 		{
 #if BX_CRT_NONE
 			return kInvalidExitKey;
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 			return FlsAlloc(threadExitCallback<ThreadExitFnT>);
 #elif BX_PLATFORM_POSIX
 			pthread_key_t key;
@@ -71,7 +71,7 @@ namespace bx
 			}
 
 #if BX_CRT_NONE
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 			FlsFree(DWORD(_key) );
 #elif BX_PLATFORM_POSIX
 			pthread_key_delete(pthread_key_t(_key) );
@@ -86,7 +86,7 @@ namespace bx
 			}
 
 #if BX_CRT_NONE
-#elif BX_PLATFORM_WINDOWS
+#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
 			FlsSetValue(DWORD(_key), _value);
 #elif BX_PLATFORM_POSIX
 			pthread_setspecific(pthread_key_t(_key), _value);

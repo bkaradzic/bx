@@ -6,13 +6,17 @@
 #include <bx/string.h>
 #include <bx/os.h>
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 #	include <direct.h> // _wchdir
 #elif !BX_CRT_MSVC
 #	include <unistd.h> // syscall, _SC_PAGESIZE
-#endif // BX_PLATFORM_WINDOWS
+#endif // BX_PLATFORM_*
 
-#if BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif // WIN32_LEAN_AND_MEAN
@@ -51,11 +55,11 @@ namespace bx
 {
 	void sleep(uint32_t _ms)
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		::Sleep(_ms);
-#elif  BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
+#elif BX_CRT_NONE
 		BX_UNUSED(_ms);
 		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 #else
@@ -67,11 +71,11 @@ namespace bx
 
 	void yield()
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		::SwitchToThread();
-#elif  BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT   \
-	|| BX_CRT_NONE
+#elif BX_CRT_NONE
 		BX_ASSERT(false, "Function '%s' is not implemented!", BX_FUNCTION);
 #else
 		::sched_yield();
@@ -127,7 +131,9 @@ namespace bx
 	{
 #if BX_CRT_NONE
 		return 1;
-#elif BX_PLATFORM_WINDOWS || BX_PLATFORM_WINRT
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		SYSTEM_INFO si;
 		memSet(&si, 0, sizeof(si) );
 		::GetNativeSystemInfo(&si);
@@ -142,7 +148,9 @@ namespace bx
 
 	uint32_t getTid()
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		return ::GetCurrentThreadId();
 #elif  BX_PLATFORM_ANDROID \
 	|| BX_PLATFORM_LINUX   \
@@ -199,7 +207,9 @@ namespace bx
 		}
 
 		return info.resident_size;
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		PROCESS_MEMORY_COUNTERS pmc;
 		GetProcessMemoryInfo(GetCurrentProcess()
 			, &pmc
@@ -294,7 +304,9 @@ namespace bx
 		char* name = (char*)BX_STACK_ALLOC(nameMax);
 		strCopy(name, nameMax, _name);
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		wchar_t* wname = (wchar_t*)BX_STACK_ALLOC(nameMax*sizeof(wchar_t) );
 
 		if (0 == toUtf16( (uint16_t*)wname, nameMax, name) )
@@ -321,8 +333,6 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_PS5        \
-	|| BX_PLATFORM_XBOXONE    \
-	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, _out, _inOutSize);
@@ -361,7 +371,9 @@ namespace bx
 			strCopy(value, valueMax, _value);
 		}
 
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		wchar_t* wname  = (wchar_t*)BX_STACK_ALLOC(nameMax*sizeof(wchar_t) );
 		wchar_t* wvalue = NULL;
 
@@ -385,8 +397,6 @@ namespace bx
 #elif  BX_PLATFORM_EMSCRIPTEN \
 	|| BX_PLATFORM_PS4        \
 	|| BX_PLATFORM_PS5        \
-	|| BX_PLATFORM_XBOXONE    \
-	|| BX_PLATFORM_WINRT      \
 	|| BX_PLATFORM_NX         \
 	|| BX_CRT_NONE
 		BX_UNUSED(name, value);
@@ -404,14 +414,14 @@ namespace bx
 
 	int chdir(const char* _path)
 	{
-#if BX_PLATFORM_PS4     \
- || BX_PLATFORM_PS5     \
- || BX_PLATFORM_XBOXONE \
- || BX_PLATFORM_WINRT   \
+#if BX_PLATFORM_PS4 \
+ || BX_PLATFORM_PS5 \
  || BX_CRT_NONE
 		BX_UNUSED(_path);
 		return -1;
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		wchar_t path[kMaxFilePath];
 
 		if (0 == toUtf16( (uint16_t*)path, BX_COUNTOF(path), _path) )
@@ -528,7 +538,9 @@ namespace bx
 			default:                       return -1;
 			}
 		}
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		static DWORD toWinProtect(uint32_t _protect)
 		{
 			switch (_protect)
@@ -662,7 +674,9 @@ namespace bx
 
 		return _address;
 
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		if (NULL == _address)
 		{
 			if (0 == (state & Memory::Reserve) )
@@ -731,7 +745,9 @@ namespace bx
 		if (Memory::DontNeed == advise)
 		{
 			VirtualAlloc(_address, _size, MEM_RESET, PAGE_NOACCESS);
+#	if BX_PLATFORM_WINDOWS
 			VirtualUnlock(_address, _size);
+#	endif // BX_PLATFORM_WINDOWS
 		}
 
 		return _address;
@@ -757,7 +773,9 @@ namespace bx
 				, "kErrorMemoryUnmapFailed"
 				);
 		}
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		BX_UNUSED(_size);
 		if (!VirtualFree(_address, 0, MEM_RELEASE) )
 		{
@@ -787,7 +805,9 @@ namespace bx
 			return 2ull << 20; // 2 MiB nominal
 		}
 		return sysconf(_SC_PAGESIZE);
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		if (0 != (page & (Memory::PageLarge | Memory::PageHuge) ) )
 		{
 			return ::GetLargePageMinimum();
@@ -804,7 +824,9 @@ namespace bx
 
 	size_t memoryAllocationGranularity()
 	{
-#if BX_PLATFORM_WINDOWS
+#if BX_PLATFORM_WINDOWS \
+ || BX_PLATFORM_WINRT   \
+ || BX_PLATFORM_XBOXONE
 		SYSTEM_INFO si;
 		memSet(&si, 0, sizeof(si) );
 		::GetSystemInfo(&si);
