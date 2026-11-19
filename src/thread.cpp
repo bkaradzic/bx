@@ -18,8 +18,7 @@
 #	include <pthread.h>
 #elif  BX_PLATFORM_WINDOWS \
 	|| BX_PLATFORM_WINRT   \
-	|| BX_PLATFORM_XBOXONE \
-	|| BX_PLATFORM_WINRT
+	|| BX_PLATFORM_XBOXONE
 #	ifndef WIN32_LEAN_AND_MEAN
 #		define WIN32_LEAN_AND_MEAN
 #	endif // WIN32_LEAN_AND_MEAN
@@ -179,13 +178,11 @@ namespace bx
 		ThreadInternal* ti = (ThreadInternal*)m_internal;
 #if BX_CRT_NONE
 		crt0::threadJoin(ti->m_handle, NULL);
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		WaitForSingleObject(ti->m_handle, INFINITE);
 		GetExitCodeThread(ti->m_handle, (DWORD*)&m_exitCode);
-		CloseHandle(ti->m_handle);
-		ti->m_handle = INVALID_HANDLE_VALUE;
-#elif BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
-		WaitForSingleObjectEx(ti->m_handle, INFINITE, FALSE);
 		CloseHandle(ti->m_handle);
 		ti->m_handle = INVALID_HANDLE_VALUE;
 #elif BX_PLATFORM_POSIX
@@ -301,9 +298,11 @@ namespace bx
 	struct TlsDataInternal
 	{
 #if BX_CRT_NONE
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		uint32_t m_id;
-#elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
+#elif BX_PLATFORM_POSIX
 		pthread_key_t m_id;
 #endif // BX_PLATFORM_*
 	};
@@ -335,7 +334,9 @@ namespace bx
 		TlsDataInternal* ti = (TlsDataInternal*)m_internal;
 		BX_UNUSED(ti);
 	}
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 	TlsData::TlsData()
 	{
 		static_assert(sizeof(TlsDataInternal) <= sizeof(m_internal) );
@@ -366,7 +367,7 @@ namespace bx
 		TlsSetValue(ti->m_id, _ptr);
 	}
 
-#elif !(BX_PLATFORM_XBOXONE || BX_PLATFORM_WINRT)
+#elif BX_PLATFORM_POSIX
 
 	TlsData::TlsData()
 	{
@@ -396,6 +397,8 @@ namespace bx
 		int result = pthread_setspecific(ti->m_id, _ptr);
 		BX_ASSERT(0 == result, "pthread_setspecific failed %d.", result); BX_UNUSED(result);
 	}
+#else
+#	error "Not implemented!"
 #endif // BX_PLATFORM_*
 
 } // namespace bx

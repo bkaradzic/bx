@@ -93,6 +93,9 @@ extern "C" __declspec(dllimport) int   __stdcall IsDebuggerPresent();
 extern "C" __declspec(dllimport) void  __stdcall OutputDebugStringA(const char* _str);
 extern "C" __declspec(dllimport) void* __stdcall GetStdHandle(unsigned long _stdHandle);
 extern "C" __declspec(dllimport) int   __stdcall WriteFile(void* _file, const void* _buffer, unsigned long _sizeInBytes, unsigned long* _outNumberOfBytesWritten, struct _OVERLAPPED* _overlapped);
+#	if !BX_PLATFORM_WINDOWS
+extern "C" __declspec(dllimport) unsigned short __stdcall RtlCaptureStackBackTrace(unsigned long _framesToSkip, unsigned long _framesToCapture, void** _outBacktrace, unsigned long* _outHash);
+#	endif // !BX_PLATFORM_WINDOWS
 #elif BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_VISIONOS
 #	if defined(__OBJC__)
 #		import <Foundation/NSObjCRuntime.h>
@@ -638,6 +641,8 @@ namespace bx
 	{
 #if BX_PLATFORM_WINDOWS
 		return RtlCaptureStackBackTrace(_skip + 1 /* skip self */, _max, (void**)_outStack, NULL);
+#elif BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
+		return ::RtlCaptureStackBackTrace(_skip + 1 /* skip self */, _max, (void**)_outStack, NULL);
 #else
 		BX_UNUSED(_skip, _max, _outStack);
 		return 0;
@@ -700,6 +705,8 @@ namespace bx
 		return getCallStackSystemVAbi(_skip + 1 /* skip self */, _max, _outStack);
 #elif BX_PLATFORM_WINDOWS
 		return getCallStackWinAbi(_skip + 1 /* skip self */, _max, _outStack);
+#elif BX_PLATFORM_WINRT || BX_PLATFORM_XBOXONE
+		return getCallStackWinRtl(_skip + 1 /* skip self */, _max, _outStack);
 #elif BX_COMPILER_GCC || BX_COMPILER_CLANG
 		return getCallStackGccBuiltin(_skip + 1 /* skip self */, _max, _outStack);
 #else
@@ -714,7 +721,9 @@ namespace bx
 		return getCallStackUnwind(_skip + 1 /* skip self */, _max, _outStack);
 #elif BX_PLATFORM_OSX
 		return getCallStackExecInfoBacktrace(_skip + 1 /* skip self */, _max, _outStack);
-#elif BX_PLATFORM_WINDOWS
+#elif  BX_PLATFORM_WINDOWS \
+	|| BX_PLATFORM_WINRT   \
+	|| BX_PLATFORM_XBOXONE
 		return getCallStackWinRtl(_skip + 1 /* skip self */, _max, _outStack);
 #else
 		BX_UNUSED(_skip, _max, _outStack);
