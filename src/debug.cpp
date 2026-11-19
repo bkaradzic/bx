@@ -12,6 +12,7 @@
 #include <bx/os.h>           // exit
 #include <bx/process.h>      // ProcessReader
 #include <bx/scanner.h>      // Scanner
+#include <bx/thread.h>       // readTeb
 
 #include <inttypes.h>        // PRIx*
 
@@ -20,6 +21,7 @@
 #	include <execinfo.h> // backtrace, backtrace_symbols
 #	include <unwind.h>   // _Unwind_Backtrace
 #	include <dlfcn.h>
+#	include <pthread.h>  // pthread_getattr_np, pthread_get_stackaddr_np
 
 #	if BX_PLATFORM_OSX
 #		include <sys/sysctl.h> // sysctl
@@ -412,7 +414,48 @@ namespace bx
 #endif // BX_CONFIG_CALLSTACK_USE_EXECINFO
 	}
 
-	inline const uintptr_t* nextStackFrame(const uintptr_t* _stackFrame)
+#if (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT
+	struct StackBounds
+	{
+		uintptr_t low;
+		uintptr_t high;
+	};
+
+	static StackBounds getThreadStackBounds()
+	{
+		static BX_THREAD_LOCAL StackBounds s_bounds;
+		static BX_THREAD_LOCAL bool        s_valid;
+
+		if (!s_valid)
+		{
+			s_valid = true;
+
+#	if BX_PLATFORM_LINUX
+			pthread_attr_t attr;
+			if (0 == pthread_getattr_np(pthread_self(), &attr) )
+			{
+				void*  addr = NULL;
+				size_t size = 0;
+				if (0 == pthread_attr_getstack(&attr, &addr, &size) )
+				{
+					s_bounds.low  = uintptr_t(addr);
+					s_bounds.high = uintptr_t(addr) + size;
+				}
+
+				pthread_attr_destroy(&attr);
+			}
+#	else
+			const pthread_t self = pthread_self();
+			s_bounds.high = uintptr_t(pthread_get_stackaddr_np(self) );
+			s_bounds.low  = s_bounds.high - pthread_get_stacksize_np(self);
+#	endif // BX_PLATFORM_LINUX
+		}
+
+		return s_bounds;
+	}
+#endif // (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT
+
+	inline const uintptr_t* nextStackFrame(const uintptr_t* _stackFrame, uintptr_t _stackHigh)
 	{
 		const uintptr_t* newStackFrame = (const uintptr_t*)*_stackFrame;
 
@@ -426,43 +469,53 @@ namespace bx
 			return NULL;
 		}
 
+		if (uintptr_t(newStackFrame) > _stackHigh - 2*sizeof(uintptr_t) )
+		{
+			return NULL;
+		}
+
 		return newStackFrame;
 	}
 
 	BX_NO_INLINE uint32_t getCallStackSystemVAbi(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
 	{
-		if constexpr (BX_ENABLED( (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT) )
-		{
-			const uintptr_t* stackFrame = (const uintptr_t*)BX_STACK_FRAME_ADDRESS();
+#if (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT
+		const StackBounds bounds = getThreadStackBounds();
+		const uintptr_t* stackFrame = (const uintptr_t*)BX_STACK_FRAME_ADDRESS();
 
-			uint32_t num = 0;
-
-			while (NULL != stackFrame
-			&&      num < _max)
-			{
-				if (uintptr_t(0) == stackFrame[1])
-				{
-					break;
-				}
-
-				if (0 < _skip) [[unlikely]]
-				{
-					--_skip;
-				}
-				else
-				{
-					_outStack[num++] = stackFrame[1];
-				}
-
-				stackFrame = nextStackFrame(stackFrame);
-			}
-
-			return num;
-		}
-		else
+		if (uintptr_t(stackFrame) < bounds.low
+		||  uintptr_t(stackFrame + 2) > bounds.high)
 		{
 			return 0;
 		}
+
+		uint32_t num = 0;
+
+		while (NULL != stackFrame
+		&&      num < _max)
+		{
+			if (uintptr_t(0) == stackFrame[1])
+			{
+				break;
+			}
+
+			if (0 < _skip) [[unlikely]]
+			{
+				--_skip;
+			}
+			else
+			{
+				_outStack[num++] = stackFrame[1];
+			}
+
+			stackFrame = nextStackFrame(stackFrame, bounds.high);
+		}
+
+		return num;
+#else
+		BX_UNUSED(_skip, _max, _outStack);
+		return 0;
+#endif // (BX_PLATFORM_LINUX || BX_PLATFORM_OSX) && BX_ARCH_64BIT
 	}
 
 	BX_NO_INLINE uint32_t getCallStackGccBuiltin(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
@@ -591,10 +644,20 @@ namespace bx
 #endif // BX_PLATFORM_WINDOWS
 	}
 
+	inline uintptr_t getWindowsX86StackHigh()
+	{
+#if BX_TLS_DATA_TEB && BX_ARCH_32BIT
+		return uintptr_t(readTeb(0x04) ); // NT_TIB::StackBase
+#else
+		return UINTPTR_MAX;
+#endif // BX_TLS_DATA_TEB && BX_ARCH_32BIT
+	}
+
 	BX_NO_INLINE uint32_t getCallStackWinAbi(uint32_t _skip, uint32_t _max, uintptr_t* _outStack)
 	{
 		if constexpr (BX_ENABLED(BX_PLATFORM_WINDOWS && BX_CPU_X86 && BX_ARCH_32BIT) )
 		{
+			const uintptr_t  stackHigh  = getWindowsX86StackHigh();
 			const uintptr_t* stackFrame = (uintptr_t*)&_skip - 2;
 
 			uint32_t num = 0;
@@ -616,7 +679,7 @@ namespace bx
 					_outStack[num++] = stackFrame[1];
 				}
 
-				stackFrame = nextStackFrame(stackFrame);
+				stackFrame = nextStackFrame(stackFrame, stackHigh);
 			}
 
 			return num;
