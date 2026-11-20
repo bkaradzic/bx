@@ -439,6 +439,40 @@ namespace bx
 		return _a * _b;
 	}
 
+	template<typename Ty>
+	inline BX_CONSTEXPR_FUNC Ty satMul(Ty _a, Ty _b)
+	{
+		static_assert(isInteger<Ty>(), "Type Ty must be an integer type.");
+
+		using UTy = MakeUnsignedType<Ty>;
+
+		if constexpr (isSigned<Ty>() )
+		{
+			const bool neg    = (_a < 0) != (_b < 0);
+			const UTy  ua     = UTy(_a < 0 ? UTy(0) - UTy(_a) : UTy(_a) );
+			const UTy  ub     = UTy(_b < 0 ? UTy(0) - UTy(_b) : UTy(_b) );
+			const UTy  umax   = UTy(UTy(LimitsT<Ty>::max) + UTy(neg) );
+			const Ty   satVal = neg ? LimitsT<Ty>::min : LimitsT<Ty>::max;
+
+			if (0 != ub
+			&&  UTy(umax / ub) < ua)
+			{
+				return satVal;
+			}
+
+			const UTy result = UTy(ua * ub);
+
+			return neg ? Ty(UTy(0) - result) : Ty(result);
+		}
+		else
+		{
+			return 0 != _b && UTy(LimitsT<Ty>::max / _b) < _a
+				? LimitsT<Ty>::max
+				: Ty(_a * _b)
+				;
+		}
+	}
+
 	inline BX_CONSTEXPR_FUNC float rcp(float _a)
 	{
 		return 1.0f / _a;
