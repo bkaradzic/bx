@@ -1303,6 +1303,23 @@ namespace bx
 		return s_memoryTracker;
 	}
 
+#if BX_CONFIG_MEMORY_TRACKING
+#	if BX_COMPILER_MSVC
+	static void memoryTrackerInit()
+	{
+		getMemoryTracker();
+	}
+
+#	pragma section(".CRT$XCL", read)
+	__declspec(allocate(".CRT$XCL") ) static void (*s_memoryTrackerInit)() = memoryTrackerInit;
+#	else
+	__attribute__( (constructor(101) ) ) static void memoryTrackerInit()
+	{
+		getMemoryTracker();
+	}
+#	endif // BX_COMPILER_MSVC
+#endif // BX_CONFIG_MEMORY_TRACKING
+
 	namespace internal
 	{
 		uint32_t addLocationTracking(const Location& _location, uint32_t _skip, size_t _newSize)
