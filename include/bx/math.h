@@ -1579,6 +1579,18 @@ namespace bx
 	///
 	BX_CONSTEXPR_FUNC float mul(float _a, float _b);
 
+	/// Saturating integer multiply. Clamps the result to the representable
+	/// range of `Ty` instead of wrapping around. Supports signed and
+	/// unsigned integer types.
+	///
+	/// @param[in] _a Left operand.
+	/// @param[in] _b Right operand.
+	///
+	/// @returns Product clamped to `[LimitsT<Ty>::min, LimitsT<Ty>::max]`.
+	///
+	template<typename Ty>
+	BX_CONSTEXPR_FUNC Ty satMul(Ty _a, Ty _b);
+
 	/// Returns reciprocal of _a.
 	///
 	/// @param[in] _a Input value.

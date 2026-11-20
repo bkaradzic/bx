@@ -379,6 +379,57 @@ TEST_CASE("satSub", "[math]")
 	STATIC_REQUIRE(INT64_MAX == bx::satSub<int64_t>(        0, INT64_MIN) );
 }
 
+TEST_CASE("satMul", "[math]")
+{
+	STATIC_REQUIRE(  0 == bx::satMul<uint8_t >(0,   0) );
+	STATIC_REQUIRE(  0 == bx::satMul<uint8_t >(0,   UINT8_MAX) );
+	STATIC_REQUIRE(  0 == bx::satMul<uint8_t >(UINT8_MAX, 0) );
+	STATIC_REQUIRE(200 == bx::satMul<uint8_t >(20,  10) );
+	STATIC_REQUIRE(255 == bx::satMul<uint8_t >(UINT8_MAX, 1) );
+	STATIC_REQUIRE(255 == bx::satMul<uint8_t >(15,  17) );
+	STATIC_REQUIRE(255 == bx::satMul<uint8_t >(16,  16) );
+	STATIC_REQUIRE(255 == bx::satMul<uint8_t >(UINT8_MAX, UINT8_MAX) );
+
+	STATIC_REQUIRE(UINT16_MAX == bx::satMul<uint16_t>(255, 257) );
+	STATIC_REQUIRE(UINT16_MAX == bx::satMul<uint16_t>(256, 256) );
+	STATIC_REQUIRE(UINT16_MAX == bx::satMul<uint16_t>(UINT16_MAX, UINT16_MAX) );
+
+	STATIC_REQUIRE(UINT32_MAX == bx::satMul<uint32_t>(65535, 65537) );
+	STATIC_REQUIRE(UINT32_MAX == bx::satMul<uint32_t>(65536, 65536) );
+	STATIC_REQUIRE(UINT32_MAX == bx::satMul<uint32_t>(UINT32_MAX, UINT32_MAX) );
+
+	STATIC_REQUIRE(UINT64_MAX   == bx::satMul<uint64_t>(UINT64_MAX, 1) );
+	STATIC_REQUIRE(UINT64_MAX   == bx::satMul<uint64_t>(UINT64_MAX, 2) );
+	STATIC_REQUIRE(UINT64_MAX   == bx::satMul<uint64_t>(UINT32_MAX, uint64_t(UINT32_MAX)+2) );
+	STATIC_REQUIRE(UINT64_MAX   == bx::satMul<uint64_t>(uint64_t(UINT32_MAX)+1, uint64_t(UINT32_MAX)+1) );
+	STATIC_REQUIRE(UINT64_MAX-1 == bx::satMul<uint64_t>(INT64_MAX, 2) );
+
+	// signed
+	STATIC_REQUIRE(   0 == bx::satMul<int8_t >(-128,   0) );
+	STATIC_REQUIRE( 126 == bx::satMul<int8_t >( -63,  -2) );
+	STATIC_REQUIRE(-127 == bx::satMul<int8_t >( 127,  -1) );
+	STATIC_REQUIRE(-128 == bx::satMul<int8_t >(  16,  -8) );
+	STATIC_REQUIRE(-128 == bx::satMul<int8_t >(-128,   1) );
+	STATIC_REQUIRE( 127 == bx::satMul<int8_t >(  16,   8) );
+	STATIC_REQUIRE( 127 == bx::satMul<int8_t >( -16,  -8) );
+	STATIC_REQUIRE( 127 == bx::satMul<int8_t >(-128,  -1) );
+	STATIC_REQUIRE( 127 == bx::satMul<int8_t >(-128,-128) );
+	STATIC_REQUIRE(-128 == bx::satMul<int8_t >( -16,   9) );
+	STATIC_REQUIRE(-128 == bx::satMul<int8_t >(-128, 127) );
+
+	STATIC_REQUIRE(INT32_MIN == bx::satMul<int32_t>(    65536,    -32768) );
+	STATIC_REQUIRE(INT32_MAX == bx::satMul<int32_t>(    65536,     32768) );
+	STATIC_REQUIRE(INT32_MAX == bx::satMul<int32_t>(INT32_MIN,        -1) );
+	STATIC_REQUIRE(INT32_MAX == bx::satMul<int32_t>(INT32_MIN, INT32_MIN) );
+	STATIC_REQUIRE(INT32_MIN == bx::satMul<int32_t>(INT32_MIN, INT32_MAX) );
+	STATIC_REQUIRE(INT32_MIN == bx::satMul<int32_t>(INT32_MIN,         1) );
+
+	STATIC_REQUIRE(INT64_MIN == bx::satMul<int64_t>(int64_t(1)<<32, -(int64_t(1)<<31) ) );
+	STATIC_REQUIRE(INT64_MAX == bx::satMul<int64_t>(INT64_MAX,  2) );
+	STATIC_REQUIRE(INT64_MIN == bx::satMul<int64_t>(INT64_MIN,  2) );
+	STATIC_REQUIRE(INT64_MAX == bx::satMul<int64_t>(INT64_MIN, -1) );
+}
+
 template<typename Ty>
 static void testFindFirstSet()
 {
