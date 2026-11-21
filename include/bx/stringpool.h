@@ -88,6 +88,8 @@ namespace bx
 		template<uint32_t SizeT>
 		struct StringLiteralTextT
 		{
+			using LiteralT = StringLiteralT<SizeT>;
+
 			consteval StringLiteralTextT(const char (&_str)[SizeT]);
 
 			char m_data[SizeT];
@@ -758,7 +760,7 @@ namespace bx
 /// @returns Literal entry.
 ///
 template<bx::internal::StringLiteralTextT TextT>
-constexpr const bx::StringLiteralT<sizeof(TextT.m_data)>& operator""_str();
+constexpr const typename decltype(TextT)::LiteralT& operator""_str();
 
 #include "inline/stringpool.inl"
 
