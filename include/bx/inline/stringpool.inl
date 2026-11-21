@@ -734,7 +734,7 @@ namespace bx
 } // namespace bx
 
 template<bx::internal::StringLiteralTextT TextT>
-inline constexpr const bx::StringLiteralT<sizeof(TextT.m_data)>& operator""_str()
+inline constexpr const typename decltype(TextT)::LiteralT& operator""_str()
 {
 	return bx::internal::s_stringLiteral<TextT>;
 }
