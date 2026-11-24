@@ -905,6 +905,7 @@ namespace bx
 		uint32_t findBlock(const Blk& _blk) const;
 		void tryMergeBlocksNext(uint32_t _idx);
 		uint32_t findTail(size_t _size) const;
+		uint32_t findTailAligned(size_t _size, size_t _alignment) const;
 		Blk allocBlock(size_t _size, size_t _alignment);
 		Blk usedBlock(uint32_t _idx, uint64_t _ptr, size_t _size, size_t _alignment);
 		Blk carveFreeBlock(uint32_t _idx, BlkMeta& _meta, size_t _size, size_t _alignment);

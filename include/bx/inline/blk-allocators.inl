@@ -1946,6 +1946,29 @@ namespace bx
 	}
 
 	template<uint32_t MinBlockSizeT, bool CpuAccessibleT>
+	inline uint32_t TwoLevelSegregatedFitAllocatorT<MinBlockSizeT, CpuAccessibleT>::findTailAligned(size_t _size, size_t _alignment) const
+	{
+		for (uint32_t ii = 0, num = m_range.getCount(); ii < num; ++ii)
+		{
+			const uint32_t idx = m_blkFreeList[m_range[ii].sentinelIdx].prevIdx;
+
+			if (kInvalid != idx)
+			{
+				const BlkMeta& meta = m_blkFreeList[idx];
+
+				if (meta.isTail()
+				&&  _size <= meta.blk.size
+				&&  isAligned(meta.blk.ptr, _alignment) )
+				{
+					return idx;
+				}
+			}
+		}
+
+		return kInvalid;
+	}
+
+	template<uint32_t MinBlockSizeT, bool CpuAccessibleT>
 	inline Blk TwoLevelSegregatedFitAllocatorT<MinBlockSizeT, CpuAccessibleT>::allocBlock(size_t _size, size_t _alignment)
 	{
 		{
@@ -1987,6 +2010,12 @@ namespace bx
 		if (kInvalid == idx)
 		{
 			idx = findTail(searchSize);
+
+			if (kInvalid == idx
+			&&  searchSize != _size)
+			{
+				idx = findTailAligned(_size, _alignment);
+			}
 
 			if (kInvalid == idx)
 			{
